@@ -9,3 +9,4 @@ pycountry_convert
 requests
 unidecode
 lxml
+wheel
