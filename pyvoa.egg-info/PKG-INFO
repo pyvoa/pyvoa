@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pyvoa
-Version: 0.1.1
+Version: 0.2.0
 Summary: Python virus open analysis. See more on pyvoa.org
 Home-page: https://github.com/pyvoa/pyvoa
 Author: pyvoa.org
@@ -12,6 +12,15 @@ Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 License-File: LICENSE
 Requires-Dist: pandas
+Requires-Dist: geopandas
+Requires-Dist: shapely
+Requires-Dist: bs4
+Requires-Dist: numpy
+Requires-Dist: pycountry
+Requires-Dist: pycountry_convert
+Requires-Dist: requests
+Requires-Dist: unidecode
+Requires-Dist: lxml
 
 # pyvoa
 
