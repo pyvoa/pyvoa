@@ -1,2 +1,2 @@
 pyvoa
-tests
+pyvoa-examples

@@ -1,2 +1,11 @@
 setuptools
 pandas
+geopandas
+shapely
+bs4
+numpy
+pycountry
+pycountry_convert
+requests
+unidecode
+lxml
