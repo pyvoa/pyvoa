@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: pyvoa
+Version: 0.1.0
+Summary: Python virus open analysis. See more on pyvoa.org
+Home-page: https://github.com/pyvoa/pyvoa
+Author: pyvoa.org
+Author-email: support@pyvoa.org
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas
+
+# pyvoa
+
+Go to pyvoa.org to know more about the project
