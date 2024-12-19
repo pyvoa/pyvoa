@@ -12,6 +12,15 @@ setup(
     packages=find_packages(),  # Trouve automatiquement tous les sous-packages
     install_requires=[
         "pandas",
+        "geopandas",
+        "shapely",
+        "bs4",
+        "numpy",
+        "pycountry",
+        "pycountry_convert",
+        "requests",
+        "unidecode",
+        "lxml",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
