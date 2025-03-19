@@ -2,14 +2,15 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyvoa",  
-    version="0.2.0",  
+    version="0.2.1",  
     author="pyvoa.org",
     author_email="support@pyvoa.org",
     description="Python virus open analysis. See more on pyvoa.org",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
-    url="https://github.com/pyvoa/pyvoa",  # Lien vers le dépôt GitHub (si applicable)
-    packages=find_packages(),  # Trouve automatiquement tous les sous-packages
+    url="https://github.com/pyvoa/pyvoa",  # Link to github deposit
+    packages=find_packages(), 
+    package_data={'pyvoa' :['data/*.json']},
     install_requires=[
         "pandas",
         "geopandas",
@@ -21,6 +22,7 @@ setup(
         "requests",
         "unidecode",
         "lxml",
+        "importlib",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
