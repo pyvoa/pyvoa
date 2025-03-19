@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyvoa",  
-    version="0.2.1",  
+    version="0.2.2",  
     author="pyvoa.org",
     author_email="support@pyvoa.org",
     description="Python virus open analysis. See more on pyvoa.org",
@@ -22,7 +22,6 @@ setup(
         "requests",
         "unidecode",
         "lxml",
-        "importlib",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

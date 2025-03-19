@@ -1,3 +1,6 @@
+# version 0.2.2
+nothing (pip troubles with previous version)
+
 # version 0.2.1
 - Structure of the package to deal with pip
 - data file can be access now. See test1.py 
