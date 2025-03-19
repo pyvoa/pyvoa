@@ -10,3 +10,4 @@ requests
 unidecode
 lxml
 wheel
+importlib
