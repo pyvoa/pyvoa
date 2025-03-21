@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
-"""Project : PyCoA - Copyright ©pycoa.fr
-Date :    april 2020 - june 2024
+"""
+Project : PyvoA
+Date :    april 2020 - march 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+Copyright ©pyvoa_fr
 License: See joint LICENSE file
+https://pyvoa.org/
 
-Module : src.tools
+Module : pyvoa.tools
 
 About
 -----
@@ -34,9 +37,10 @@ from urllib.parse import urlparse
 import unidecode
 import datetime as dt
 import numpy as np
-from pyvoa.error import CoaError, CoaConnectionError, CoaNotManagedError
+from pyvoa.error import PyvoaError, PyvoaConnectionError, PyvoaNotManagedError
 
-# testing if src.ata is available
+
+# testing if pyvoa.ata is available
 import importlib
 _coacache_folder=''
 _coacache_module_info = importlib.util.find_spec("coacache")
@@ -79,17 +83,17 @@ def verb(*args):
 
 def kwargs_keystesting(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a CoaKeyError with error_string.
+    it raises a PyvoaKeyError with error_string.
     """
 
     if type(given_args)!=dict:
-        raise CoaError("kwargs_keystesting error, the given args are not a dict type.")
+        raise PyvoaError("kwargs_keystesting error, the given args are not a dict type.")
     if type(expected_args)!=list:
-        raise CoaError("kwargs_keystesting error, the expected args are not a list type")
+        raise PyvoaError("kwargs_keystesting error, the expected args are not a list type")
 
     bad_kwargs=[a for a in list(given_args.keys()) if a not in expected_args ]
     if len(bad_kwargs) != 0 :
-        raise CoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
+        raise PyvoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
 
     return True
 
@@ -104,24 +108,24 @@ def debug(value,message=''):
 
 def kwargs_test(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a CoaKeyError with error_string.
+    it raises a PyvoaKeyError with error_string.
     """
 
     if type(given_args)!=dict:
-        raise CoaKeyError("kwargs_test error, the given args are not a dict type.")
+        raise PyvoaKeyError("kwargs_test error, the given args are not a dict type.")
     if type(expected_args)!=list:
-        raise CoaKeyError("kwargs_test error, the expected args are not a list type")
+        raise PyvoaKeyError("kwargs_test error, the expected args are not a list type")
 
     bad_kwargs=[a for a in list(given_args.keys()) if a not in expected_args ]
     if len(bad_kwargs) != 0 :
-        raise CoaKeyError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
+        raise PyvoaKeyError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
 
     return True
 
 def kwargs_valuestesting(given_values, expected_values, error_string):
     ''' test if the values in the list given_values are in the expected_values '''
     if not isinstance(expected_values,list):
-        raise CoaError("kwargs_fulltest error, the given args are not a list type.")
+        raise PyvoaError("kwargs_fulltest error, the given args are not a list type.")
 
     if expected_values is not None and given_values is not None:
         if isinstance(given_values,list):
@@ -129,27 +133,27 @@ def kwargs_valuestesting(given_values, expected_values, error_string):
                 for a in given_values:
                     bad_values = [i for i in a if i not in expected_values ]
                     if len(bad_values) != 0 :
-                        raise CoaError(error_string+' unrecognized values '+str(bad_values))
+                        raise PyvoaError(error_string+' unrecognized values '+str(bad_values))
             else:
                 bad_values = [a for a in given_values if a not in expected_values ]
                 if len(bad_values) != 0 :
-                    raise CoaError(error_string+' unrecognized values '+str(bad_values))
+                    raise PyvoaError(error_string+' unrecognized values '+str(bad_values))
         else:
             if given_values not in expected_values:
-                raise CoaError(error_string+' unrecognized values '+str(given_values))
+                raise PyvoaError(error_string+' unrecognized values '+str(given_values))
     else:
         pass
 
 def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a CoaKeyError with error_string.
+    it raises a PyvoaKeyError with error_string.
     """
     if not isinstance(given_kargs,dict) or not isinstance(expected_kargs,dict):
-        raise CoaError("kwargs_fulltest error, the given args are not a dict type.")
+        raise PyvoaError("kwargs_fulltest error, the given args are not a dict type.")
 
     bad_kwargs = [a for a in list(given_kargs.keys()) if a not in list(expected_kargs.keys()) ]
     if len(bad_kwargs) != 0 :
-        raise CoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
+        raise PyvoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
     else:
         if hiddenkeys:
             [expected_kargs.pop(i) for i in hiddenkeys]
@@ -160,10 +164,10 @@ def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string
                     expected = [i for i in flat_list(list(expected_kargs.values())) if i != '']
                     print("%%%",expected)
                     if i not in flat_list(expected) and list(expected_kargs.values()):
-                        raise CoaError(error_string+' %%%Unrecognized argument '+i+'.')
+                        raise PyvoaError(error_string+' %%%Unrecognized argument '+i+'.')
             else:
                 if a not in list(expected_kargs.values()):
-                    raise CoaError(error_string+' Unrecognized argument '+a+'.')
+                    raise PyvoaError(error_string+' Unrecognized argument '+a+'.')
     return True
 
 def tostdstring(s):
@@ -175,11 +179,11 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
     """Filling the input pandas dataframe p with missing dates
     """
     if not isinstance(p, pd.DataFrame):
-        raise CoaTypeError("Expecting input p as a pandas dataframe.")
+        raise PyvoaTypeError("Expecting input p as a pandas dataframe.")
     if not date_field in p.columns:
-        raise CoaKeyError("The date_field is not a proper column of input pandas dataframe.")
+        raise PyvoaKeyError("The date_field is not a proper column of input pandas dataframe.")
     if not loc_field in p.columns:
-        raise CoaKeyError("The loc_field is not a proper column of input pandas dataframe.")
+        raise PyvoaKeyError("The loc_field is not a proper column of input pandas dataframe.")
     # datatoilettage :)
     p = p.loc[~p[loc_field].isin([''])]
 
@@ -189,9 +193,9 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
         d1=p[date_field].min()
 
     if not all(isinstance(d, datetime.date) for d in [d1,d2]):
-        raise CoaTypeError("Waiting for dates as datetime.date.")
+        raise PyvoaTypeError("Waiting for dates as datetime.date.")
     if d1 > d2:
-        raise CoaKeyError("Dates should be ordered as d1<d2.")
+        raise PyvoaKeyError("Dates should be ordered as d1<d2.")
 
     idx = pd.date_range(d1, d2, freq = "D")
     idx = idx.date
@@ -216,7 +220,7 @@ def check_valid_date(date):
     """
     raise_error=False
     if type(date) != type(str()):
-        raise CoaTypeError('Expecting date given as string.')
+        raise PyvoaTypeError('Expecting date given as string.')
 
     d=date.split('/')
     if len(d)!=3:
@@ -233,13 +237,13 @@ def check_valid_date(date):
                 raise_error=True
 
     if raise_error:
-        raise CoaTypeError("Not a valid date should be : day/month/year, with 2 digits " \
+        raise PyvoaTypeError("Not a valid date should be : day/month/year, with 2 digits " \
             "for month or day, 4 digits for year.")
 
     try:
         return datetime.date(int(year),int(month),int(day))
     except ValueError:
-        raise CoaTypeError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
+        raise PyvoaTypeError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
             "the month (btw 1 and 12) and the year value.")
 
 def extract_dates(when):
@@ -255,13 +259,12 @@ def extract_dates(when):
     w0=datetime.date(1,1,1) # minimal year is 1
     w1=datetime.date.today()
     if when and when != ['']:  # when input is not None, assume min and max date
-        print(when,type(when))
         if type(when) != type(str()):
-            raise CoaError("Date expected as string.")
+            raise PyvoaError("Date expected as string.")
         w=when.split(':')
 
         if len(w)>2 :
-            raise CoaError("Too many dates given. Expecting 1 or 2 with : as a separator. ")
+            raise PyvoaError("Too many dates given. Expecting 1 or 2 with : as a separator. ")
         if len(w) == 1:
             w1=check_valid_date(w[0])
         if len(w) > 1:
@@ -271,7 +274,7 @@ def extract_dates(when):
                 w0=check_valid_date(w[0])
 
         if w0>w1:
-            raise CoaError("First date must occur before the second one.")
+            raise PyvoaError("First date must occur before the second one.")
     return w0, w1
 
 def week_to_date(whenstr):
@@ -358,10 +361,10 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
             info('Cannot access to '+url+' . Will use locally stored cached version.')
             pass
         else:
-            raise CoaConnectionError('Cannot access to the url '+\
+            raise PyvoaConnectionError('Cannot access to the url '+\
                 url+' . Please check your internet connection or url path.')
     except Exception as e2:
-        raise CoaNotManagedError(type(e2).__name__+" : "+str(e2))
+        raise PyvoaNotManagedError(type(e2).__name__+" : "+str(e2))
 
     return local_filename
 
@@ -399,7 +402,7 @@ def getnonnegfunc(mypd,which):
     From a mypd pandas and a which value return non negative values
     '''
     if isinstance(which,list):
-        raise CoaError('getnonnegfunc do not accepte a list ...')
+        raise PyvoaError('getnonnegfunc do not accepte a list ...')
     else:
         whichvalues = mypd[which]
         reconstructed = pd.DataFrame()
