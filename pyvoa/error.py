@@ -1,22 +1,26 @@
 # -*- coding: utf-8 -*-
-""" Project : PyCoA
-Date :    april 2020 - june 2024
+""" 
+Project : PyvoA
+Date :    april 2020 - march 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pycoa.fr
+Copyright ©pyvoa_fr
 License: See joint LICENSE file
+https://pyvoa.org/
 
-Module : src.error
+Module : pyvoa.error
 
 About :
 -------
 
-Main class definitions for error management within the pycoa.framework.
-All Coa exceptions should derive from the main CoaError class.
+Main class definitions for error management within the PYVOA.framework.
+All Pyvoa exceptions should derive from the main PyvoaError class.
 """
 import os
 import sys
 import time
 from time import sleep
+from IPython import get_ipython
+
 def blinking_centered_text(typemsg,message,blinking=0,text_color="37", bg_color="41"):
     """
     center blinking color output message
@@ -37,61 +41,61 @@ def blinking_centered_text(typemsg,message,blinking=0,text_color="37", bg_color=
     text_code = color_codes.get(text_color.lower(), color_codes["white"])
     bg_code = bg_codes.get(bg_color.lower(), bg_codes["red"])
 
-    try:
-        rows, columns = os.popen('stty size', 'r').read().split()
-        columns = int(columns)
-        typemsg = typemsg.center(columns)
-        message = message.center(columns)
-    except:
-        pass
-
-        # Séquences ANSI pour les couleurs et le clignotement
     if blinking:
         ansi_start = f"\033[5;{text_code};{bg_code}m"
     else:
         ansi_start = f"\033[;{text_code};{bg_code}m"
     ansi_reset = "\033[0m"
-    sys.stdout.write(f"{ansi_start}{typemsg}{ansi_reset}\n")
-    sys.stdout.write(f"{ansi_start}{message}{ansi_reset}\n")
 
+    env = get_ipython().__class__.__name__
+    if env != 'ZMQInteractiveShell':
+        rows, columns = os.popen('stty size', 'r').read().split()
+        columns = int(columns)
+        typemsg = typemsg.center(columns)
+        message = message.center(columns)
+        sys.stdout.write(f'{ansi_start}{typemsg}{ansi_reset}\n')
+        sys.stdout.write(f'{ansi_start}{message}{ansi_reset}\n')
+    else:
+        print(f'{ansi_start}{typemsg}{ansi_reset}\n')
+        print(f'{ansi_start}{message}{ansi_reset}\n')
 
-class CoaInfo(Exception):
-    """Base class for exceptions in PyCoa."""
+class PyvoaInfo(Exception):
+    """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Info !',message, blinking=0,text_color='white', bg_color='magenta')
+        blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='black', bg_color='blue')
         Exception(message)
 
-class CoaDBInfo(Exception):
-    """Base class for exceptions in PyCoa."""
+class PyvoaDBInfo(Exception):
+    """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Info !',message, blinking=0,text_color='white', bg_color='blue')
+        blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='white', bg_color='blue')
         Exception(message)
 
-class CoaWarning(Exception):
-    """Base class for exceptions in PyCoa."""
+class PyvoaWarning(Exception):
+    """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Warning !',message, blinking=0,text_color='white', bg_color='magenta')
+        blinking_centered_text('PYVOA Warning !',message, blinking=0,text_color='black', bg_color='orange')
         Exception(message)
 
-class CoaError(Exception):
-    """Base class for exceptions in PyCoa."""
+class PyvoaError(Exception):
+    """Base class for exceptions in PYVOA."""
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         sys.exit(0)
         #Exception(message)
 
-class CoaNoData(CoaError, IndexError):
+class PyvoaNoData(PyvoaError, IndexError):
     """Exception raised when there is no data to plot or to manage (invalid cut)"""
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         IndexError(message)
-        CoaError(message)
+        PyvoaError(message)
 
-class CoaWhereError(CoaError, IndexError):
+class PyvoaWhereError(PyvoaError, IndexError):
     """Exception raised for location errors.
 
     Attributes:
@@ -99,12 +103,12 @@ class CoaWhereError(CoaError, IndexError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         IndexError(message)
-        CoaError(message)
+        PyvoaError(message)
 
 
-class CoaTypeError(CoaError, TypeError):
+class PyvoaTypeError(PyvoaError, TypeError):
     """Exception raised for type mismatch errors.
 
     Attributes:
@@ -112,12 +116,12 @@ class CoaTypeError(CoaError, TypeError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         TypeError(message)
-        CoaError(message)
+        PyvoaError(message)
 
 
-class CoaLookupError(CoaError, LookupError):
+class PyvoaLookupError(PyvoaError, LookupError):
     """Exception raised for type lookup errors.
 
     Attributes:
@@ -125,12 +129,12 @@ class CoaLookupError(CoaError, LookupError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         LookupError(message)
-        CoaError(message)
+        PyvoaError(message)
 
 
-class CoaNotManagedError(CoaError):
+class PyvoaNotManagedError(PyvoaError):
     """Exception raised when the error is unknown and not managed.
 
     Attributes:
@@ -138,11 +142,11 @@ class CoaNotManagedError(CoaError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
-        CoaError(message)
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        PyvoaError(message)
 
 
-class CoaDbError(CoaError):
+class PyvoaDbError(PyvoaError):
     """Exception raised for database errors.
 
     Attributes:
@@ -150,11 +154,11 @@ class CoaDbError(CoaError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
-        CoaError(message)
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        PyvoaError(message)
 
 
-class CoaConnectionError(CoaError, ConnectionError):
+class PyvoaConnectionError(PyvoaError, ConnectionError):
     """Exception raised for connection errors.
 
     Attributes:
@@ -162,6 +166,6 @@ class CoaConnectionError(CoaError, ConnectionError):
     """
 
     def __init__(self, message):
-        blinking_centered_text('PYCOA Error !',message, blinking=1,text_color='white', bg_color='red')
+        blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         ConnectionError(message)
-        CoaError(message)
+        PyvoaError(message)
