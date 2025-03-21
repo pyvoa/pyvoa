@@ -1,17 +1,5 @@
 from setuptools import setup, find_packages
 
-try:
-    importlib.import_module("bokeh")
-    include_visu_bokeh = True
-except ImportError:
-    include_visu_bokeh = False
-
-# Définir les fichiers à inclure
-package_files = ["pyvoa/*.py"]
-if include_visu_bokeh:
-    package_files.append("pyvoa/visu_bokeh.py")
-
-
 setup(
     name="pyvoa",  
     version="0.2.2",  
@@ -22,7 +10,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/pyvoa/pyvoa",  # Link to github deposit
     packages=find_packages(), 
-    package_data={'pyvoa' :['data/*.json',package_files]},
+    package_data={'pyvoa' :['data/*.json']},
     install_requires=[
         "pandas",
         "geopandas",
