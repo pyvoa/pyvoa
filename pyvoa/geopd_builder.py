@@ -279,7 +279,7 @@ class GPDBuilder(object):
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
         where_geometry_none = newpd[newpd['geometry'].isna()]['where'].unique()
-        if where_geometry_none:
+        if where_geometry_none.size>0:
             PyvoaWarning('Those localisation have None geometry, remove them ...:'+str(where_geometry_none))
         newpd = newpd.dropna(subset=['geometry'])
         return newpd

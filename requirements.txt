@@ -11,3 +11,4 @@ unidecode
 lxml
 wheel
 IPython
+contextily
