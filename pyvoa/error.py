@@ -56,14 +56,23 @@ def blinking_centered_text(typemsg,message,blinking=0,text_color="37", bg_color=
     env = get_ipython().__class__.__name__
     if env != 'ZMQInteractiveShell' and not IN_COLAB:
         rows, columns = os.popen('stty size', 'r').read().split()
-        columns = int(columns)
+    elif IN_COLAB:
+        rows, columns = 24, 80  # standard valuess
+    else:
+        import shutil
+        rows, columns = shutil.get_terminal_size()
+
         typemsg = typemsg.center(columns)
         message = message.center(columns)
+        rows, columns = int(rows), int(columns)
+
+        typemsg = typemsg.center(columns)
+        message = message.center(columns)
+
         sys.stdout.write(f'{ansi_start}{typemsg}{ansi_reset}\n')
         sys.stdout.write(f'{ansi_start}{message}{ansi_reset}\n')
-    else:
-        print(f'{ansi_start}{typemsg}{ansi_reset}\n')
-        print(f'{ansi_start}{message}{ansi_reset}\n')
+        #print(f'{ansi_start}{typemsg}{ansi_reset}\n')
+        #print(f'{ansi_start}{message}{ansi_reset}\n')
 
 class PyvoaInfo(Exception):
     """Base class for exceptions in PYVOA."""
