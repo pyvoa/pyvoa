@@ -46,9 +46,15 @@ def blinking_centered_text(typemsg,message,blinking=0,text_color="37", bg_color=
     else:
         ansi_start = f"\033[;{text_code};{bg_code}m"
     ansi_reset = "\033[0m"
+    
+    try:
+        import google.colab
+        IN_COLAB = True
+    except ImportError:
+        IN_COLAB = False
 
     env = get_ipython().__class__.__name__
-    if env != 'ZMQInteractiveShell':
+    if env != 'ZMQInteractiveShell' and not IN_COLAB:
         rows, columns = os.popen('stty size', 'r').read().split()
         columns = int(columns)
         typemsg = typemsg.center(columns)
