@@ -4,7 +4,7 @@ setup(
     name="pyvoa",  
     version="0.3.0",  
     author="pyvoa.org",
-    author_email="support@pyvoa.org",
+    author_email="contact@pyvoa.org",
     description="Python virus open analysis. See more on pyvoa.org",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
