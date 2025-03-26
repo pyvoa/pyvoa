@@ -1,5 +1,9 @@
+# version 0.3.0
+- import of the whole former pycoa software into pyvoa
+- using matplotlib as graphical output
+
 # version 0.2.2
-nothing (pip troubles with previous version)
+- nothing (pip troubles with previous version)
 
 # version 0.2.1
 - Structure of the package to deal with pip
