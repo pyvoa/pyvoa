@@ -651,7 +651,8 @@ class GeoRegion():
         self._amu=p_amu[2].Country.to_list()[0:-1]
 
         # --- filling ceeac information
-        p_ceeac=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Economic_Community_of_Central_African_States'))
+        #p_ceeac=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Economic_Community_of_Central_African_States'))
+        p_ceeac=pd.read_html(get_local_from_url('https://en.wikipedia.org/w/index.php?title=Economic_Community_of_Central_African_States&oldid=1285302050'))
         self._ceeac=["COD" if w == "Democratic Republic of the Congo" else w for w in [x.split('[')[0] for x in p_ceeac[3].Country.to_list()]]
 
         # --- filling eac information
