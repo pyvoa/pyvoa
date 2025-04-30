@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """ 
 Project : PyvoA
-Date :    april 2020 - march 2025
+Date :    april 2020 - april 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
 Copyright ©pyvoa_fr
 License: See joint LICENSE file
@@ -640,7 +640,7 @@ class GeoRegion():
 
         # --- filling cedeao information
         p_cedeao=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Economic_Community_of_West_African_States'))
-        self._cedeao=["Cabo Verde" if x=="Cape Verde" else "CIV" if x=="Ivory Pyvoast" else x for x in pd.concat([p_cedeao[1][0:-1],p_cedeao[2][0:-1]]).Country.to_list()]
+        self._cedeao=["Cabo Verde" if x=="Cape Verde" else "CIV" if x=="Ivory Coast" else x for x in pd.concat([p_cedeao[1][0:-1],p_cedeao[2][0:-1]]).Country.to_list()]
 
         # --- filling sadc information
         p_sadc=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Southern_African_Development_Community'))
@@ -660,7 +660,7 @@ class GeoRegion():
 
         # --- filling censad information
         p_censad=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Community_of_Sahel%E2%80%93Saharan_States'))
-        self._censad=["Cabo Verde" if x == "Cape Verde" else "CIV" if x == "Ivory Pyvoast" else x.split('[')[0] for x in p_censad[3][p_censad[3].columns[0]].to_list()[0:-1]]
+        self._censad=["Cabo Verde" if x == "Cape Verde" else "CIV" if x == "Ivory Coast" else x.split('[')[0] for x in p_censad[3][p_censad[3].columns[0]].to_list()[0:-1]]
 
         # --- filing comesa information
         p_comesa=pd.read_html(get_local_from_url('https://www.worlddata.info/trade-agreements/comesa.php'))
@@ -877,10 +877,10 @@ class GeoCountry():
             f_reg_flag.close()
             soup_reg_flag = bs4.BeautifulSoup(content_reg_flag,'lxml')
             for img in soup_reg_flag.find_all('img'):  # need to convert <img tags to pyvoa content for pandas_read
-                pyvoa=img.get('pyvoa')
-                if pyvoa[0] == '/':
-                    pyvoa='http:'+pyvoa
-                img.replace_with(pyvoa)
+                src=img.get('src')
+                if src[0] == '/':
+                    src='http:'+src
+                img.replace_with(src)
 
             tabs_reg_flag=pd.read_html(io.StringIO(str(soup_reg_flag))) # pandas read the modified html
             metropole=tabs_reg_flag[5][["Logo","Dénomination","Code INSEE[5]"]]  # getting 5th table, and only usefull columns
@@ -951,10 +951,10 @@ class GeoCountry():
             f_us.close()
             soup_us = bs4.BeautifulSoup(content_us,'lxml')
             for img in soup_us.find_all('img'):  # need to convert <img tags to pyvoa content for pandas_read
-                pyvoa=img.get('pyvoa')
-                if pyvoa[0] == '/':
-                    pyvoa='http:'+pyvoa
-                img.replace_with(pyvoa)
+                src=img.get('src')
+                if src[0] == '/':
+                    src='http:'+src
+                img.replace_with(src)
 
             h_us=pd.read_html(str(soup_us)) # pandas read the modified html
             h_us=h_us[1][h_us[1].columns[[0,1,2,5,7]]]
