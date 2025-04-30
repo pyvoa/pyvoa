@@ -122,7 +122,6 @@ class MetaInfo:
       valide = ''
       for i in onlyfiles:
          name = i.replace('.json','')
-         print(pathmetadb,i)
          metadata = MetaInfo.parsejson(pathmetadb+"/"+i)
          try:
              meta = metadata[1]
