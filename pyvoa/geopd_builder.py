@@ -128,23 +128,22 @@ class GPDBuilder(object):
        '''
        db_name = kwargs.get('db_name')
        reload = kwargs.get('reload', True)
-       vis = kwargs.get('vis',None)
+       vis = kwargs.get('vis', None)
 
        path = ".cache/"
        if not os.path.exists(path):
            os.makedirs(path)
-       filepkl = path + db_name + '.pkl'
-
+       filepkl = path + db_name + '.pkl' 
        if reload:
            datab = GPDBuilder(db_name)
            with open(filepkl, 'wb') as f:
                pickle.dump(datab,f)
-
-       #if vis:
-       datab.setvisu(db_name,datab.getwheregeometrydescription())
-       return datab, datab.getvisu()
-       #else:
-       #        return datab, None
+       if vis is not None:
+            datab.setvisu(db_name,datab.getwheregeometrydescription())
+            return datab, datab.getvisu()
+       else:
+            PyvoaWarning('Please not that no visualisation is loaded, only get attribute can be used') 
+            return datab, None
 
    def setvisu(self,db_name,wheregeometrydescription):
        ''' Set the Display '''
