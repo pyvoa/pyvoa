@@ -21,7 +21,67 @@ import time
 from time import sleep
 from IPython import get_ipython
 
-def blinking_centered_text(typemsg,message,blinking=0,text_color="37", bg_color="41"):
+
+def blinking_centered_text(typemsg, message, blinking=False, text_color="white", bg_color="red"):
+    """
+    Display a centered message with optional blinking and color formatting.
+    
+    This function is intended for terminal use. Blinking will not work in Jupyter
+    or Google Colab environments, but the message will still be displayed with colors.
+    
+    Parameters:
+        typemsg (str): The header or type of message to display.
+        message (str): The main message to display.
+        blinking (bool): If True, enables blinking text (terminal only). Default is False.
+        text_color (str): Name of the text color (e.g., 'red', 'green', 'white'). Default is 'white'.
+        bg_color (str): Name of the background color. Default is 'red'.
+    """
+    color_codes = {
+        'black': '30', 'red': '31', 'green': '32', 'yellow': '33',
+        'blue': '34', 'magenta': '35', 'cyan': '36', 'white': '37',
+        'default': '39',
+    }
+    # Background codes are text color codes + 10
+    bg_codes = {name: str(int(code) + 10) for name, code in color_codes.items()}
+
+    text_code = color_codes.get(text_color.lower(), '37')
+    bg_code = bg_codes.get(bg_color.lower(), '41')
+
+    # ANSI escape sequence for styling
+    ansi_start = f"\033[5;{text_code};{bg_code}m" if blinking else f"\033[{text_code};{bg_code}m"
+    ansi_reset = "\033[0m"
+
+    # Detect environment (Jupyter or Colab)
+    try:
+        import google.colab
+        in_colab = True
+    except ImportError:
+        in_colab = False
+
+    env_name = get_ipython().__class__.__name__ if 'get_ipython' in globals() else ""
+    is_jupyter = env_name == 'ZMQInteractiveShell'
+
+    # Get terminal size
+    if in_colab:
+        rows, columns = 24, 80  # fallback default
+    elif is_jupyter:
+        try:
+            rows, columns = shutil.get_terminal_size()
+        except:
+            rows, columns = 24, 80
+    else:
+        try:
+            rows, columns = os.popen('stty size', 'r').read().split()
+            rows, columns = int(rows), int(columns)
+        except:
+            rows, columns = shutil.get_terminal_size()
+
+    # Center and display the messages
+    typemsg_centered = typemsg.center(columns)
+    message_centered = message.center(columns)
+
+    sys.stdout.write(f'{ansi_start}{typemsg_centered}{ansi_reset}\n')
+    sys.stdout.write(f'{ansi_start}{message_centered}{ansi_reset}\n')
     """
     center blinking color output message
     """
