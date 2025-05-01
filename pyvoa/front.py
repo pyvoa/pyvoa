@@ -148,8 +148,8 @@ class front:
                 self.gpdbuilder = coco.GPDBuilder.readpkl('.cache/'+base+'.pkl')
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
-                coge.GeoManager('name')
-        self.db = base
+                coge.GeoManager('name')    
+        self.db = base   
 
     def input_wrapper(func):
         '''
@@ -207,7 +207,7 @@ class front:
                     raise PyvoaError("'typeofhist' not compatible with get ...")
             elif func.__name__ == 'plot':
                 if dicovisu['mapoption'] or dicovisu['tile']:
-                    PyvoaError('Please have a look on your arguement not compatible with plot')
+                    raise PyvoaError('Please have a look on your arguement not compatible with plot')
                 if dicovisu['typeofhist']:
                     raise PyvoaError("'typeofhist' option not compatible with plot ...")
             elif func.__name__ == 'hist':
@@ -246,18 +246,21 @@ class front:
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
                 z = {**self.getvisukwargs(), **kwargs}
-            if func.__name__ in ['hist','map']:
-                if isinstance(z['which'],list) and len(z['which'])>1:
-                    raise PyvoaError("Histo and map available only for ONE variable ...")
-                #else:
-                #    z['which'] = z['which'][0]
-                z['input'] = z['input'].loc[z['input'].date==z['input'].date.max()].reset_index(drop=True)
-                z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False)
-                if func.__name__ == 'map':
-                        z.pop('typeofhist')
-                        z.pop('typeofplot')
-                        z.pop('bins')
-            return func(self,**z)
+            if self.getdisplay() is not None:
+                if func.__name__ in ['hist','map']:
+                    if isinstance(z['which'],list) and len(z['which'])>1:
+                        raise PyvoaError("Histo and map available only for ONE variable ...")
+                    #else:
+                    #    z['which'] = z['which'][0]
+                    z['input'] = z['input'].loc[z['input'].date==z['input'].date.max()].reset_index(drop=True)
+                    z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False)
+                    if func.__name__ == 'map':
+                            z.pop('typeofhist')
+                            z.pop('typeofplot')
+                            z.pop('bins')
+                return func(self,**z)
+            else:
+                PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
         return inner
 
     @input_wrapper
@@ -343,7 +346,6 @@ class front:
             raise PyvoaError('Unknown output.')
         self.outcome = casted_data
         return casted_data
-
 
     def setoptvis(self,**kwargs):
         '''
