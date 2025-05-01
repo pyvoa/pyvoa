@@ -244,7 +244,7 @@ class front:
         self.db = base   
 
     def input_wrapper(func):
-       """
+        """
         Decorator for handling input argument testing and formatting for
         geopandas builder methods. This decorator ensures that the input
         arguments are properly formatted and validated before passing them
@@ -542,9 +542,9 @@ class front:
         Examples:
             >>> obj.setdisplay('example_visualization')
         """
-       if vis not in self.lvisu:
+        if vis not in self.lvisu:
             raise PyvoaError("Visualisation "+ visu + " not implemented setting problem. Please contact support@pycoa.fr")
-       else:
+        else:
             self.vis = vis
 
     def getdisplay(self,):
