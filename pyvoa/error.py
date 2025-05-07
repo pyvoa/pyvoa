@@ -159,7 +159,6 @@ class PyvoaError(Exception):
     """Base class for exceptions in PYVOA."""
     def __init__(self, message):
         blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
-        sys.exit(0)
         #Exception(message)
 
 class PyvoaNoData(PyvoaError, IndexError):
