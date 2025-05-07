@@ -278,7 +278,7 @@ class front:
                 order position of the items in 'option'
             '''
             if self.db == '':
-                raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+                PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
             kwargs_keystesting(kwargs,self.lchartkargskeys + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
@@ -301,7 +301,9 @@ class front:
                     kwargs[k]=v[0]
 
             if kwargs['where'][0] == '':
-                kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                if self.gpdbuilder:
+                    kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -340,7 +342,8 @@ class front:
             if self.getvisukwargs()['vis']:
                 pass
             if kwargs['input'].empty:
-                    kwargs = self.gpdbuilder.get_stats(**kwargs)
+                    if self.gpdbuilder:
+                        kwargs = self.gpdbuilder.get_stats(**kwargs)
 
             found_bypop = None
             for w in kwargs['option']:
