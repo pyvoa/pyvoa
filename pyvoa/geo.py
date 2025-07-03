@@ -156,10 +156,8 @@ class GeoManager():
         This method retrieves the value of the private attribute `_list_output`.
         
         Returns:
-            list: The current value of `_list_output`.
-        """
-        """ return supported list of output type. First one is default
-        for the class
+            list: The current value of `_list_output`. The first element is the
+                  the default one
         """
         return self._list_output
 
