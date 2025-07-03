@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """ 
-Project : PyvoA
-Date :    april 2020 - april 2025
+Project : Pyvoa
+Date :    april 2020 - july 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pyvoa_fr
+Copyright ©pyvoa_org
 License: See joint LICENSE file
 https://pyvoa.org/
-
-Module : coa.geo
+   
+Module : pyvoa.geo
 
 About :
 -------
 
-Geo classes within the PyCoA framework.
+Geo classes within the PYVOA framework.
 
 GeoManager class provides translations between naming normalisations
 of countries. It's based on the pycountry module.
@@ -48,10 +48,49 @@ from pyvoa.error import *
 # ---------------------------------------------------------------------
 
 class GeoManager():
-    """GeoManager class definition. No inheritance from any other class.
-
-    It should raise only PyvoaError and derived exceptions in case
-    of errors (see pycoa.error)
+    """GeoManager class for managing geographical data and standardization.
+    
+    This class provides functionality to manage geographical regions, 
+    convert country names to standardized formats, and handle various 
+    output types. It supports multiple standards for country names and 
+    integrates with different databases for name translation.
+    
+    Attributes:
+        _list_standard (list): List of supported standard names for countries.
+        _list_db (list): List of supported database names for country name translation.
+        _list_output (list): List of supported output types.
+        _standard (str): Currently used normalization standard.
+    
+    Methods:
+        __init__(standard=_list_standard[0]):
+            Initializes the GeoManager with a specified standard.
+    
+        get_GeoRegion():
+            Returns the local instance of GeoRegion.
+    
+        get_region_list():
+            Returns a list of regions via the GeoRegion instance.
+    
+        get_list_standard():
+            Returns the list of supported standard names for countries.
+    
+        get_list_output():
+            Returns the list of supported output types.
+    
+        get_list_db():
+            Returns the list of supported database names for country name translation.
+    
+        get_standard():
+            Returns the current standard used within the GeoManager class.
+    
+        set_standard(standard):
+            Sets the working standard type within the GeoManager class.
+    
+        to_standard(w, **kwargs):
+            Converts a list of location strings to a normalized list according to the current standard.
+    
+        first_db_translation(w, db):
+            Translates country names to standard formats for specific databases.
     """
 
     _list_standard=['iso2',   # Iso2 standard, default
@@ -65,48 +104,112 @@ class GeoManager():
     _standard = None # currently used normalisation standard
 
     def __init__(self,standard=_list_standard[0]):
-        """ __init__ member function, with default definition of
-        the used standard. To get the current default standard,
-        see get_list_standard()[0].
+        """Initialize a GeoManager instance.
+        
+        This constructor initializes a GeoManager object, setting the standard 
+        to a specified value or a default from the _list_standard. It also 
+        creates a GeoRegion instance for managing geographical data.
+        
+        Args:
+            standard (optional): The standard to be set for the GeoManager. 
+                                 Defaults to the first element of _list_standard.
+        
+        Raises:
+            Any relevant exceptions that may arise during initialization or 
+            setting the standard.
         """
         verb("Init of GeoManager() from "+str(inspect.stack()[1]))
         self.set_standard(standard)
         self._gr=GeoRegion()
 
     def get_GeoRegion(self):
-        """ return the GeoRegion local instance
+        """Returns the geographical region associated with the instance.
+        
+        Returns:
+            GeoRegion: The geographical region (_gr) of the instance.
         """
         return self._gr
 
     def get_region_list(self):
-        """ return the list of region via the GeoRegion instance
+        """Retrieves a list of regions.
+        
+        This method calls the underlying service to obtain a list of regions.
+        
+        Returns:
+            list: A list containing the regions.
         """
         return self._gr.get_region_list()
 
     def get_list_standard(self):
-        """ return the list of supported standard name of countries.
-        First one is default for the class
+        """Returns the standard list.
+        
+        This method retrieves the supported list of standard name of countries.
+        
+        Returns:
+            list: The standard list. First one is default for the class.
         """
         return self._list_standard
 
     def get_list_output(self):
+        """Returns the list output.
+        
+        This method retrieves the value of the private attribute `_list_output`.
+        
+        Returns:
+            list: The current value of `_list_output`.
+        """
         """ return supported list of output type. First one is default
         for the class
         """
         return self._list_output
 
     def get_list_db(self):
+        """Returns the list database.
+        
+        This method retrieves the internal list database stored in the instance.
+        
+        Returns:
+            list: The list database.
+        """
         """ return supported list of database name for translation of
         country names to standard.
         """
         return self._list_db
 
     def get_standard(self):
-        """ return current standard use within the GeoManager class
+        """Get and set the standard for the GeoManager.
+        
+        This method checks if the provided standard is a string and if it is part of the
+        available standards. If the checks pass, it sets the standard and returns the
+        current standard.
+        
+        Args:
+            standard (str): The standard to be set for the GeoManager.
+        
+        Raises:
+            PyvoaTypeError: If the standard argument is not a string.
+            PyvoaKeyError: If the standard is not in the list of managed standards.
+        
+        Returns:
+            str: The current standard after setting it.
         """
-        return self._standard
-
-    def set_standard(self,standard):
+        """Sets the working standard type within the GeoManager class.
+        
+        This method ensures that the specified standard meets the requirements 
+        defined by the `get_list_standard()` method. If the provided standard 
+        is not a string or is not in the list of valid standards, appropriate 
+        exceptions are raised.
+        
+        Args:
+            standard (str): The standard type to be set for the GeoManager.
+        
+        Raises:
+            PyvoaTypeError: If the `standard` argument is not a string.
+            PyvoaKeyError: If the `standard` is not managed or recognized.
+        
+        Returns:
+            str: The current standard after setting it.
+        """
         """
         set the working standard type within the GeoManager class.
         The standard should meet the get_list_standard() requirement
@@ -122,6 +225,26 @@ class GeoManager():
         return self.get_standard()
 
     def to_standard(self, w, **kwargs):
+        """Converts input location names to standardized forms based on specified parameters.
+        
+        Args:
+            w (str or list of str): The location names to be standardized. Can be a single string or a list of strings.
+            **kwargs: Additional keyword arguments.
+                - output (str): The format of the output. Options include 'list', 'dict', or 'pandas'. Defaults to the first item from the list of available outputs.
+                - db (str): The database to use for translation. Defaults to the first item from the list of available databases.
+                - interpret_region (bool): If True, interprets region names and expands them to their corresponding countries. Defaults to False.
+        
+        Raises:
+            PyvoaKeyError: If an incorrect output type or incompatible arguments are provided.
+            PyvoaDbError: If an unknown database is specified.
+            PyvoaTypeError: If the input types are incorrect.
+            PyvoaLookupError: If no country matches the provided key.
+            PyvoaNotManagedError: If an unexpected error occurs during processing.
+        
+        Returns:
+            list or dict or pandas.DataFrame: The standardized location names in the specified output format.
+        """
+
         """Given a list of string of locations (countries), returns a
         normalised list according to the used standard (defined
         via the setStandard() or __init__ function. Current default is iso2.
@@ -236,6 +359,21 @@ class GeoManager():
             return None # should not be here
 
     def first_db_translation(self,w,db):
+        """Generates translations for country names based on the specified database.
+        
+        Args:
+            w (list): A list of country names to be translated.
+            db (str): The database to use for translations. Supported values are:
+                - 'jhu': Johns Hopkins University database.
+                - 'worldometers': Worldometers database.
+                - 'owid': Our World in Data database.
+                - 'olympics': Olympic database.
+        
+        Returns:
+            list: A list of translated country names corresponding to the input list.
+                  If a country name does not have a translation in the specified database,
+                  the original name is returned.
+        """
         """ This function helps to translate from country name to
         standard for specific databases. It's the first step
         before final translation.
@@ -321,6 +459,46 @@ class GeoManager():
 # ---------------------------------------------------------------------
 
 class GeoInfo():
+    """GeoInfo class for managing geographical information.
+    
+    This class provides methods to retrieve and manipulate geographical data, including country demographics, geographical boundaries, and additional fields related to countries.
+    
+    Attributes:
+        _list_field (dict): A dictionary mapping field names to their respective data sources.
+        _data_geometry (pd.DataFrame): DataFrame containing geographical data.
+        _data_population (pd.DataFrame): DataFrame containing population data.
+        _data_flag (pd.DataFrame): DataFrame containing flag data.
+    
+    Methods:
+        __init__(gm=0):
+            Initializes the GeoInfo instance, optionally with a GeoManager instance.
+    
+        get_GeoManager():
+            Returns the local instance of the GeoManager used.
+    
+        get_list_field():
+            Returns a sorted list of supported additional fields available.
+    
+        get_source(field=None):
+            Returns the source of the information provided for a given field.
+    
+        add_field(**kwargs):
+            Adds specified fields to the input pandas DataFrame based on geographical information.
+            
+            Args:
+                field (str or list of str): The field(s) to add to the DataFrame. Mandatory.
+                input (pd.DataFrame): The input DataFrame to which fields will be added. Mandatory.
+                geofield (str): The name of the column in the DataFrame that contains location data. Default is 'where'.
+                overload (bool): If True, allows overwriting existing fields in the DataFrame. Default is False.
+            
+            Returns:
+                pd.DataFrame: The modified DataFrame with the added fields.
+            
+            Raises:
+                PyvoaKeyError: If the provided field is not supported or if the geofield is invalid.
+                PyvoaTypeError: If the input DataFrame or overload option is of incorrect type.
+                PyvoaDbError: If the source database structure has changed.
+    """
     """GeoInfo class definition. No inheritance from any other class.
 
     It should raise only PyvoaError and derived exceptions in case
@@ -352,6 +530,17 @@ class GeoInfo():
     _data_flag = pd.DataFrame()
 
     def __init__(self,gm=0):
+        """Initializes a GeoInfo instance.
+        
+        This constructor initializes the GeoInfo object. If a GeoManager instance is provided, it is used; otherwise, a new GeoManager is created. The group data is then retrieved from the GeoManager and stored in the instance.
+        
+        Args:
+            gm (GeoManager, optional): An instance of GeoManager. Defaults to 0, which triggers the creation of a new GeoManager.
+        
+        Attributes:
+            _gm (GeoManager): The GeoManager instance used by this GeoInfo.
+            _grp (pandas.DataFrame): The group data retrieved from the GeoManager.
+        """
         """ __init__ member function.
         """
         verb("Init of GeoInfo() from "+str(inspect.stack()[1]))
@@ -363,16 +552,46 @@ class GeoInfo():
         self._grp=self._gm._gr.get_pandas()
 
     def get_GeoManager(self):
+        """Returns the GeoManager instance.
+        
+        This method retrieves the GeoManager object associated with the current instance.
+        
+        Returns:
+            GeoManager: The GeoManager instance.
+        """
         """ return the local instance of used GeoManager()
         """
         return self._gm
 
     def get_list_field(self):
+        """Returns a sorted list of the keys from the _list_field dictionary.
+        
+        This method retrieves the keys from the _list_field attribute, which is expected to be a dictionary, and returns them as a sorted list.
+        
+        Returns:
+            list: A sorted list of keys from the _list_field dictionary.
+        """
         """ return the list of supported additionnal fields available
         """
         return sorted(list(self._list_field.keys()))
 
     def get_source(self,field=None):
+        """Retrieve the source information for a specified field.
+        
+        Args:
+            field (str, optional): The name of the field for which to retrieve the source information. 
+                                   If None, the method returns the entire list of fields.
+        
+        Returns:
+            str: The source information for the specified field, or the entire list of fields if no field is specified.
+        
+        Raises:
+            PyvoaKeyError: If the specified field is not a supported field of GeoInfo.
+        
+        Examples:
+            source_info = get_source('example_field')
+            all_fields = get_source()
+        """
         """ return the source of the information provided for a given
         field.
         """
@@ -386,6 +605,26 @@ class GeoInfo():
 
 
     def add_field(self,**kwargs):
+        """Adds specified fields to a pandas DataFrame based on geographical data.
+        
+        This method allows the user to add various fields to a given pandas DataFrame, including country-related information such as continent codes, population, area, and more. The function validates input parameters and ensures that the specified fields are supported and do not conflict with existing DataFrame columns unless the overload option is set to True.
+        
+        Args:
+            **kwargs: Keyword arguments that can include:
+                - field (list or str): The field(s) to add to the DataFrame. Must be valid fields supported by the class.
+                - input (pd.DataFrame): The input pandas DataFrame to which fields will be added. Must be a valid DataFrame.
+                - geofield (str): The name of the column in the DataFrame that contains geographical identifiers (e.g., country codes).
+                - overload (bool): If True, allows overwriting existing fields in the DataFrame. Defaults to False.
+        
+        Raises:
+            PyvoaTypeError: If the input DataFrame is not valid or if overload is not a boolean.
+            PyvoaKeyError: If no field is provided, if any specified fields are invalid, or if the geofield is not a valid column in the DataFrame.
+            PyvoaDbError: If the worldometers database field names have changed and cannot be matched.
+        
+        Returns:
+            pd.DataFrame: The modified DataFrame with the specified fields added.
+        """
+
         """ this is the main function of the GeoInfo class. It adds to
         the input pandas dataframe some fields according to
         the geofield field of input.
@@ -563,6 +802,35 @@ class GeoInfo():
 # ---------------------------------------------------------------------
 
 class GeoRegion():
+    """Class representing geographical regions and their associated countries.
+    
+    This class provides functionality to manage and retrieve information about various geographical regions, including their member countries. It initializes with data sourced from various online references and allows users to query regions, check if a name corresponds to a region, and retrieve lists of countries belonging to specific regions.
+    
+    Attributes:
+        _source_dict (dict): A dictionary containing URLs for various geographical data sources.
+        _region_dict (dict): A dictionary mapping region codes to region names.
+        _p_gs (DataFrame): A pandas DataFrame containing geographical data including country codes and region associations.
+    
+    Methods:
+        __init__(self):
+            Initializes the GeoRegion instance, populating region and country data from external sources.
+    
+        get_source(self):
+            Returns the source dictionary containing URLs for geographical data.
+    
+        get_region_list(self):
+            Returns a list of all region names available in the region dictionary.
+    
+        is_region(self, region):
+            Checks if the provided region name is valid and returns the correctly formatted region name or False.
+    
+        get_countries_from_region(self, region):
+            Returns a sorted list of ISO3 country codes for the specified region.
+    
+        get_pandas(self):
+            Returns the pandas DataFrame containing geographical data.
+    """
+
     """GeoRegion class definition. Does not inheritate from any other
     class.
 
@@ -594,8 +862,31 @@ class GeoRegion():
     _p_gs = pd.DataFrame()
 
     def __init__(self,):
+        """Initialize a GeoRegion instance.
+        
+        This constructor fetches and processes geographical region data from various sources, including the United Nations M49 standard and several Wikipedia pages. It populates internal dictionaries and lists with region names, codes, and other relevant information.
+        
+        Attributes:
+            _region_dict (dict): A dictionary mapping region codes to region names.
+            _cw (list): A list of countries that are members of the Commonwealth of Nations.
+            _celac (list): A list of countries that are members of the Community of Latin American and Caribbean States.
+            _cedeao (list): A list of countries that are members of the Economic Community of West African States.
+            _sadc (list): A list of countries that are members of the Southern African Development Community.
+            _amu (list): A list of countries that are members of the Arab Maghreb Union.
+            _ceeac (list): A list of countries that are members of the Economic Community of Central African States.
+            _eac (list): A list of countries that are members of the East African Community.
+            _censad (list): A list of countries that are members of the Community of Sahel–Saharan States.
+            _comesa (list): A list of countries that are members of the Common Market for Eastern and Southern Africa.
+            _p_gs (DataFrame): A DataFrame containing country information including ISO codes, capitals, and region codes.
+        
+        Logs:
+            Verbose logging of the initialization process is performed, including the calling stack.
+        """
+
         """ __init__ member function.
         """
+
+
         #if 'XK' in self._country_list:
         #    del self._country_list['XK'] # creates bugs in pycountry and is currently a contested country as country
 
@@ -688,12 +979,37 @@ class GeoRegion():
                             right_on='code').drop(["code"],axis=1)
 
     def get_source(self):
+        """Returns the source dictionary.
+        
+        This method retrieves the internal source dictionary associated with the instance.
+        
+        Returns:
+            dict: The source dictionary.
+        """
         return self._source_dict
 
     def get_region_list(self):
+        """Returns a list of regions.
+        
+        This method retrieves all the values from the internal region dictionary and returns them as a list.
+        
+        Returns:
+            list: A list containing the regions.
+        """
         return list(self._region_dict.values())
 
     def is_region(self,region):
+        """Checks if the provided region is valid.
+        
+        Args:
+            region (str): The region to be checked.
+        
+        Raises:
+            PyvoaKeyError: If the provided region is not of type str.
+        
+        Returns:
+            bool: True if the region is valid, False otherwise.
+        """
         """ it returns either False or the correctly named region name
         """
         if type(region) != str:
@@ -707,6 +1023,24 @@ class GeoRegion():
             return region
 
     def get_countries_from_region(self,region):
+        """Retrieve a list of country codes from a specified region.
+        
+        This method checks if the provided region is valid and returns a sorted list of country codes (ISO 3166-1 alpha-3) associated with that region. If the region is not recognized, a PyvoaKeyError is raised.
+        
+        Args:
+            region (str): The name of the region for which to retrieve country codes. 
+                          Valid regions include 'European Union', 'G7', 'G8', 'G20', 
+                          'Oecd', 'G77', 'Commonwealth', 'Celac', 'Cedeao', 'Sadc', 
+                          'Amu', 'Ceeac', 'Eac', 'Censad', 'Comesa', and 'Brics'.
+        
+        Raises:
+            PyvoaKeyError: If the provided region is unknown.
+        
+        Returns:
+            list: A sorted list of country codes corresponding to the specified region.
+        
+        
+        Examples: ..."""
         """ it returns a list of countries for the given region name.
         The standard used is iso3. To convert to another standard,
         use the GeoManager class.
@@ -777,6 +1111,13 @@ class GeoRegion():
         return sorted(clist)
 
     def get_pandas(self):
+        """Returns the pandas object.
+        
+        This method retrieves the pandas object stored in the instance.
+        
+        Returns:
+            pandas.DataFrame: The pandas object associated with the instance.
+        """
         return self._p_gs
 
 
@@ -785,6 +1126,41 @@ class GeoRegion():
 # ---------------------------------------------------------------------
 
 class GeoCountry():
+    """A class to handle geographical data for various countries.
+    
+    This class provides functionalities to manage and manipulate geographical data for different countries, including retrieving country-specific information, handling geometries, and accessing subregions and regions.
+    
+    Attributes:
+        _country_info_dict (dict): A dictionary mapping country ISO3 codes to their respective data source URLs.
+        _source_dict (dict): A dictionary mapping country ISO3 codes to their respective data sources and additional information.
+    
+    Methods:
+        __init__(country=None): Initializes the GeoCountry instance with a specified country.
+        set_dense_geometry(): Sets the geometry to a dense representation for subregions and regions.
+        set_exploded_geometry(): Sets the geometry to an exploded representation for certain countries.
+        set_main_geometry(): Sets the geometry to the main representation for subregions and regions.
+        is_dense_geometry(): Returns whether the current geometry is dense.
+        is_exploded_geometry(): Returns whether the current geometry is exploded.
+        is_main_geometry(): Returns whether the current geometry is the main representation.
+        get_source(): Returns information about the data source for the current country.
+        get_country(): Returns the currently set country.
+        get_list_countries(): Returns a sorted list of supported countries.
+        is_init(): Checks if the country is initialized.
+        test_is_init(): Raises an error if the country is not initialized.
+        get_region_list(): Returns a list of available regions with their codes, names, and geometries.
+        is_region(r): Checks if a given region is valid and returns its correctly capitalized name.
+        get_subregion_list(): Returns a list of available subregions with their codes, names, and geometries.
+        is_subregion(r): Checks if a given subregion is valid and returns its correctly capitalized name.
+        get_subregions_from_region(**kwargs): Returns a list of subregions within a specified region.
+        get_subregions_from_list_of_region_names(l, output='code'): Returns a list of subregions based on a list of region names.
+        get_regions_from_subregion(code, output='code'): Returns a list of regions containing a specified subregion.
+        get_regions_from_list_of_subregion_codes(l, output='code'): Returns a list of regions based on a list of subregion codes.
+        get_regions_from_macroregion(**kwargs): Retrieves regions from a specified macroregion based on its name or code.
+        get_list_properties(): Retrieves and sorts the properties of the country data.
+        get_data(region_version=False): Returns the entire geopandas data, optionally region-based.
+        add_field(**kwargs): Adds an additional column to the data with specified properties.
+    """
+
     """GeoCountry class definition.
     This class provides functions for specific countries and their states / departments / regions,
     and their geo properties (geometry, population if available, etc.)
@@ -839,6 +1215,36 @@ class GeoCountry():
                     }
 
     def __init__(self,country=None):
+        """Initialize the class with country-specific data.
+        
+        Args:
+            country (str, optional): The country code for which to initialize data. 
+                If None, no country data is loaded. Supported country codes include:
+                'FRA' for France, 'USA' for the United States, 'ITA' for Italy, 
+                'IND' for India, 'DEU' for Germany, 'ESP' for Spain, 'GBR' for the 
+                United Kingdom, 'BEL' for Belgium, 'PRT' for Portugal, 'MYS' for 
+                Malaysia, 'CHL' for Chile, 'EUR' for Europe, 'GRC' for Greece, 
+                and 'JPN' for Japan.
+        
+        Raises:
+            PyvoaKeyError: If the provided country code is not supported.
+        
+        Attributes:
+            _country_data (GeoDataFrame): A GeoDataFrame containing geographical 
+                and demographic data for the specified country.
+            _country_data_region (str): The region data for the country.
+            _country_data_subregion (str): The subregion data for the country.
+            _municipality_region (str): The municipality region data.
+            _is_dense_geometry (bool): Flag indicating if the geometry is dense.
+            _is_exploded_geometry (bool): Flag indicating if the geometry is exploded.
+            _is_main_geometry (bool): Flag indicating if the geometry is the main one.
+            _list_translation (dict): A dictionary mapping subregion codes to 
+                translation coordinates.
+            _list_scale (dict): A dictionary mapping subregion codes to scale factors.
+            _list_center (dict): A dictionary mapping subregion codes to center 
+                coordinates.
+        """
+
 
         """ __init__ member function.
         Must give as arg the country to deal with, as a valid ISO3 string.
@@ -1264,6 +1670,21 @@ class GeoCountry():
     #     return self._municipality_region.loc[self._municipality_region.name.isin(lname)]['district'].to_list()
 
     def set_dense_geometry(self):
+        """Sets the geometry of the country data to a dense format based on the current country.
+        
+        This method checks the current geometry state and updates the geometry for the country data 
+        to a dense representation if applicable. It raises errors if the geometry has already been set 
+        to main or exploded formats. The method handles specific transformations for France and the USA, 
+        applying translations and scaling as necessary.
+        
+        Raises:
+            PyvoaError: If the geometry is already set to main or exploded, or if the current country 
+            does not support dense geometry.
+        
+        Returns:
+            None
+        """
+
         """  If used, we're using for the current country a dense geometry forsubregions
         and regions.
         It's not possible to go back.
@@ -1322,6 +1743,17 @@ class GeoCountry():
         self._is_main_geometry = False
 
     def set_exploded_geometry(self):
+        """Sets the exploded geometry for the object.
+        
+        This method checks the current geometry state and raises an error if the main or dense geometry has already been set. If the exploded geometry is already set, the method returns without making any changes. If not, it sets the dense geometry and modifies the geometry data for the country if the country is France (FRA). The geometry is adjusted based on specific translation, scaling, and centering parameters.
+        
+        Raises:
+            PyvoaError: If the main or dense geometry is already set.
+        
+        Returns:
+            None
+        """
+
         """  If used, we're using for the current country a dense geometry forsubregions
         and regions.
         Moreover we're exploding internal dense geometry for some countries (currently IdF
@@ -1361,6 +1793,17 @@ class GeoCountry():
         self._is_exploded_geometry = True
 
     def set_main_geometry(self):
+        """Sets the main geometry for the object.
+        
+        This method checks if the current geometry is already set to main. If it is, the method returns immediately. If the geometry is set to dense or exploded, a PyvoaError is raised indicating that the main geometry cannot be set. Depending on the country (either 'FRA' or 'USA'), the method filters the country data accordingly. If the country is not supported, a PyvoaError is raised.
+        
+        Raises:
+            PyvoaError: If the geometry is already set to dense or exploded, or if the current country does not support dense geometry.
+        
+        Returns:
+            None
+        """
+
         """  If used, we're using only for the current country the main
         geometry for subregions and regions.
         It's not possible to go back.
@@ -1385,21 +1828,48 @@ class GeoCountry():
         self._is_main_geometry = True
 
     def is_dense_geometry(self):
+        """Determines if the geometry is dense.
+        
+        Returns:
+            bool: True if the geometry is dense, False otherwise.
+        """
+
         """Return the self._is_dense_geometry variable
         """
         return self._is_dense_geometry
 
     def is_exploded_geometry(self):
+        """Determines if the geometry is exploded.
+        
+        Returns:
+            bool: True if the geometry is exploded, False otherwise.
+        """
+
         """Return the self._is_exploded_geometry variable
         """
         return self._is_exploded_geometry
 
     def is_main_geometry(self):
+        """Determines if the current geometry is the main geometry.
+        
+        Returns:
+            bool: True if the current geometry is the main geometry, False otherwise.
+        """
+
         """Return the self._is_main_geometry variable
         """
         return self._is_main_geometry
 
     def get_source(self):
+        """Retrieves the source data based on the country.
+        
+        If a country is set, it returns the corresponding source from the source dictionary.
+        If no country is set, it returns the entire source dictionary.
+        
+        Returns:
+            dict: The source data corresponding to the country, or the entire source dictionary if no country is set.
+        """
+
         """ Return informations about URL sources
         """
         if self.get_country() != None:
@@ -1408,16 +1878,40 @@ class GeoCountry():
             return self._source_dict
 
     def get_country(self):
+        """Returns the country associated with the instance.
+        
+        This method retrieves the value of the private attribute `_country`.
+        
+        Returns:
+            str: The country associated with the instance.
+        """
+
         """ Return the current country used.
         """
         return self._country
 
     def get_list_countries(self):
+        """Returns a sorted list of country names.
+        
+        This method retrieves the keys from the internal dictionary that contains country information
+        and returns them as a sorted list.
+        
+        Returns:
+            list: A sorted list of country names.
+        """
+
         """ This function returns back the list of supported countries
         """
         return sorted(list(self._country_info_dict.keys()))
 
     def is_init(self):
+        """Determines if the object is initialized based on the country attribute.
+        
+        Returns:
+            bool: True if the country is not None, indicating the object is initialized; 
+                  False otherwise.
+        """
+
         """Test if the country is initialized. Return True if it is. False if not.
         """
         if self.get_country() != None:
@@ -1426,6 +1920,20 @@ class GeoCountry():
             return False
 
     def test_is_init(self):
+        """Test if the object is initialized.
+        
+        This method checks whether the object has been properly initialized. 
+        If the object is initialized, it returns True. Otherwise, it raises 
+        a PyvoaDbError indicating that the country is not set.
+        
+        Raises:
+            PyvoaDbError: If the object is not initialized with a non-empty 
+            country string.
+        
+        Returns:
+            bool: True if the object is initialized, otherwise an exception is raised.
+        """
+
         """Test if the country is initialized. If not, raise a PyvoaDbError.
         """
         if self.is_init():
@@ -1434,6 +1942,17 @@ class GeoCountry():
             raise PyvoaDbError("The country is not set. Use a constructor with non empty country string.")
 
     def get_region_list(self):
+        """Retrieves a list of regions along with their geometries.
+        
+        This method filters the properties of the object to include only those that
+        contain '_region' in their names, and appends the 'geometry' property to the
+        list. It then returns the corresponding data for these properties.
+        
+        Returns:
+            DataFrame: A DataFrame containing the filtered list of regions and their
+            geometries.
+        """
+
         """ Return the list of available regions with code, name and geometry
         """
         cols=[c for c in self.get_list_properties() if '_region' in c]
@@ -1441,6 +1960,16 @@ class GeoCountry():
         return self.get_data(True)[cols]
 
     def is_region(self,r):
+        """Checks if a given region exists in the region list.
+        
+        Args:
+            r (str): The region to check, which will be standardized before comparison.
+        
+        Returns:
+            str or bool: The name of the region if it exists in the region list, 
+                         otherwise returns False.
+        """
+
         """ Return False if r is a not a known region, return the correctly capitalized name if ok
         """
         r=tostdstring(r)
@@ -1450,13 +1979,36 @@ class GeoCountry():
         return False
 
     def get_subregion_list(self):
-        """ Return the list of available subregions with code, name and geometry
+        """Retrieves a list of subregion data along with their geometries.
+        
+        This method filters the properties of the object to find those that contain
+        the substring '_subregion' and appends the 'geometry' property to the list.
+        It then returns a DataFrame containing only the selected columns.
+        
+        Returns:
+            DataFrame: A DataFrame containing the subregion properties and their
+            corresponding geometries.
         """
         cols=[c for c in self.get_list_properties() if '_subregion' in c ]
         cols.append('geometry')
         return self.get_data()[cols]
 
     def is_subregion(self,r):
+        """Determines if a given region is a subregion of the current object.
+        
+        Args:
+            r (str): The region code or name to check against the subregions.
+        
+        Returns:
+            str or bool: The name of the subregion if found, otherwise False.
+            
+        Notes:
+            This function first converts the input region to a standardized string format.
+            It then checks if the standardized input matches any of the names in the subregion list.
+            If a match is found, it returns the corresponding name. If no match is found, it checks
+            if the input region code corresponds to a single subregion and returns its name if so.
+        """
+
         """ Return False if r is a not a known region, return the correctly capitalized name if ok
         """
         r2=tostdstring(r)
@@ -1469,6 +2021,25 @@ class GeoCountry():
         return False
 
     def get_subregions_from_region(self,**kwargs):
+        """Retrieves subregions based on the specified region name or code.
+        
+        This method allows you to obtain subregions from a specified region by providing either the region's name or code. The output can be customized to return either the code or name of the subregion.
+        
+        Args:
+            **kwargs: Keyword arguments that can include:
+                - name (str): The name of the region. Must be provided as a string.
+                - code (str): The code of the region. Must be provided as a string.
+                - output (str): Specifies the output format. Should be either 'code' or 'name'. Defaults to 'code'.
+        
+        Raises:
+            PyvoaKeyError: If both name and code are provided, or if neither is provided.
+            PyvoaTypeError: If the provided name or code is not a string.
+            PyvoaWhereError: If the specified region does not exist for the country.
+        
+        Returns:
+            str: The subregion corresponding to the specified region, in the format specified by the output argument.
+        """
+
         """ Return the list of subregions within a specified region.
         Should give either the code or the name of the region as strings in kwarg : code=# or name=#
         Output default is 'code' of subregions. Can be changed with output='name'.
@@ -1500,6 +2071,19 @@ class GeoCountry():
         return self.get_data(True)[cut][out+'_subregion'].iloc[0]#to_list()
 
     def get_subregions_from_list_of_region_names(self,l,output='code'):
+        """Retrieve subregions for a list of region names.
+        
+        Args:
+            l (list): A list of region names for which to retrieve subregions.
+            output (str, optional): The format of the output. Defaults to 'code'.
+        
+        Raises:
+            PyvoaTypeError: If the provided argument is not a list.
+        
+        Returns:
+            list: A list of subregions corresponding to the provided region names.
+        """
+
         """ Return the list of subregions according to list of region names given.
         The output argument ('code' as default) is given to the get_subregions_from_region function.
         """
@@ -1511,10 +2095,28 @@ class GeoCountry():
         return s
 
     def get_regions_from_subregion(self,code,output='code'):
+        """Retrieve regions associated with a specified subregion code.
+        
+        This method checks if the provided subregion code exists and returns a list of regions 
+        that are linked to that subregion. The output can be either the region codes or the 
+        region names based on the specified output parameter.
+        
+        Args:
+            code (str): The subregion code for which to retrieve associated regions.
+            output (str, optional): The format of the output. Can be 'code' for region codes 
+                or 'name' for region names. Defaults to 'code'.
+        
+        Raises:
+            PyvoaKeyError: If the output option is not 'code' or 'name'.
+            PyvoaWhereError: If the specified subregion code does not exist for the current country.
+        
+        Returns:
+            list: A list of unique regions associated with the specified subregion code, 
+            either as codes or names based on the output parameter.
+        """
         """ Return the list of regions where the subregion, given by a code, is.
         Output default is 'code' of subregions. Can be changer with output='name'.
         """
-
         if not output in ['code','name']:
             raise PyvoaKeyError('The output option should be "code" or "name" only')
 
@@ -1531,7 +2133,23 @@ class GeoCountry():
         return list(dict.fromkeys(l))
 
     def get_regions_from_list_of_subregion_codes(self,l,output='code'):
-        """ Return the list of regions according to list of subregion names given.
+        """Returns a list of regions corresponding to a given list of subregion codes.
+        
+        This function takes a list of subregion codes and retrieves the associated regions. The `output` parameter, which defaults to 'code', is passed to the `get_regions_from_subregion` function to determine the format of the returned regions.
+        
+        Args:
+            l (list): A list of subregion codes.
+            output (str, optional): The format for the output from `get_regions_from_subregion`. Defaults to 'code'.
+        
+        Raises:
+            PyvoaTypeError: If the provided argument is not a list.
+        
+        Returns:
+            list: A list of unique regions corresponding to the provided subregion codes.
+        """
+
+        """
+        toto=" Return the list of regions according to list of subregion names given.
         The output argument ('code' as default) is given to the get_regions_from_subregion function.
         """
         if not isinstance(l,list):
@@ -1542,10 +2160,42 @@ class GeoCountry():
         return list(dict.fromkeys(s))
 
     def get_regions_from_macroregion(self,**kwargs):
-        """ Return the list of regions included in another macroregion
-        Can provide input as code= or name=
-        Can provide output as 'name' or 'code' (default).
+        """Retrieve regions from a specified macroregion based on either the region's name or code.
+        
+        This method allows the user to obtain a list of regions that belong to a specified macroregion. The user must provide either the name or the code of the region, and can specify the desired output format (either 'code' or 'name').
+        
+        Args:
+            **kwargs: Keyword arguments that can include:
+                - 'name' (str): The name of the region.
+                - 'code' (str): The code of the region.
+                - 'output' (str): The desired output format, either 'code' or 'name'. Defaults to 'code'.
+        
+        Raises:
+            PyvoaKeyError: If both 'name' and 'code' are provided, or if neither is provided.
+            PyvoaKeyError: If 'output' is not set to either 'code' or 'name'.
+        
+        Returns:
+            list: A list of regions associated with the specified macroregion, including the input region.
         """
+
+        """Get regions from a specified macroregion based on either the region's name or code.
+        
+        This method retrieves a list of regions that belong to a specified macroregion. The user must provide either the name or the code of the region, and can specify the desired output format (either 'code' or 'name').
+        
+        Args:
+            **kwargs: Keyword arguments that can include:
+                - 'name' (str): The name of the region.
+                - 'code' (str): The code of the region.
+                - 'output' (str): The desired output format, either 'code' or 'name'. Defaults to 'code'.
+        
+        Raises:
+            PyvoaKeyError: If both 'name' and 'code' are provided, or if neither is provided.
+            PyvoaKeyError: If 'output' is not set to either 'code' or 'name'.
+        
+        Returns:
+            list: A list of regions associated with the specified macroregion, including the input region.
+        """
+
         kwargs_test(kwargs,['name','code','output'],'Should give either name or code of region. Output can be changed with the output option.')
         code=kwargs.get("code",None)
         name=kwargs.get("name",None)
@@ -1584,12 +2234,39 @@ class GeoCountry():
         return r_out
 
     def get_list_properties(self):
-        """Return the list of available properties for the current country
+        """Retrieves and sorts the properties of the country data list.
+        
+        This method checks if the object is initialized and, if so, returns a sorted list of the column names from the country data.
+        
+        Returns:
+            list: A sorted list of column names from the country data if initialized, otherwise None.
+        """
+
+        """Retrieves and sorts the properties of the country data.
+        
+        This method checks if the object is initialized and, if so, returns a sorted list of the column names from the country data.
+        
+        Returns:
+            list: A sorted list of column names from the country data if initialized, otherwise None.
         """
         if self.test_is_init():
             return sorted(self._country_data.columns.to_list())
 
     def get_data(self,region_version=False):
+        """Retrieves country data based on the specified region version.
+        
+        This method checks if the class is initialized and retrieves either region-level or subregion-level data from the internal country data. If `region_version` is set to True, it processes the data to include region-specific information, handling special cases for certain countries. If `region_version` is False, it returns subregion-level data.
+        
+        Args:
+            region_version (bool): If True, retrieves region-level data; if False, retrieves subregion-level data. Default is False.
+        
+        Returns:
+            pd.DataFrame: A DataFrame containing either region-level or subregion-level country data, depending on the value of `region_version`.
+        
+        Raises:
+            ValueError: If the class is not initialized or if the data cannot be processed correctly.
+        """
+
         """Return the whole geopandas data.
         If region_version = True (not default), the pandas output is region based focalized.
         """
@@ -1680,6 +2357,25 @@ class GeoCountry():
                 return self._country_data_subregion
 
     def add_field(self,**kwargs):
+        """Adds a field to a pandas DataFrame by merging it with additional data based on specified parameters.
+        
+        Args:
+            **kwargs: Keyword arguments that include:
+                - input (pd.DataFrame): The input pandas DataFrame to which the field will be added.
+                - field (list or str): The field(s) to be added. Can be a single string or a list of strings.
+                - input_key (str): The column name in the input DataFrame to join on. Defaults to 'where'.
+                - geofield (str): The column name in the additional data to join on. Defaults to 'code_subregion'.
+                - region_merging (bool, optional): Indicates whether to merge based on region. Defaults to None, which infers from geofield.
+                - overload (bool): If True, allows overwriting existing columns in the input DataFrame. Defaults to False.
+        
+        Raises:
+            PyvoaTypeError: If the input DataFrame, input_key, geofield, or overload parameters are of incorrect type.
+            PyvoaKeyError: If the input_key or geofield is not a valid column name in the respective DataFrames, or if the field(s) to be added are not available.
+        
+        Returns:
+            pd.DataFrame: A new DataFrame that results from merging the input DataFrame with the additional data based on the specified keys.
+        """
+
         """Return a the data pandas.Dataframe with an additionnal column with property prop.
 
         Arguments :
