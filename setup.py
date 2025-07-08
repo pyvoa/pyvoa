@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyvoa",  
-    version="0.3.0",  
+    version="0.3.1",  
     author="pyvoa.org",
     author_email="contact@pyvoa.org",
     description="Python virus open analysis. See more on pyvoa.org",
