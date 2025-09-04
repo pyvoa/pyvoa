@@ -146,7 +146,7 @@ class front:
         for lib, available in available_libs.items():
             if not available:
                 self.lvisu.remove(lib)
-        PyvoaInfo("Available graphicals librairies : " + str(self.lvisu))
+        PyvoaInfo("Available graphical librairies : " + str(self.lvisu))
 
         self.lwhat = list(self.av.d_batchinput_args['what'])
         self.lhist = list(self.av.d_graphicsinput_args['typeofhist'])
