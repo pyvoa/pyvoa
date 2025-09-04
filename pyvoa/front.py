@@ -39,9 +39,9 @@ from pyvoa.visualizer import AllVisu
 
 class front:
     """Class for managing graphical data visualization and processing.
-    
+
     This class provides methods to configure and utilize various graphical libraries for data visualization. It allows users to set visualization options, retrieve data in different formats, and manage the underlying database for graphical data.
-    
+
     Attributes:
         meta (MetaInfo): Metadata information for the graphical data.
         av (InputOption): Input options for graphical input arguments.
@@ -63,7 +63,7 @@ class front:
         charts: Current chart settings.
         namefunction (str): Name of the currently set function.
         _setkwargsvisu (dict): Dictionary for visualization options.
-    
+
     Methods:
         whattodo(): Generates a DataFrame summarizing available methods and their options.
         setwhom(base, **kwargs): Sets the current GPDBuilder database and optionally reloads it.
@@ -117,17 +117,17 @@ class front:
 
     def whattodo(self,):
         """Generates a DataFrame summarizing available methods and their options.
-        
-        This method constructs a DataFrame that combines information from two dictionaries: 
-        one containing graphics input arguments and another with visualization options. 
-        The resulting DataFrame is organized by method names and their corresponding 
+
+        This method constructs a DataFrame that combines information from two dictionaries:
+        one containing graphics input arguments and another with visualization options.
+        The resulting DataFrame is organized by method names and their corresponding
         available options.
-        
+
         Returns:
-            pd.DataFrame: A DataFrame with methods as the index and their available 
-            options listed in the columns. The DataFrame is sorted by the 'Arguments' 
+            pd.DataFrame: A DataFrame with methods as the index and their available
+            options listed in the columns. The DataFrame is sorted by the 'Arguments'
             column in descending order.
-        
+
         Raises:
             None: This method does not raise any exceptions.
         """
@@ -153,18 +153,18 @@ class front:
 
     def setwhom(self,base,**kwargs):
         """Sets the current GPDBuilder database and optionally reloads it.
-        
-        This method updates the current database to the specified base if it is supported. 
+
+        This method updates the current database to the specified base if it is supported.
         If the `reload` parameter is set to True, it will reload the database; otherwise, it will read from a cached file.
-        
+
         Args:
             base (str): The name of the GPDBuilder database to set as the current database.
             **kwargs: Additional keyword arguments that may be used for further customization.
-        
+
         Raises:
             PyvoaError: If the `reload` parameter is not a boolean (0 or 1).
             PyvoaDbError: If the specified `base` is not in the list of supported GPDBuilders.
-        
+
         Returns:
             None: This method does not return a value.
         """
@@ -186,8 +186,8 @@ class front:
                 self.gpdbuilder = coco.GPDBuilder.readpkl('.cache/'+base+'.pkl')
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
-                coge.GeoManager('name')    
-        self.db = base   
+                coge.GeoManager('name')
+        self.db = base
 
     def input_wrapper(func):
         """
@@ -347,24 +347,24 @@ class front:
     @input_wrapper
     def get(self,**kwargs):
         """Retrieve and process data based on the specified output format.
-        
-        This method accepts a pandas DataFrame as input and converts it into various formats 
-        such as pandas DataFrame, GeoPandas DataFrame, dictionary, list, or numpy array 
-        based on the 'output' keyword argument. It also logs memory usage for the DataFrame 
+
+        This method accepts a pandas DataFrame as input and converts it into various formats
+        such as pandas DataFrame, GeoPandas DataFrame, dictionary, list, or numpy array
+        based on the 'output' keyword argument. It also logs memory usage for the DataFrame
         if the output is set to 'pandas'.
-        
+
         Args:
             **kwargs: Arbitrary keyword arguments. Expected keys include:
                 - 'input': A pandas DataFrame to be processed.
-                - 'output': A string indicating the desired output format. 
+                - 'output': A string indicating the desired output format.
                             Options include 'pandas', 'geopandas', 'dict', 'list', or 'array'.
-        
+
         Returns:
             The processed data in the specified output format.
-        
+
         Raises:
             PyvoaError: If the specified output format is unknown.
-        
+
         Notes:
             - If the output is 'pandas', the method will log the memory usage of the DataFrame.
             - If the output is 'geopandas', it merges the input DataFrame with geometry data.
@@ -409,9 +409,9 @@ class front:
 
     def setoptvis(self,**kwargs):
         """Sets the visualization options for the instance.
-        
+
         This method configures various visualization parameters based on the provided keyword arguments. It checks if the visualization is implemented and sets the display accordingly. If the visualization is not implemented, it raises a `PyvoaError`. If no graphics are loaded, a warning is issued.
-        
+
         Args:
             **kwargs: Arbitrary keyword arguments that can include:
                 - tile (str): The type of tile to use for the map. Defaults to 'openstreet'.
@@ -419,11 +419,11 @@ class front:
                 - mapoption (str): The option for the map display. Defaults to 'text'.
                 - guideline (str): A guideline option. Defaults to 'False'.
                 - title (str or None): The title for the visualization. Defaults to None.
-        
+
         Raises:
             PyvoaError: If the specified visualization is not implemented or if the function name is not registered.
             PyvoaWarning: If no graphics are loaded.
-        
+
         Returns:
             function: The function corresponding to the visualization, if successfully set.
         """
@@ -440,7 +440,7 @@ class front:
             if vis not in self.lvisu:
                 raise PyvoaError("Sorry but " + visu + " visualisation isn't implemented ")
             else:
-                self.setdisplay(vis)
+                self.vis = vis
                 print(f"The visualization has been set correctly to: {vis}")
                 try:
                     f = self.getnamefunction()
@@ -455,12 +455,12 @@ class front:
 
     def setnamefunction(self,name):
         """Sets the name of the function.
-        
+
         This method assigns the name of the provided function to the instance variable `namefunction`.
-        
+
         Args:
             name (function): The function whose name will be assigned to `namefunction`.
-        
+
         Returns:
             None
         """
@@ -469,38 +469,18 @@ class front:
 
     def getnamefunction(self,):
         """Retrieves the name of the function.
-        
+
         Returns:
             str: The name of the function associated with the instance.
         """
-       
-        return self.namefunction
 
-    def setdisplay(self,vis):
-        """Sets the display visualization.
-        
-        This method updates the current visualization setting if the specified visualization is available. 
-        If the visualization is not in the list of available visualizations, it raises a `PyvoaError`.
-        
-        Args:
-            vis (str): The visualization to set.
-        
-        Raises:
-            PyvoaError: If the specified visualization is not implemented.
-        
-        Examples:
-            >>> obj.setdisplay('example_visualization')
-        """
-        if vis not in self.lvisu:
-            raise PyvoaError("Visualisation "+ visu + " not implemented setting problem. Please contact support@pycoa.fr")
-        else:
-            self.vis = vis
+        return self.namefunction
 
     def getdisplay(self,):
         """Returns the display attribute of the instance.
-        
+
         This method retrieves the value of the `vis` attribute from the instance.
-        
+
         Returns:
             The value of the `vis` attribute.
         """
@@ -508,7 +488,7 @@ class front:
 
     def getversion(self,):
         """Retrieve the current version of the pyvoa package.
-        
+
         Returns:
             str: The version number of the pyvoa package.
         """
@@ -516,10 +496,10 @@ class front:
 
     def listoutput(self,):
         """Returns a list of output values from the batch input arguments.
-        
-        This method retrieves the 'output' key from the `d_batchinput_args` dictionary 
+
+        This method retrieves the 'output' key from the `d_batchinput_args` dictionary
         of the `av` attribute and converts it into a list.
-        
+
         Returns:
             list: A list containing the output values.
         """
@@ -527,9 +507,9 @@ class front:
 
     def listvisu(self,):
         """Returns the visualization list.
-        
+
         This method retrieves the visualization list associated with the instance.
-        
+
         Returns:
             list: The visualization list.
         """
@@ -537,15 +517,15 @@ class front:
 
     def listwhom(self, detailed = False):
         """Lists the names of databases and their associated metadata.
-        
+
         Args:
             detailed (bool, optional): If True, returns a detailed DataFrame containing database names, ISO3 codes, granularity, and variables. Defaults to False.
-        
+
         Returns:
-            list or pd.DataFrame: 
+            list or pd.DataFrame:
                 - If detailed is False, returns a list of database names.
                 - If detailed is True, returns a DataFrame with columns for database names, ISO3 codes, granularity, and variables.
-        
+
         Raises:
             PyvoaError: If the detailed argument is not a boolean.
         """
@@ -578,9 +558,9 @@ class front:
 
     def listwhat(self,):
         """Returns the value of the lwhat attribute.
-        
+
         This method retrieves the current value of the lwhat attribute from the instance.
-        
+
         Returns:
             The value of the lwhat attribute.
         """
@@ -588,9 +568,9 @@ class front:
 
     def listhist(self,):
         """Returns the list histogram.
-        
+
         This method retrieves the histogram of the list stored in the instance.
-        
+
         Returns:
             list: The list histogram.
         """
@@ -598,11 +578,11 @@ class front:
 
     def listplot(self,):
         """Returns a list of the types of plots from the graphics input arguments.
-        
-        This method retrieves the 'typeofplot' key from the 
-        'd_graphicsinput_args' attribute of the 'av' object and 
+
+        This method retrieves the 'typeofplot' key from the
+        'd_graphicsinput_args' attribute of the 'av' object and
         returns it as a list.
-        
+
         Returns:
             list: A list containing the types of plots.
         """
@@ -610,9 +590,9 @@ class front:
 
     def listoption(self,):
         """Returns the value of the loption attribute.
-        
+
         This method retrieves the current value of the loption attribute from the instance.
-        
+
         Returns:
             The value of the loption attribute.
         """
@@ -620,9 +600,9 @@ class front:
 
     def listchartkargskeys(self,):
         """Returns the keys of the lchartkargskeys attribute.
-        
+
         This method retrieves the keys stored in the lchartkargskeys attribute of the instance.
-        
+
         Returns:
             list: A list of keys from the lchartkargskeys attribute.
         """
@@ -630,9 +610,9 @@ class front:
 
     def listchartkargskeys(self,):
         """Returns the values of the lchartkargs attribute.
-        
+
         This method retrieves the values stored in the lchartkargsvalues attribute of the instance.
-        
+
         Returns:
             list: The values of the lchartkargsvalues attribute.
         """
@@ -640,9 +620,9 @@ class front:
 
     def listtiles(self,):
         """Returns the list of tiles.
-        
+
         This method retrieves the current list of tiles stored in the instance.
-        
+
         Returns:
             list: A list containing the tiles.
         """
@@ -650,15 +630,15 @@ class front:
 
     def listwhich(self,dbname=None):
         """Lists the current metadata for a specified database.
-        
+
         This method retrieves the current metadata for the given database name. If no database name is provided, it uses the default database associated with the instance. If neither is available, it raises an error.
-        
+
         Args:
             dbname (str, optional): The name of the database for which to list the metadata. If not provided, the default database will be used.
-        
+
         Returns:
             list: A sorted list of metadata associated with the specified database.
-        
+
         Raises:
             PyvoaError: If no database name is provided and no default database is set.
         """
@@ -673,16 +653,16 @@ class front:
 
     def listwhere(self,clustered = False):
         """Lists regions or countries based on the current metadata and specified granularity.
-        
+
         Args:
             clustered (bool): If True, returns a clustered list of regions. Defaults to False.
-        
+
         Returns:
             list or str: A list of region names or a single country code, depending on the granularity and the clustered flag.
-        
+
         Raises:
             PyvoaError: If the granularity of the database is not recognized.
-        
+
         Notes:
             The function retrieves the current metadata to determine the granularity and ISO3 code.
             If the granularity is 'country' and the code is not 'WLD' or 'EUR', it returns the country code.
@@ -730,9 +710,9 @@ class front:
 
     def listbypop(self):
         """Returns a list of keys from the dictionary `dict_bypop`.
-        
+
         This method retrieves all the keys from the `dict_bypop` attribute and returns them as a list.
-        
+
         Returns:
             list: A list containing the keys of the `dict_bypop` dictionary.
         """
@@ -740,9 +720,9 @@ class front:
 
     def listmapoption(self):
         """Returns the value of the lmapoption attribute.
-        
+
         This method retrieves the current setting of the lmapoption attribute from the instance.
-        
+
         Returns:
             The value of the lmapoption attribute.
         """
@@ -750,10 +730,10 @@ class front:
 
     def getwhom(self,return_error=True):
         """Retrieves the database instance associated with the current object.
-        
+
         Args:
             return_error (bool): A flag indicating whether to return an error if the database instance is not available. Defaults to True.
-        
+
         Returns:
             The database instance associated with the current object.
         """
@@ -761,15 +741,15 @@ class front:
 
     def getwhichinfo(self, which=None):
         """Retrieves information based on the specified keyword.
-        
+
         Args:
-            which (str, optional): The keyword for which information is to be retrieved. 
-                If provided, the function will print the keyword's definition and its associated URL. 
+            which (str, optional): The keyword for which information is to be retrieved.
+                If provided, the function will print the keyword's definition and its associated URL.
                 If not provided, the function will return the database description.
-        
+
         Raises:
             PyvoaError: If the provided keyword does not exist in the database.
-        
+
         Returns:
             DataFrame: The database description if no keyword is specified.
         """
@@ -785,9 +765,9 @@ class front:
 
     def getrawdb(self):
         """Retrieves the full database and logs its memory usage.
-        
+
         This method fetches the complete database from the `gpdbuilder` object, calculates the total memory usage of all columns, and logs this information. It then returns the full database as a DataFrame.
-        
+
         Returns:
             pandas.DataFrame: The full database retrieved from the `gpdbuilder`.
         """
@@ -799,17 +779,17 @@ class front:
 
     def setkwargsvisu(self,**kwargs):
         """Sets visualization parameters using keyword arguments.
-        
-        This method updates the internal dictionary of visualization parameters. 
-        If the internal dictionary `_setkwargsvisu` already exists, it updates 
-        the existing keys with the provided values only if the values are truthy. 
-        If `_setkwargsvisu` does not exist, it initializes it with the provided 
+
+        This method updates the internal dictionary of visualization parameters.
+        If the internal dictionary `_setkwargsvisu` already exists, it updates
+        the existing keys with the provided values only if the values are truthy.
+        If `_setkwargsvisu` does not exist, it initializes it with the provided
         keyword arguments.
-        
+
         Args:
-            **kwargs: Arbitrary keyword arguments representing visualization parameters. 
+            **kwargs: Arbitrary keyword arguments representing visualization parameters.
                        Only keys with truthy values will be set in the internal dictionary.
-        
+
         Returns:
             None
         """
@@ -825,19 +805,19 @@ class front:
 
     def setvisu(self,**kwargs):
         """Sets the visualization and updates the keyword arguments for the visualization settings.
-        
+
         Args:
             **kwargs: Arbitrary keyword arguments that may include visualization settings.
-        
+
         Raises:
             PyvoaError: If the specified visualization is not implemented.
-        
+
         Notes:
             This method retrieves default visualization settings from the object's graphics input arguments,
             updates them with any provided keyword arguments, and checks if the specified visualization is
             available. If it is, the visualization is set, and a confirmation message is logged. Otherwise,
             an error is raised.
-        
+
         Example:
             setvisu(vis='example_visualization', additional_arg=value)
         """
@@ -850,7 +830,7 @@ class front:
         if vis not in self.lvisu:
             raise PyvoaError("Sorry but " + vis + " visualisation isn't implemented ")
         else:
-            self.setdisplay(vis)
+            self.vis = vis
             kwargs['vis'] = vis
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
         self.setkwargsvisu(**kwargs)
@@ -859,7 +839,7 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             """Inner function to process input parameters and modify geometry settings.
-            
+
             Args:
                 self: The instance of the class.
                 **kwargs: Additional keyword arguments that may include:
@@ -869,10 +849,10 @@ class front:
                     - bypop: Optional population parameter (ignored in processing).
                     - dateslider: Optional date slider parameter (default is None).
                     - input (DataFrame): Input data that may be modified based on geometry settings.
-            
+
             Returns:
                 The result of the function `func` after processing the input parameters.
-            
+
             Raises:
                 Any exceptions raised by the `func` or during the processing of geometry settings.
             """
@@ -906,20 +886,20 @@ class front:
     @decomap
     def figuremap(self,**kwargs):
         """Generates a figure map based on the specified visualization options.
-        
+
         Args:
             **kwargs: Arbitrary keyword arguments that may include:
-                - mapoption (str): Specifies the type of map to generate. 
+                - mapoption (str): Specifies the type of map to generate.
                     Options include 'spark', 'spiral', 'text', 'exploded', or 'dense'.
-        
+
         Returns:
-            A figure map generated by the appropriate visualization method based on the 
+            A figure map generated by the appropriate visualization method based on the
             provided mapoption.
-        
+
         Raises:
-            PyvoaError: If an invalid mapoption is provided or if no mapoption is specified 
+            PyvoaError: If an invalid mapoption is provided or if no mapoption is specified
             when required.
-        
+
         Notes:
             The function checks the current display method. If the display method is 'bokeh',
             it processes the mapoption to determine which visualization function to call.
@@ -943,15 +923,15 @@ class front:
     @decomap
     def map(self,**kwargs):
         """Maps the visualization with the provided keyword arguments.
-        
+
         This method checks if a display is set up. If it is, it combines the visualization keyword arguments with the provided keyword arguments and applies the mapping. If no display is set up, it raises a `PyvoaError`.
-        
+
         Args:
             **kwargs: Additional keyword arguments to be passed to the mapping function.
-        
+
         Returns:
             The outcome of the mapping operation.
-        
+
         Raises:
             PyvoaError: If no visualization has been set up.
         """
@@ -967,16 +947,16 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             """Inner method to generate a histogram visualization based on provided keyword arguments.
-            
+
             Args:
                 **kwargs: Arbitrary keyword arguments that may include:
                     - typeofhist: The type of histogram to generate.
                     - output: This argument is removed from kwargs and not used.
                     - bypop: If present, this argument is removed from kwargs and not used.
-            
+
             Raises:
                 PyvoaError: If no visualization has been set up.
-            
+
             Returns:
                 The result of the visualization function applied to the generated histogram outcome.
             """
@@ -996,10 +976,10 @@ class front:
     @decohist
     def figurehist(fig):
         """Returns the input figure.
-        
+
         Args:
             fig: The figure object to be returned.
-        
+
         Returns:
             The same figure object that was passed as an argument.
         """
@@ -1010,15 +990,15 @@ class front:
     @decohist
     def hist(self,fig):
         """Generates and displays a histogram figure.
-        
+
         This method sets the function name, stores the provided figure, and displays it using the appropriate visualization library based on the current display setting.
-        
+
         Args:
             fig: The figure object to be displayed, typically a histogram.
-        
+
         Returns:
             The figure object if the display setting is not 'bokeh'.
-        
+
         Raises:
             ImportError: If 'bokeh' is specified but the library is not installed.
         """
@@ -1038,15 +1018,15 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             """Inner method to plot visualization based on provided keyword arguments.
-            
+
             This method checks if a display is set up and, if so, merges the visualization keyword arguments with any additional keyword arguments provided. It then calls the plotting function and returns the outcome. If no display is set up, it raises a PyvoaError.
-            
+
             Args:
                 **kwargs: Additional keyword arguments to be passed to the plotting function.
-            
+
             Returns:
                 The outcome of the plotting function.
-            
+
             Raises:
                 PyvoaError: If no visualization has been set up.
             """
@@ -1074,7 +1054,7 @@ class front:
     def figureplot(self,fig):
         """Args:
             fig: The figure object to be returned.
-        
+
         Returns:
             The input figure object.
         """
@@ -1085,12 +1065,12 @@ class front:
     @decoplot
     def plot(self,fig):
         """Plots the given figure using the appropriate display method.
-        
+
         This method checks the current display setting and uses Bokeh to show the plot if the display is set to 'bokeh'. If the display is not set to 'bokeh', it simply returns the figure.
-        
+
         Args:
             fig: The figure to be plotted.
-        
+
         Returns:
             If the display is not 'bokeh', returns the input figure. Otherwise, displays the figure using Bokeh.
         """
@@ -1108,18 +1088,18 @@ class front:
 
     def saveoutput(self,**kwargs):
         """Save output to a specified format.
-        
+
         This method saves a pandas DataFrame to a file in the specified format. It requires a pandas DataFrame to be provided and allows for customization of the save format and file name.
-        
+
         Args:
             **kwargs: Keyword arguments that can include:
                 - pandas (pd.DataFrame): The DataFrame to save. This is mandatory.
                 - saveformat (str): The format to save the DataFrame in. Default is 'excel'.
                 - savename (str): The name of the file to save the DataFrame as. Default is an empty string.
-        
+
         Raises:
             PyvoaError: If the provided DataFrame is empty or if mandatory arguments are not provided.
-        
+
         Returns:
             None
         """
@@ -1134,18 +1114,18 @@ class front:
             _db.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
     def merger(self,**kwargs):
         """Merger function that integrates provided data into the database.
-        
-        This function takes keyword arguments and specifically looks for a key 
-        named 'coapandas'. It validates the arguments and then calls the 
+
+        This function takes keyword arguments and specifically looks for a key
+        named 'coapandas'. It validates the arguments and then calls the
         database merger function with the provided data.
-        
+
         Args:
             **kwargs: Arbitrary keyword arguments. Must include:
                 - 'coapandas' (list): A list of data to be merged into the database.
-        
+
         Raises:
             ValueError: If invalid arguments are provided.
-        
+
         Returns:
             The result of the database merger operation.
         """
@@ -1156,12 +1136,12 @@ class front:
 
     def savefig(self,name):
         """Saves the current figure to a file.
-        
+
         This method checks the display type and saves the figure accordingly. If the display type is 'bokeh', it uses the Bokeh library to export the figure as a PNG file. Otherwise, it uses the standard savefig method. If the name function is 'get', it raises a PyvoaError indicating that saving is not allowed for a pandas DataFrame.
-        
+
         Args:
             name (str): The name of the file to save the figure as.
-        
+
         Raises:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
