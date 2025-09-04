@@ -1,3 +1,7 @@
+# version 0.3.1
+- cosmetic and docstrings
+- version for pip, first full version 
+
 # version 0.3.0
 - import of the whole former pycoa software into pyvoa
 - using matplotlib as graphical output
