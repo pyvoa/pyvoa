@@ -9,61 +9,7 @@ Copyright ©pyvoa_fr
 License: See joint LICENSE file
 https://pyvoa.org/
 
-
 Date :    April 2020 - May 2025
-
-
-This module provides the `front` class, which serves as the main interface for interacting with the PyvoA framework. 
-It includes methods for managing data visualization, database selection, and data retrieval.
-
-Classes:
-    - front: Main class for managing PyvoA functionalities.
-
-Methods:
-    - __init__: Initializes the `front` class with default settings and available options.
-    - whattodo: Lists all available keys and values from kwargs for chart methods and visualization options.
-    - setwhom: Sets the geopandas builder (GPDBuilder) to be used, given as a string.
-    - input_wrapper: Decorator for handling input argument testing and formatting for geopandas builder methods.
-    - input_visuwrapper: Decorator for ensuring single-variable input for histograms and maps.
-    - get: Retrieves data from the geopandas builder in the specified format.
-    - setoptvis: Defines visualization and associated options.
-    - setnamefunction: Sets the name of the chart function.
-    - getnamefunction: Retrieves the name of the chart function.
-    - setdisplay: Sets the visualization method.
-    - getdisplay: Retrieves the current visualization method.
-    - getversion: Returns the current running version of PyvoA.
-    - listoutput: Lists available output types for the `get` function.
-    - listvisu: Lists available visualization methods for the `map` function.
-    - listwhom: Lists available GPDBuilder databases.
-    - listwhat: Lists available series types.
-    - listhist: Lists available histogram types.
-    - listplot: Lists available plot types.
-    - listoption: Lists available data processing options.
-    - listchartkargskeys: Lists available keyword arguments for chart functions.
-    - listchartkargsvalues: Lists available values for chart function arguments.
-    - listtiles: Lists available tile options for maps.
-    - listwhich: Lists available fields for a specified or current database.
-    - listwhere: Lists available regions/subregions for the current GPDBuilder.
-    - listbypop: Lists available population normalization options.
-    - listmapoption: Lists available map options.
-    - getwhom: Retrieves the current database in use.
-    - getwhichinfo: Retrieves information about a specific field in the current database.
-    - getrawdb: Retrieves the main pandas DataFrame with all loaded values from the GPDBuilder.
-    - setkwargsvisu: Updates visualization options.
-    - getvisukwargs: Retrieves current visualization options.
-    - setvisu: Defines visualization and associated options.
-    - decomap: Decorator for handling map-specific arguments and options.
-    - figuremap: Creates a map figure based on arguments and options.
-    - map: Displays a map visualization.
-    - decohist: Decorator for handling histogram-specific arguments and options.
-    - figurehist: Creates a histogram figure.
-    - hist: Displays a histogram visualization.
-    - decoplot: Decorator for handling plot-specific arguments and options.
-    - figureplot: Creates a plot figure.
-    - plot: Displays a plot visualization.
-    - saveoutput: Exports a pandas DataFrame to a specified file format.
-    - merger: Merges multiple PyvoA pandas DataFrames.
-    - savefig: Saves the current visualization as an image file.
 '''
 
 # --- Imports ----------------------------------------------------------
