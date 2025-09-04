@@ -191,7 +191,12 @@ class GeoManager():
         Returns:
             str: The current standard after setting it.
         """
-        """Sets the working standard type within the GeoManager class.
+
+        return self._standard
+
+    def set_standard(self,standard):
+        """
+        Sets the working standard type within the GeoManager class.
         
         This method ensures that the specified standard meets the requirements 
         defined by the `get_list_standard()` method. If the provided standard 
@@ -207,10 +212,6 @@ class GeoManager():
         
         Returns:
             str: The current standard after setting it.
-        """
-        """
-        set the working standard type within the GeoManager class.
-        The standard should meet the get_list_standard() requirement
         """
         if not isinstance(standard,str):
             raise PyvoaTypeError('GeoManager error, the standard argument'
