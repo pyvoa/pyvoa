@@ -89,6 +89,7 @@ class InputOption():
             except ImportError:
                 results[lib] = False
         return results
+        
     def setkwargsfront(self,kw):
         kwargs_keystesting(kw, list(self.d_graphicsinput_args.keys())+list(self.d_graphicsinput_args.keys()), 'Error with this resquest (not available in setoptvis)')
         self.dicokfront = kw
