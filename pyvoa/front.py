@@ -608,7 +608,7 @@ class front:
         """
         return self.lchartkargskeys
 
-    def listchartkargskeys(self,):
+    def listchartkargsvalues(self,):
         """Returns the values of the lchartkargs attribute.
 
         This method retrieves the values stored in the lchartkargsvalues attribute of the instance.
