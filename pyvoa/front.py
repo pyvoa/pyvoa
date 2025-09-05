@@ -436,7 +436,7 @@ class front:
             mapoption =  kwargs.get('mapoption','text')
             guideline = kwargs.get('guideline','False')
             title = kwargs.get('title',None)
-            self.allvisu.setkwargsfront(kwargs)
+            self.av.setkwargsfront(kwargs)
             if vis not in self.lvisu:
                 raise PyvoaError("Sorry but " + visu + " visualisation isn't implemented ")
             else:
@@ -803,7 +803,7 @@ class front:
     def getvisukwargs(self,):
         return self._setkwargsvisu
 
-    def setvisu(self,**kwargs):
+    def setgraphics(self,**kwargs):
         """Sets the visualization and updates the keyword arguments for the visualization settings.
 
         Args:
@@ -819,7 +819,7 @@ class front:
             an error is raised.
 
         Example:
-            setvisu(vis='example_visualization', additional_arg=value)
+            setgraphics(vis='example_visualization', additional_arg=value)
         """
         kwargs_keystesting(kwargs,self.listviskargskeys,'Bad args used ! please check ')
         default = { k:v[0] if isinstance(v,list) else v for k,v in self.av.d_graphicsinput_args.items()}
