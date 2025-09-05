@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" 
+"""
 Project : PyvoA
 Date :    april 2020 - march 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
@@ -25,10 +25,10 @@ from IPython import get_ipython
 def blinking_centered_text(typemsg, message, blinking=False, text_color="white", bg_color="red"):
     """
     Display a centered message with optional blinking and color formatting.
-    
+
     This function is intended for terminal use. Blinking will not work in Jupyter
     or Google Colab environments, but the message will still be displayed with colors.
-    
+
     Parameters:
         typemsg (str): The header or type of message to display.
         message (str): The main message to display.
@@ -106,7 +106,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
     else:
         ansi_start = f"\033[;{text_code};{bg_code}m"
     ansi_reset = "\033[0m"
-    
+
     try:
         import google.colab
         IN_COLAB = True
@@ -160,6 +160,18 @@ class PyvoaError(Exception):
     def __init__(self, message):
         blinking_centered_text('PYVOA Error !',message, blinking=1,text_color='white', bg_color='red')
         #Exception(message)
+
+class PyvoaKeyError(PyvoaError, KeyError):
+    """Exception raised for errors in used key option.
+
+    Attributes:
+        message -- explanation of the error
+    """
+
+    def __init__(self, message):
+        self.message = message
+        KeyError(message)
+        PyvoaError(message)
 
 class PyvoaNoData(PyvoaError, IndexError):
     """Exception raised when there is no data to plot or to manage (invalid cut)"""
