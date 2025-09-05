@@ -47,7 +47,7 @@ class InputOption():
     def __init__(self):
         self.d_batchinput_args  = {
                 'where':[''],\
-                        'option':['nonneg','smooth7','sumall',
+                        'option':['','nonneg','smooth7','sumall',
                                   'bypop=0','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
                                           'which':[''],\
                                           'what':['current','daily','weekly'],\
@@ -89,7 +89,7 @@ class InputOption():
             except ImportError:
                 results[lib] = False
         return results
-        
+
     def setkwargsfront(self,kw):
         kwargs_keystesting(kw, list(self.d_graphicsinput_args.keys())+list(self.d_graphicsinput_args.keys()), 'Error with this resquest (not available in setoptvis)')
         self.dicokfront = kw
