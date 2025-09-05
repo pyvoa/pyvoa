@@ -35,9 +35,7 @@ import datetime as dt
 import matplotlib.dates as mdates
 from pyvoa.jsondb_parser import MetaInfo
 import matplotlib.pyplot as plt
-from IPython.terminal.embed import InteractiveShellEmbed
-shell = InteractiveShellEmbed()
-shell.enable_gui('tk')
+
 class visu_matplotlib:
     '''
         MATPLOTLIB chart drawing methods ...
