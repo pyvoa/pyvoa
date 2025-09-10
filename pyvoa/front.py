@@ -187,6 +187,7 @@ class front:
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
                 coge.GeoManager('name')
+        print(self.allvisu)        
         self.db = base
 
     def input_wrapper(func):
@@ -1112,7 +1113,6 @@ class front:
             raise PyvoaError('Pandas to save is mandatory there is not default !')
         else:
             _db.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
-
     def merger(self,**kwargs):
         """Merger function that integrates provided data into the database.
 
