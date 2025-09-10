@@ -133,22 +133,19 @@ class GPDBuilder(object):
        path = ".cache/"
        if not os.path.exists(path):
            os.makedirs(path)
-       filepkl = path + db_name + '.pkl' 
+       filepkl = path + db_name + '.pkl'
        if reload:
            datab = GPDBuilder(db_name)
            with open(filepkl, 'wb') as f:
                pickle.dump(datab,f)
-       if vis is not None:
-            datab.setvisu(db_name,datab.getwheregeometrydescription())
-            return datab, datab.getvisu()
-       else:
-            PyvoaWarning('Please not that no visualisation is loaded, only get attribute can be used') 
-            return datab, None
+       datab.setvisu(db_name,datab.getwheregeometrydescription())
+       return datab, datab.getvisu()
 
    def setvisu(self,db_name,wheregeometrydescription):
        ''' Set the Display '''
        import pyvoa.visualizer as output
        self.codisp = output.AllVisu(db_name, wheregeometrydescription)
+       print("self.codisp ",self.codisp )
 
    def getvisu(self):
        ''' Return the instance of Display initialized by factory'''
@@ -161,7 +158,7 @@ class GPDBuilder(object):
          if not os.path.exists(path):
               os.makedirs(path)
          db_name=filepkl.replace(path,'').replace('.pkl','')
-         PyvoaWarning("Data from "+db_name + " isn't allready stored")
+         PyvoaInfo("Data from "+db_name + " isn't allready stored")
          datab = GPDBuilder(db_name)
          with open(filepkl, 'wb') as f:
              pickle.dump(datab,f)
