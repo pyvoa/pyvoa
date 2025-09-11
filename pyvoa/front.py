@@ -25,6 +25,7 @@ from pyvoa.tools import (
     info,
     flat_list,
     all_or_none_lists,
+    readpkl
 )
 
 import pyvoa.geopd_builder as coco
@@ -183,11 +184,12 @@ class front:
             if reload:
                 self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=reload,vis=visu)
             else:
-                self.gpdbuilder = coco.GPDBuilder.readpkl('.cache/'+base+'.pkl')
+                self.gpdbuilder = readpkl(base + '.pkl')
+                if self.gpdbuilder is None:
+                   self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=True,vis=visu)
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
                 coge.GeoManager('name')
-        print(self.allvisu)        
         self.db = base
 
     def input_wrapper(func):

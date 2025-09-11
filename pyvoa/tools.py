@@ -37,9 +37,8 @@ from urllib.parse import urlparse
 import unidecode
 import datetime as dt
 import numpy as np
-from pyvoa.error import PyvoaError, PyvoaConnectionError, PyvoaNotManagedError
-
-
+from pyvoa.error import *
+import pickle
 # testing if pyvoa.ata is available
 import importlib
 _coacache_folder=''
@@ -49,7 +48,7 @@ if _coacache_module_info != None:
 
 # Verbosity of pycoa
 _verbose_mode = 1 # default
-
+pklpath = ".cache/"
 # ----------------------------------------------------
 # --- Usefull functions for pycoa.--------------------
 # ----------------------------------------------------
@@ -458,6 +457,35 @@ def return_nonan_dates_pandas(df = None, field = None):
        j += 1
    df = df.loc[df.date >= watchdate - dt.timedelta(days=j - 1)]
    return df
+
+
+def readpkl(filepkl):
+  if filepkl is None:
+        raise PyvoaError("readpkl requires 'filepkl'")
+  filepkl = pklpath+filepkl
+  if not os.path.isfile(filepkl):
+     if not os.path.exists(pklpath):
+          os.makedirs(pklpath)
+     db_name=filepkl.replace(pklpath,'').replace('.pkl','')
+     PyvoaInfo("Data from "+db_name + " isn't allready stored")
+  else:
+     with open(filepkl, 'rb') as f:
+         #print("Info of "+ db_name + " stored ")
+         PyvoaInfo("last update: %s" % time.ctime(os.path.getmtime(filepkl)))
+         #datab = pickle.load(f)
+         datab = pd.read_pickle(f)
+         datab.get_parserdb().get_echoinfo()
+     return datab
+
+def dumppkl(filepkl,whattodump):
+   if filepkl is None or whattodump is None:
+        raise PyvoaError("dumppkl requires both 'filepkl' and 'whattodump'")
+   if not os.path.exists(pklpath):
+       os.makedirs(pklpath)
+   filepkl = pklpath+filepkl
+   with open(filepkl, 'wb') as f:
+        pickle.dump(whattodump,f)
+
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""

@@ -31,6 +31,7 @@ from pyvoa.tools import (
     flat_list,
     getnonnegfunc,
     return_nonan_dates_pandas,
+    dumppkl,
 )
 import pyvoa.geo as coge
 
@@ -38,7 +39,6 @@ import pyvoa.jsondb_parser as parser
 
 import geopandas as gpd
 from pyvoa.error import *
-import pickle
 import os, time
 import re
 import pyvoa.geo as coge
@@ -130,14 +130,11 @@ class GPDBuilder(object):
        reload = kwargs.get('reload', True)
        vis = kwargs.get('vis', None)
 
-       path = ".cache/"
-       if not os.path.exists(path):
-           os.makedirs(path)
-       filepkl = path + db_name + '.pkl'
+       f = db_name+'.pkl'
        if reload:
            datab = GPDBuilder(db_name)
-           with open(filepkl, 'wb') as f:
-               pickle.dump(datab,f)
+           dumppkl(f,datab)
+
        datab.setvisu(db_name,datab.getwheregeometrydescription())
        return datab, datab.getvisu()
 
@@ -145,31 +142,10 @@ class GPDBuilder(object):
        ''' Set the Display '''
        import pyvoa.visualizer as output
        self.codisp = output.AllVisu(db_name, wheregeometrydescription)
-       print("self.codisp ",self.codisp )
 
    def getvisu(self):
        ''' Return the instance of Display initialized by factory'''
        return self.codisp
-
-   @staticmethod
-   def readpkl(filepkl):
-      if not os.path.isfile(filepkl):
-         path = ".cache/"
-         if not os.path.exists(path):
-              os.makedirs(path)
-         db_name=filepkl.replace(path,'').replace('.pkl','')
-         PyvoaInfo("Data from "+db_name + " isn't allready stored")
-         datab = GPDBuilder(db_name)
-         with open(filepkl, 'wb') as f:
-             pickle.dump(datab,f)
-      else:
-         with open(filepkl, 'rb') as f:
-             #print("Info of "+ db_name + " stored ")
-             PyvoaInfo("last update: %s" % time.ctime(os.path.getmtime(filepkl)))
-             #datab = pickle.load(f)
-             datab = pd.read_pickle(f)
-             datab.get_parserdb().get_echoinfo()
-      return datab
 
    def setgeo(self,geo):
        self.geo = geo
