@@ -137,11 +137,11 @@ class visu_matplotlib:
 
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
-        input = input.set_index('where')
-        ax = input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
-        title=title, ylabel='where', labeldistance=None)
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
+        input = input.set_index('where')
+        input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
+        title=title, ylabel='where', labeldistance=None,ax=ax)
         plt.show()
         return plt
 
@@ -157,8 +157,8 @@ class visu_matplotlib:
         cmap = plt.get_cmap('Paired')
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
-        bar = ax.barh(input['where'], input[which],color=cmap.colors)
         ax.set_title(title)
+        ax.barh(input['where'], input[which],color=cmap.colors)
         plt.show()
         return plt
 
@@ -171,9 +171,10 @@ class visu_matplotlib:
         which = kwargs.get('which')
         title = kwargs.get('title')
         plt = kwargs.get('plt')
+        ax = kwargs.get('ax')
         bins=len(input['where'])+1
-        input= pd.pivot_table(input,index='date', columns='where', values=which)
-        ax = input.plot.hist(bins=bins, alpha=0.5,title = title)
+        input = pd.pivot_table(input,index='date', columns='where', values=which)
+        input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
         plt.show()
         return plt
 
