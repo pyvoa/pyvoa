@@ -731,15 +731,24 @@ class front:
         """
         return self.lmapoption
 
-    def getwhom(self,return_error=True):
+    def getwhom(self,detailed=False,return_error=True):
         """Retrieves the database instance associated with the current object.
 
         Args:
             return_error (bool): A flag indicating whether to return an error if the database instance is not available. Defaults to True.
+            detailed (bool): If True, displays detailed information about the database instance. Defaults to False.
 
         Returns:
             The database instance associated with the current object.
         """
+        if self.db=='':
+            if return_error:
+                raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+            else:
+                return None
+        if detailed:
+            l=self.listwhom(True)
+            print(l[l.index==self.db])
         return self.db
 
     def getwhichinfo(self, which=None):
