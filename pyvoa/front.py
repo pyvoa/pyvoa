@@ -69,7 +69,7 @@ class front:
         whattodo(): Generates a DataFrame summarizing available methods and their options.
         setwhom(base, **kwargs): Sets the current GPDBuilder database and optionally reloads it.
         get(**kwargs): Retrieves and processes data based on the specified output format.
-        setoptvis(**kwargs): Sets the visualization options for the instance.
+        setoptgraphics(**kwargs): Sets the visualization options for the instance.
         listoutput(): Returns the list of currently available output types for the get() function.
         listvisu(): Returns the list of currently available visualizations for the map() function.
         listwhom(detailed=False): Returns the list of currently available GPDBuilders for geopd_builder data in PyCoA.
@@ -146,7 +146,7 @@ class front:
         pd1.index = np.where(pd1.Arguments=='output','get', pd1.index)
         pd1.index = np.where(pd1.Arguments=='typeofhist','hist',pd1.index)
         pd1.index = np.where(pd1.Arguments=='typeofplot','plot', pd1.index)
-        pd2 = df(dico2,'setoptvis')
+        pd2 = df(dico2,'setoptgraphics')
         pd1=pd.concat([pd1,pd2])
         pd1.index = pd1.index.rename('Methods')
         pd1 = pd1.sort_values(by='Arguments',ascending = False)
@@ -176,7 +176,7 @@ class front:
             raise PyvoaDbError(base + ' is not a supported GPDBuilder. '
                                     'See pycoa.listbase() for the full list.')
         # Check if the current base is already set to the requested base
-        visu = self.getdisplay()
+        visu = self.getgraphics()
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
             return
@@ -288,7 +288,7 @@ class front:
             else:
                 raise PyvoaError(" What does " + func.__name__ + ' is supposed to be ... ?')
 
-            if self.getvisukwargs()['vis']:
+            if self.getkwargsvisu()['vis']:
                 pass
             if kwargs['input'].empty:
                     if self.gpdbuilder:
@@ -329,8 +329,8 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
-                z = {**self.getvisukwargs(), **kwargs}
-            if self.getdisplay() is not None:
+                z = {**self.getkwargsvisu(), **kwargs}
+            if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
@@ -410,7 +410,7 @@ class front:
         self.outcome = casted_data
         return casted_data
 
-    def setoptvis(self,**kwargs):
+    def setoptgraphics(self,**kwargs):
         """Sets the visualization options for the instance.
 
         This method configures various visualization parameters based on the provided keyword arguments. It checks if the visualization is implemented and sets the display accordingly. If the visualization is not implemented, it raises a `PyvoaError`. If no graphics are loaded, a warning is issued.
@@ -431,6 +431,8 @@ class front:
             function: The function corresponding to the visualization, if successfully set.
         """
         vis = kwargs.get('vis', None)
+        if not vis:
+            vis = self.getgraphics()
         if not self.allvisu:
             self.allvisu = self.av
         if vis:
@@ -438,7 +440,7 @@ class front:
             dateslider = kwargs.get('dateslider',False)
             mapoption =  kwargs.get('mapoption','text')
             guideline = kwargs.get('guideline','False')
-            title = kwargs.get('title',None)
+            title = kwargs.get('title','NIKEAMOOK')
             self.av.setkwargsfront(kwargs)
             if vis not in self.lvisu:
                 raise PyvoaError("Sorry but " + visu + " visualisation isn't implemented ")
@@ -478,16 +480,6 @@ class front:
         """
 
         return self.namefunction
-
-    def getdisplay(self,):
-        """Returns the display attribute of the instance.
-
-        This method retrieves the value of the `vis` attribute from the instance.
-
-        Returns:
-            The value of the `vis` attribute.
-        """
-        return self.vis
 
     def getversion(self,):
         """Retrieve the current version of the pyvoa package.
@@ -731,7 +723,7 @@ class front:
         """
         return self.lmapoption
 
-    def getwhom(self,detailed=False,return_error=True):
+    def getwhom(self, db = None, detailed=False,return_error=True):
         """Retrieves the database instance associated with the current object.
 
         Args:
@@ -741,15 +733,31 @@ class front:
         Returns:
             The database instance associated with the current object.
         """
-        if self.db=='':
-            if return_error:
-                raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
-            else:
+        if db:
+            if detailed:
+                l=self.listwhom(True)
+                print(l[l.index == db])
                 return None
-        if detailed:
-            l=self.listwhom(True)
-            print(l[l.index==self.db])
-        return self.db
+        else: 
+            if self.db=='':
+                if return_error:
+                    raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+                else:
+                    return None
+            if detailed:
+                l=self.listwhom(True)
+                print(l[l.index==self.db])
+            return self.db
+
+    def getdbmetadata(self,db=None):
+        if db:
+            if db in self.listwhom():
+               return self.meta.getcurrentmetadata(db)
+            else:
+                PyvoaError('Database is not in the pyvoa listing, please have a look ...')
+
+        else:
+            raise PyvoaError('Database has not been defined')
 
     def getwhichinfo(self, which=None):
         """Retrieves information based on the specified keyword.
@@ -812,7 +820,8 @@ class front:
         else:
             self._setkwargsvisu = kwargs
 
-    def getvisukwargs(self,):
+
+    def getkwargsvisu(self,):
         return self._setkwargsvisu
 
     def setgraphics(self,**kwargs):
@@ -835,7 +844,7 @@ class front:
         """
         kwargs_keystesting(kwargs,self.listviskargskeys,'Bad args used ! please check ')
         default = { k:v[0] if isinstance(v,list) else v for k,v in self.av.d_graphicsinput_args.items()}
-        vis = kwargs.get('vis')
+        vis = kwargs.get('vis', None)
         for k,v in default.items():
             kwargs[k] = v
 
@@ -846,6 +855,16 @@ class front:
             kwargs['vis'] = vis
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
         self.setkwargsvisu(**kwargs)
+
+    def getgraphics(self,):
+        """Returns the display attribute of the instance.
+
+        This method retrieves the value of the `vis` attribute from the instance.
+
+        Returns:
+            The value of the `vis` attribute.
+        """
+        return self.vis
 
     def decomap(func):
         @wraps(func)
@@ -918,7 +937,7 @@ class front:
         """
         dateslider = kwargs.get('dateslider', None)
         mapoption = kwargs.get('mapoption', None)
-        visu = self.getdisplay()
+        visu = self.getgraphics()
         if visu == 'bokeh':
             if mapoption:
                 if 'spark' in mapoption or 'spiral' in mapoption:
@@ -948,8 +967,8 @@ class front:
             PyvoaError: If no visualization has been set up.
         """
         self.setnamefunction(self.map)
-        if self.getdisplay():
-            z = {**self.getvisukwargs(), **kwargs}
+        if self.getgraphics():
+            z = {**self.getkwargsvisu(), **kwargs}
             self.outcome = self.allvisu.map(**z)
             return self.outcome
         else:
@@ -977,7 +996,7 @@ class front:
             kwargs.pop('output')
             if kwargs.get('bypop'):
               kwargs.pop('bypop')
-            if self.getdisplay():
+            if self.getgraphics():
                 self.outcome = self.allvisu.hist(**kwargs)
                 return func(self,self.outcome)
             else:
@@ -1016,7 +1035,7 @@ class front:
         """
         self.setnamefunction(self.hist)
         self.outcome = fig
-        if self.getdisplay() == 'bokeh':
+        if self.getgraphics() == 'bokeh':
             from bokeh.io import (
             show,
             output_notebook,
@@ -1052,8 +1071,8 @@ class front:
             if kwargs.get('bypop'):
                 kwargs.pop('bypop')
 
-            if self.getdisplay():
-                z = {**self.getvisukwargs(), **kwargs}
+            if self.getgraphics():
+                z = {**self.getkwargsvisu(), **kwargs}
                 self.outcome = self.allvisu.plot(**z)
 
                 return func(self,self.outcome)
@@ -1088,7 +1107,7 @@ class front:
         """
         self.setnamefunction(self.plot)
         ''' show plot '''
-        if self.getdisplay() == 'bokeh' and self.plot != '':
+        if self.getgraphics() == 'bokeh' and self.plot != '':
             from bokeh.io import (
             show,
             output_notebook,
@@ -1158,7 +1177,7 @@ class front:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
         if  self.getnamefunction() != 'get':
-            if self.getdisplay() == 'bokeh':
+            if self.getgraphics() == 'bokeh':
                 #PyvoaError("Bokeh savefig not yet implemented")
                 from bokeh.io import export_png
                 export_png(self.outcome, filename=name)
