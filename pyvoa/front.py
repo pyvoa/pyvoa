@@ -696,6 +696,9 @@ class front:
                 if granularity == 'subregion':
                     pan = self.gpdbuilder.geo.get_subregion_list()
                     r = list(pan.name_subregion.unique())
+                elif granularity == 'region':
+                    pan = self.gpdbuilder.geo.get_region_list()
+                    r = list(pan.name_region.unique())
                 elif granularity == 'country':
                     r = clust()
                     r.append(code)
