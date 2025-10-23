@@ -5,6 +5,9 @@
     "iso3": "FRA",
     "locationmode":"code"
   },
+  "replace":{
+          "NA":"np.nan"
+         },
   "datasets": [
   	{	
 	 "urldata": "https://www.data.gouv.fr/fr/datasets/r/2963ccb5-344d-4978-bdd3-08aaf9efe514",
@@ -17,7 +20,7 @@
                 },
     		{
 			"name":"ratio",
-			"alias":"National",
+			"alias":"National_54",
 			"description":"Les indicateurs de suivi du SARS-CoV-2 dans les eaux usées sont calculés à partir du ratio entre la concentration virale de SARS-CoV-2 (exprimée en cg/L et quantification réalisée à partir du gène E) et la concentration en azote ammoniacal (exprimée en mg de N/L)"
     		}
   		]
