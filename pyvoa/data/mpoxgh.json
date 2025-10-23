@@ -14,8 +14,8 @@
 	 "urldata": "https://raw.githubusercontent.com/owid/monkeypox/main/owid-monkeypox-data.csv",
 	 "drop":
             {
-            "iso_code": "OWID_"
-            },
+            "iso_code": ["OWID_","XKX"]
+	    },
 	 "separator":",",
   	 "columns": [
     		     {
