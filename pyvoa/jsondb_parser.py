@@ -374,7 +374,7 @@ class DataParser:
       whereanddate =  ['date','where']
       notwhereanddate =  [ i  for i in list(pandas_db.columns) if i not in whereanddate ]
       self.available_keywords = notwhereanddate
-      pandas_db[notwhereanddate] = pandas_db[notwhereanddate].astype(float)
+      pandas_db[notwhereanddate] = pandas_db[notwhereanddate].apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", ".", regex=False), errors="coerce"))
       pandas_db = pandas_db[whereanddate+notwhereanddate]
       pandas_db = pandas_db.groupby(whereanddate).sum(min_count=1).reset_index()
       pandas_db = fill_missing_dates(pandas_db)
