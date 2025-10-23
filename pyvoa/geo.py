@@ -750,7 +750,6 @@ class GeoInfo():
                     # About some countries not properly managed by this database (south and north soudan)
                     self._data_geometry=pd.concat([self._data_geometry,pd.DataFrame({'id_tmp':'SSD','geometry':None},index=[0])],ignore_index=True)
                     #self._data_geometry=self._data_geometry.append({'id_tmp':'SSD','geometry':None},ignore_index=True) # adding the SSD row
-                    #self._data_geometry=pd.concat([self._data_geometry,pd.DataFrame({'id_tmp':'SSD','geometry':None})])
                     for newc in ['SSD','SDN']:
                         newgeo=gpd.read_file(get_local_from_url('https://github.com/johan/world.geo.json/raw/master/countries/'+newc+'.geo.json'))
                         poly=newgeo[newgeo.id==newc].geometry.values[0]
@@ -1351,7 +1350,7 @@ class GeoCountry():
                     src='http:'+src
                 img.replace_with(src)
 
-            h_us=pd.read_html(str(soup_us)) # pandas read the modified html
+            h_us=pd.read_html(io.StringIO(str(soup_us))) # pandas read the modified html
             h_us=h_us[1][h_us[1].columns[[0,1,2,5,7]]]
             h_us.columns=['flag_subregion','code_subregion','town_subregion','population_subregion','area_subregion']
             h_us['flag_subregion'] = [ h.split('\xa0')[0] for h in h_us['flag_subregion'] ]
