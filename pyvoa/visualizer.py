@@ -30,6 +30,7 @@ from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwarg_options import InputOption
 from pyvoa.visu_matplotlib import visu_matplotlib
 from pyvoa.visu_seaborn import visu_seaborn
+from pyvoa.error import *
 
 Max_Countries_Default  = 12
 try:
