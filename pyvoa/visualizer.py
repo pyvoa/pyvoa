@@ -75,7 +75,6 @@ class AllVisu:
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
 
 
-
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
         """
@@ -139,7 +138,6 @@ class AllVisu:
                     take the most import one')
             first=kwargs['input'].where.unique()[0]
             kwargs['input'] =  kwargs['input'].loc[kwargs['input'].where.isin([first])]
-
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
@@ -151,6 +149,8 @@ class AllVisu:
                 fig = visu_matplotlib().matplotlib_versus_plot(**kwargs)
             elif typeofplot == 'yearly':
                 fig = visu_matplotlib().matplotlib_yearly_plot(**kwargs)
+            elif typeofplot == 'menulocation' or typeofplot == 'spiral':
+                raise PyvoaWarning('For display: '+ vis + ' ' + typeofplot + ' not implemented')
             else:
                 raise PyvoaError('For display: '+ vis +' unknown type of plot '+typeofplot)
         elif vis =='seaborn':

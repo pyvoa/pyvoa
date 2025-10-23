@@ -271,7 +271,6 @@ class GPDBuilder(object):
        kwargs_valuestesting(what,defaultargs['what'],'what error ...')
        output = kwargs['output']
        kwargs_valuestesting(output,defaultargs['output'],'output error ...')
-
        which = kwargs.get('which',[self.currentdata.get_available_keywords()[0]])
        if which == ['']:
           which = [self.currentdata.get_available_keywords()[0]]
@@ -317,7 +316,7 @@ class GPDBuilder(object):
            if wherenan:
                PyvoaWarning('drop ' + str(wherenan) +' : value is NAN for all the date  ')
            kwargs['input'] = kwargs['input'].loc[~kwargs['input']['where'].isin(wherenan)]
-           kwargs['which'] = w
+           #kwargs['which'] = w
            kwargs['input'] = self.whereclustered(**kwargs)
            wconcatpd = pd.DataFrame()
            for o in option:
@@ -337,14 +336,14 @@ class GPDBuilder(object):
                elif o == 'smooth7':
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
                     inx7 = temppd.groupby('where').head(7).index
-                    temppd.loc[inx7, which] = temppd[w].bfill()
+                    temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
                         temppd = temppd.groupby(['where','code','date','geometry']).mean().reset_index()
                     else:
                         temppd = temppd.groupby(['where','code','date','geometry']).sum(numeric_only=True).reset_index()
                elif o.startswith('bypop='):
-                     input = self.normbypop(input, which ,o)
+                     input = self.normbypop(input, w ,o)
                      kwargs['input'] = input
                      temppd = self.whereclustered(**kwargs)
 
@@ -353,15 +352,15 @@ class GPDBuilder(object):
                else:
                     wconcatpd = pd.concat([wconcatpd,temppd])
 
-       input = kwargs['input']
-       if not wconcatpd.empty:
-           input = wconcatpd
-       input.loc[:,'daily'] = input.groupby('where')[w].diff()
-       input.loc[:,'weekly'] = input.groupby('where')[w].diff(7)
-       input.loc[:,'daily'] = input['daily'].bfill()
-       input.loc[:,'weekly'] = input['weekly'].bfill()
-
-       input = input.reset_index(drop=True)
+           input = kwargs['input']
+           if not wconcatpd.empty:
+               input = wconcatpd
+           input.loc[:,'daily'] = input.groupby('where')[w].diff()
+           input.loc[:,'weekly'] = input.groupby('where')[w].diff(7)
+           input.loc[:,'daily'] = input['daily'].bfill()
+           input.loc[:,'weekly'] = input['weekly'].bfill()
+           input = input.reset_index(drop=True)
+       
        if 'geometry' in input.columns:
           kwargs['input'] = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):

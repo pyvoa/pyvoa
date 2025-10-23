@@ -46,20 +46,20 @@ class InputOption():
     """
     def __init__(self):
         self.d_batchinput_args  = {
-                'where':[''],\
+                        'where':[''],\
                         'option':['','nonneg','smooth7','sumall',
-                                  'bypop=0','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
-                                          'which':[''],\
-                                          'what':['current','daily','weekly'],\
-                                          'when':[''],\
-                                          'input':[pd.DataFrame()],\
-                                          'output':['pandas','geopandas','list','dict','array']
-                                          }
+                        'bypop=0','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
+                        'which':[''],\
+                        'what':['current','daily','weekly'],\
+                        'when':[''],\
+                        'input':[pd.DataFrame()],\
+                        'output':['pandas','geopandas','list','dict','array']
+                        }
         self.listchartkargskeys = list(self.d_batchinput_args.keys())
         self.listchartkargsvalues = list(self.d_batchinput_args.values())
 
         self.d_graphicsinput_args = {
-                'title':'',\
+                        'title':'',\
                         'copyright': 'pyvoa',\
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['bylocation','byvalue','pie'],\
@@ -75,7 +75,6 @@ class InputOption():
                         }
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
         self.dicokfront = {}
-
 
     def test_add_graphics_libraries(self,libraries):
         '''
