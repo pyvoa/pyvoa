@@ -227,17 +227,21 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
-            if func.__name__ == 'get' or func.__name__ == 'map' in list(kwargs.keys()):
+            if func.__name__ == 'get' in list(kwargs.keys()):
                 if 'typeofhist' or 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
             elif func.__name__ == 'plot':
               if 'typeofhist' in list(kwargs.keys()):
-                        raise PyvoaError("Argument ERROR")
+                    raise PyvoaError("Argument ERROR")
             elif func.__name__ == 'hist':
               if 'typeofplot' in list(kwargs.keys()):
-                        raise PyvoaError("Argument ERROR")
+                    raise PyvoaError("Argument ERROR")
+            elif func.__name__ == 'map':
+              print(list(kwargs.keys()))
+              if 'typeofhist' in list(kwargs.keys()) or 'typeofplot' in list(kwargs.keys()):
+                    raise PyvoaError("Argument ERROR")
             else:
-                raise PyvoaError("What function is this ",func.__name__)
+                raise PyvoaError("What function is this "+func.__name__)
 
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
