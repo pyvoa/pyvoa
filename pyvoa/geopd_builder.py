@@ -265,7 +265,7 @@ class GPDBuilder(object):
        '''
 
        defaultargs = InputOption().d_batchinput_args
-       option = kwargs['option']
+       option = kwargs.get('option',defaultargs['option'][0])
        kwargs_valuestesting(option,defaultargs['option'],'option error ... ')
        what = kwargs['what']
        kwargs_valuestesting(what,defaultargs['what'],'what error ...')
@@ -320,6 +320,7 @@ class GPDBuilder(object):
            kwargs['input'] = self.whereclustered(**kwargs)
            wconcatpd = pd.DataFrame()
            for o in option:
+               print(o)
                temppd = kwargs['input']
                if o == 'nonneg':
                    if w.startswith('cur_'):
@@ -360,7 +361,7 @@ class GPDBuilder(object):
            input.loc[:,'daily'] = input['daily'].bfill()
            input.loc[:,'weekly'] = input['weekly'].bfill()
            input = input.reset_index(drop=True)
-       
+
        if 'geometry' in input.columns:
           kwargs['input'] = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):
@@ -385,6 +386,7 @@ class GPDBuilder(object):
         Return a pandas with a normalisation column add by population
         * can normalize by '100', '1k', '100k' or '1M' and the new which
     """
+
     if pandy.empty:
         raise PyvoaError('normbypop problem, your pandas seems to be empty ....')
     value = re.sub(r'^.*?bypop=', '', bypop)
@@ -413,9 +415,13 @@ class GPDBuilder(object):
             raise PyvoaKeyError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
     pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
-
+    if not isinstance(val2norm, list):
+        val2norm=[val2norm]
     for i in val2norm:
-        pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*GPDBuilder.dictbypop()[value]
+        if value == '0':
+            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]
+        else:
+            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*GPDBuilder.dictbypop()[value]
     return pandy
 
    def saveoutput(self,**kwargs):
