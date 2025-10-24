@@ -97,6 +97,7 @@ class front:
 
         self.lwhat = list(self.av.d_batchinput_args['what'])
         self.lhist = list(self.av.d_graphicsinput_args['typeofhist'])
+        self.lplot = list(self.av.d_graphicsinput_args['typeofplot'])
         self.loption = list(self.av.d_batchinput_args['option'])
 
         self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
@@ -226,16 +227,27 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
+            if func.__name__ == 'get' or func.__name__ == 'map' in list(kwargs.keys()):
+                if 'typeofhist' or 'typeofplot' in list(kwargs.keys()):
+                    raise PyvoaError("Argument ERROR")
+            elif func.__name__ == 'plot':
+              if 'typeofhist' in list(kwargs.keys()):
+                        raise PyvoaError("Argument ERROR")
+            elif func.__name__ == 'hist':
+              if 'typeofplot' in list(kwargs.keys()):
+                        raise PyvoaError("Argument ERROR")
+            else:
+                raise PyvoaError("What function is this ",func.__name__)
+
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
             kwargs_keystesting(kwargs,self.lchartkargskeys + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
 
-            dicovisu = {k:kwargs.get(k) for k,v in self.av.d_graphicsinput_args.items()}
+            dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             self.setkwargsvisu(**dicovisu)
-            [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct')
-                for i in ['typeofhist','typeofplot']]
+            [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
 
             for k,v in default.items():
                 if k in kwargs.keys():
@@ -263,37 +275,11 @@ class front:
 
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multile values ... remove one please')
-
-            if  func.__name__ == 'get':
-                if dicovisu['typeofplot']:
-                    raise PyvoaError("'typeofplot' not compatible with get ...")
-                if  dicovisu['typeofhist']:
-                    raise PyvoaError("'typeofhist' not compatible with get ...")
-            elif func.__name__ == 'plot':
-                if dicovisu['mapoption'] or dicovisu['tile']:
-                    raise PyvoaError('Please have a look on your arguement not compatible with plot')
-                if dicovisu['typeofhist']:
-                    raise PyvoaError("'typeofhist' option not compatible with plot ...")
-            elif func.__name__ == 'hist':
-                if dicovisu['typeofplot']:
-                    raise PyvoaError("'typeofplot' option not compatible with " + func.__name__ )
-                if dicovisu['mapoption'] or dicovisu['tile']:
-                    PyvoaError('Please have a look on your arguement not compatible with hist')
-            elif func.__name__ == 'map' :
-                if dicovisu['typeofplot']:
-                    raise PyvoaError("'typeofplot' option not compatible with " + func.__name__ )
-
-            elif func.__name__ in ['save']:
-                pass
-            else:
-                raise PyvoaError(" What does " + func.__name__ + ' is supposed to be ... ?')
-
             if self.getkwargsvisu()['vis']:
                 pass
             if kwargs['input'].empty:
                     if self.gpdbuilder:
                         kwargs = self.gpdbuilder.get_stats(**kwargs)
-
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('bypop='):
@@ -330,6 +316,7 @@ class front:
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
                 z = {**self.getkwargsvisu(), **kwargs}
+
             if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
@@ -581,7 +568,7 @@ class front:
         Returns:
             list: A list containing the types of plots.
         """
-        return list(self.av.d_graphicsinput_args['typeofplot'])
+        return self.lplot
 
     def listoption(self,):
         """Returns the value of the loption attribute.
@@ -741,7 +728,7 @@ class front:
                 l=self.listwhom(True)
                 print(l[l.index == db])
                 return None
-        else: 
+        else:
             if self.db=='':
                 if return_error:
                     raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
@@ -1068,7 +1055,6 @@ class front:
             which = kwargs.get('which')
             typeofplot = kwargs.get('typeofplot',self.listplot()[0])
             kwargs.pop('output')
-
             if typeofplot == 'versus' and len(which)>2:
                 PyvoaError(" versu can be used with 2 variables and only 2 !")
             if kwargs.get('bypop'):
