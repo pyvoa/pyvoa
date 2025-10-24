@@ -133,6 +133,7 @@ class AllVisu:
     def plot(self,**kwargs):
         typeofplot = kwargs.get('typeofplot')
         vis = kwargs.get('vis')
+        fig = None
         if typeofplot == 'yearly' and len(kwargs['input']['where'].unique())>1:
             PyvoaWarning('Yearly plot can display only one country,\
                     take the most import one')
@@ -150,7 +151,7 @@ class AllVisu:
             elif typeofplot == 'yearly':
                 fig = visu_matplotlib().matplotlib_yearly_plot(**kwargs)
             elif typeofplot == 'menulocation' or typeofplot == 'spiral':
-                raise PyvoaWarning('For display: '+ vis + ' ' + typeofplot + ' not implemented')
+                PyvoaWarning('For display: '+ vis + ' ' + typeofplot + ' not implemented')
             else:
                 raise PyvoaError('For display: '+ vis +' unknown type of plot '+typeofplot)
         elif vis =='seaborn':
