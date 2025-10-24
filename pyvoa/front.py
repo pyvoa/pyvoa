@@ -237,7 +237,7 @@ class front:
               if 'typeofplot' in list(kwargs.keys()):
                         raise PyvoaError("Argument ERROR")
             else:
-                raise PyvoaError("What function is this ",func.__name__)
+                raise PyvoaError("What function is this "+func.__name__)
 
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
