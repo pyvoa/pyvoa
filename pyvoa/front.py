@@ -237,7 +237,6 @@ class front:
               if 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
             elif func.__name__ == 'map':
-              print(list(kwargs.keys()))
               if 'typeofhist' in list(kwargs.keys()) or 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
             else:
