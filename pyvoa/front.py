@@ -249,7 +249,6 @@ class front:
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
 
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
-            self.setkwargsvisu(**dicovisu)
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
 
             for k,v in default.items():
@@ -289,6 +288,8 @@ class front:
                     found_bypop = w
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
                     break
+            if kwargs['what'] == 'current':
+               kwargs['what'] = kwargs['which'][0]
             return func(self,**kwargs)
         return wrapper
 
@@ -319,7 +320,6 @@ class front:
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
                 z = {**self.getkwargsvisu(), **kwargs}
-
             if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
@@ -814,7 +814,6 @@ class front:
         else:
             self._setkwargsvisu = kwargs
 
-
     def getkwargsvisu(self,):
         return self._setkwargsvisu
 
@@ -1063,11 +1062,9 @@ class front:
                 PyvoaError(" versu can be used with 2 variables and only 2 !")
             if kwargs.get('bypop'):
                 kwargs.pop('bypop')
-
             if self.getgraphics():
                 z = {**self.getkwargsvisu(), **kwargs}
                 self.outcome = self.allvisu.plot(**z)
-
                 return func(self,self.outcome)
             else:
                 PyvoaError(" No visualization has been set up !")
