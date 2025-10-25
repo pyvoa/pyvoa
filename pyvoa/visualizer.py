@@ -142,7 +142,6 @@ class AllVisu:
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
-
         if vis == 'matplotlib':
             if typeofplot == 'date':
                 fig = visu_matplotlib().matplotlib_date_plot(**kwargs)
@@ -199,7 +198,6 @@ class AllVisu:
         '''
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
-
         if vis == 'matplotlib':
             if typeofhist == 'bylocation':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)

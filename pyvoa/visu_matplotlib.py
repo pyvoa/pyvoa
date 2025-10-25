@@ -57,15 +57,15 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
 
         plt = kwargs['plt']
         ax = kwargs['ax']
         plt.xlabel("Date", fontsize=10)
-        plt.ylabel(which, fontsize=10)
+        plt.ylabel(what, fontsize=10)
         #for val in which:
-        df = pd.pivot_table(input,index='date', columns='where', values=which)
+        df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
         for col in df.columns:
             lines = plt.plot(df.index, df[col],label=f'{col}')
@@ -103,7 +103,7 @@ class visu_matplotlib:
          Max display defined by Max_Countries_Default
         '''
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
         plt = kwargs['plt']
         ax = kwargs['ax']
@@ -118,7 +118,7 @@ class visu_matplotlib:
         loc = input['where'][0]
         d = input.allyears.unique()
         for i in d:
-            df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=which)
+            df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
             ax = plt.plot(df.index,df,label=f'{i}')
         plt.legend(d)
         plt.title(title)
@@ -132,7 +132,7 @@ class visu_matplotlib:
          Max display defined by Max_Countries_Default
         '''
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
 
         plt = kwargs.get('plt')
@@ -140,7 +140,7 @@ class visu_matplotlib:
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
         input = input.set_index('where')
-        input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
+        input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='where', labeldistance=None,ax=ax)
         plt.show()
         return plt
@@ -151,14 +151,14 @@ class visu_matplotlib:
         matplotlib horizon histo
         '''
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         cmap = plt.get_cmap('Paired')
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         ax.set_title(title)
-        ax.barh(input['where'], input[which],color=cmap.colors)
+        ax.barh(input['where'], input[what],color=cmap.colors)
         plt.show()
         return plt
 
@@ -168,12 +168,12 @@ class visu_matplotlib:
         matplotlib vertical histo
         '''
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         bins=len(input['where'])+1
-        input = pd.pivot_table(input,index='date', columns='where', values=which)
+        input = pd.pivot_table(input,index='date', columns='where', values=what)
         input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
         plt.show()
         return plt
@@ -192,13 +192,12 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         plt.axis('off')
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         mapoption = kwargs.get('mapoption')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
-
-        input.plot(column = which, ax=ax,legend=True,
-                                legend_kwds={'label': which,
+        input.plot(column = what, ax=ax,legend=True,
+                                legend_kwds={'label': what,
                                 'orientation': "horizontal","pad": 0.001})
 
         if tile == 'openstreet':
@@ -220,7 +219,7 @@ class visu_matplotlib:
             for idx, centroid in enumerate(centroids):
                 if centroid:
                     x, y = centroid.x, centroid.y
-                    annotation = input.iloc[idx][which]
+                    annotation = input.iloc[idx][what]
                     annotation =  annotation.round(2)
 
         ax.set_axis_off()
