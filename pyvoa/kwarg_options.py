@@ -48,7 +48,7 @@ class InputOption():
         self.d_batchinput_args  = {
                         'where':[''],\
                         'option':['','nonneg','smooth7','sumall',
-                        'bypop=0','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
+                        'bypop=pop','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
                         'which':[''],\
                         'what':['current','daily','weekly'],\
                         'when':[''],\

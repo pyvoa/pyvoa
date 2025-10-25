@@ -581,6 +581,7 @@ class front:
         Returns:
             The value of the loption attribute.
         """
+        self.loption.remove('')
         return self.loption
 
     def listchartkargskeys(self,):

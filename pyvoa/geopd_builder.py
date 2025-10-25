@@ -105,7 +105,7 @@ class GPDBuilder(object):
    @staticmethod
    def dictbypop():
        ''' return dictionnary bypop '''
-       bypop = {'no':0,'100':100,'1k':1e3,'100k':1e5,'1M':1e6,'pop':1.}
+       bypop = {'pop':1.,'100':100,'1k':1e3,'100k':1e5,'1M':1e6}
        return bypop
 
    def getwheregeometrydescription(self):
@@ -320,7 +320,6 @@ class GPDBuilder(object):
            kwargs['input'] = self.whereclustered(**kwargs)
            wconcatpd = pd.DataFrame()
            for o in option:
-               print(o)
                temppd = kwargs['input']
                if o == 'nonneg':
                    if w.startswith('cur_'):
@@ -418,7 +417,7 @@ class GPDBuilder(object):
     if not isinstance(val2norm, list):
         val2norm=[val2norm]
     for i in val2norm:
-        if value == '0':
+        if value == 'pop':
             pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]
         else:
             pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*GPDBuilder.dictbypop()[value]
