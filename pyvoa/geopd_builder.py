@@ -393,7 +393,10 @@ class GPDBuilder(object):
     pop_field='population'
     uniquepandy = pandy.groupby('where').first().reset_index()
     if self.db_world == True:
-        uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population')
+        try:
+            uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population')
+        except:
+            PyvoaError(self.db + ' has no information for what concern: '+pop_field)    
     else:
         if not isinstance(self._gi,coge.GeoCountry):
             self._gi = None
@@ -403,13 +406,18 @@ class GPDBuilder(object):
 
         if self._gi == None :
             self._gi = self.geo
-
         pop_field='population_subregion'
         if self.granularity == 'region':
             regsubreg={i:self.geo.get_subregions_from_region(name=i) for i in clust}
-            uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+            try:
+                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+            except:
+                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         elif self.granularity == 'subregion':
-            uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+            try:
+                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+            except:
+                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         else:
             raise PyvoaKeyError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
