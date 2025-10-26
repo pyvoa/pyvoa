@@ -78,7 +78,7 @@ from bokeh.plotting import figure, show
 from bokeh.io import output_notebook
 
 from bokeh.io import output_notebook
-
+'''
 def safe_output_notebook():
     try:
         from IPython import get_ipython
@@ -88,7 +88,9 @@ def safe_output_notebook():
     except Exception:
         pass
 safe_output_notebook()
-        
+'''
+output_notebook()
+
 from bokeh.layouts import (
 row,
 column,
