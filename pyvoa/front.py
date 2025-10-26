@@ -283,7 +283,7 @@ class front:
 
             if kwargs['input'].empty:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
-               
+
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('bypop='):
@@ -574,6 +574,7 @@ class front:
         Returns:
             list: A list containing the types of plots.
         """
+        self.lplot = self.av.d_visu_possible_plots[self.vis]
         return self.lplot
 
     def listoption(self,):
