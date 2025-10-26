@@ -227,8 +227,8 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
-            if func.__name__ == 'get' in list(kwargs.keys()):
-                if 'typeofhist' or 'typeofplot' in list(kwargs.keys()):
+            if func.__name__ == 'get':
+                if 'typeofhist' in list(kwargs.keys()) or 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
             elif func.__name__ == 'plot':
               if 'typeofhist' in list(kwargs.keys()):
@@ -289,7 +289,7 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
                     break
             if kwargs['what'] == 'current':
-               kwargs['what'] = kwargs['which'][0]
+               kwargs['what'] = kwargs['which']
             return func(self,**kwargs)
         return wrapper
 
