@@ -264,11 +264,10 @@ class front:
             #    if k not in mustbealist:
             #        print(k,v)
             #        kwargs[k]=v[0]
-            print("0000000,",kwargs)
+
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
                     kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
-
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -284,6 +283,7 @@ class front:
 
             if kwargs['input'].empty:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
+               
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('bypop='):
