@@ -355,10 +355,10 @@ class GPDBuilder(object):
            input = kwargs['input']
            if not wconcatpd.empty:
                input = wconcatpd
-           input.loc[:,'daily'] = input.groupby('where')[w].diff()
-           input.loc[:,'weekly'] = input.groupby('where')[w].diff(7)
-           input.loc[:,'daily'] = input['daily'].bfill()
-           input.loc[:,'weekly'] = input['weekly'].bfill()
+           input.loc[:,w+' daily']  = input.groupby('where')[w].diff()
+           input.loc[:,w+' weekly'] = input.groupby('where')[w].diff(7)
+           input.loc[:,w+' daily']  = input[w+' daily'].bfill()
+           input.loc[:,w+' weekly'] = input[w+' weekly'].bfill()
            input = input.reset_index(drop=True)
 
        if 'geometry' in input.columns:
@@ -378,6 +378,12 @@ class GPDBuilder(object):
             ordered=True
             )
        kwargs['input'] = kwargs['input'].sort_values(by=['where','date'])
+       prefix = ['date', 'where', 'code']
+       suffix = ['geometry']
+       others = sorted([c for c in kwargs['input'].columns if c not in prefix + suffix])
+       new_order = prefix + others + suffix
+       kwargs['input'] = kwargs['input'][new_order]
+       print(kwargs['input'])
        return kwargs
 
    def normbypop(self, pandy, val2norm ,bypop):
@@ -396,7 +402,7 @@ class GPDBuilder(object):
         try:
             uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population')
         except:
-            PyvoaError(self.db + ' has no information for what concern: '+pop_field)    
+            PyvoaError(self.db + ' has no information for what concern: '+pop_field)
     else:
         if not isinstance(self._gi,coge.GeoCountry):
             self._gi = None
