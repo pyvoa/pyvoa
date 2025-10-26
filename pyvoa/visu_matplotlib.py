@@ -46,7 +46,6 @@ class visu_matplotlib:
 
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
-
             fig, ax = plt.subplots(1, 1,figsize=(12, 8))
             kwargs['fig'] = fig
             kwargs['ax'] = ax
@@ -59,7 +58,6 @@ class visu_matplotlib:
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
-
         plt = kwargs['plt']
         ax = kwargs['ax']
         plt.xlabel("Date", fontsize=10)
@@ -78,18 +76,17 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         title = kwargs.get('title')
         plt = kwargs['plt']
         ax = kwargs['ax']
-
         loc = list(input['where'].unique())
-        plt.xlabel(which[0], fontsize=10)
-        plt.ylabel(which[1], fontsize=10)
+        plt.xlabel(what[0], fontsize=10)
+        plt.ylabel(what[1], fontsize=10)
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
-            lines=plt.plot(pandy[which[0]], pandy[which[1]])
+            lines=plt.plot(pandy[what[0]], pandy[what[1]])
             leg.append(col)
         plt.legend(leg)
         plt.title(title)

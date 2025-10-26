@@ -256,11 +256,12 @@ class front:
                     else:
                         default[k] = [kwargs[k]]
             kwargs = {**default, **dicovisu}
-
+            kwargs['what'] = kwargs['what'][0]
             #for k,v in kwargs.items():
             #    if k not in mustbealist:
+            #        print(k,v)
             #        kwargs[k]=v[0]
-
+            print("0000000,",kwargs)
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
                     kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
@@ -277,7 +278,7 @@ class front:
                 raise PyvoaError('sumall option incompatible with multile values ... remove one please')
             if self.getkwargsvisu()['vis']:
                 pass
-            print(kwargs['input'])
+
             if kwargs['input'].empty:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
             found_bypop = None
@@ -288,7 +289,6 @@ class front:
                     break
             if kwargs['what'] == 'current':
                kwargs['what'] = kwargs['which']
-            print(kwargs)
             return func(self,**kwargs)
         return wrapper
 
