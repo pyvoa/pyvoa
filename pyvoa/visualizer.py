@@ -101,7 +101,7 @@ class AllVisu:
         def inner_hm(self, **kwargs):
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
-            input = kwargs['input'] 
+            input = kwargs['input']
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -149,7 +149,6 @@ class AllVisu:
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
-
         if vis == 'matplotlib':
             if typeofplot == 'date':
                 fig = visu_matplotlib().matplotlib_date_plot(**kwargs)
@@ -169,7 +168,6 @@ class AllVisu:
             else:
                 PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
-            import visu_bokeh
             if typeofplot == 'date':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_date_plot(**kwargs)
             elif typeofplot == 'spiral':

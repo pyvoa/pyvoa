@@ -321,7 +321,7 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
-                z = {**self.getkwargsvisu(), **kwargs}
+                z = { **kwargs, **self.getkwargsvisu() }
             if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
