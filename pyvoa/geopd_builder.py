@@ -285,7 +285,7 @@ class GPDBuilder(object):
            input = self.currentdata.get_maingeopandas()
            kwargs['input'] = input
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
-
+      
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
 
@@ -360,7 +360,6 @@ class GPDBuilder(object):
            input.loc[:,w+' daily']  = input[w+' daily'].bfill()
            input.loc[:,w+' weekly'] = input[w+' weekly'].bfill()
            input = input.reset_index(drop=True)
-
        if 'geometry' in input.columns:
           kwargs['input'] = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):

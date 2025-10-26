@@ -225,6 +225,7 @@ class DataParser:
                     PyvoaError('Granularity problem: neither country, region or subregion')
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
+
             self.get_echoinfo()
         except:
             raise PyvoaDbError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
