@@ -52,14 +52,14 @@ class InputOption():
                         'which':[''],\
                         'what':['current','daily','weekly'],\
                         'when':[''],\
-                        'input':[pd.DataFrame()],\
+                        'input':pd.DataFrame(),\
                         'output':['pandas','geopandas','list','dict','array']
                         }
         self.listchartkargskeys = list(self.d_batchinput_args.keys())
         self.listchartkargsvalues = list(self.d_batchinput_args.values())
 
         self.d_graphicsinput_args = {
-                        'title':'',\
+                        'title':'Pyvoa charts',\
                         'copyright': 'pyvoa',\
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['bylocation','byvalue','pie'],\

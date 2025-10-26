@@ -86,6 +86,9 @@ class AllVisu:
             locunique = list(input['where'].unique())[:Max_Countries_Default]
             input = input.loc[input['where'].isin(locunique)]
             kwargs['input'] = input
+            if kwargs['what'] in ['daily','weekly']:
+               cols = [c for c in input.columns if c.endswith(kwargs['what'])]
+               kwargs['what'] = cols
             return func(self, **kwargs)
         return inner_plot
 
@@ -98,7 +101,10 @@ class AllVisu:
         def inner_hm(self, **kwargs):
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
-            kwargs['which'] = kwargs.get('which')[0]
+            if kwargs['what'] in ['daily','weekly']:
+               cols = [c for c in input.columns if c.endswith(kwargs['what'])]
+               kwargs['what'] = cols
+            kwargs['what'] = kwargs.get('what')[0]
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -142,6 +148,7 @@ class AllVisu:
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
+
         if vis == 'matplotlib':
             if typeofplot == 'date':
                 fig = visu_matplotlib().matplotlib_date_plot(**kwargs)

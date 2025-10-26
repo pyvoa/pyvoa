@@ -378,12 +378,12 @@ class GPDBuilder(object):
             ordered=True
             )
        kwargs['input'] = kwargs['input'].sort_values(by=['where','date'])
+
        prefix = ['date', 'where', 'code']
        suffix = ['geometry']
        others = sorted([c for c in kwargs['input'].columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        kwargs['input'] = kwargs['input'][new_order]
-       print(kwargs['input'])
        return kwargs
 
    def normbypop(self, pandy, val2norm ,bypop):
