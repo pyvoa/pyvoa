@@ -236,7 +236,7 @@ class visu_seaborn:
         input['month'] = [m.month for m in input['date']]
         input['year'] = [m.year for m in input['date']]
 
-        data_pivot = input.pivot_table(index='month', columns='year', values='what)
+        data_pivot = input.pivot_table(index='month', columns='year', values=what)
 
         total = data_pivot.sum().sum()
 
