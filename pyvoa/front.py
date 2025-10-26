@@ -13,6 +13,9 @@ Date :    April 2020 - May 2025
 '''
 
 # --- Imports ----------------------------------------------------------
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import pandas as pd
 from functools import wraps
 import numpy as np
