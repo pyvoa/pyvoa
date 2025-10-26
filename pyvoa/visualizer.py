@@ -101,6 +101,7 @@ class AllVisu:
         def inner_hm(self, **kwargs):
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
+            input = kwargs['input'] 
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
