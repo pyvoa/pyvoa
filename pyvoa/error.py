@@ -20,7 +20,7 @@ import sys
 import time
 from time import sleep
 from IPython import get_ipython
-
+import pyvoa.tools as pt
 
 def blinking_centered_text(typemsg, message, blinking=False, text_color="white", bg_color="red"):
     """
@@ -138,21 +138,24 @@ class PyvoaInfo(Exception):
     """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='black', bg_color='blue')
+        if pt.get_verbose_mode()>1:
+            blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='black', bg_color='blue')
         Exception(message)
 
 class PyvoaDBInfo(Exception):
     """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='white', bg_color='blue')
+        if pt.get_verbose_mode()>1:
+            blinking_centered_text('PYVOA Info !',message, blinking=0,text_color='white', bg_color='blue')
         Exception(message)
 
 class PyvoaWarning(Exception):
     """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        blinking_centered_text('PYVOA Warning !',message, blinking=0,text_color='black', bg_color='orange')
+        if pt.get_verbose_mode()>1:
+            blinking_centered_text('PYVOA Warning !',message, blinking=0,text_color='black', bg_color='orange')
         Exception(message)
 
 class PyvoaError(Exception):
