@@ -105,12 +105,12 @@ class visu_seaborn:
         Create a seaborn line plot with date on x-axis and which on y-axis.
         """
         input = kwargs['input']
-        which = kwargs['which']
+        what = kwargs['what']
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         st=['-','--',':']
-        for idx, i in enumerate(which):
+        for idx, i in enumerate(what):
             input['where+i']=input['where'].apply(lambda x: x+', '+i)
             sns.lineplot(data=input, x='date', y = i, hue='where+i',style='where+i')#linestyle=st[idx])
         plt.legend(title = "where", loc= "upper right",bbox_to_anchor=(1.04, 1))
@@ -146,13 +146,13 @@ class visu_seaborn:
         Create a seaborn vertical histogram with which on y-axis.
         """
         filtered_input = kwargs['filtered_input']
-        which = kwargs['which']
+        what = kwargs['what']
         title = kwargs.get('title')
 
         # Créer le graphique
         sns.set_theme(style="whitegrid")
         plt.figure(figsize=(14, 7))
-        sns.barplot(data=filtered_input, x='where', y=which, palette="viridis")
+        sns.barplot(data=filtered_input, x='where', y=what, palette="viridis")
         plt.title(title)
         plt.xlabel('')  # Suppression de l'étiquette de l'axe x
         plt.ylabel(which)
@@ -166,14 +166,14 @@ class visu_seaborn:
         Create a seaborn vertical histogram where the x-axis represents a numerical field.
         """
         input = kwargs['input']
-        which = kwargs['which']
+        what = kwargs['what']
         title = kwargs.get('title')
         if isinstance(which, list):
             which = which[0]
 
         sns.set_theme(style="whitegrid")
         plt.figure(figsize=(14, 7))
-        sns.histplot(data=filtered_input, x=which, bins=24, color='blue', kde=True)
+        sns.histplot(data=filtered_input, x=what, bins=24, color='blue', kde=True)
         plt.title(title)
         plt.xlabel(which)
         plt.ylabel('Fréquence')
@@ -188,18 +188,16 @@ class visu_seaborn:
         Create a seaborn horizontal histogram with which on x-axis.
         """
         input = kwargs['input']
-        which = kwargs['which']
+        what = kwargs['what']
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
-        if isinstance(which, list):
-            which = which[0]
 
         sns.set_theme(style="whitegrid")
         plt.figure(figsize=(14, 7))
-        sns.barplot(data=input, x=which, y='where', palette="viridis", errorbar=None)
+        sns.barplot(data=input, x=what, y='where', palette="viridis", errorbar=None)
         plt.title(title)
-        plt.xlabel(which)
+        plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
         plt.show()
@@ -212,12 +210,12 @@ class visu_seaborn:
         Create a seaborn pairplot
         """
         input = kwargs['input']
-        which = kwargs['which']
+        what = kwargs['what']
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
         plt.figure(figsize=(14, 7))
-        plt.pie(input[which], labels=input['where'], autopct='%1.1f%%')
+        plt.pie(input[what], labels=input['where'], autopct='%1.1f%%')
         plt.xlabel(which)
         plt.ylabel('')
         plt.xticks(rotation=45)
@@ -231,14 +229,14 @@ class visu_seaborn:
         """
         PyvoaWarning("BEWARE !!! THIS visulasation need to be checked !!!")
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        what = kwargs['what']
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
 
         input['month'] = [m.month for m in input['date']]
         input['year'] = [m.year for m in input['date']]
 
-        data_pivot = input.pivot_table(index='month', columns='year', values='daily')
+        data_pivot = input.pivot_table(index='month', columns='year', values='what)
 
         total = data_pivot.sum().sum()
 
