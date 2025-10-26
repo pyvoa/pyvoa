@@ -241,7 +241,6 @@ class front:
                     raise PyvoaError("Argument ERROR")
             else:
                 raise PyvoaError("What function is this "+func.__name__)
-
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
@@ -250,18 +249,17 @@ class front:
 
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
-
             for k,v in default.items():
                 if k in kwargs.keys():
                     if isinstance(kwargs[k],list):
                         default[k] = kwargs[k]
                     else:
                         default[k] = [kwargs[k]]
-            kwargs = default
+            kwargs = {**default, **dicovisu}
 
-            for k,v in kwargs.items():
-                if k not in mustbealist:
-                    kwargs[k]=v[0]
+            #for k,v in kwargs.items():
+            #    if k not in mustbealist:
+            #        kwargs[k]=v[0]
 
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
@@ -279,9 +277,9 @@ class front:
                 raise PyvoaError('sumall option incompatible with multile values ... remove one please')
             if self.getkwargsvisu()['vis']:
                 pass
+            print(kwargs['input'])
             if kwargs['input'].empty:
-                    if self.gpdbuilder:
-                        kwargs = self.gpdbuilder.get_stats(**kwargs)
+                kwargs = self.gpdbuilder.get_stats(**kwargs)
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('bypop='):
@@ -290,6 +288,7 @@ class front:
                     break
             if kwargs['what'] == 'current':
                kwargs['what'] = kwargs['which']
+            print(kwargs)
             return func(self,**kwargs)
         return wrapper
 
@@ -332,6 +331,7 @@ class front:
                             z.pop('typeofhist')
                             z.pop('typeofplot')
                             z.pop('bins')
+
                 return func(self,**z)
             else:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
