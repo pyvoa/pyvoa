@@ -47,18 +47,17 @@ class visu_matplotlib:
                 from IPython import get_ipython
                 ipy = get_ipython()
                 if ipy is None:
-                    # Cas terminal classique (python)
+                    # For classic terminal  (python)
                     matplotlib.use("TkAgg")
                 elif "IPKernelApp" in ipy.config:
-                    # Cas Jupyter notebook
+                    # For Jupyter notebook
                     matplotlib.use("module://matplotlib_inline.backend_inline")
                 else:
                     # Cas IPython shell (ex : ipython en console)
                     matplotlib.use("TkAgg")
             except Exception:
-                # En cas de doute, fallback vers TkAgg (fenêtre graphique)
+                #in other case fallback vers TkAgg (fenêtre graphique)
                 matplotlib.use("TkAgg")
-
         set_matplotlib_backend()
 
     def decomatplotlib(func):
@@ -79,7 +78,7 @@ class visu_matplotlib:
         ax = kwargs['ax']
         plt.xlabel("Date", fontsize=10)
         plt.ylabel(what, fontsize=10)
-        #for val in which:
+
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
         for col in df.columns:

@@ -277,7 +277,7 @@ class front:
                 kwargs['option'].append('sumall')
 
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
-                raise PyvoaError('sumall option incompatible with multile values ... remove one please')
+                raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
             if self.getkwargsvisu()['vis']:
                 pass
 
@@ -288,10 +288,15 @@ class front:
             for w in kwargs['option']:
                 if w.startswith('bypop='):
                     found_bypop = w
+                    if kwargs['what'] == 'current':
+                        ext =' '
+                    else:
+                        ext = ' '+kwargs['what']+' '
+                    kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
+
                     break
-            if kwargs['what'] == 'current':
-               kwargs['what'] = kwargs['which']
+            #if kwargs['what'] == 'current':
             return func(self,**kwargs)
         return wrapper
 
