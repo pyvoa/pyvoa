@@ -80,7 +80,7 @@ class front:
         listhist(): Returns the list of currently available types of histograms.
         listplot(): Returns the list of currently available types of plots.
         listoption(): Returns the list of currently available options applied to data.
-        listtiles(): Returns the list of currently available tile options for maps.
+        listtile(): Returns the list of currently available tile options for maps.
         listwhich(dbname=None): Gets the available fields for the specified database.
         listwhere(clustered=False): Gets the list of available regions/subregions managed by the current GPDBuilder.
         getrawdb(): Returns the main pandas DataFrame with all values loaded from the selected GPDBuilder.
@@ -612,7 +612,7 @@ class front:
         """
         return self.lchartkargsvalues
 
-    def listtiles(self,):
+    def listtile(self,):
         """Returns the list of tiles.
 
         This method retrieves the current list of tiles stored in the instance.
@@ -998,7 +998,7 @@ class front:
             if kwargs.get('bypop'):
               kwargs.pop('bypop')
             if self.getgraphics():
-                z = { **self.getkwargsvisu(), **kwargs}
+                z = { **kwargs , **self.getkwargsvisu() }
                 self.outcome = self.allvisu.hist(**z)
                 return func(self,self.outcome)
             else:
