@@ -285,7 +285,7 @@ class GPDBuilder(object):
            input = self.currentdata.get_maingeopandas()
            kwargs['input'] = input
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
-      
+
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
 
@@ -429,10 +429,8 @@ class GPDBuilder(object):
     pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
     if not isinstance(val2norm, list):
         val2norm=[val2norm]
+
     for i in val2norm:
-        if value == 'pop':
-            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]
-        else:
             pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*GPDBuilder.dictbypop()[value]
     return pandy
 
