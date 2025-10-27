@@ -947,12 +947,12 @@ class visu_bokeh:
         #toggl=kwargs.get('toggl')
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         mode = kwargs.get('mode',self.d_graphicsinput_args['mode'])
         mapoption = kwargs.get('mapoption', self.d_graphicsinput_args['mapoption'])
 
-        input['left'] = input[which]
-        input['right'] = input[which]
+        input['left'] = input[what]
+        input['right'] = input[what]
         input['left'] = input['left'].apply(lambda x: 0 if x > 0 else x)
         input['right'] = input['right'].apply(lambda x: 0 if x < 0 else x)
 
@@ -1010,7 +1010,7 @@ class visu_bokeh:
                     source = pyvoafiltered,text_font_size='10px',text_color='black')
 
             cases_custom = visu_bokeh().rollerJS()
-            hover_tool = HoverTool(tooltips=[('where', '@where'), (which, '@right{0,0.0}'), ],
+            hover_tool = HoverTool(tooltips=[('where', '@where'), (what, '@right{0,0.0}'), ],
                                    formatters = {'where': 'printf', '@{' + 'right' + '}': cases_custom, '%':'printf'},
                                    mode = mode, point_policy="snap_to_data")
             bokeh_figure.add_tools(hover_tool)

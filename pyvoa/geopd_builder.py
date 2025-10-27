@@ -241,7 +241,6 @@ class GPDBuilder(object):
                     newpd = temp
                 else:
                     newpd = pd.concat([newpd,temp])
-
         else:
             where = flat_list(where)
             if self.db_world:
