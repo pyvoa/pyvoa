@@ -2436,7 +2436,12 @@ class GeoCountry():
         if not overload and not all(p not in data.columns.tolist() for p in prop):
             raise PyvoaKeyError('Some fields already exist in you panda '
                 'dataframe columns. You may set overload to True.')
-
+        
+        if overload:
+            for p in prop:
+                if p in data.columns.tolist():
+                    data.drop(p, axis=1, inplace=True)
+                    
         # Is the oject properly initialized ?
         self.test_is_init()
 
