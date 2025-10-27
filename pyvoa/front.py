@@ -294,9 +294,8 @@ class front:
                         ext = ' '+kwargs['what']+' '
                     kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
-
-                    break
-            #if kwargs['what'] == 'current':
+            if kwargs['what'] == 'current':
+                kwargs['what'] = kwargs['which']
             return func(self,**kwargs)
         return wrapper
 
@@ -326,7 +325,7 @@ class front:
         @wraps(func)
         def inner(self,**kwargs):
             if not 'get' in func.__name__:
-                z = { **kwargs, **self.getkwargsvisu() }
+                z = { **self.getkwargsvisu(),**kwargs }
             if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
@@ -970,7 +969,7 @@ class front:
         """
         self.setnamefunction(self.map)
         if self.getgraphics():
-            z = {**self.getkwargsvisu(), **kwargs}
+            z = {**kwargs , **self.getkwargsvisu()}
             self.outcome = self.allvisu.map(**z)
             return self.outcome
         else:
@@ -999,7 +998,8 @@ class front:
             if kwargs.get('bypop'):
               kwargs.pop('bypop')
             if self.getgraphics():
-                self.outcome = self.allvisu.hist(**kwargs)
+                z = { **self.getkwargsvisu(), **kwargs}
+                self.outcome = self.allvisu.hist(**z)
                 return func(self,self.outcome)
             else:
                 raise PyvoaError(" No visualization has been set up !")
@@ -1043,7 +1043,6 @@ class front:
             output_notebook,
             )
             output_notebook(hide_banner=True)
-            show(fig)
         else:
             return fig
 
@@ -1072,7 +1071,7 @@ class front:
             if kwargs.get('bypop'):
                 kwargs.pop('bypop')
             if self.getgraphics():
-                z = {**self.getkwargsvisu(), **kwargs}
+                z = {**self.getkwargsvisu(),**kwargs}
                 self.outcome = self.allvisu.plot(**z)
                 return func(self,self.outcome)
             else:
