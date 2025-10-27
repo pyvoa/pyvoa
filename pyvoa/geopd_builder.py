@@ -268,6 +268,8 @@ class GPDBuilder(object):
        option = kwargs.get('option',defaultargs['option'][0])
        kwargs_valuestesting(option,defaultargs['option'],'option error ... ')
        what = kwargs['what']
+       if isinstance(what,list):
+           raise PyvoaError("WHAT should not be a list ...")
        kwargs_valuestesting(what,defaultargs['what'],'what error ...')
        output = kwargs['output']
        kwargs_valuestesting(output,defaultargs['output'],'output error ...')
@@ -308,6 +310,7 @@ class GPDBuilder(object):
 
        kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        flatwhere = flat_list(where)
+       bypopvalue = None
        for w in which:
            kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].bfill()
            kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].ffill()
@@ -346,20 +349,26 @@ class GPDBuilder(object):
                      input = self.normbypop(input, w ,o)
                      kwargs['input'] = input
                      temppd = self.whereclustered(**kwargs)
+                     bypopvalue=o
 
                if wconcatpd.empty:
                     wconcatpd = temppd
                else:
                     wconcatpd = pd.concat([wconcatpd,temppd])
 
-           input = kwargs['input']
            if not wconcatpd.empty:
                input = wconcatpd
            input.loc[:,w+' daily']  = input.groupby('where')[w].diff()
            input.loc[:,w+' weekly'] = input.groupby('where')[w].diff(7)
-           input.loc[:,w+' daily']  = input[w+' daily'].bfill()
-           input.loc[:,w+' weekly'] = input[w+' weekly'].bfill()
-           input = input.reset_index(drop=True)
+           input.loc[:,w+' daily']  = input[w + ' daily'].bfill()
+           input.loc[:,w+' weekly'] = input[w + ' weekly'].bfill()
+
+           if bypopvalue is not None:
+              for i in [w+' daily',w+' weekly']:
+                 input = self.normbypop(input, i ,bypopvalue)
+           kwargs['input'] = input
+           kwargs['input'] = kwargs['input'].reset_index(drop=True)
+
        if 'geometry' in input.columns:
           kwargs['input'] = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):
@@ -390,16 +399,16 @@ class GPDBuilder(object):
         Return a pandas with a normalisation column add by population
         * can normalize by '100', '1k', '100k' or '1M' and the new which
     """
-
     if pandy.empty:
         raise PyvoaError('normbypop problem, your pandas seems to be empty ....')
     value = re.sub(r'^.*?bypop=', '', bypop)
     clust = list(pandy['where'].unique())
     pop_field='population'
     uniquepandy = pandy.groupby('where').first().reset_index()
+
     if self.db_world == True:
         try:
-            uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population')
+            uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population',overload=True)
         except:
             PyvoaError(self.db + ' has no information for what concern: '+pop_field)
     else:
@@ -415,18 +424,19 @@ class GPDBuilder(object):
         if self.granularity == 'region':
             regsubreg={i:self.geo.get_subregions_from_region(name=i) for i in clust}
             try:
-                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
             except:
                 PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         elif self.granularity == 'subregion':
             try:
-                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code')
+                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
             except:
                 PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         else:
             raise PyvoaKeyError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
-    pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
+    if pop_field not in pandy.columns:
+        pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
     if not isinstance(val2norm, list):
         val2norm=[val2norm]
 
