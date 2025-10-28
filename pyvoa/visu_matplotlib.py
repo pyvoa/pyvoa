@@ -171,7 +171,8 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         ax.set_title(title)
-        ax.barh(input['where'], input[what],color=cmap.colors)
+        input_sorted = input.sort_values(by=what, ascending=True)
+        ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors)
         plt.show()
         return plt
 
