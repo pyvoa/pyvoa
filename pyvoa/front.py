@@ -259,6 +259,7 @@ class front:
                     else:
                         default[k] = [kwargs[k]]
             kwargs = {**default, **dicovisu}
+
             kwargs['what'] = kwargs['what'][0]
             #for k,v in kwargs.items():
             #    if k not in mustbealist:
@@ -278,8 +279,8 @@ class front:
 
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
-            if self.getkwargsvisu()['vis']:
-                pass
+            #if self.getkwargsvisu()['vis']:
+            #    pass
 
             if kwargs['input'].empty:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
@@ -324,8 +325,11 @@ class front:
         """
         @wraps(func)
         def inner(self,**kwargs):
+            if self._setkwargsvisu is None:
+                raise PyvoaError("vis is not set can you can not use charts functions  ...")
+            kwargs['vis'] = self.vis
             if not 'get' in func.__name__:
-                z = { **self.getkwargsvisu(),**kwargs }
+                z = { **self.getkwargsvisu(), **kwargs }
             if self.getgraphics() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
@@ -338,7 +342,6 @@ class front:
                             z.pop('typeofhist')
                             z.pop('typeofplot')
                             z.pop('bins')
-
                 return func(self,**z)
             else:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
@@ -998,7 +1001,7 @@ class front:
             if kwargs.get('bypop'):
               kwargs.pop('bypop')
             if self.getgraphics():
-                z = { **kwargs , **self.getkwargsvisu() }
+                z = { **self.getkwargsvisu(), **kwargs  }
                 self.outcome = self.allvisu.hist(**z)
                 return func(self,self.outcome)
             else:
@@ -1040,9 +1043,8 @@ class front:
         if self.getgraphics() == 'bokeh':
             from bokeh.io import (
             show,
-            output_notebook,
             )
-            output_notebook(hide_banner=True)
+            show(fig)
         else:
             return fig
 
@@ -1106,11 +1108,10 @@ class front:
         self.setnamefunction(self.plot)
         ''' show plot '''
         if self.getgraphics() == 'bokeh' and self.plot != '':
+
             from bokeh.io import (
             show,
-            output_notebook,
             )
-            output_notebook(hide_banner=True)
             show(fig)
         else:
             return fig
