@@ -388,7 +388,7 @@ class visu_bokeh:
         '''
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
 
@@ -397,7 +397,7 @@ class visu_bokeh:
         cases_custom = visu_bokeh().rollerJS()
 
         dicof={'title':kwargs.get('title')}
-        for axis_type in self.av.d_graphicsinput_args:
+        for axis_type in self.av.d_graphicsinput_args['ax_type']:
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
             bokeh_figure = self.bokeh_figure(**dicof)
@@ -409,9 +409,9 @@ class visu_bokeh:
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
             maxou, minou=0, 0
             tooltips=[]
-            for val in which:
+            for val in what:
                 for loc in list(input['where'].unique()):
-                    color = next(lcolors)
+                    color = input['colors'][input['where']==loc].iloc[0]
                     inputwhere = input.loc[input['where'] == loc].reset_index(drop = True)
                     pyvoa = ColumnDataSource(inputwhere)
                     leg = loc
@@ -454,7 +454,7 @@ class visu_bokeh:
             bokeh_figure.legend.location  = "top_left"
             bokeh_figure.legend.click_policy="hide"
             bokeh_figure.legend.label_text_font_size = '8pt'
-            if len(which) > 1 and len(which)*len(input['where'].unique())>16:
+            if len(what) > 1 and len(what)*len(input['where'].unique())>16:
                 PyvoaWarning('To much labels to be displayed ...')
                 bokeh_figure.legend.visible=False
             bokeh_figure.xaxis.formatter = DatetimeTickFormatter(
