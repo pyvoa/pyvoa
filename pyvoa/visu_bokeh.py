@@ -213,8 +213,6 @@ class visu_bokeh:
         @wraps(func)
         def innerdeco_bokeh(self,**kwargs):
             input = kwargs.get('input')
-            which = kwargs.get("which")
-            title = kwargs.get('title')
             unique_where = input['where'].unique()
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
             input['colors'] = input['where'].map(color_map)
@@ -293,11 +291,11 @@ class visu_bokeh:
 
     ''' PLOT VERSUS '''
     @deco_bokeh
-    def bokeh_plot(self,**kwargs):
+    def bokeh_versus_plot(self,**kwargs):
         '''
         -----------------
         Create a versus plot according to arguments.
-        See help(bokeh_plot).
+        See help(bokeh_versus_plot).
         Keyword arguments
         -----------------
         - input = None : if None take first element. A DataFrame with a Pypyvoa.struture is mandatory
@@ -319,7 +317,7 @@ class visu_bokeh:
         '''
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
-        which = kwargs.get('which')
+        what = kwargs.get('what')
         copyright = kwargs.get('copyright')
         mode = kwargs.get('mode')
 
@@ -331,22 +329,22 @@ class visu_bokeh:
 
         dicof={'title':kwargs.get('title')}
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
-            dicof['x_axis_label'] = which[0]
-            dicof['y_axis_label'] = which[1]
+            dicof['x_axis_label'] = what[0]
+            dicof['y_axis_label'] = what[1]
             dicof['y_axis_type' ] = axis_type
             bokeh_figure = self.bokeh_figure(**dicof)
 
             bokeh_figure.add_tools(HoverTool(
                 tooltips=[('where', '@rolloverdisplay'), ('date', '@date{%F}'),
-                          (which[0], '@{casesx}' + '{custom}'),
-                          (which[1], '@{casesy}' + '{custom}')],
+                          (what[0], '@{casesx}' + '{custom}'),
+                          (what[1], '@{casesy}' + '{custom}')],
                 formatters={'where': 'printf', '@{casesx}': cases_custom, '@{casesy}': cases_custom,
                             '@date': 'datetime'}, mode = mode,
                 point_policy="snap_to_data"))  # ,PanTool())
 
             for loc in input['where'].unique():
                 pandaloc = input.loc[input['where'] == loc].sort_values(by='date', ascending=True)
-                pandaloc.rename(columns={which[0]: 'casesx', which[1]: 'casesy'}, inplace=True)
+                pandaloc.rename(columns={what[0]: 'casesx', what[1]: 'casesy'}, inplace=True)
                 bokeh_figure.line(x='casesx', y='casesy',
                                  source=ColumnDataSource(pandaloc), legend_label=pandaloc['where'].iloc[0],
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
