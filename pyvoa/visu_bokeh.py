@@ -812,7 +812,7 @@ class visu_bokeh:
         return innerdeco_bokeh
 
     ''' VERTICAL HISTO '''
-    #@importbokeh
+    @deco_bokeh
     def bokeh_histo(self, **kwargs):
         '''
             -----------------
@@ -833,13 +833,11 @@ class visu_bokeh:
                      if [:dd/mm/yyyy] min date up to
                      if [dd/mm/yyyy:] up to max date
         '''
-        which=kwargs.get('which')
-        input = kwargs.get('input')
-        input = input.rename(columns = {'cases': which})
-        bins = kwargs.get('bins', self.d_graphicsinput_args['bins'])
-        min_val = input[which].min()
-        max_val =  input[which].max()
 
+        input = kwargs.get('input')
+        bins = kwargs.get('bins', self.d_graphicsinput_args['bins'])
+        min_val = input['cases'].min()
+        max_val =  input['cases'].max()
         if bins:
             bins = bins
         else:
@@ -854,7 +852,7 @@ class visu_bokeh:
 
         contributors = {  i : [] for i in range(bins+1)}
         for i in range(len(input)):
-            rank = bisect.bisect_left(interval, input.iloc[i][which])
+            rank = bisect.bisect_left(interval, input.iloc[i]['cases'])
             if rank == bins+1:
                 rank = bins
             contributors[rank].append(input.iloc[i]['where'])
@@ -896,7 +894,7 @@ class visu_bokeh:
                 kwargs.pop('dateslider')
             except:
                 pass
-            bokeh_figure = self.bokeh_figure(x_axis_type=x_axis_type, y_axis_type=y_axis_type, **kwargs)
+            bokeh_figure = self.bokeh_figure(x_axis_type=x_axis_type, y_axis_type=y_axis_type)
 
             #bokeh_figure.yaxis[0].formatter = PrintfTickFormatter(format = "%4.2e")
             #bokeh_figure.xaxis[0].formatter = PrintfTickFormatter(format="%4.2e")
