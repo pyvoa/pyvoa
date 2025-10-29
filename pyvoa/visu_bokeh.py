@@ -89,7 +89,7 @@ def safe_output_notebook():
         pass
 safe_output_notebook()
 '''
-output_notebook()
+output_notebook(hide_banner=True)
 
 from bokeh.layouts import (
 row,
@@ -799,6 +799,18 @@ class visu_bokeh:
         tabs = Tabs(tabs = panels)
         return tabs
 
+    def deco_bokeh(func):
+        @wraps(func)
+        def innerdeco_bokeh(self,**kwargs):
+            input = kwargs.get('input')
+            which = kwargs.get("which")
+            input['cases'] = input[which]
+            unique_where = input['where'].unique()
+            color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
+            input['colors'] = input['where'].map(color_map)
+            return func(self, **kwargs)
+        return innerdeco_bokeh
+
     ''' VERTICAL HISTO '''
     #@importbokeh
     def bokeh_histo(self, **kwargs):
@@ -911,7 +923,7 @@ class visu_bokeh:
         return tabs
 
     ''' VERTICAL HISTO '''
-    #@importbokeh
+    @deco_bokeh
     def bokeh_horizonhisto(self, **kwargs):
         '''
             -----------------
@@ -948,8 +960,8 @@ class visu_bokeh:
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
         what = kwargs.get('what')
-        mode = kwargs.get('mode',self.d_graphicsinput_args['mode'])
-        mapoption = kwargs.get('mapoption', self.d_graphicsinput_args['mapoption'])
+        mode = kwargs.get('mode')
+        mapoption = kwargs.get('mapoption')
 
         input['left'] = input[what]
         input['right'] = input[what]
@@ -974,9 +986,6 @@ class visu_bokeh:
             input['horihistotext'] = [ '{:.3g}'.format(float(i)) if float(i)>1.e4 or float(i)<0.01 else round(float(i),2) for i in input['right'] ]
             input['horihistotext'] = [str(i) for i in input['horihistotext']]
 
-        lcolors = iter(self.lcolors)
-        colors = next(lcolors)
-        input['colors'] = [next(lcolors) for i in range(len(input))]
         pyvoafiltered = ColumnDataSource(data = input)
         new_panels = []
         for axis_type in self.d_graphicsinput_args['ax_type']:
@@ -1010,7 +1019,7 @@ class visu_bokeh:
                     source = pyvoafiltered,text_font_size='10px',text_color='black')
 
             cases_custom = visu_bokeh().rollerJS()
-            hover_tool = HoverTool(tooltips=[('where', '@where'), (what, '@right{0,0.0}'), ],
+            hover_tool = HoverTool(tooltips=[('where', '@where'), ('cases', '@right{0,0.0}'), ],
                                    formatters = {'where': 'printf', '@{' + 'right' + '}': cases_custom, '%':'printf'},
                                    mode = mode, point_policy="snap_to_data")
             bokeh_figure.add_tools(hover_tool)
@@ -1053,10 +1062,12 @@ class visu_bokeh:
                 raise PyvoaError("Locale setting problem. Please contact support@pycoa_fr")
 
         df['textdisplayed2'] =  ['      '+str(round(100*i,1))+'%' for i in df['percentage']]
-        df.loc[df['diff'] <= np.pi/20,'textdisplayed']=''
-        df.loc[df['diff'] <= np.pi/20,'textdisplayed2']=''
+        #df.loc[df['diff'] <= np.pi/20,'textdisplayed']=''
+        #df.loc[df['diff'] <= np.pi/20,'textdisplayed2']=''
         return df
 
+    @importbokeh
+    @deco_bokeh
     def bokeh_pie(self, **kwargs):
         '''
             -----------------
@@ -1075,13 +1086,18 @@ class visu_bokeh:
             - dateslider = None if True
                     - orientation = horizontal
         '''
-        pyvoafiltered=kwargs.get('pyvoafiltered')
+        input=kwargs.get('input')
+        pyvoafiltered=self.add_columns_for_pie_chart(input,'cases')
+        pyvoafiltered=ColumnDataSource(pyvoafiltered.drop(columns='geometry'))
+        bokeh_figure = self.bokeh_figure()
         panels=kwargs.get('panels')
         dateslider=kwargs.get('dateslider')
-        toggl=kwargs.get('toggl')
-        bokeh_figure = panels[0].child
-        bokeh_figure.graph_height=400
-        bokeh_figure.graph_width=400
+        mode=kwargs.get('mode')
+        #toggl=kwargs.get('toggl')
+        bokeh_figure = self.bokeh_figure()
+        #bokeh_figure = panels[0].child
+        bokeh_figure.frame_height=400
+        bokeh_figure.frame_width=400
         bokeh_figure.x_range = Range1d(-1.1, 1.1)
         bokeh_figure.y_range = Range1d(-1.1, 1.1)
         bokeh_figure.axis.visible = False
@@ -1094,10 +1110,16 @@ class visu_bokeh:
         bokeh_figure.legend.visible = False
 
         labels = LabelSet(x=0, y=0,text='textdisplayed',angle=cumsum('angle', include_zero=True),
-        text_font_size="10pt",source=pyvoafiltered,render_mode='canvas')
+        text_font_size="10pt",source=pyvoafiltered)#,render_mode='canvas')
 
         labels2 = LabelSet(x=0, y=0, text='textdisplayed2',
         angle=cumsum('angle', include_zero=True),text_font_size="8pt",source=pyvoafiltered)
+
+        cases_custom = visu_bokeh().rollerJS()
+        hover_tool = HoverTool(tooltips=[('where', '@where'), ('cases', '@cases{0,0.0}'), ],
+                               formatters = {'where': 'printf', '@{' + 'cases' + '}': cases_custom, '%':'printf'},
+                               mode = mode, point_policy="snap_to_data")
+        bokeh_figure.add_tools(hover_tool)
 
         bokeh_figure.add_layout(labels)
         bokeh_figure.add_layout(labels2)
@@ -1105,17 +1127,8 @@ class visu_bokeh:
             bokeh_figure = column(dateslider,bokeh_figure)
         return bokeh_figure
 
-    def deco_bokeh_geo(func):
-        @wraps(func)
-        def innerdeco_bokeh_geo(self,**kwargs):
-            input = kwargs.get('input')
-            which = kwargs.get("which")
-            input['cases'] = input[which]
-            return func(self, **kwargs)
-        return innerdeco_bokeh_geo
-
     @importbokeh
-    @deco_bokeh_geo
+    @deco_bokeh
     def bokeh_map(self,**kwargs):
         '''
             -----------------
