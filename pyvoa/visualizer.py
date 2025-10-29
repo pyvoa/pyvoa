@@ -118,7 +118,6 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             locunique = input['where'].unique()
-
             input_first = input.loc[input['where'].isin(locunique[:Max_Countries_Default-1])]
             input_others = input.loc[input['where'].isin(locunique[Max_Countries_Default-1:])]
 
@@ -166,23 +165,23 @@ class AllVisu:
                 PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
             if typeofplot == 'date':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_date_plot(**kwargs)
+                fig = visu_bokeh().bokeh_date_plot(**kwargs)
             elif typeofplot == 'spiral':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_spiral_plot(**kwargs)
+                fig = visu_bokeh().bokeh_spiral_plot(**kwargs)
             elif typeofplot == 'versus':
                 if isinstance(which,list) and len(which) == 2:
-                    fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_plot(**kwargs)
+                    fig = visu_bokeh().bokeh_plot(**kwargs)
                 else:
                     print('typeofplot is versus but dim(which)!=2, versus has not effect ...')
-                    fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_date_plot(**kwargs)
+                    fig = visu_bokeh().bokeh_date_plot(**kwargs)
             elif typeofplot == 'menulocation':
                 if self.granularity == 'nation' and self.granularity != 'World':
                     print('typeofplot is menulocation with a national DB granularity, use date plot instead ...')
-                    fig = visu_bokeh(InputOption().d_graphicsinput_args).plot(*kwargs)
+                    fig = visu_bokeh().plot(*kwargs)
                 else:
                     if len(kwargs['which']) > 1:
                         PyvoaWarning('typeofplot is menulocation but dim(which)>1, take first one '+kwargs['which'][0])
-                    fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_menu_plot(**kwargs)
+                    fig = visu_bokeh().bokeh_menu_plot(**kwargs)
             elif typeofplot == 'yearly':
                 if input.date.max()-input.date.min() <= dt.timedelta(days=365):
                     print("Yearly will not be used since the time covered is less than 1 year")
@@ -214,7 +213,7 @@ class AllVisu:
             if typeofhist == 'bylocation':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_horizonhisto(**kwargs)
             elif typeofhist == 'byvalue':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_histo( **kwargs)
+                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_histo(**kwargs)
             elif typeofhist == 'pie':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_pie(**kwargs)
         elif vis == 'seaborn':
