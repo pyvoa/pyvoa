@@ -828,7 +828,7 @@ class front:
     def getkwargsvisu(self,):
         return self._setkwargsvisu
 
-    def setgraphics(self,**kwargs):
+    def setvis(self,vis,**kwargs):
         """Sets the visualization and updates the keyword arguments for the visualization settings.
 
         Args:
@@ -844,11 +844,11 @@ class front:
             an error is raised.
 
         Example:
-            setgraphics(vis='example_visualization', additional_arg=value)
+            setvis('example_visualization', additional_arg=value)
         """
         kwargs_keystesting(kwargs,self.listviskargskeys,'Bad args used ! please check ')
         default = { k:v[0] if isinstance(v,list) else v for k,v in self.av.d_graphicsinput_args.items()}
-        vis = kwargs.get('vis', None)
+
         for k,v in default.items():
             kwargs[k] = v
 
