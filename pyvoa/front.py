@@ -180,7 +180,7 @@ class front:
             raise PyvoaDbError(base + ' is not a supported GPDBuilder. '
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
-        visu = self.getgraphics()
+        visu = self.getvis()
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
             return
@@ -330,7 +330,7 @@ class front:
             kwargs['vis'] = self.vis
             if not 'get' in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
-            if self.getgraphics() is not None:
+            if self.getvis() is not None:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
@@ -432,7 +432,7 @@ class front:
         """
         vis = kwargs.get('vis', None)
         if not vis:
-            vis = self.getgraphics()
+            vis = self.getvis()
         if not self.allvisu:
             self.allvisu = self.av
         if vis:
@@ -860,7 +860,7 @@ class front:
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
         self.setkwargsvisu(**kwargs)
 
-    def getgraphics(self,):
+    def getvis(self,):
         """Returns the display attribute of the instance.
 
         This method retrieves the value of the `vis` attribute from the instance.
@@ -941,7 +941,7 @@ class front:
         """
         dateslider = kwargs.get('dateslider', None)
         mapoption = kwargs.get('mapoption', None)
-        visu = self.getgraphics()
+        visu = self.getvis()
         if visu == 'bokeh':
             if mapoption:
                 if 'spark' in mapoption or 'spiral' in mapoption:
@@ -971,7 +971,7 @@ class front:
             PyvoaError: If no visualization has been set up.
         """
         self.setnamefunction(self.map)
-        if self.getgraphics():
+        if self.getvis():
             z = {**kwargs , **self.getkwargsvisu()}
             self.outcome = self.allvisu.map(**z)
             return self.outcome
@@ -1000,7 +1000,7 @@ class front:
             kwargs.pop('output')
             if kwargs.get('bypop'):
               kwargs.pop('bypop')
-            if self.getgraphics():
+            if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
                 self.outcome = self.allvisu.hist(**z)
                 return func(self,self.outcome)
@@ -1040,7 +1040,7 @@ class front:
         """
         self.setnamefunction(self.hist)
         self.outcome = fig
-        if self.getgraphics() == 'bokeh':
+        if self.getvis() == 'bokeh':
             from bokeh.io import (
             show,
             )
@@ -1072,7 +1072,7 @@ class front:
                 PyvoaError(" versu can be used with 2 variables and only 2 !")
             if kwargs.get('bypop'):
                 kwargs.pop('bypop')
-            if self.getgraphics():
+            if self.getvis():
                 z = {**self.getkwargsvisu(),**kwargs}
                 self.outcome = self.allvisu.plot(**z)
                 return func(self,self.outcome)
@@ -1107,7 +1107,7 @@ class front:
         """
         self.setnamefunction(self.plot)
         ''' show plot '''
-        if self.getgraphics() == 'bokeh' and self.plot != '':
+        if self.getvis() == 'bokeh' and self.plot != '':
 
             from bokeh.io import (
             show,
@@ -1176,7 +1176,7 @@ class front:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
         if  self.getnamefunction() != 'get':
-            if self.getgraphics() == 'bokeh':
+            if self.getvis() == 'bokeh':
                 #PyvoaError("Bokeh savefig not yet implemented")
                 from bokeh.io import export_png
                 export_png(self.outcome, filename=name)
