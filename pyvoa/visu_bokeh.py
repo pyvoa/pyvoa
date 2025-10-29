@@ -120,49 +120,11 @@ Max_Countries_Default = 24
 import pyvoa.visualizer
 import pyvoa.kwarg_options
 class visu_bokeh:
-    def __init__(self,d_graphicsinput_args = None):
-        self.pycoageopandas = False
+    def __init__(self,):
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
-        #self.HoverTool= HoverTool
-        #self.TabPanel = TabPanel
-        #self.DatetimeTickFormatter = DatetimeTickFormatter
-        #self.BasicTicker = BasicTicker
-        #self.GeoJSONDataSource = GeoJSONDataSource
-        #self.Tabs = Tabs
-        #self.LinearColorMapper = LinearColorMapper
-        #self.ColorBar = ColorBar
-        #self.Viridis256 = Viridis256
-        self.d_graphicsinput_args = d_graphicsinput_args
-        self.graph_height=400
-        self.graph_width=400
-
-        #self.ColumnDataSource = ColumnDataSource
-        if type(input)==gpd.geodataframe.GeoDataFrame:
-            self.pycoageopandas = True
-
-            '''
-            kwargs['GeoJSONDataSource'] = GeoJSONDataSource,\
-            kwargs['Viridis256'] = Viridis256,\
-            kwargs['LinearColorMapper'] = LinearColorMapper,\
-            kwargs['ColorBar'] = ColorBar,\
-            kwargs['BasicTicker'] = BasicTicker,\
-            kwargs['BasicTickFormatter'] = BasicTickFormatter,\
-            kwargs['Label'] = Label,\
-            kwargs['figure'] = figure,\
-            kwargs['Title'] = Title,\
-            kwargs['Category10'] = Category10,\
-            kwargs['Category20'] = Category20,\
-            kwargs['ColumnDataSource'] = ColumnDataSource,\
-            kwargs['HoverTool'] = HoverTool,\
-            kwargs['BasicTickFormatter'] = BasicTickFormatter,\
-            kwargs['TabPanel'] = TabPanel,\
-            kwargs['DatetimeTickFormatter'] = DatetimeTickFormatter,\
-            kwargs['BasicTickFormatter'] = BasicTickFormatter,\
-            kwargs['Tabs'] = Tabs,\
-            kwargs['Range1d'] = Range1d,\
-            kwargs['LabelSet'] = LabelSet,\
-            '''
+        self.graph_height = 400
+        self.graph_width = 400
 
     @staticmethod
     def min_max_range(a_min, a_max):
@@ -244,15 +206,22 @@ class visu_bokeh:
                   return s;*/
                 """)
 
-    def importbokeh(func):
-        def wrapper(self,**kwargs):
-            """
-            ALL Librairies (and more) needs by bokeh
-            """
-            return func(self,**kwargs)
-        return wrapper
+    def deco_bokeh(func):
+        @wraps(func)
+        def innerdeco_bokeh(self,**kwargs):
+            print('EEEEEEEkwargs',kwargs)
+            input = kwargs.get('input')
+            which = kwargs.get("which")
+            input['cases'] = input[which]
+            title = kwargs.get('title')
+            unique_where = input['where'].unique()
+            color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
+            input['colors'] = input['where'].map(color_map)
 
-    #@importbokeh
+            return func(self, **kwargs)
+        return innerdeco_bokeh
+
+    @deco_bokeh
     def bokeh_figure(self, **kwargs):
         """
          Create a standard Bokeh figure, with pycoa_fr copyright, used in all the bokeh charts
@@ -276,6 +245,7 @@ class visu_bokeh:
         '''
         y_axis_type = kwargs.get('y_axis_type','linear')
         x_axis_type = kwargs.get('x_axis_type','linear')
+
         kwargs['width']  = kwargs.get('width', Width_Height_Default[0])
         kwargs['height'] = kwargs.get('height',Width_Height_Default[1])
         fig = figure(**kwargs)
@@ -411,7 +381,7 @@ class visu_bokeh:
         return tabs
 
     ''' DATE PLOT '''
-    #@importbokeh
+    @deco_bokeh
     def bokeh_date_plot(self,**kwargs):
         '''
         -----------------
@@ -799,18 +769,6 @@ class visu_bokeh:
         tabs = Tabs(tabs = panels)
         return tabs
 
-    def deco_bokeh(func):
-        @wraps(func)
-        def innerdeco_bokeh(self,**kwargs):
-            input = kwargs.get('input')
-            which = kwargs.get("which")
-            input['cases'] = input[which]
-            unique_where = input['where'].unique()
-            color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
-            input['colors'] = input['where'].map(color_map)
-            return func(self, **kwargs)
-        return innerdeco_bokeh
-
     ''' VERTICAL HISTO '''
     @deco_bokeh
     def bokeh_histo(self, **kwargs):
@@ -1064,7 +1022,6 @@ class visu_bokeh:
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed2']=''
         return df
 
-    @importbokeh
     @deco_bokeh
     def bokeh_pie(self, **kwargs):
         '''
@@ -1125,7 +1082,6 @@ class visu_bokeh:
             bokeh_figure = column(dateslider,bokeh_figure)
         return bokeh_figure
 
-    @importbokeh
     @deco_bokeh
     def bokeh_map(self,**kwargs):
         '''
