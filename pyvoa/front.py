@@ -72,7 +72,6 @@ class front:
         whattodo(): Generates a DataFrame summarizing available methods and their options.
         setwhom(base, **kwargs): Sets the current GPDBuilder database and optionally reloads it.
         get(**kwargs): Retrieves and processes data based on the specified output format.
-        setoptgraphics(**kwargs): Sets the visualization options for the instance.
         listoutput(): Returns the list of currently available output types for the get() function.
         listvisu(): Returns the list of currently available visualizations for the map() function.
         listwhom(detailed=False): Returns the list of currently available GPDBuilders for geopd_builder data in PyCoA.
@@ -150,7 +149,7 @@ class front:
         pd1.index = np.where(pd1.Arguments=='output','get', pd1.index)
         pd1.index = np.where(pd1.Arguments=='typeofhist','hist',pd1.index)
         pd1.index = np.where(pd1.Arguments=='typeofplot','plot', pd1.index)
-        pd2 = df(dico2,'setoptgraphics')
+        pd2 = df(dico2,'setoptvis')
         pd1=pd.concat([pd1,pd2])
         pd1.index = pd1.index.rename('Methods')
         pd1 = pd1.sort_values(by='Arguments',ascending = False)
@@ -409,54 +408,6 @@ class front:
             raise PyvoaError('Unknown output.')
         self.outcome = casted_data
         return casted_data
-
-    def setoptgraphics(self,**kwargs):
-        """Sets the visualization options for the instance.
-
-        This method configures various visualization parameters based on the provided keyword arguments. It checks if the visualization is implemented and sets the display accordingly. If the visualization is not implemented, it raises a `PyvoaError`. If no graphics are loaded, a warning is issued.
-
-        Args:
-            **kwargs: Arbitrary keyword arguments that can include:
-                - tile (str): The type of tile to use for the map. Defaults to 'openstreet'.
-                - dateslider (bool): Indicates whether to include a date slider. Defaults to False.
-                - mapoption (str): The option for the map display. Defaults to 'text'.
-                - guideline (str): A guideline option. Defaults to 'False'.
-                - title (str or None): The title for the visualization. Defaults to None.
-
-        Raises:
-            PyvoaError: If the specified visualization is not implemented or if the function name is not registered.
-            PyvoaWarning: If no graphics are loaded.
-
-        Returns:
-            function: The function corresponding to the visualization, if successfully set.
-        """
-        vis = kwargs.get('vis', None)
-        if not vis:
-            vis = self.getvis()
-        if not self.allvisu:
-            self.allvisu = self.av
-        if vis:
-            tile = kwargs.get('tile','openstreet')
-            dateslider = kwargs.get('dateslider',False)
-            mapoption =  kwargs.get('mapoption','text')
-            guideline = kwargs.get('guideline','False')
-            title = kwargs.get('title','NIKEAMOOK')
-            self.av.setkwargsfront(kwargs)
-            if vis not in self.lvisu:
-                raise PyvoaError("Sorry but " + visu + " visualisation isn't implemented ")
-            else:
-                self.vis = vis
-                print(f"The visualization has been set correctly to: {vis}")
-                try:
-                    f = self.getnamefunction()
-                    if f == 'Charts Function Not Registered':
-                        raise PyvoaError("Sorry but " + f + ". Did you draw it ? ")
-                    return f(**self.getkwargs())
-                except:
-                    pass
-        else:
-            PyvoaWarning("No Graphics loaded ! Only geopandas can be asked")
-        self.vis = vis
 
     def setnamefunction(self,name):
         """Sets the name of the function.
@@ -828,7 +779,7 @@ class front:
     def getkwargsvisu(self,):
         return self._setkwargsvisu
 
-    def setvis(self,vis,**kwargs):
+    def setvis(self,vis=' '):
         """Sets the visualization and updates the keyword arguments for the visualization settings.
 
         Args:
@@ -844,21 +795,14 @@ class front:
             an error is raised.
 
         Example:
-            setvis('example_visualization', additional_arg=value)
+            setvis('example_visualization')
         """
-        kwargs_keystesting(kwargs,self.listviskargskeys,'Bad args used ! please check ')
-        default = { k:v[0] if isinstance(v,list) else v for k,v in self.av.d_graphicsinput_args.items()}
-
-        for k,v in default.items():
-            kwargs[k] = v
-
         if vis not in self.lvisu:
             raise PyvoaError("Sorry but " + vis + " visualisation isn't implemented ")
         else:
             self.vis = vis
-            kwargs['vis'] = vis
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
-        self.setkwargsvisu(**kwargs)
+        self.setkwargsvisu(**{'vis':vis})
 
     def getvis(self,):
         """Returns the display attribute of the instance.
