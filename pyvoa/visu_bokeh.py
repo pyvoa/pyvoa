@@ -78,6 +78,7 @@ from bokeh.plotting import figure, show
 from bokeh.io import output_notebook
 
 from bokeh.io import output_notebook
+from pyvoa.kwarg_options import InputOption
 '''
 def safe_output_notebook():
     try:
@@ -121,10 +122,12 @@ import pyvoa.visualizer
 import pyvoa.kwarg_options
 class visu_bokeh:
     def __init__(self,):
+        self.av = InputOption()
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
         self.graph_height = 400
         self.graph_width = 400
+        self.listfigs = None
 
     @staticmethod
     def min_max_range(a_min, a_max):
@@ -209,52 +212,26 @@ class visu_bokeh:
     def deco_bokeh(func):
         @wraps(func)
         def innerdeco_bokeh(self,**kwargs):
-            print('EEEEEEEkwargs',kwargs)
             input = kwargs.get('input')
             which = kwargs.get("which")
-            input['cases'] = input[which]
             title = kwargs.get('title')
             unique_where = input['where'].unique()
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
             input['colors'] = input['where'].map(color_map)
-
+            kwargs['input'] = input
             return func(self, **kwargs)
         return innerdeco_bokeh
 
-    @deco_bokeh
     def bokeh_figure(self, **kwargs):
         """
          Create a standard Bokeh figure, with pycoa_fr copyright, used in all the bokeh charts
         """
-        '''
-        copyright = kwargs.get('text')
-        graph_width = kwargs.get('graph_width',Width_Height_Default[0])
-        graph_height = kwargs.get('graph_height',Width_Height_Default[1])
-        Label = kwargs.get('Label')
-        figure = kwargs.get('figure')
-        Title = kwargs.get('Title')
-        min_width = kwargs.get('min_width')
-        min_height = kwargs.get('min_height')
-
-
-        citation = Label(x=0.65 * graph_width - len(copyright), y=0.01 *graph_height,
-                                          x_units='screen', y_units='screen',
-                                          text_font_size='1.5vh', background_fill_color='white',
-                                          background_fill_alpha=.75,
-                                          text = copyright)
-        '''
         y_axis_type = kwargs.get('y_axis_type','linear')
         x_axis_type = kwargs.get('x_axis_type','linear')
 
         kwargs['width']  = kwargs.get('width', Width_Height_Default[0])
         kwargs['height'] = kwargs.get('height',Width_Height_Default[1])
         fig = figure(**kwargs)
-            #y_axis_type = y_axis_type,x_axis_type = x_axis_type,\
-            #min_width = graph_width, min_height = graph_height,
-            #tools=['save', 'box_zoom,reset'],
-            #toolbar_location="right", sizing_mode="stretch_width")
-        #fig.add_layout(citation)
-        #fig.add_layout(Title(text=self.uptitle, text_font_size="10pt"), 'above')
         return fig
 
     @staticmethod
@@ -315,6 +292,7 @@ class visu_bokeh:
         return input.to_html(escape=False,formatters=dict(resume=path_to_image_html))
 
     ''' PLOT VERSUS '''
+    @deco_bokeh
     def bokeh_plot(self,**kwargs):
         '''
         -----------------
@@ -340,18 +318,23 @@ class visu_bokeh:
                  if [dd/mm/yyyy:] up to max date
         '''
         input = kwargs.get('input')
+        input = input.drop(columns='geometry')
         which = kwargs.get('which')
         copyright = kwargs.get('copyright')
-        mode = kwargs.get('mode',list(self.d_graphicsinput_args['mode'])[0])
+        mode = kwargs.get('mode')
 
         panels = []
         cases_custom = visu_bokeh().rollerJS()
         if self.get_listfigures():
             self.set_listfigures([])
         listfigs=[]
-        for axis_type in  self.d_graphicsinput_args['ax_type']:
-            bokeh_figure = self.bokeh_figure( x_axis_label = which[0], y_axis_label = which[1],
-                                                y_axis_type = axis_type, text = "ffff")
+
+        dicof={'title':kwargs.get('title')}
+        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+            dicof['x_axis_label'] = which[0]
+            dicof['y_axis_label'] = which[1]
+            dicof['y_axis_type' ] = axis_type
+            bokeh_figure = self.bokeh_figure(**dicof)
 
             bokeh_figure.add_tools(HoverTool(
                 tooltips=[('where', '@rolloverdisplay'), ('date', '@date{%F}'),
@@ -369,7 +352,7 @@ class visu_bokeh:
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
 
             bokeh_figure.legend.label_text_font_size = "12px"
-            panel = Panel(child=bokeh_figure, title=axis_type)
+            panel = TabPanel(child=bokeh_figure, title=axis_type)
             panels.append(panel)
             bokeh_figure.legend.background_fill_alpha = 0.6
 
@@ -408,7 +391,6 @@ class visu_bokeh:
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
         which = kwargs.get('which')
-
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
 
@@ -416,8 +398,11 @@ class visu_bokeh:
         listfigs = []
         cases_custom = visu_bokeh().rollerJS()
 
-        for axis_type in ['linear', 'log']:
-            bokeh_figure = self.bokeh_figure( y_axis_type = axis_type, x_axis_type = 'datetime')
+        dicof={'title':kwargs.get('title')}
+        for axis_type in self.av.d_graphicsinput_args:
+            dicof['x_axis_type'] = 'datetime'
+            dicof['y_axis_type'] = axis_type
+            bokeh_figure = self.bokeh_figure(**dicof)
             lcolors = iter(self.lcolors)
             i = 0
             r_list=[]

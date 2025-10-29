@@ -169,11 +169,7 @@ class AllVisu:
             elif typeofplot == 'spiral':
                 fig = visu_bokeh().bokeh_spiral_plot(**kwargs)
             elif typeofplot == 'versus':
-                if isinstance(which,list) and len(which) == 2:
                     fig = visu_bokeh().bokeh_plot(**kwargs)
-                else:
-                    print('typeofplot is versus but dim(which)!=2, versus has not effect ...')
-                    fig = visu_bokeh().bokeh_date_plot(**kwargs)
             elif typeofplot == 'menulocation':
                 if self.granularity == 'nation' and self.granularity != 'World':
                     print('typeofplot is menulocation with a national DB granularity, use date plot instead ...')
