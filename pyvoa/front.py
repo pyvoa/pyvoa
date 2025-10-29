@@ -73,7 +73,7 @@ class front:
         setwhom(base, **kwargs): Sets the current GPDBuilder database and optionally reloads it.
         get(**kwargs): Retrieves and processes data based on the specified output format.
         listoutput(): Returns the list of currently available output types for the get() function.
-        listvisu(): Returns the list of currently available visualizations for the map() function.
+        listvis(): Returns the list of currently available visualizations for the map() function.
         listwhom(detailed=False): Returns the list of currently available GPDBuilders for geopd_builder data in PyCoA.
         listwhat(): Returns the list of currently available types of series.
         listhist(): Returns the list of currently available types of histograms.
@@ -451,7 +451,7 @@ class front:
         """
         return list(self.av.d_batchinput_args['output'])
 
-    def listvisu(self,):
+    def listvis(self,):
         """Returns the visualization list.
 
         This method retrieves the visualization list associated with the instance.
