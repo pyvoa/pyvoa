@@ -466,33 +466,32 @@ class visu_bokeh:
         return tabs
 
     ''' SPIRAL PLOT '''
+    @deco_bokeh
     def bokeh_spiral_plot(self, **kwargs):
         panels = []
         listfigs = []
         input = kwargs.get('input')
-        which = kwargs.get('which')
-
-        if isinstance(input['rolloverdisplay'].iloc[0],list):
-            input['rolloverdisplay'] = input['where']
+        what = kwargs.get('what')
         borne = 300
-
-        bokeh_figure = self.bokeh_figure(x_range=[-borne, borne], y_range=[-borne, borne], match_aspect=True,**kwargs)
-
+        dicof={'title':kwargs.get('title')}
+        dicof['match_aspect']=True
+        bokeh_figure = self.bokeh_figure(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
+        
         if len(input['where'].unique()) > 1 :
             print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
         input["dayofyear"]=input.date.dt.dayofyear
         input['year']=input.date.dt.year
-        input['cases'] = input[which]
+        input['cases'] = input[what]
 
-        K = 2*input[which].max()
+        K = 2*input[what].max()
         #drop bissextile fine tuning in needed in the future
         input = input.loc[~(input['date'].dt.month.eq(2) & input['date'].dt.day.eq(29))].reset_index(drop=True)
         input["dayofyear_angle"] = input["dayofyear"]*2 * np.pi/365
         input["r_baseline"] = input.apply(lambda x : ((x["year"]-2020)*2 * np.pi + x["dayofyear_angle"])*K,axis=1)
         size_factor = 16
-        input["r_cas_sup"] = input.apply(lambda x : x["r_baseline"] + 0.5*x[which]*size_factor,axis=1)
-        input["r_cas_inf"] = input.apply(lambda x : x["r_baseline"] - 0.5*x[which]*size_factor,axis=1)
+        input["r_cas_sup"] = input.apply(lambda x : x["r_baseline"] + 0.5*x[what]*size_factor,axis=1)
+        input["r_cas_inf"] = input.apply(lambda x : x["r_baseline"] - 0.5*x[what]*size_factor,axis=1)
 
         radius = 200
         def polar(theta,r,norm=radius/input["r_baseline"].max()):
