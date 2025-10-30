@@ -689,7 +689,10 @@ class front:
         Returns:
             The value of the lmapoption attribute.
         """
-        return self.lmapoption
+        if self.av.pdcharts[self.vis]['map']:
+            return self.av.pdcharts[self.vis]['map']
+        else:
+            raise PyvoaError('Map not implement for '+ self.vis)
 
     def getwhom(self, db = None, detailed=False,return_error=True):
         """Retrieves the database instance associated with the current object.
