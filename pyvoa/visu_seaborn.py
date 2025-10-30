@@ -50,7 +50,24 @@ class visu_seaborn:
     ######SEABORN#########
     ######################
     def __init__(self,):
-        pass
+        import matplotlib
+        def set_matplotlib_backend():
+            try:
+                from IPython import get_ipython
+                ipy = get_ipython()
+                if ipy is None:
+                    # For classic terminal  (python)
+                    matplotlib.use("TkAgg")
+                elif "IPKernelApp" in ipy.config:
+                    # For Jupyter notebook
+                    matplotlib.use("module://matplotlib_inline.backend_inline")
+                else:
+                    # Cas IPython shell (ex : ipython en console)
+                    matplotlib.use("TkAgg")
+            except Exception:
+                #in other case fallback vers TkAgg (fenêtre graphique)
+                matplotlib.use("TkAgg")
+        set_matplotlib_backend()
 
     def decoplotseaborn(func):
         """
