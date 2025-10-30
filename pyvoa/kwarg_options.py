@@ -75,10 +75,10 @@ class InputOption():
                         }
 
         self.pdcharts = pd.DataFrame({
-            'matplotlib': [['date', 'versus', 'yearly','versus'],['location','value','pie'],True],
-            'seaborn': [['date', 'versus'], ['location','value','pie'],False],
-            'bokeh': [['date', 'menulocation', 'versus', 'spiral', 'yearly'], ['location','value','pie'],True]
-            }, index=['typeofplot', 'typeofhist','map'])
+            'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly','versus']","'typeofhist'=['location','value','pie']",True],
+            'seaborn': ["'typeofplot'=['date', 'versus']","'typeofhist'=['location','value','pie']",False],
+            'bokeh': ["'typeofplot'=['date', 'menulocation', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",True]
+            }, index=['plot', 'hist','map'])
 
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
         self.dicokfront = {}

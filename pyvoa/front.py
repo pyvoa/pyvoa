@@ -511,6 +511,11 @@ class front:
         """
         return self.lwhat
 
+    def listchart(self,):
+        if self.vis == None:
+            raise PyvoaError('Vis has not be set !')
+        return self.av.pdcharts[self.vis]
+
     def listhist(self,):
         """Returns the list histogram.
 
@@ -519,8 +524,10 @@ class front:
         Returns:
             list: The list histogram.
         """
-        self.lhist = self.av.pdcharts[self.vis]['typeofhist']
-        return self.lhist
+        if self.vis == None:
+            raise PyvoaError('Vis has not be set !')
+        self.lhist = self.av.pdcharts[self.vis]['hist']
+        return self.lhist.replace('','"')
 
     def listplot(self,):
         """Returns a list of the types of plots from the graphics input arguments.
@@ -532,7 +539,9 @@ class front:
         Returns:
             list: A list containing the types of plots.
         """
-        self.lplot = self.av.pdcharts[self.vis]['typeofplot']
+        if self.vis == None:
+            raise PyvoaError('Vis has not be set !')
+        self.lplot = self.av.pdcharts[self.vis]['plot']
         return self.lplot
 
     def listoption(self,):
