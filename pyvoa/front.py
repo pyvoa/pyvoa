@@ -532,7 +532,7 @@ class front:
         Returns:
             list: A list containing the types of plots.
         """
-        self.lplot = self.av.d_visu_possible_plots[self.vis]
+        self.lplot = self.av.pdcharts[self.vis]['typeofplot']
         return self.lplot
 
     def listoption(self,):

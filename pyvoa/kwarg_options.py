@@ -74,11 +74,12 @@ class InputOption():
                         'ax_type':['linear', 'log']
                         }
 
-        self.d_visu_possible_plots= {
-            'matplotlib':['date', 'versus', 'yearly','versus'],\
-            'seaborn': ['date', 'versus'],\
-            'bokeh':['date', 'menulocation', 'versus', 'spiral', 'yearly']
-        }
+        self.pdcharts = pd.DataFrame({
+            'matplotlib': [['date', 'versus', 'yearly','versus'],['location','value','pie'],True],
+            'seaborn': [['date', 'versus'], ['location','value','pie'],False],
+            'bokeh': [['date', 'menulocation', 'versus', 'spiral', 'yearly'], ['location','value','pie'],True]
+            }, index=['typeofplot', 'typeofhist','map'])
+
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
         self.dicokfront = {}
 
