@@ -574,7 +574,10 @@ class front:
         Returns:
             list: A list containing the tiles.
         """
-        return self.ltiles
+        if self.av.pdcharts[self.vis]['map']:
+            return self.ltiles
+        else:
+            raise PyvoaError(self.vis+ ' : has not map function !')
 
     def listwhich(self,dbname=None):
         """Lists the current metadata for a specified database.
