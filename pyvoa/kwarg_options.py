@@ -62,7 +62,7 @@ class InputOption():
                         'title':'Pyvoa charts',\
                         'copyright': 'pyvoa',\
                         'mode':['mouse','vline','hline'],\
-                        'typeofhist':['bylocation','byvalue','pie'],\
+                        'typeofhist':['location','value','pie'],\
                         'typeofplot':['date','menulocation','versus','spiral','yearly'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','folium','seaborn'],\
