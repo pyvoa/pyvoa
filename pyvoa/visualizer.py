@@ -137,11 +137,9 @@ class AllVisu:
         typeofplot = kwargs.get('typeofplot')
         vis = kwargs.get('vis')
         fig = None
-        if typeofplot == 'yearly' and len(kwargs['input']['where'].unique())>1:
-            PyvoaWarning('Yearly plot can display only one country,\
-                    take the most import one')
-            first=kwargs['input'].where.unique()[0]
-            kwargs['input'] =  kwargs['input'].loc[kwargs['input'].where.isin([first])]
+        if (typeofplot == 'yearly' or typeofplot == 'spiral') and \
+           (len(kwargs['input']['where'].unique())>1 or len(kwargs['which'])>1):
+            raise PyvoaError('yearly or spirale plot can display only one country and one value')
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
@@ -169,7 +167,7 @@ class AllVisu:
             elif typeofplot == 'spiral':
                 fig = visu_bokeh().bokeh_spiral_plot(**kwargs)
             elif typeofplot == 'versus':
-                    fig = visu_bokeh().bokeh_plot(**kwargs)
+                    fig = visu_bokeh().bokeh_versus_plot(**kwargs)
             elif typeofplot == 'menulocation':
                 if self.granularity == 'nation' and self.granularity != 'World':
                     print('typeofplot is menulocation with a national DB granularity, use date plot instead ...')
