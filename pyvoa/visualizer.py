@@ -193,27 +193,27 @@ class AllVisu:
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
         if vis == 'matplotlib':
-            if typeofhist == 'bylocation':
+            if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)
-            elif typeofhist == 'byvalue':
+            elif typeofhist == 'value':
                 fig = visu_matplotlib().matplotlib_histo(**kwargs)
             elif typeofhist == 'pie':
                 fig = visu_matplotlib().matplotlib_pie(**kwargs)
             else:
                 raise PyvoaError(typeofhist + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
-            if typeofhist == 'bylocation':
+            if typeofhist == 'location':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_horizonhisto(**kwargs)
-            elif typeofhist == 'byvalue':
+            elif typeofhist == 'value':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_histo(**kwargs)
             elif typeofhist == 'pie':
                 fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_pie(**kwargs)
         elif vis == 'seaborn':
-            if typeofhist == 'bylocation':
+            if typeofhist == 'location':
                 fig = visu_seaborn().seaborn_hist_horizontal(**kwargs)
             elif typeofhist == 'pie':
                 fig = visu_seaborn().seaborn_pie(**kwargs)
-            elif typeofhist == 'byvalue':
+            elif typeofhist == 'value':
                 fig = visu_seaborn().seaborn_hist_value( **kwargs)
             else:
                 print(typeofhist + ' not implemented in ' + vis)
