@@ -157,6 +157,8 @@ class AllVisu:
                 fig = visu_seaborn().seaborn_date_plot(**kwargs)
             elif  typeofplot == 'versus':
                 fig = visu_seaborn().seaborn_versus_plot(**kwargs)
+            elif  typeofplot == 'yearly':
+                fig = visu_seaborn().seaborn_yearly_plot(**kwargs)    
             else:
                 raise PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
