@@ -104,7 +104,7 @@ class front:
         self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
 
-        self.lchartkargskeys = self.av.listchartkargskeys
+        self.larguments = self.av.listarguments
         self.listchartkargsvalues = self.av.listchartkargsvalues
         self.listviskargskeys = self.av.listviskargskeys
 
@@ -555,7 +555,7 @@ class front:
         self.loption.remove('')
         return self.loption
 
-    def listchartkargskeys(self,):
+    def listarguments(self,):
         """Returns the keys of the lchartkargskeys attribute.
 
         This method retrieves the keys stored in the lchartkargskeys attribute of the instance.
@@ -563,7 +563,7 @@ class front:
         Returns:
             list: A list of keys from the lchartkargskeys attribute.
         """
-        return self.lchartkargskeys
+        return self.larguments
 
     def listchartkargsvalues(self,):
         """Returns the values of the lchartkargs attribute.

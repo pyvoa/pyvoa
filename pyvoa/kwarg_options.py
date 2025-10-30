@@ -55,7 +55,7 @@ class InputOption():
                         'input':pd.DataFrame(),\
                         'output':['pandas','geopandas','list','dict','array']
                         }
-        self.listchartkargskeys = list(self.d_batchinput_args.keys())
+        self.listarguments = list(self.d_batchinput_args.keys())
         self.listchartkargsvalues = list(self.d_batchinput_args.values())
 
         self.d_graphicsinput_args = {
