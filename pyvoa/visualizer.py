@@ -150,17 +150,15 @@ class AllVisu:
                 fig = visu_matplotlib().matplotlib_versus_plot(**kwargs)
             elif typeofplot == 'yearly':
                 fig = visu_matplotlib().matplotlib_yearly_plot(**kwargs)
-            elif typeofplot == 'menulocation' or typeofplot == 'spiral':
-                PyvoaWarning('For display: '+ vis + ' ' + typeofplot + ' not implemented')
             else:
-                raise PyvoaError('For display: '+ vis +' unknown type of plot '+typeofplot)
+                raise PyvoaError('For display: '+ vis +' unknown typeofplot '+typeofplot)
         elif vis =='seaborn':
             if typeofplot == 'date':
                 fig = visu_seaborn().seaborn_date_plot(**kwargs)
             elif  typeofplot == 'versus':
                 fig = visu_seaborn().seaborn_versus_plot(**kwargs)
             else:
-                PyvoaError(typeofplot + ' not implemented in ' + vis)
+                raise PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
             if typeofplot == 'date':
                 fig = visu_bokeh().bokeh_date_plot(**kwargs)
