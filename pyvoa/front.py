@@ -40,6 +40,7 @@ import geopandas as gpd
 from pyvoa.kwarg_options import InputOption
 from pyvoa.visualizer import AllVisu
 
+from importlib import import_module
 
 class front:
     """Class for managing graphical data visualization and processing.
@@ -432,12 +433,11 @@ class front:
         return self.namefunction
 
     def getversion(self,):
-        """Retrieve the current version of the pyvoa package.
-
-        Returns:
-            str: The version number of the pyvoa package.
-        """
-        return pyvoa._version.__version__
+        try:
+            version_module = import_module("pyvoa.__version__")
+            return getattr(version_module, "__version__", "unknown")
+        except Exception:
+            return "unknown"
 
     def listoutput(self,):
         """Returns a list of output values from the batch input arguments.
