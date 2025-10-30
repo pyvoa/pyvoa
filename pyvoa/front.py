@@ -104,8 +104,8 @@ class front:
         self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
 
-        self.larguments = self.av.listarguments
-        self.listchartkargsvalues = self.av.listchartkargsvalues
+        self.largument = self.av.listargument
+        self.largumentvalue = self.av.listargumentvalue
         self.listviskargskeys = self.av.listviskargskeys
 
         self.dict_bypop = coco.GPDBuilder.dictbypop()
@@ -555,7 +555,7 @@ class front:
         self.loption.remove('')
         return self.loption
 
-    def listarguments(self,):
+    def listargument(self,):
         """Returns the keys of the lchartkargskeys attribute.
 
         This method retrieves the keys stored in the lchartkargskeys attribute of the instance.
@@ -563,9 +563,9 @@ class front:
         Returns:
             list: A list of keys from the lchartkargskeys attribute.
         """
-        return self.larguments
+        return self.largument
 
-    def listchartkargsvalues(self,):
+    def listargumentvalue(self,):
         """Returns the values of the lchartkargs attribute.
 
         This method retrieves the values stored in the lchartkargsvalues attribute of the instance.
@@ -573,7 +573,7 @@ class front:
         Returns:
             list: The values of the lchartkargsvalues attribute.
         """
-        return self.lchartkargsvalues
+        return self.largumentvalue
 
     def listtile(self,):
         """Returns the list of tiles.
