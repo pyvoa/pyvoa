@@ -132,6 +132,39 @@ class visu_seaborn:
         plt.xticks(rotation=45)
         plt.show()
         return plt
+    @decoplotseaborn
+    def seaborn_yearly_plot(self, **kwargs):
+
+        input = kwargs['input']
+        what = kwargs['what'][0]
+        title = kwargs.get('title')
+        plt = kwargs.get('plt')
+        sns = kwargs.get('sns')
+        input = input.loc[~(input['date'].dt.month.eq(2) & input['date'].dt.day.eq(29))].reset_index(drop=True)
+        input = input.copy()
+        input.loc[:,'allyears']=input['date'].apply(lambda x : x.year)
+        input['allyears'] = input['allyears'].astype(int)
+        input.loc[:,'dayofyear']= input['date'].apply(lambda x : x.dayofyear)
+
+        years = sorted(input["allyears"].unique())
+        palette = sns.color_palette("husl", n_colors=len(years))
+        for color, i in zip(palette, years):
+            subset = input.loc[input["allyears"] == i]
+            sns.lineplot(
+                data=subset,
+                x="dayofyear",
+                y=what,
+                label=str(i),    # la légende affichera les années
+                color=color
+            )
+
+
+        plt.title(title)
+        plt.xlabel("Jour de l'année ")
+        plt.ylabel(what)
+        plt.legend(title="Année", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.tight_layout()
+        plt.show()
 
     @decoplotseaborn
     def seaborn_versus_plot(self, **kwargs):
@@ -148,6 +181,7 @@ class visu_seaborn:
         plt.ylabel(what[1])
         plt.show()
         return plt
+
 
     @decoplotseaborn
     @decohistseaborn

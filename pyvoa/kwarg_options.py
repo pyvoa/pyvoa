@@ -76,7 +76,7 @@ class InputOption():
 
         self.pdcharts = pd.DataFrame({
             'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly','versus']","'typeofhist'=['location','value','pie']",True],
-            'seaborn': ["'typeofplot'=['date', 'versus']","'typeofhist'=['location','value','pie']",False],
+            'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
             'bokeh': ["'typeofplot'=['date', 'menulocation', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",True]
             }, index=['plot', 'hist','map'])
 

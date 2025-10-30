@@ -527,7 +527,7 @@ class front:
         if self.vis == None:
             raise PyvoaError('Vis has not be set !')
         self.lhist = self.av.pdcharts[self.vis]['hist']
-        return self.lhist.replace('','"')
+        return self.lhist
 
     def listplot(self,):
         """Returns a list of the types of plots from the graphics input arguments.
