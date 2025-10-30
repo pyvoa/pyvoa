@@ -82,7 +82,7 @@ class front:
         listtile(): Returns the list of currently available tile options for maps.
         listwhich(dbname=None): Gets the available fields for the specified database.
         listwhere(clustered=False): Gets the list of available regions/subregions managed by the current GPDBuilder.
-        getrawdb(): Returns the main pandas DataFrame with all values loaded from the selected GPDBuilder.
+        getdatabase(): Returns the main pandas DataFrame with all values loaded from the selected GPDBuilder.
         saveoutput(**kwargs): Exports pandas DataFrame as an output file.
         merger(**kwargs): Merges two or more pandas DataFrames from get_stats operation.
         savefig(name): Saves the current figure to a file.
@@ -754,7 +754,7 @@ class front:
             df = self.gpdbuilder.get_parserdb().get_dbdescription()
             return df
 
-    def getrawdb(self):
+    def getdatabase(self):
         """Retrieves the full database and logs its memory usage.
 
         This method fetches the complete database from the `gpdbuilder` object, calculates the total memory usage of all columns, and logs this information. It then returns the full database as a DataFrame.
