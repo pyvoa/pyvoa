@@ -56,7 +56,7 @@ class front:
         loption (list): List of available options for data processing.
         lmapoption (list): List of available map options.
         ltiles (list): List of available tile options for maps.
-        lchartkargskeys (list): List of available keyword argument keys for chart functions.
+        largument (list): List of available keyword argument keys for chart functions.
         listchartkargsvalues (list): List of available keyword argument values for chart functions.
         listviskargskeys (list): List of available visualization keyword argument keys.
         dict_bypop (dict): Dictionary for population normalization options.
@@ -245,7 +245,7 @@ class front:
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
-            kwargs_keystesting(kwargs,self.lchartkargskeys + self.listviskargskeys,' kwargs keys not recognized ...')
+            kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
 
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
@@ -556,12 +556,12 @@ class front:
         return self.loption
 
     def listargument(self,):
-        """Returns the keys of the lchartkargskeys attribute.
+        """Returns the keys of the largument attribute.
 
-        This method retrieves the keys stored in the lchartkargskeys attribute of the instance.
+        This method retrieves the keys stored in the largument attribute of the instance.
 
         Returns:
-            list: A list of keys from the lchartkargskeys attribute.
+            list: A list of keys from the largument attribute.
         """
         return self.largument
 
