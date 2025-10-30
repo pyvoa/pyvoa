@@ -798,7 +798,7 @@ class front:
             setvis('example_visualization')
         """
         if vis not in self.lvisu:
-            raise PyvoaError("Sorry but " + vis + " visualisation isn't implemented ")
+            raise PyvoaError("Sorry but " + vis + " visualisation isn't installed ")
         else:
             self.vis = vis
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
