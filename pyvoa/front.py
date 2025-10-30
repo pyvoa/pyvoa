@@ -42,6 +42,15 @@ from pyvoa.visualizer import AllVisu
 
 from importlib import import_module
 
+def getversion():
+    try:
+        version_module = import_module("pyvoa.__version__")
+        return getattr(version_module, "__version__", "unknown")
+    except Exception:
+        return "unknown"
+
+print(f"\033[1m\033[92m ✨ Welcome to PyVOA (version {getversion()}) ✨\033[0m")
+
 class front:
     """Class for managing graphical data visualization and processing.
 
@@ -88,6 +97,7 @@ class front:
         merger(**kwargs): Merges two or more pandas DataFrames from get_stats operation.
         savefig(name): Saves the current figure to a file.
     """
+
     def __init__(self):
         self.meta = MetaInfo()
         self.av = InputOption()
@@ -431,13 +441,6 @@ class front:
         """
 
         return self.namefunction
-
-    def getversion(self,):
-        try:
-            version_module = import_module("pyvoa.__version__")
-            return getattr(version_module, "__version__", "unknown")
-        except Exception:
-            return "unknown"
 
     def listoutput(self,):
         """Returns a list of output values from the batch input arguments.
