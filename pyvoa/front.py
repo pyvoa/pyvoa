@@ -98,7 +98,6 @@ class front:
         PyvoaInfo("Available graphical librairies : " + str(self.lvisu))
 
         self.lwhat = list(self.av.d_batchinput_args['what'])
-        self.lhist = list(self.av.d_graphicsinput_args['typeofhist'])
         self.lplot = list(self.av.d_graphicsinput_args['typeofplot'])
         self.loption = list(self.av.d_batchinput_args['option'])
 
@@ -520,6 +519,7 @@ class front:
         Returns:
             list: The list histogram.
         """
+        self.lhist = self.av.pdcharts[self.vis]['typeofhist']
         return self.lhist
 
     def listplot(self,):
