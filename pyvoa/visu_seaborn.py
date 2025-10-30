@@ -84,10 +84,6 @@ class visu_seaborn:
             if 'where' in kwargs:
                 title += f" - {kwargs.get('where')}"
             kwargs['title'] = title
-            # top_countries = (input.groupby('where')[which].sum()
-            #              .nlargest(Max_Countries_Default).index.tolist())
-            # filtered_input = input[input['where'].isin(top_countries)]
-
             loc = list(input['where'].unique())
             kwargs['plt'] = plt
             kwargs['sns'] = sns
@@ -129,11 +125,10 @@ class visu_seaborn:
         st=['-','--',':']
         for idx, i in enumerate(what):
             input['where+i']=input['where'].apply(lambda x: x+', '+i)
-            sns.lineplot(data=input, x='date', y = i, hue='where+i',style='where+i')#linestyle=st[idx])
+            sns.lineplot(data=input, x='date', y = i, hue='where+i',style='where+i',color='colors',linestyle=st[idx])
         plt.legend(title = "where", loc= "upper right",bbox_to_anchor=(1.04, 1))
         plt.title(title)
         plt.xlabel('Date')
-        #plt.ylabel(', '.join(which))
         plt.xticks(rotation=45)
         plt.show()
         return plt
@@ -141,18 +136,16 @@ class visu_seaborn:
     @decoplotseaborn
     def seaborn_versus_plot(self, **kwargs):
         input = kwargs['input']
-        which = kwargs['which']
+        what = kwargs['what']
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(12, 8))
-
-        sns.lineplot(data=input, x=which[0], y=which[1], hue='where')
+        sns.lineplot(data=input, x=what[0], y=what[1], hue='where',color='colors')
         plt.legend(title = "where", loc= "upper right",bbox_to_anchor=(1.04, 1))
         plt.title(title)
-        plt.xlabel(which[0])
-        plt.ylabel(which[1])
+        plt.xlabel(what[0])
+        plt.ylabel(what[1])
         plt.show()
         return plt
 

@@ -75,8 +75,8 @@ class InputOption():
                         }
 
         self.d_visu_possible_plots= {
-            'matplotlib':['date', 'versus', 'yearly'],\
-            'seaborn': ['date', 'versus', 'yearly'],\
+            'matplotlib':['date', 'versus', 'yearly','versus'],\
+            'seaborn': ['date', 'versus'],\
             'bokeh':['date', 'menulocation', 'versus', 'spiral', 'yearly']
         }
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
