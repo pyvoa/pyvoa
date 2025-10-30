@@ -50,6 +50,7 @@ def getversion():
         return "unknown"
 
 print(f"\033[1m\033[92m ✨ Welcome to PyVOA (version {getversion()}) ✨\033[0m")
+print("See https://pyvoa.org")
 
 class front:
     """Class for managing graphical data visualization and processing.
@@ -1147,7 +1148,6 @@ class front:
                 self.outcome.savefig(name)
         else:
             PyvoaError('savefig can\'t be used to store a panda DataFrame')
-
 
 # this trick allow you to do
 # import pyvoa.front as pv
