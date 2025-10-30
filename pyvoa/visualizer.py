@@ -139,7 +139,7 @@ class AllVisu:
         fig = None
         if (typeofplot == 'yearly' or typeofplot == 'spiral') and \
            (len(kwargs['input']['where'].unique())>1 or len(kwargs['which'])>1):
-            raise PyvoaError('yearly or spirale plot can display only one country and one value')
+            raise PyvoaError('Yearly or spiral plots can display only one country and/or one value.')
         if typeofplot == 'versus':
             if len(kwargs.get('which')) != 2:
                 raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
