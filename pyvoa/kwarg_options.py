@@ -48,7 +48,7 @@ class InputOption():
         self.d_batchinput_args  = {
                         'where':[''],\
                         'option':['','nonneg','smooth7','sumall',
-                        'bypop=pop','bypop=100', 'bypop=1k', 'bypop=100k','bypop=1M'],\
+                        'pop=pop','pop=100', 'pop=1k', 'pop=100k','pop=1M'],\
                         'which':[''],\
                         'what':['current','daily','weekly'],\
                         'when':[''],\
@@ -63,7 +63,7 @@ class InputOption():
                         'copyright': 'pyvoa',\
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['location','value','pie'],\
-                        'typeofplot':['date','menulocation','versus','spiral','yearly'],\
+                        'typeofplot':['date','compare','versus','spiral','yearly'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','folium','seaborn'],\
                         'tile' : ['openstreet','esri','stamen','positron'],\
@@ -78,7 +78,7 @@ class InputOption():
             'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly','versus']","'typeofhist'=['location','value','pie']",\
                 "['dense']" ],
             'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
-            'bokeh': ["'typeofplot'=['date', 'menulocation', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",
+            'bokeh': ["'typeofplot'=['date', 'compare', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",
             "['text','textinteger','spark','label%','log','unsorted','dense']"]
             }, index=['plot', 'hist','map'])
 
