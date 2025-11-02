@@ -205,11 +205,11 @@ class AllVisu:
                 raise PyvoaError(typeofhist + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
             if typeofhist == 'location':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_horizonhisto(**kwargs)
+                fig = visu_bokeh().bokeh_horizonhisto(**kwargs)
             elif typeofhist == 'value':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_histo(**kwargs)
+                fig = visu_bokeh().bokeh_histo(**kwargs)
             elif typeofhist == 'pie':
-                fig = visu_bokeh(InputOption().d_graphicsinput_args).bokeh_pie(**kwargs)
+                fig = visu_bokeh().bokeh_pie(**kwargs)
         elif vis == 'seaborn':
             if typeofhist == 'location':
                 fig = visu_seaborn().seaborn_hist_horizontal(**kwargs)
