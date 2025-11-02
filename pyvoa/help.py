@@ -1,114 +1,110 @@
 import argparse
-from colorama import init, Fore, Style
 
+# Basic metadata
 __version__ = '3.0.1'
 __author__ = 'Tristan Beau, Julien Browaeys, Olivier Dadoun'
-__github__ = 'https://github.com/src.project/pycoa
+__github__ = 'https://github.com/src.project/pycoa'
 __web__ = 'http://pycoa.fr/'
+
+# ANSI color codes
+BLUE = "\033[94m"
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+RED = "\033[91m"
+RESET = "\033[0m"
+BOLD = "\033[1m"
 
 def display_full_help():
     print()
-    # Message d'accueil
-    print(Fore.RED + "Bienvenue dans l'aide de Pysrc. + Style.RESET_ALL)
+    print(f"{RED}{BOLD}=== Welcome to the Pysrc Help System ==={RESET}\n")
 
-    # Affichage de l'aide 
-    print()
-    # Section liste des commandes basiques
-    print(Fore.BLUE + "Liste des commandes" + Style.RESET_ALL)
-
-    print()
-    # Liste des commandes et leurs descriptions
+    # -------------------------
+    # Basic commands
+    # -------------------------
+    print(f"{BLUE}{BOLD}Available Commands:{RESET}\n")
     list_commands = [
-        ('listwhom', "Liste les bases de données disponibles"),
-        ('listwhom(True)', "Liste les bases de données disponibles en format pandas (recommandé)"),
-        ('setwhom("DBname")', "Pour définir la base de données à utiliser"),
-        ('getwhom', "Connaitre la base de données utilisée"),
-        ('listwhich', "Liste les variables épidémiologiques disponibles dans la BD choisie"),
-        ('listwhere', "Liste les départements disponibles"),
-        ('listwhere(True)', "Liste les régions disponibles"),
-        ('listwhat', "Données cumulées ou différentielles : cumul, daily, weekly"),
-        ('listoption', "Liste les options disponibles"),
-        ('listoutput', "Liste les formats de sortie disponibles : pandas, geopandas, list, dict, array"),
-        ('listbypop', "Liste les options pour normaliser les courbes par le nombre d'habitants"),
-        ('listplot', "Liste les types de graphiques disponibles"),
-        ('listtile', "Liste les textures disponibles pour les cartes"),
-        ('listvisu', "Liste les options de visualisation disponibles pour les cartes"),
-        ('dir(pycoa.', "Affiche toutes les méthodes")
+        ('listwhom', "List available databases"),
+        ('listwhom(True)', "List available databases as a pandas DataFrame (recommended)"),
+        ('setwhom(\"DBname\")', "Set the database to be used"),
+        ('getwhom', "Display the currently used database"),
+        ('listwhich', "List available epidemiological variables"),
+        ('listwhere', "List available departments"),
+        ('listwhere(True)', "List available regions"),
+        ('listwhat', "Show data modes: cumulative, daily, weekly"),
+        ('listoption', "List available options"),
+        ('listoutput', "List available output formats: pandas, geopandas, list, dict, array"),
+        ('listbypop', "List normalization options (per population)"),
+        ('listplot', "List available plot types"),
+        ('listtile', "List available map textures"),
+        ('listvisu', "List available visualization options for maps"),
+        ('dir(pycoa)', "Display all available methods")
     ]
-
-    for command, description in list_commands:        
-        print(Fore.GREEN + command.ljust(30) + Style.RESET_ALL + description)
-
+    for command, description in list_commands:
+        print(f"  {GREEN}{command.ljust(30)}{RESET}{description}")
     print()
-    # Section pour les commandes de graphiques
-    print(Fore.BLUE + "Commandes de graphiques" + Style.RESET_ALL)
 
-    print()
-    # Liste des commandes et descriptions pour les commandes de graphiques
+    # -------------------------
+    # Graph commands
+    # -------------------------
+    print(f"{BLUE}{BOLD}Graph Commands:{RESET}\n")
     graph_commands = [
-        ('plot', "Représentation de la donnée sélectionnée en fonction du temps (série temporelle)"),
-        ('map', "Représentation sous forme de carte"),
-        ('hist', "Représentation sous forme d'histogrammes"),
-        ('get', "Récupérer les données en vue d'un traitement ultérieur")
+        ('plot', "Display selected data as a time series"),
+        ('map', "Display data as a geographical map"),
+        ('hist', "Display data as histograms"),
+        ('get', "Retrieve data for further processing")
     ]
-
-    # sous commande de plot et hist
     for command, description in graph_commands:
-        print(Fore.GREEN + command.ljust(30) + Style.RESET_ALL + description)
-        # typeofplot
+        print(f"  {GREEN}{command.ljust(30)}{RESET}{description}")
+
+        # Plot sub-options
         if command == 'plot':
             plot_options = [
-                ("typeofplot='date'(défaut)", "Le plot est une évolution temporelle de la variable épidémiologique étudiée."),
-                ("typeofplot='menulocation'", "Si l'on désire comparer uniquement 2 variations temporelles parmi la liste where."),
-                ("typeofplot='yearly'", "Permet de comparer les différentes années entre elles mois par mois."),
-                ("typeofplot='spiral'", "Représentation en spiral, complémentaire de la précédente.")
+                ("typeofplot='date' (default)", "Time evolution of the selected variable"),
+                ("typeofplot='menulocation'", "Compare two locations over time"),
+                ("typeofplot='yearly'", "Compare different years month by month"),
+                ("typeofplot='spiral'", "Spiral representation (complementary to yearly)")
             ]
-            for plot_command, plot_description in plot_options:
-                print("  " + Fore.YELLOW + plot_command.ljust(30) + Style.RESET_ALL + plot_description)
-        # typeofhist
+            for opt, desc in plot_options:
+                print(f"    {YELLOW}{opt.ljust(35)}{RESET}{desc}")
+
+        # Histogram sub-options
         if command == 'hist':
             hist_options = [
-                ("typeofhist='bycountry'(défaut)", "Histogramme par pays"),
-                ("typeofhist='byvalue'", "Histogramme en fonction des valeurs"),
-                ("typeofhist='pie'", "Diagramme circulaire")
+                ("typeofhist='bycountry' (default)", "Histogram by country"),
+                ("typeofhist='byvalue'", "Histogram by value"),
+                ("typeofhist='pie'", "Pie chart representation")
             ]
-            for hist_command, hist_description in hist_options:
-                print("  " + Fore.YELLOW + hist_command.ljust(30) + Style.RESET_ALL + hist_description)
-
+            for opt, desc in hist_options:
+                print(f"    {YELLOW}{opt.ljust(35)}{RESET}{desc}")
     print()
-    # Section exemple
-    print(Fore.BLUE + "Exemple de requêtes avec Pysrc. + Style.RESET_ALL)
 
-    print()
-    # Liste des commandes et descriptions pour les commandes de graphiques
-    exemple_commands = [
+    # -------------------------
+    # Examples
+    # -------------------------
+    print(f"{BLUE}{BOLD}Examples:{RESET}\n")
+    examples = [
         ('listwhich', "pycoa.listwhich()"),
-        ('plot', "pycoa.plot(where=['France', 'Italy', 'United kingdom'])"),
-        ('map', "pycoa.map(where='world',what='daily',when='01/04/2020')"),
-        ('hist', "pycoa.hist(where='middle africa', which='tot_confirmed',what='cumul')"),
-        ('get', "pycoa.get(where='usa', what='daily', which='tot_recovered',output='pandas')")
+        ('plot', "pycoa.plot(where=['France', 'Italy', 'United Kingdom'])"),
+        ('map', "pycoa.map(where='world', what='daily', when='01/04/2020')"),
+        ('hist', "pycoa.hist(where='Middle Africa', which='tot_confirmed', what='cumul')"),
+        ('get', "pycoa.get(where='USA', what='daily', which='tot_recovered', output='pandas')")
     ]
-
-    for command, description in exemple_commands:
-        print(Fore.GREEN + command.ljust(30) + Style.RESET_ALL + Style.BRIGHT + description + Style.RESET_ALL)
-
+    for cmd, ex in examples:
+        print(f"  {GREEN}{cmd.ljust(30)}{RESET}{BOLD}{ex}{RESET}")
     print()
 
 def main():
-    # Initialiser colorama
-    init()
+    parser = argparse.ArgumentParser(
+        description="Extended help for Pysrc.",
+        add_help=False
+    )
 
-    parser = argparse.ArgumentParser(description=Fore.RED+"Aide supplémentaire de Pysrc.+Style.RESET_ALL, add_help=False)
-
-    parser.add_argument('-h', '--help', action='store_true', help="Affiche l'aide complète de Pysrc.)
+    parser.add_argument('-h', '--help', action='store_true', help="Show the complete Pysrc help.")
     parser.add_argument('-v', '--version', action='version', version=f'%(prog)s {__version__}',
-                        help="Affiche la version de Pysrc.)
-    parser.add_argument('-a', '--author', action='store_true',
-                        help="Affiche les auteurs de Pysrc.)
-    parser.add_argument('-g', '--github', action='store_true', 
-                        help="Affiche le github de Pysrc.)
-    parser.add_argument('-w', '--web', action='store_true',
-                        help="Affiche le site web de Pysrc.)
+                        help="Show the current version of Pysrc.")
+    parser.add_argument('-a', '--author', action='store_true', help="Show the authors of Pysrc.")
+    parser.add_argument('-g', '--github', action='store_true', help="Show the Pysrc GitHub repository.")
+    parser.add_argument('-w', '--web', action='store_true', help="Show the Pysrc website.")
 
     args = parser.parse_args()
 
