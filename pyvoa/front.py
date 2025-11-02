@@ -39,6 +39,7 @@ import pyvoa.geo as coge
 import geopandas as gpd
 from pyvoa.kwarg_options import InputOption
 from pyvoa.visualizer import AllVisu
+import pyvoa.help as h
 
 from importlib import import_module
 
@@ -51,6 +52,7 @@ def getversion():
 
 print(f"\033[1m\033[92m ✨ Welcome to PyVOA (version {getversion()}) ✨\033[0m")
 print("See https://pyvoa.org")
+
 
 class front:
     """Class for managing graphical data visualization and processing.
@@ -205,6 +207,9 @@ class front:
                 self.allvisu = AllVisu(base, pandy)
                 coge.GeoManager('name')
         self.db = base
+
+    def help(self,):
+        return h.display_full_help()
 
     def input_wrapper(func):
         """
