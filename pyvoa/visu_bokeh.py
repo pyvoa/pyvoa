@@ -570,8 +570,8 @@ class visu_bokeh:
         input = kwargs.get('input')
         input = input.drop(columns='geometry')
         which= kwargs.get('which')
-        guideline = kwargs.get('guideline',self.d_graphicsinput_args['guideline'][0])
-        mode = kwargs.get('mode',self.d_graphicsinput_args['mode'][0])
+        guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
+        mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
         if isinstance(which,list):
             which=which[0]
 
@@ -601,7 +601,7 @@ class visu_bokeh:
         #                       mode = mode, point_policy="snap_to_data")  # ,PanTool())
 
         panels = []
-        for axis_type in  self.d_graphicsinput_args['ax_type']:
+        for axis_type in  self.av.d_graphicsinput_args['ax_type']:
             bokeh_figure = self.bokeh_figure( y_axis_type = axis_type, x_axis_type = 'datetime')
 
             bokeh_figure.yaxis[0].formatter = PrintfTickFormatter(format = "%4.2e")
@@ -664,8 +664,8 @@ class visu_bokeh:
         '''
         input = kwargs['input']
         which = kwargs['which']
-        guideline = kwargs.get('guideline',self.d_graphicsinput_args['guideline'][0])
-        mode = kwargs.get('mode',self.d_graphicsinput_args['mode'][0])
+        guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
+        mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
 
         if len(input['where'].unique()) > 1 :
             PyvoaWarning('Can only display yearly plot for ONE location. I took the first one:'+ input['where'][0])
@@ -691,7 +691,7 @@ class visu_bokeh:
         #    PyvoaError('Only one variable could be displayed')
         #else:
         #    which=which[0]
-        for axis_type in  self.d_graphicsinput_args['ax_type']:
+        for axis_type in  self.av.d_graphicsinput_args['ax_type']:
             bokeh_figure = self.bokeh_figure( y_axis_type = axis_type,**kwargs)
             i = 0
             r_list=[]
@@ -776,7 +776,7 @@ class visu_bokeh:
         '''
 
         input = kwargs.get('input')
-        bins = kwargs.get('bins', self.d_graphicsinput_args['bins'])
+        bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         min_val = input['cases'].min()
         max_val =  input['cases'].max()
         if bins:
