@@ -33,7 +33,7 @@ def display_full_help():
         ('listwhat', "Show data modes: cumulative, daily, weekly"),
         ('listoption', "List available options"),
         ('listoutput', "List available output formats: pandas, geopandas, list, dict, array"),
-        ('listbypop', "List normalization options (per population)"),
+        ('listpop', "List normalization options (per population)"),
         ('listplot', "List available plot types"),
         ('listtile', "List available map textures"),
         ('listvisu', "List available visualization options for maps"),
@@ -60,7 +60,7 @@ def display_full_help():
         if command == 'plot':
             plot_options = [
                 ("typeofplot='date' (default)", "Time evolution of the selected variable"),
-                ("typeofplot='menulocation'", "Compare two locations over time"),
+                ("typeofplot='compare'", "Compare two locations over time"),
                 ("typeofplot='yearly'", "Compare different years month by month"),
                 ("typeofplot='spiral'", "Spiral representation (complementary to yearly)")
             ]
@@ -70,8 +70,8 @@ def display_full_help():
         # Histogram sub-options
         if command == 'hist':
             hist_options = [
-                ("typeofhist='bycountry' (default)", "Histogram by country"),
-                ("typeofhist='byvalue'", "Histogram by value"),
+                ("typeofhist='country' (default)", "Histogram by country"),
+                ("typeofhist='value'", "Histogram by value"),
                 ("typeofhist='pie'", "Pie chart representation")
             ]
             for opt, desc in hist_options:

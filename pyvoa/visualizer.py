@@ -158,7 +158,7 @@ class AllVisu:
             elif  typeofplot == 'versus':
                 fig = visu_seaborn().seaborn_versus_plot(**kwargs)
             elif  typeofplot == 'yearly':
-                fig = visu_seaborn().seaborn_yearly_plot(**kwargs)    
+                fig = visu_seaborn().seaborn_yearly_plot(**kwargs)
             else:
                 raise PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
@@ -168,13 +168,13 @@ class AllVisu:
                 fig = visu_bokeh().bokeh_spiral_plot(**kwargs)
             elif typeofplot == 'versus':
                     fig = visu_bokeh().bokeh_versus_plot(**kwargs)
-            elif typeofplot == 'menulocation':
+            elif typeofplot == 'compare':
                 if self.granularity == 'nation' and self.granularity != 'World':
-                    print('typeofplot is menulocation with a national DB granularity, use date plot instead ...')
+                    print('typeofplot is compare with a national DB granularity, use date plot instead ...')
                     fig = visu_bokeh().plot(*kwargs)
                 else:
                     if len(kwargs['which']) > 1:
-                        PyvoaWarning('typeofplot is menulocation but dim(which)>1, take first one '+kwargs['which'][0])
+                        PyvoaWarning('typeofplot is compare but dim(which)>1, take first one '+kwargs['which'][0])
                     fig = visu_bokeh().bokeh_menu_plot(**kwargs)
             elif typeofplot == 'yearly':
                 if input.date.max()-input.date.min() <= dt.timedelta(days=365):

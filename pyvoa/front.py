@@ -122,7 +122,7 @@ class front:
         self.largumentvalue = self.av.listargumentvalue
         self.listviskargskeys = self.av.listviskargskeys
 
-        self.dict_bypop = coco.GPDBuilder.dictbypop()
+        self.dict_bypop = coco.GPDBuilder.dictpop()
 
         self.db = ''
         self.gpdbuilder = ''
@@ -247,7 +247,7 @@ class front:
             '''
             if self.gpdbuilder == '':
                 raise PyvoaError("Does setwhom has been defined ???")
-                
+
             if func.__name__ == 'get':
                 if 'typeofhist' in list(kwargs.keys()) or 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
@@ -301,7 +301,7 @@ class front:
 
             found_bypop = None
             for w in kwargs['option']:
-                if w.startswith('bypop='):
+                if w.startswith('pop='):
                     found_bypop = w
                     if kwargs['what'] == 'current':
                         ext =' '
@@ -679,7 +679,7 @@ class front:
                     raise PyvoaError('What is the granularity of your DB ?')
             return r
 
-    def listbypop(self):
+    def listpop(self):
         """Returns a list of keys from the dictionary `dict_bypop`.
 
         This method retrieves all the keys from the `dict_bypop` attribute and returns them as a list.
@@ -864,8 +864,8 @@ class front:
 
             if 'output' in kwargs:
                 kwargs.pop('output')
-            if 'bypop' in kwargs:
-                kwargs.pop('bypop')
+            if 'pop' in kwargs:
+                kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
             mapoption = kwargs.get('mapoption', None)
             if 'dense' in mapoption:
@@ -954,7 +954,7 @@ class front:
                 **kwargs: Arbitrary keyword arguments that may include:
                     - typeofhist: The type of histogram to generate.
                     - output: This argument is removed from kwargs and not used.
-                    - bypop: If present, this argument is removed from kwargs and not used.
+                    - pop: If present, this argument is removed from kwargs and not used.
 
             Raises:
                 PyvoaError: If no visualization has been set up.
@@ -965,8 +965,8 @@ class front:
             dateslider = kwargs.get('dateslider')
             typeofhist = kwargs.get('typeofhist')
             kwargs.pop('output')
-            if kwargs.get('bypop'):
-              kwargs.pop('bypop')
+            if kwargs.get('pop'):
+              kwargs.pop('pop')
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
                 self.outcome = self.allvisu.hist(**z)
@@ -1037,8 +1037,8 @@ class front:
             kwargs.pop('output')
             if typeofplot == 'versus' and len(which)>2:
                 PyvoaError(" versu can be used with 2 variables and only 2 !")
-            if kwargs.get('bypop'):
-                kwargs.pop('bypop')
+            if kwargs.get('pop'):
+                kwargs.pop('pop')
             if self.getvis():
                 z = {**self.getkwargsvisu(),**kwargs}
                 self.outcome = self.allvisu.plot(**z)
