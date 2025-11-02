@@ -45,10 +45,12 @@ class InputOption():
         Option visualisation !
     """
     def __init__(self):
+        self.dictpop = {'pop':1.,'pop100':100,'pop1k':1e3,'pop100k':1e5,'pop1M':1e6}
         self.d_batchinput_args  = {
                         'where':[''],\
-                        'option':['','nonneg','smooth7','sumall',
-                        'pop=pop','pop=100', 'pop=1k', 'pop=100k','pop=1M'],\
+                        'option':['','nonneg','smooth7','sumall',\
+                        'normalize:pop','normalize:pop100',\
+                        'normalize:pop1k', 'normalize:pop100k','normalize:pop1M'],\
                         'which':[''],\
                         'what':['current','daily','weekly'],\
                         'when':[''],\
@@ -75,7 +77,7 @@ class InputOption():
                         }
 
         self.pdcharts = pd.DataFrame({
-            'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly','versus']","'typeofhist'=['location','value','pie']",\
+            'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly']","'typeofhist'=['location','value','pie']",\
                 "['dense']" ],
             'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
             'bokeh': ["'typeofplot'=['date', 'compare', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",

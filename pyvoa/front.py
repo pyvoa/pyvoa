@@ -122,7 +122,7 @@ class front:
         self.largumentvalue = self.av.listargumentvalue
         self.listviskargskeys = self.av.listviskargskeys
 
-        self.dict_bypop = coco.GPDBuilder.dictpop()
+        self.dict_bypop = self.av.dictpop
 
         self.db = ''
         self.gpdbuilder = ''
@@ -265,6 +265,7 @@ class front:
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
+            print(self.largument + self.listviskargskeys)
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
 
@@ -301,7 +302,7 @@ class front:
 
             found_bypop = None
             for w in kwargs['option']:
-                if w.startswith('pop='):
+                if w.startswith('normalize:'):
                     found_bypop = w
                     if kwargs['what'] == 'current':
                         ext =' '
