@@ -80,6 +80,7 @@ from bokeh.io import output_notebook
 from bokeh.io import output_notebook
 from pyvoa.kwarg_options import InputOption
 
+
 def safe_output_notebook():
     try:
         from IPython import get_ipython
@@ -926,7 +927,7 @@ class visu_bokeh:
 
         pyvoafiltered = ColumnDataSource(data = input)
         new_panels = []
-        for axis_type in self.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['ax_type']:
             bokeh_figure = self.bokeh_figure( x_axis_type = axis_type)
             #fig = panels[i].child
             bokeh_figure.y_range = Range1d(min(pyvoafiltered.data['bottom']), max(pyvoafiltered.data['top']))
@@ -966,7 +967,7 @@ class visu_bokeh:
             panel = TabPanel(child = bokeh_figure, title = axis_type)
             new_panels.append(panel)
         tabs = Tabs(tabs = new_panels)
-        dateslider = self.d_graphicsinput_args['dateslider']
+        dateslider = self.av.d_graphicsinput_args['dateslider']
 
         if dateslider:
                 toggl = Toggle(label='► Play',active=False, button_type="success",height=30,width=10)
@@ -1090,6 +1091,8 @@ class visu_bokeh:
             - mapoption: False
         '''
         input=kwargs.get('input')
+        what = kwargs.get('what')
+        input['cases'] = input[what]
         sourcemapoption=ColumnDataSource(input.drop(columns='geometry'))
         tile = kwargs.get('tile')
         tile = visu_bokeh.convert_tile(tile, 'bokeh')
