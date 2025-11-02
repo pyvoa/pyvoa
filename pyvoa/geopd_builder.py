@@ -102,12 +102,6 @@ class GPDBuilder(object):
             raise PyvoaTypeError('What data base are you looking for ?')
         self.where_geodescription = where_kindgeo
 
-   @staticmethod
-   def dictpop():
-       ''' return dictionnary pop '''
-       pop = {'pop':1.,'100':100,'1k':1e3,'100k':1e5,'1M':1e6}
-       return pop
-
    def getwheregeometrydescription(self):
         return self.where_geodescription
 
@@ -344,7 +338,7 @@ class GPDBuilder(object):
                         temppd = temppd.groupby(['where','code','date','geometry']).mean().reset_index()
                     else:
                         temppd = temppd.groupby(['where','code','date','geometry']).sum(numeric_only=True).reset_index()
-               elif o.startswith('pop='):
+               elif o.startswith('normalize:'):
                      input = self.normbypop(input, w ,o)
                      kwargs['input'] = input
                      temppd = self.whereclustered(**kwargs)
@@ -398,9 +392,10 @@ class GPDBuilder(object):
         Return a pandas with a normalisation column add by population
         * can normalize by '100', '1k', '100k' or '1M' and the new which
     """
+    dpop = InputOption().dictpop
     if pandy.empty:
         raise PyvoaError('normbypop problem, your pandas seems to be empty ....')
-    value = re.sub(r'^.*?pop=', '', bypop)
+    value = re.sub(r'normalize:', '', bypop)
     clust = list(pandy['where'].unique())
     pop_field='population'
     uniquepandy = pandy.groupby('where').first().reset_index()
@@ -440,7 +435,7 @@ class GPDBuilder(object):
         val2norm=[val2norm]
 
     for i in val2norm:
-            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*GPDBuilder.dictpop()[value]
+            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*dpop[value]
     return pandy
 
    def saveoutput(self,**kwargs):
