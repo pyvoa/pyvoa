@@ -79,7 +79,7 @@ from bokeh.io import output_notebook
 
 from bokeh.io import output_notebook
 from pyvoa.kwarg_options import InputOption
-'''
+
 def safe_output_notebook():
     try:
         from IPython import get_ipython
@@ -89,8 +89,8 @@ def safe_output_notebook():
     except Exception:
         pass
 safe_output_notebook()
-'''
-output_notebook(hide_banner=True)
+
+#output_notebook(hide_banner=True)
 
 from bokeh.layouts import (
 row,
@@ -476,7 +476,7 @@ class visu_bokeh:
         dicof={'title':kwargs.get('title')}
         dicof['match_aspect']=True
         bokeh_figure = self.bokeh_figure(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
-        
+
         if len(input['where'].unique()) > 1 :
             print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()

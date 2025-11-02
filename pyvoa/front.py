@@ -245,6 +245,9 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
+            if self.gpdbuilder == '':
+                raise PyvoaError("Does setwhom has been defined ???")
+                
             if func.__name__ == 'get':
                 if 'typeofhist' in list(kwargs.keys()) or 'typeofplot' in list(kwargs.keys()):
                     raise PyvoaError("Argument ERROR")
@@ -276,10 +279,6 @@ class front:
             kwargs = {**default, **dicovisu}
 
             kwargs['what'] = kwargs['what'][0]
-            #for k,v in kwargs.items():
-            #    if k not in mustbealist:
-            #        print(k,v)
-            #        kwargs[k]=v[0]
 
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
