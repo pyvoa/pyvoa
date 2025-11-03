@@ -1041,6 +1041,7 @@ class front:
             if self.getvis():
                 z = {**self.getkwargsvisu(),**kwargs}
                 self.outcome = self.allvisu.plot(**z)
+                print("self.outcome ",self.outcome)
                 return func(self,self.outcome)
             else:
                 PyvoaError(" No visualization has been set up !")
@@ -1129,8 +1130,8 @@ class front:
         Raises:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
+        print("TYPE",type(self.outcome))
         if  self.getnamefunction() != 'get':
-            print('outcome',self.outcome)
             if self.getvis() == 'bokeh':
                 #PyvoaError("Bokeh savefig not yet implemented")
                 from bokeh.io import export_png

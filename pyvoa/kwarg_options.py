@@ -46,6 +46,7 @@ class InputOption():
     """
     def __init__(self):
         self.dictpop = {'pop':1.,'pop100':100,'pop1k':1e3,'pop100k':1e5,'pop1M':1e6}
+        self.lpop = ['normalize:'+k for k in self.dictpop.keys()]
         self.d_batchinput_args  = {
                         'where':[''],\
                         'option':['','nonneg','smooth7','sumall']+\
