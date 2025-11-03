@@ -207,12 +207,12 @@ class visu_seaborn:
         filtered_input = kwargs['filtered_input']
         what = kwargs['what']
         title = kwargs.get('title')
-
+        legend = kwargs.get('legend',None)
         # Créer le graphique
         sns.set_theme(style="whitegrid")
         plt.figure(figsize=(14, 7))
         sns.barplot(data=filtered_input, x='where', y=what, palette="viridis")
-        plt.title(title)
+        #plt.title(title)
         plt.xlabel('')  # Suppression de l'étiquette de l'axe x
         plt.ylabel(which)
         plt.xticks(rotation=70, ha='center')  # Rotation à 70 degrés et alignement central
@@ -251,11 +251,10 @@ class visu_seaborn:
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
-
+        legend = kwargs.get('legend',None)
         sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(14, 7))
         sns.barplot(data=input, x=what, y='where', palette="viridis", errorbar=None)
-        plt.title(title)
+        #plt.title(title)
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
