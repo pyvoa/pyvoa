@@ -392,7 +392,7 @@ class visu_bokeh:
         what = kwargs.get('what')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
-
+        legend = kwargs.get('legend',None)
         panels = []
         listfigs = []
         cases_custom = visu_bokeh().rollerJS()
@@ -415,7 +415,10 @@ class visu_bokeh:
                     color = input['colors'][input['where']==loc].iloc[0]
                     inputwhere = input.loc[input['where'] == loc].reset_index(drop = True)
                     pyvoa = ColumnDataSource(inputwhere)
-                    leg = loc
+                    if legend:
+                        leg = legend[loc]
+                    else:
+                        leg = loc
 
                     r = bokeh_figure.line(x = 'date', y = val, source = pyvoa,
                                      color = color, line_width = 3,

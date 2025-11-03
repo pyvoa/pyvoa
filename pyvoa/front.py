@@ -211,6 +211,18 @@ class front:
     def help(self,):
         return h.display_full_help()
 
+
+    @staticmethod
+    def create_legend(mylist):
+        legend={}
+        for i in mylist:
+            w = i.split(',')
+            if len(w)>3:
+                legend[i]=str(w[:3]).replace('[','').replace(']','')+'...'
+            else:
+                legend[i]=w[0]
+        return legend
+
     def input_wrapper(func):
         """
         Decorator for handling input argument testing and formatting for
@@ -265,6 +277,7 @@ class front:
             if self.db == '':
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
+
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
 
@@ -311,6 +324,10 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
+
+            unique = list(kwargs['input']['where'].unique())
+            legend = front().create_legend(unique)
+            kwargs['legend'] = legend
             return func(self,**kwargs)
         return wrapper
 
