@@ -72,7 +72,6 @@ class front:
         largument (list): List of available keyword argument keys for chart functions.
         listchartkargsvalues (list): List of available keyword argument values for chart functions.
         listviskargskeys (list): List of available visualization keyword argument keys.
-        dict_bypop (dict): Dictionary for population normalization options.
         db (str): Current database name.
         gpdbuilder: Current GPDBuilder instance.
         vis: Current visualization setting.
@@ -114,6 +113,7 @@ class front:
         self.lwhat = list(self.av.d_batchinput_args['what'])
         self.lplot = list(self.av.d_graphicsinput_args['typeofplot'])
         self.loption = list(self.av.d_batchinput_args['option'])
+        self.loption.remove('')
 
         self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
@@ -122,7 +122,7 @@ class front:
         self.largumentvalue = self.av.listargumentvalue
         self.listviskargskeys = self.av.listviskargskeys
 
-        self.dict_bypop = self.av.dictpop
+        self.lpop = self.av.lpop
 
         self.db = ''
         self.gpdbuilder = ''
@@ -577,7 +577,6 @@ class front:
         Returns:
             The value of the loption attribute.
         """
-        self.loption.remove('')
         return self.loption
 
     def listargument(self,):
@@ -697,14 +696,10 @@ class front:
             return r
 
     def listpop(self):
-        """Returns a list of keys from the dictionary `dict_bypop`.
-
-        This method retrieves all the keys from the `dict_bypop` attribute and returns them as a list.
-
-        Returns:
-            list: A list containing the keys of the `dict_bypop` dictionary.
         """
-        return list(self.dict_bypop.keys())
+        Returns a list of keys from the dictionary `lpop`.
+        """
+        return self.lpop
 
     def listmapoption(self):
         """Returns the value of the lmapoption attribute.
