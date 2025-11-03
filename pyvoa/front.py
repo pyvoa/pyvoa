@@ -988,19 +988,6 @@ class front:
         return inner
 
     @input_wrapper
-    @decohist
-    def figurehist(fig):
-        """Returns the input figure.
-
-        Args:
-            fig: The figure object to be returned.
-
-        Returns:
-            The same figure object that was passed as an argument.
-        """
-        return fig
-
-    @input_wrapper
     @input_visuwrapper
     @decohist
     def hist(self,fig):
