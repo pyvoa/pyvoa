@@ -234,7 +234,7 @@ class GPDBuilder(object):
                 if newpd.empty:
                     newpd = temp
                 else:
-                    newpd = pd.concat([newpd,temp])  
+                    newpd = pd.concat([newpd,temp])
         else:
             where = flat_list(where)
             if self.db_world:
