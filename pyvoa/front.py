@@ -1060,17 +1060,6 @@ class front:
         return inner
 
     @input_wrapper
-    @decoplot
-    def figureplot(self,fig):
-        """Args:
-            fig: The figure object to be returned.
-
-        Returns:
-            The input figure object.
-        """
-        return fig
-
-    @input_wrapper
     @input_visuwrapper
     @decoplot
     def plot(self,fig):
@@ -1087,7 +1076,6 @@ class front:
         self.setnamefunction(self.plot)
         ''' show plot '''
         if self.getvis() == 'bokeh' and self.plot != '':
-
             from bokeh.io import (
             show,
             )
@@ -1155,6 +1143,7 @@ class front:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
         if  self.getnamefunction() != 'get':
+            print('outcome',self.outcome)
             if self.getvis() == 'bokeh':
                 #PyvoaError("Bokeh savefig not yet implemented")
                 from bokeh.io import export_png
