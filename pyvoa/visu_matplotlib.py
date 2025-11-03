@@ -76,13 +76,15 @@ class visu_matplotlib:
         title = kwargs.get('title')
         plt = kwargs['plt']
         ax = kwargs['ax']
+        legend = kwargs.get('legend',None)
         plt.xlabel("Date", fontsize=10)
         plt.ylabel(what, fontsize=10)
 
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
         for col in df.columns:
-            lines = plt.plot(df.index, df[col],label=f'{col}')
+            label = legend[col[1]] if legend else col
+            lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
         plt.title(title)
