@@ -146,10 +146,10 @@ class visu_seaborn:
         plt.xlabel('Date')
         plt.xticks(rotation=45)
         plt.show()
-        return plt
+        return plt.gcf()
+
     @decoplotseaborn
     def seaborn_yearly_plot(self, **kwargs):
-
         input = kwargs['input']
         what = kwargs['what'][0]
         title = kwargs.get('title')
@@ -180,6 +180,7 @@ class visu_seaborn:
         plt.legend(title="Anneé", bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
         plt.show()
+        return plt.gcf()
 
     @decoplotseaborn
     def seaborn_versus_plot(self, **kwargs):
@@ -195,7 +196,7 @@ class visu_seaborn:
         plt.xlabel(what[0])
         plt.ylabel(what[1])
         plt.show()
-        return plt
+        return plt.gcf()
 
 
     @decoplotseaborn
@@ -217,7 +218,7 @@ class visu_seaborn:
         plt.ylabel(which)
         plt.xticks(rotation=70, ha='center')  # Rotation à 70 degrés et alignement central
         plt.show()
-        return plt
+        return plt.gcf()
 
     @decohistseaborn
     def seaborn_hist_value(self, **kwargs):
@@ -259,7 +260,7 @@ class visu_seaborn:
         plt.ylabel('')
         plt.xticks(rotation=45)
         plt.show()
-        return plt
+        return plt.gcf()
 
     ######SEABORN BOXPLOT#########
     @decoplotseaborn
@@ -277,7 +278,8 @@ class visu_seaborn:
         plt.xlabel(which)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        return plt
+        plt.show()
+        return plt.gcf()
 
     ######SEABORN heatmap#########
     @decoplotseaborn
@@ -306,4 +308,4 @@ class visu_seaborn:
         # Afficher le total en dehors du graphique
         plt.text(0, data_pivot.shape[0] + 1, f'Total: {total}', fontsize=12)
         plt.show()
-        return plt
+        return plt.gcf()
