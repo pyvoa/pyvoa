@@ -121,13 +121,28 @@ class visu_seaborn:
         what = kwargs['what']
         title = kwargs.get('title')
         plt = kwargs.get('plt')
+        legend = kwargs.get('legend',None)
         sns = kwargs.get('sns')
         st=['-','--',':']
+        df = input.copy()
         for idx, i in enumerate(what):
-            input['where+i']=input['where'].apply(lambda x: x+', '+i)
-            sns.lineplot(data=input, x='date', y = i, hue='where+i',style='where+i',color='colors',linestyle=st[idx])
-        plt.legend(title = "where", loc= "upper right",bbox_to_anchor=(1.04, 1))
-        plt.title(title)
+            label_col = f'where_{i}'
+            df[label_col] = df['where'].astype(str) + ', ' + i
+            label_name = legend.get(i, i) if legend else i
+            if st and idx < len(st):
+                dashes = st[idx]
+
+            sns.lineplot(
+                data=df,
+                x='date',
+                y=i,
+                hue=label_col,
+                style=label_col,
+                legend='full',
+            )
+        plt.legend(title=what)
+        #plt.title(title)
+
         plt.xlabel('Date')
         plt.xticks(rotation=45)
         plt.show()
@@ -162,7 +177,7 @@ class visu_seaborn:
         plt.title(title)
         plt.xlabel("Jour de l'année ")
         plt.ylabel(what)
-        plt.legend(title="Année", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title="Anneé", bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
         plt.show()
 
