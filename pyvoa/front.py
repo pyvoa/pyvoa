@@ -1130,12 +1130,20 @@ class front:
         Raises:
             PyvoaError: If the name function is 'get', indicating that saving a pandas DataFrame is not permitted.
         """
-        print("TYPE",type(self.outcome))
         if  self.getnamefunction() != 'get':
             if self.getvis() == 'bokeh':
-                #PyvoaError("Bokeh savefig not yet implemented")
+                ''' Not so easy to save a png with bokeh ... error from geckodriver and Chromium
                 from bokeh.io import export_png
+                try:
+                    import bokeh
+                except:
+                    raise PyvoaError('selenium is needed ... pip install selenium')
                 export_png(self.outcome, filename=name)
+                '''
+                from bokeh.plotting import figure, output_file, save
+                output_file(name+'.html')
+                save(self.outcome)
+                #
             else:
                 #self.outcome.show()
                 self.outcome.savefig(name)
