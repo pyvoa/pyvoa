@@ -924,13 +924,13 @@ class front:
             #return self.outcome
         else:
             raise PyvoaError(" No visualization has been set up !")
-
         fig = self.outcome
         if self.getvis() == 'bokeh':
             from bokeh.io import (
             show,
             )
-            show(fig)
+            if not self.batch:
+                show(fig)
         else:
             import matplotlib.pyplot as plt
             if not self.batch:
@@ -990,7 +990,8 @@ class front:
             from bokeh.io import (
             show,
             )
-            show(fig)
+            if not self.batch:
+                show(fig)
         else:
             import matplotlib.pyplot as plt
             if not self.batch:
@@ -1045,11 +1046,12 @@ class front:
         """
         self.setnamefunction(self.plot)
         ''' show plot '''
-        if self.getvis() == 'bokeh' and self.plot != '':
+        if self.getvis() == 'bokeh':
             from bokeh.io import (
             show,
             )
-            show(fig)
+            if not self.batch:
+                show(fig)
         else:
             import matplotlib.pyplot as plt
             if not self.batch:
