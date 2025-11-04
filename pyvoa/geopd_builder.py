@@ -260,7 +260,6 @@ class GPDBuilder(object):
        defaultargs = InputOption().d_batchinput_args
        option = kwargs.get('option',defaultargs['option'][0])
        kwargs_valuestesting(option,defaultargs['option'],'option error ... ')
-       
        output = kwargs['output']
        kwargs_valuestesting(output,defaultargs['output'],'output error ...')
        which = kwargs.get('which',[self.currentdata.get_available_keywords()[0]])
