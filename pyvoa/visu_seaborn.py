@@ -259,8 +259,8 @@ class visu_seaborn:
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        plt.show()
-        return plt.gcf()
+        #plt.show()
+        #return plt.gcf()
 
     ######SEABORN BOXPLOT#########
     @decoplotseaborn
