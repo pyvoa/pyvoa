@@ -254,7 +254,6 @@ class visu_seaborn:
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        #plt.show()
         return plt.gcf()
 
     ######SEABORN BOXPLOT#########
@@ -273,7 +272,6 @@ class visu_seaborn:
         plt.xlabel(which)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        plt.show()
         return plt.gcf()
 
     ######SEABORN heatmap#########
@@ -302,5 +300,4 @@ class visu_seaborn:
 
         # Afficher le total en dehors du graphique
         plt.text(0, data_pivot.shape[0] + 1, f'Total: {total}', fontsize=12)
-        plt.show()
         return plt.gcf()
