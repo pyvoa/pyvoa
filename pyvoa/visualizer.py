@@ -105,7 +105,8 @@ class AllVisu:
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-               kwargs['what'] =kwargs['what'][0] 
+            if isinstance(kwargs['what'],list):
+                 kwargs['what'] = kwargs['what'][0]
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -132,6 +133,11 @@ class AllVisu:
             input = pd.concat([input_first,input_others])
             input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
             kwargs['input'] = input
+            if kwargs['what'] in ['daily','weekly']:
+               cols = [c for c in input.columns if c.endswith(kwargs['what'])]
+               kwargs['what'] = cols
+            if isinstance(kwargs['what'],list):
+                 kwargs['what'] = kwargs['what'][0]
             return func(self,**kwargs)
         return inner_decohistopie
 
