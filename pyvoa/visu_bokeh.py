@@ -74,7 +74,7 @@ from bokeh.models import (
 )
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.models import Panel
-from bokeh.plotting import figure, show
+from bokeh.plotting import figure
 from bokeh.io import output_notebook
 
 from bokeh.io import output_notebook
@@ -1278,7 +1278,7 @@ class visu_bokeh:
         point_policy = "snap_to_data",callback=callback))  # ,PanTool())
         if dateslider:
             bokeh_figure = column(dateslider, bokeh_figure,toggl)
-        return show(bokeh_figure)
+        return bokeh_figure
 
     @staticmethod
     def bokeh_savefig(fig,name):
