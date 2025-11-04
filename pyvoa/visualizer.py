@@ -107,6 +107,8 @@ class AllVisu:
                kwargs['what'] = cols
             if isinstance(kwargs['what'],list):
                  kwargs['what'] = kwargs['what'][0]
+            if (input[kwargs['what']] == 0.0).all():
+                raise PyvoaError("All values seems to be null ...")
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
