@@ -146,7 +146,6 @@ class visu_matplotlib:
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
-
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
@@ -169,7 +168,7 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         ax.set_title(title)
-        input_sorted = input.sort_values(by=what, ascending=True)
+        input_sorted = input.sort_values(by=what,ascending=True)
         ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors)
         return plt.gcf()
 

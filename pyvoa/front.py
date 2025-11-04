@@ -292,9 +292,7 @@ class front:
                     else:
                         default[k] = [kwargs[k]]
             kwargs = {**default, **dicovisu}
-
-            kwargs['what'] = kwargs['what'][0]
-
+            kwargs['what']=kwargs['what'][0]
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
                     kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
