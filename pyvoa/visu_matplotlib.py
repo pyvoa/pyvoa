@@ -148,6 +148,8 @@ class visu_matplotlib:
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
+        if (input[what] == 0.0).all():
+            raise PyvoaError("All values seems to be null ...")
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
         input = input.set_index('where')
