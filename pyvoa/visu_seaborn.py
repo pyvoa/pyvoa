@@ -145,7 +145,6 @@ class visu_seaborn:
 
         plt.xlabel('Date')
         plt.xticks(rotation=45)
-        plt.show()
         return plt.gcf()
 
     @decoplotseaborn
@@ -179,7 +178,6 @@ class visu_seaborn:
         plt.ylabel(what)
         plt.legend(title="Anneé", bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
-        plt.show()
         return plt.gcf()
 
     @decoplotseaborn
@@ -195,7 +193,6 @@ class visu_seaborn:
         plt.title(title)
         plt.xlabel(what[0])
         plt.ylabel(what[1])
-        plt.show()
         return plt.gcf()
 
 
@@ -217,7 +214,6 @@ class visu_seaborn:
         plt.xlabel('')  # Suppression de l'étiquette de l'axe x
         plt.ylabel(which)
         plt.xticks(rotation=70, ha='center')  # Rotation à 70 degrés et alignement central
-        plt.show()
         return plt.gcf()
 
     @decohistseaborn
@@ -237,8 +233,7 @@ class visu_seaborn:
         plt.title(title)
         plt.xlabel(which)
         plt.ylabel('Fréquence')
-        plt.show()
-        return plt
+        return plt.gcf()
 
     ######SEABORN HIST HORIZONTALE#########
     @decoplotseaborn
@@ -260,7 +255,7 @@ class visu_seaborn:
         plt.ylabel('')
         plt.xticks(rotation=45)
         #plt.show()
-        #return plt.gcf()
+        return plt.gcf()
 
     ######SEABORN BOXPLOT#########
     @decoplotseaborn

@@ -985,7 +985,6 @@ class front:
             ImportError: If 'bokeh' is specified but the library is not installed.
         """
         self.setnamefunction(self.hist)
-        self.outcome = fig
         if self.getvis() == 'bokeh':
             from bokeh.io import (
             show,
@@ -1132,7 +1131,6 @@ class front:
                 save(self.outcome)
                 #
             else:
-                #self.outcome.show()
                 self.outcome.savefig(name)
             print('Figure :', name, ' has been saved ')
         else:
