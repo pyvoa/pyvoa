@@ -42,6 +42,7 @@ from pyvoa.visualizer import AllVisu
 import pyvoa.help as h
 
 from importlib import import_module
+import ast
 
 def getversion():
     try:
@@ -553,6 +554,7 @@ class front:
         if self.vis == None:
             raise PyvoaError('Vis has not be set !')
         self.lhist = self.av.pdcharts[self.vis]['hist']
+        self.lhist = ast.literal_eval(self.lhist.split("=", 1)[1])
         return self.lhist
 
     def listplot(self,):
@@ -568,6 +570,7 @@ class front:
         if self.vis == None:
             raise PyvoaError('Vis has not be set !')
         self.lplot = self.av.pdcharts[self.vis]['plot']
+        self.lplot = ast.literal_eval(self.lplot.split("=", 1)[1])
         return self.lplot
 
     def listoption(self,):
