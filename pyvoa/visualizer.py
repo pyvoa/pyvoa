@@ -32,7 +32,6 @@ from pyvoa.visu_matplotlib import visu_matplotlib
 from pyvoa.visu_seaborn import visu_seaborn
 from pyvoa.error import *
 
-Max_Countries_Default  = 12
 try:
     import bokeh
     BOKEH_AVAILABLE = True
@@ -73,7 +72,7 @@ class AllVisu:
         self.code = self.currentmetadata['geoinfo']['iso3']
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
-
+        self.Max_Countries_Default  = 12
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
@@ -83,7 +82,7 @@ class AllVisu:
         @wraps(func)
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
-            locunique = list(input['where'].unique())[:Max_Countries_Default]
+            locunique = list(input['where'].unique())[:self.Max_Countries_Default]
             input = input.loc[input['where'].isin(locunique)]
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
@@ -125,16 +124,15 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             locunique = input['where'].unique()
-            input_first = input.loc[input['where'].isin(locunique[:Max_Countries_Default-1])]
-            input_others = input.loc[input['where'].isin(locunique[Max_Countries_Default-1:])]
-
-            input_others[which] = input_others[which].sum()
-            input_others['where'] = 'SumOthers'
-            input_others['code'] = 'SumOthers'
-            input_others['colors'] = '#FFFFFF'
-            input_others = input_others.drop_duplicates(['where','code'])
-            input = pd.concat([input_first,input_others])
-            input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
+            #input_first = input.loc[input['where'].isin(locunique[:Max_Countries_Default-1])]
+            #input_others = input.loc[input['where'].isin(locunique[Max_Countries_Default-1:])]
+            #input_others[which] = input_others[which].sum()
+            #input_others['where'] = 'SumOthers'
+            #input_others['code'] = 'SumOthers'
+            #input_others['colors'] = '#FFFFFF'
+            #input_others = input_others.drop_duplicates(['where','code'])
+            #input = pd.concat([input_first,input_others]).head(12).reset_index(drop=True)
+            input = input.sort_values(by=which, ascending=False).head(self.Max_Countries_Default-1).reset_index(drop=True)
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
