@@ -72,7 +72,7 @@ class AllVisu:
         self.code = self.currentmetadata['geoinfo']['iso3']
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
-        self.Max_Countries_Default  = 12
+        self.maxcountrydisplay  = 12
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
@@ -82,7 +82,7 @@ class AllVisu:
         @wraps(func)
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
-            locunique = list(input['where'].unique())[:self.Max_Countries_Default]
+            locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
@@ -109,6 +109,7 @@ class AllVisu:
             if (input[kwargs['what']] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
+            kwargs['maxcountrydisplay'] = self.maxcountrydisplay   
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -132,7 +133,7 @@ class AllVisu:
             #input_others['colors'] = '#FFFFFF'
             #input_others = input_others.drop_duplicates(['where','code'])
             #input = pd.concat([input_first,input_others]).head(12).reset_index(drop=True)
-            input = input.sort_values(by=which, ascending=False).head(self.Max_Countries_Default-1).reset_index(drop=True)
+            input = input.sort_values(by=which, ascending=False).head(self.maxcountrydisplay).reset_index(drop=True)
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]

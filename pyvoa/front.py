@@ -365,10 +365,11 @@ class front:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
-                    #else:
-                    #    z['which'] = z['which'][0]
+    
+                    z['input_alldates'] = z['input']
                     z['input'] = z['input'].loc[z['input'].date==z['input'].date.max()].reset_index(drop=True)
                     z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False)
+
                     if func.__name__ == 'map':
                             z.pop('typeofhist')
                             z.pop('typeofplot')
