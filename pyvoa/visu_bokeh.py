@@ -122,7 +122,7 @@ class visu_bokeh:
         self.av = InputOption()
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
-        self.figure_height = 580
+        self.figure_height = 400
         self.figure_width = 580
         self.graph_height = 400
         self.graph_width = 400
@@ -222,24 +222,27 @@ class visu_bokeh:
     def decodateslider(func):
         @wraps(func)
         def inner_decodateslider(self, **kwargs):
-            dateslider = kwargs.get('dateslider')
             input = kwargs['input']
-            input = input.drop(columns='geometry')
-            input_alldates = kwargs['input_alldates'].drop(columns='geometry')
             what = kwargs.get('what')
+            dateslider = kwargs.get('dateslider')
+            input = input.drop(columns='geometry')
+            input_alldates = kwargs['input_alldates']
+
+            input_uniquecountries = input_alldates.drop_duplicates(subset=["where", "geometry"]).drop(columns=['date']).reset_index(drop=True)
+            input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
+            input_alldates = input_alldates.drop(columns='geometry')
+
             mapoption = kwargs.get('mapoption')
             maxcountrydisplay = kwargs['maxcountrydisplay']
-
-            n = len(input.index)
             ymax = self.graph_height
             input['left'] = input[what]
             input['right'] = input[what]
 
             input['left'] = input['left'].apply(lambda x: 0 if x > 0 else x)
             input['right'] = input['right'].apply(lambda x: 0 if x < 0 else x)
-            input['top'] = [ymax*(n-i)/n + 0.5*ymax/n   for i in range(n)]
-            input['bottom'] = [ymax*(n-i)/n - 0.5*ymax/n for i in range(n)]
-            input['horihistotexty'] = input['bottom'] + 0.5*ymax/n
+            input['top'] = [ymax*(maxcountrydisplay-i)/maxcountrydisplay + 0.5*ymax/maxcountrydisplay   for i in range(maxcountrydisplay)]
+            input['bottom'] = [ymax*(maxcountrydisplay-i)/maxcountrydisplay - 0.5*ymax/maxcountrydisplay for i in range(maxcountrydisplay)]
+            input['horihistotexty'] = input['bottom'] + 0.5*ymax/maxcountrydisplay
             input['horihistotextx'] = input['right']
 
             if 'label%' in mapoption:
@@ -251,48 +254,40 @@ class visu_bokeh:
             else:
                 input['horihistotext'] = [ '{:.3g}'.format(float(i)) if float(i)>1.e4 or float(i)<0.01 else round(float(i),2) for i in input['right'] ]
                 input['horihistotext'] = [str(i) for i in input['horihistotext']]
+            columndatasrc = ColumnDataSource(data = input)
 
-            pyvoafiltered = ColumnDataSource(data = input)
             if dateslider:
                 input_dates = input_alldates.copy()
                 input_dates['date'] = input_dates['date'].astype(str)
                 unique_dates = sorted(input_dates['date'].unique().tolist())
                 frames = []
-                cols = ['date',what,'where']#list(input_dates.columns)
+                cols = list(input_dates.columns)
 
                 #unique_dates = unique_dates[:10]
                 frames = []
-
                 for d in unique_dates:
-                    # sous-DataFrame pour la date d
                     df_d = input_dates[input_dates['date'] == d].copy()
                     df_d = df_d[cols]
-
-                    # trier par la variable 'what' (décroissant ici) et ne garder que les 12 premières 'where'
                     df_d = df_d.sort_values(by=what, ascending=False).head(maxcountrydisplay).reset_index(drop=True)
-                    # si aucune ligne pour cette date, créer un frame vide
                     if df_d.empty:
                         frame = {c: [] for c in cols}
                         frames.append(frame)
                         continue
 
-                    # recalculer les colonnes nécessaires côté pandas
-                    n = len(df_d.index)
                     ymax = self.graph_height
-
                     # col 'what' utilisée pour construire left/right
                     df_d['left'] = df_d[what].copy()
                     df_d['right'] = df_d[what].copy()
                     df_d['left']  = df_d['left'].apply(lambda x: 0 if x > 0 else x)
                     df_d['right'] = df_d['right'].apply(lambda x: 0 if x < 0 else x)
 
-                    palette = Category20[12]
+                    palette = Category20[maxcountrydisplay]
                     # si moins de 12 lignes, on prend juste un sous-ensemble
-                    df_d['colors'] = palette[:n]
+                    df_d['colors'] = palette[:maxcountrydisplay]
                     # top / bottom / text positions
-                    df_d['top']  = [ymax*(n - i)/n + 0.5*ymax/n for i in range(n)]
-                    df_d['bottom'] = [ymax*(n - i)/n - 0.5*ymax/n for i in range(n)]
-                    df_d['horihistotexty'] = df_d['bottom'] + 0.5*ymax/n
+                    df_d['top']  = [ymax*(maxcountrydisplay - i)/maxcountrydisplay + 0.5*ymax/maxcountrydisplay for i in range(maxcountrydisplay)]
+                    df_d['bottom'] = [ymax*(maxcountrydisplay - i)/maxcountrydisplay - 0.5*ymax/maxcountrydisplay for i in range(maxcountrydisplay)]
+                    df_d['horihistotexty'] = df_d['bottom'] + 0.5*ymax/maxcountrydisplay
                     df_d['horihistotextx'] = df_d['right']
                     # horihistotext : conserver la logique de formatage que tu avais
                     if 'label%' in mapoption:
@@ -306,57 +301,39 @@ class visu_bokeh:
                             if fv == 0:
                                 return '0'
                             if abs(fv) >= 1.e4 or (abs(fv) > 0 and abs(fv) < 0.01):
-                                # notation courte proche de ton exemple Python
                                 return '{:.3g}'.format(fv)
                             return str(round(fv, 2))
                         df_d['horihistotext'] = df_d['right'].apply(_fmt)
 
-                    # construire frame en respectant exactement les clés 'cols'
                     frame = {}
                     for c in list(df_d.columns):
                         if c in df_d.columns:
                             frame[c] = df_d[c].tolist()
                         else:
-                            # si la colonne n'existe pas pour ce sous-DF, fournir une liste vide
                             frame[c] = []
-
                     frames.append(frame)
+
                 from bokeh.models import Slider, CustomJS, Div
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
-                # JS callback plus robuste et avec logs de debug
-                slider_callback = CustomJS(args=dict(source=pyvoafiltered, frames=frames, dates=unique_dates, div=date_display),
+                geocolumndatasrc = GeoJSONDataSource(geojson = input_uniquecountries.to_json())
+                slider_callback = CustomJS(args=dict(source=geocolumndatasrc, frames=frames, source2=columndatasrc, dates=unique_dates, div=date_display),
                                            code="""
-                    const i = cb_obj.value;
-                    const frame = frames[i];
-                    if (!frame) {
-                        console.warn("No frame for index", i);
-                        return;
-                    }
-                    // Debug: afficher info sur les longueurs
-                    console.log("Applying frame", i, "date:", dates[i]);
-                    // Mettre à jour toutes les clefs existantes dans source.data
-                    const s_keys = Object.keys(frames[i]);
-                    for (let k of s_keys) {
-                        // si la clé existe dans frame, on copie sa liste, sinon on met une liste vide
-                        if (frame.hasOwnProperty(k)) {
-                            // slice() pour créer un nouvel array (sécurité)
-                            source.data[k] = frame[k].slice();
-                        } else {
-                            source.data[k] = [];
-                        }
-                        for (let k of Object.keys(source.data)) {
-                            console.log(k, ":", source.data[k]);
-                        }
-                        // Debug: log length
-                            console.log("key", k, "-> len", source.data[k].length);
-                    }
-                    source.change.emit();
+                                const i = cb_obj.value;
+                                const frame = frames[i];
+                                if (!frame) return;
+                                const s_keys = Object.keys(frames[i]);
+                                for (const k of Object.keys(frame)) {
+                                    if (k in source.data) source.data[k] = frame[k];
+                                    if (k in source2.data) source2.data[k] = frame[k];
+                                }
 
-                    // Mettre à jour l'affichage textuel de la date
-                    div.text = '<b>' + dates[i] + '</b>';
-                """)
+                                console.log("updated source2:", source2.data);
+                                source.change.emit();
+                                source2.change.emit();
+                                div.text = '<b>' + dates[i] + '</b>';
+                            """)
                 slider.js_on_change('value', slider_callback)
                 toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
                 # CustomJS pour démarrer/arrêter l'animation
@@ -397,10 +374,10 @@ class visu_bokeh:
                 controls = column(toggl, slider, date_display)
                 kwargs['controls'] = controls
 
-            kwargs['pyvoafiltered'] = pyvoafiltered
+            kwargs['geocolumndatasrc'] = geocolumndatasrc
+            kwargs['columndatasrc'] = columndatasrc
             return func(self, **kwargs)
         return inner_decodateslider
-
 
     def bokeh_figure(self, **kwargs):
         """
@@ -1049,49 +1026,20 @@ class visu_bokeh:
     @deco_bokeh
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
-        '''
-            -----------------
-            Create 1D histogramme by location according to arguments.
-            See help(bokeh_histo).
-            Keyword arguments
-            -----------------
-            - pyvoafiltered : A DataFrame with a Pypyvoa.struture is mandatory
-            |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-            - which = if None take second element could be a list
-            - plot_heigh= Width_Height_Default[1]
-            - graph_width = Width_Height_Default[0]
-            - title = None
-            - copyright = default
-            - mode = mouse
-            - dateslider = None if True
-                    - orientation = horizontal
-            - when : default min and max according to the inpude DataFrame.
-                         Dates are given under the format dd/mm/yyyy.
-                         when format [dd/mm/yyyy : dd/mm/yyyy]
-                         if [:dd/mm/yyyy] min date up to
-                         if [dd/mm/yyyy:] up to max date
-        '''
-
-        #ColumnDataSource = kwargs.get('ColumnDataSource')
-        #TabPanel = kwargs.get('TabPanel')
-        #Range1d = kwargs.get('Range1d')
-        #NumeralTickFormatter = kwargs.get('NumeralTickFormatter')
-        #LabelSet = kwargs.get('LabelSet')
-        #Tabs = kwargs.get('Tabs')
         mode = kwargs.get('mode')
         mapoption = kwargs.get('mapoption')
         dateslider=kwargs.get('dateslider')
         #toggl=kwargs.get('toggl')
-        pyvoafiltered = kwargs.get('pyvoafiltered')
+        columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
         new_panels = []
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
             bokeh_figure = self.bokeh_figure( x_axis_type = axis_type)
             #fig = panels[i].child
-            bokeh_figure.y_range = Range1d(min(pyvoafiltered.data['bottom']), max(pyvoafiltered.data['top']))
-            ytick_loc = [int(i) for i in pyvoafiltered.data['horihistotexty']]
+            bokeh_figure.y_range = Range1d(min(columndatasrc.data['bottom']), max(columndatasrc.data['top']))
+            ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             bokeh_figure.yaxis.ticker  = ytick_loc
-            label_dict = dict(zip(ytick_loc,pyvoafiltered.data['where']))
+            label_dict = dict(zip(ytick_loc,columndatasrc.data['where']))
             bokeh_figure.yaxis.major_label_overrides = label_dict
             #bokeh_figure.yaxis[0].formatter = NumeralTickFormatter(format="0.0")
 
@@ -1101,9 +1049,9 @@ class visu_bokeh:
             if axis_type=='log':
                 factor = 20.
                 left = 0.01
-                if min(pyvoafiltered.data['left'])==0:epslion = 0.01
-            bokeh_figure.x_range = Range1d(min(pyvoafiltered.data['left'])+epslion, factor*max(pyvoafiltered.data['right']))
-            bokeh_figure.quad(source = pyvoafiltered,
+                if min(columndatasrc.data['left'])==0:epslion = 0.01
+            bokeh_figure.x_range = Range1d(min(columndatasrc.data['left'])+epslion, factor*max(columndatasrc.data['right']))
+            bokeh_figure.quad(source = columndatasrc,
                 top='top', bottom = 'bottom', left = left, right = 'right', color = 'colors', line_color = 'black',
                 line_width = 1, hover_line_width = 2)
 
@@ -1113,7 +1061,7 @@ class visu_bokeh:
                     x_offset=5,
                     y_offset=-4,
                     text = 'horihistotext',
-                    source = pyvoafiltered,text_font_size='10px',text_color='black')
+                    source = columndatasrc,text_font_size='10px',text_color='black')
 
             cases_custom = visu_bokeh().rollerJS()
             hover_tool = HoverTool(tooltips=[('where', '@where'), ('cases', '@right{0,0.0}'), ],
@@ -1223,59 +1171,36 @@ class visu_bokeh:
         return bokeh_figure
 
     @deco_bokeh
+    @decodateslider
     def bokeh_map(self,**kwargs):
-        '''
-            -----------------
-            Create a map bokeh with arguments.
-            See help(bokeh_histo).
-            Keyword arguments
-            -----------------
-            - pyvoafiltered : A DataFrame with a Pypyvoa.struture is mandatory
-            |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-            - which = if None take second element could be a list
-            - plot_heigh= Width_Height_Default[1]
-            - graph_width = Width_Height_Default[0]
-            - title = None
-            - copyright = default
-            - mode = mouse
-            - dateslider = None if True
-                    - orientation = horizontal
-            - when : default min and max according to the inpude DataFrame.
-                         Dates are given under the format dd/mm/yyyy.
-                         when format [dd/mm/yyyy : dd/mm/yyyy]
-                         if [:dd/mm/yyyy] min date up to
-                         if [dd/mm/yyyy:] up to max date
-            - mapoption: False
-        '''
-        input=kwargs.get('input')
+        input = kwargs.get('input')
+        geocolumndatasrc = kwargs.get('geocolumndatasrc')
         what = kwargs.get('what')
-        input['cases'] = input[what]
-        sourcemapoption=ColumnDataSource(input.drop(columns='geometry'))
         tile = kwargs.get('tile')
+
         tile = visu_bokeh.convert_tile(tile, 'bokeh')
         wmt = WMTSTileSource(url = tile)
         bokeh_figure = self.bokeh_figure(x_axis_type = 'mercator', y_axis_type = 'mercator', match_aspect = True)
         bokeh_figure.add_tile(wmt, retina=True)
 
         dateslider = kwargs.get('dateslider')
-
+        controls = kwargs.get('controls', None)
         mapoption = kwargs.get('mapoption')
         min_col, max_col, min_col_non0 = 3*[0.]
         try:
             if dateslider:
-                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input['cases']),
-                                                         np.nanmax(input['cases']))
-                min_col_non0 = (np.nanmin(input.loc[input['cases']>0.]['cases']))
+                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[what]),
+                                                         np.nanmax(input[what]))
+                min_col_non0 = (np.nanmin(input.loc[input[what]>0.][what]))
             else:
-                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input['cases']),
-                                                         np.nanmax(input['cases']))
-                min_col_non0 = (np.nanmin(input.loc[input['cases']>0.]['cases']))
+                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[what]),
+                                                         np.nanmax(input[what]))
+                min_col_non0 = (np.nanmin(input.loc[input[what]>0.][what]))
         except ValueError:
             pass
         #min_col, max_col = np.nanmin(intput_pyvoa['cases']),np.nanmax(intput_pyvoa['cases'])
-        input = input.drop(columns='date')
-        json_data = json.dumps(json.loads(input.to_json()))
-        intput_pyvoa = GeoJSONDataSource(geojson=json_data)
+        #json_data = json.dumps(json.loads(input_uniquecountries.to_json()))
+        #intput_pyvoa = GeoJSONDataSource(geojson=json_data)
 
         invViridis256 = Viridis256[::-1]
         if mapoption and 'log' in mapoption:
@@ -1292,146 +1217,48 @@ class visu_bokeh:
 
         self.bokeh_figure().add_layout(color_bar, 'below')
         #self.bokeh_figure().add_layout(Title(text=self.subtitle, text_font_size="8pt", text_font_style="italic"), 'below')
-        if dateslider:
-            allcases_location, allcases_dates = pd.DataFrame(), pd.DataFrame()
-            allcases_location = input.groupby('where')['cases'].apply(list)
-            input_tmp = input.drop_duplicates(subset = ['where']).drop(columns = 'cases')
-            input_tmp = pd.merge(input_tmp, allcases_location, on = 'where')
-            input_tmp  = input_tmp.drop_duplicates(subset = ['where'])
-            input_tmp = ColumnDataSource(input_tmp.drop(columns=['geometry']))
-
-            callback = CustomJS(args =  dict(source = input_tmp, source_filter = intput_pyvoa,
-                                          datesliderjs = dateslider, title=bokeh_figure.title,
-                                          color_mapperjs = color_mapper, mapoptionjs = sourcemapoption),
-                        code = """
-                        var ind_date_max = (datesliderjs.end-datesliderjs.start)/(24*3600*1000);
-                        var ind_date = (datesliderjs.value-datesliderjs.start)/(24*3600*1000);
-                        var new_cases = [];
-                        var dict = {};
-                        var iloop = source_filter.data['where'].length;
-
-                        function form(value) {
-                             if(value>10000 || value <0.01)
-                                value =  Number.parseFloat(value).toExponential(2);
-                             else
-                                 value = Number.parseFloat(value).toFixed(2);
-                            return value;
-                         }
-                        for (var i = 0; i < source.get_length(); i++)
-                        {
-                                var val=form(source.data['cases'][i][ind_date_max-ind_date]);
-                                new_cases.push(val);
-                        }
-                        if(source.get_length() == 1 && iloop>1)
-                            for(var i = 0; i < iloop; i++)
-                                for(var j = 0; j < new_cases.length; j++){
-                                source_filter.data['cases'][i][j] = new_cases[j];
-                                }
-                        else{
-                            source_filter.data['cases'] = new_cases;
-                            }
-
-                        if (mapoptionjs.get_length() !== 0){
-                            mapoptionjs.data['cases'] = source_filter.data['cases'];
-                            }
-                        for (var i = 0; i < mapoptionjs.get_length(); i++)
-                        {
-                            mapoptionjs.data['cases'][i] = form(mapoptionjs.data['cases'][i]).toString();
-                            mapoptionjs.data['rolloverdisplay'][i] = source_filter.data['rolloverdisplay'][i];
-                        }
-
-                        var tmp = title.text;
-                        tmp = tmp.slice(0, -11);
-                        var dateconverted = new Date(datesliderjs.value);
-                        var dd = String(dateconverted.getDate()).padStart(2, '0');
-                        var mm = String(dateconverted.getMonth() + 1).padStart(2, '0'); //January is 0!
-                        var yyyy = dateconverted.getFullYear();
-                        var dmy = dd + '/' + mm + '/' + yyyy;
-                        title.text = tmp + dmy+")";
-
-                        if (mapoptionjs.get_length() !== 0)
-                            mapoptionjs.change.emit();
-
-                        color_mapperjs.high=Math.max.apply(Math, new_cases);
-                        color_mapperjs.low=Math.min.apply(Math, new_cases);
-                        console.log(mapoptionjs.data['cases']);
-                        source_filter.change.emit();
-                    """)
-            dateslider.js_on_change('value', callback)
-            # Set up Play/Pause button/toggle JS
-            date_list = pd.date_range(input.date.min(),input.date.max()-dt.timedelta(days=1),freq='d').to_list()
-            indexCDS = ColumnDataSource(dict(date=date_list))
-            toggl_js = CustomJS(args=dict(dateslider=dateslider,indexCDS=indexCDS),code="""
-            // A little lengthy but it works for me, for this problem, in this version.
-                var check_and_iterate = function(date){
-                    var slider_val = dateslider.value;
-                    var toggle_val = cb_obj.active;
-                    if(toggle_val == false) {
-                        cb_obj.label = '► Play';
-                        clearInterval(looop);
-                        }
-                    else if(slider_val == date[date.length - 1]) {
-                        cb_obj.label = '► Play';
-                        //dateslider.value = date[0];
-                        cb_obj.active = false;
-                        clearInterval(looop);
-                        }
-                    else if(slider_val !== date[date.length - 1]){
-                        dateslider.value = date.filter((item) => item > slider_val)[0];
-                        }
-                    else {
-                    clearInterval(looop);
-                        }
-                }
-                if(cb_obj.active == false){
-                    cb_obj.label = '► Play';
-                    clearInterval(looop);
-                }
-                else {
-                    cb_obj.label = '❚❚ Pause';
-                    var looop = setInterval(check_and_iterate, 10, indexCDS.data['date']);
-                };
-            """)
-
-            toggl = Toggle(label='► Play',active=False, button_type="success",height=30,width=10)
-            toggl.js_on_change('active',toggl_js)
 
         bokeh_figure.xaxis.visible = False
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
-        bokeh_figure.patches('xs', 'ys', source = intput_pyvoa,
-                            fill_color = {'field': 'cases', 'transform': color_mapper},
+        if dateslider:
+            bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
+            fill_color = {'field': what, 'transform': color_mapper},
+            line_color = 'black', line_width = 0.25, fill_alpha = 1)
+        else:
+
+            bokeh_figure.patches('xs', 'ys', source = intput_pyvoa,
+                            fill_color = {'field': what, 'transform': color_mapper},
                             line_color = 'black', line_width = 0.25, fill_alpha = 1)
+        '''
         if mapoption:
             if 'text' in mapoption or 'textinteger' in mapoption:
-
                 if 'textinteger' in mapoption:
-                    sourcemapoption.data['cases'] = sourcemapoption.data['cases'].astype(float).astype(int).astype(str)
+                    columndatasrc.data[what] = columndatasrc.data[what].astype(float).astype(int).astype(str)
                 input.loc[:,'centroidx'] = input['geometry'].to_crs(3035).centroid.x
                 input.loc[:,'centroidy'] = input['geometry'].to_crs(3035).centroid.y
                 labels = LabelSet(
                     x = 'centroidx',
                     y = 'centroidy',
                     text = 'cases',
-                    source = sourcemapoption, text_font_size='10px',text_color='white',background_fill_color='grey',background_fill_alpha=0.5)
+                    source = columndatasrc, text_font_size='10px',text_color='white',background_fill_color='grey',background_fill_alpha=0.5)
                 bokeh_figure.add_layout(labels)
-
-        #cases_custom = AllVisu.rollerJS()
-        callback = CustomJS(code="""
-        //document.getElementsByClassName('bk-tooltip')[0].style.backgroundColor="transparent";
-        document.getElementsByClassName('bk-tooltip')[0].style.opacity="0.7";
-        """ )
+        '''
+        #callback = CustomJS(code="""
+        #//document.getElementsByClassName('bk-tooltip')[0].style.backgroundColor="transparent";
+        #document.getElementsByClassName('bk-tooltip')[0].style.opacity="0.7";
+        #""" )
         tooltips = """
                     <b>location: @where<br>
-                    cases: @cases{0,0.0} </b>
+                    cases: @right </b>
                     """
 
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
-        formatters = {'where': 'printf', 'cases': 'printf',},
-        point_policy = "snap_to_data",callback=callback))  # ,PanTool())
+        formatters = {'where': 'printf', '@right': 'printf',})),
+        #point_policy = "snap_to_data",callback=callback))  # ,PanTool())
         if dateslider:
-            bokeh_figure = column(dateslider, bokeh_figure,toggl)
+                 bokeh_figure = column(controls, bokeh_figure,)
         return bokeh_figure
 
     @staticmethod
