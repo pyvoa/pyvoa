@@ -109,7 +109,7 @@ class AllVisu:
             if (input[kwargs['what']] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
-            kwargs['maxcountrydisplay'] = self.maxcountrydisplay   
+            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -235,6 +235,7 @@ class AllVisu:
         return fig
 
     @decohistomap
+    @decohistopie
     def map(self,**kwargs):
         '''
         FILL IT

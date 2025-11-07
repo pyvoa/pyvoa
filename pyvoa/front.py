@@ -365,11 +365,10 @@ class front:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
-    
-                    z['input_alldates'] = z['input']
+                    z['input_alldates'] = z['input'].reset_index(drop=True)
                     z['input'] = z['input'].loc[z['input'].date==z['input'].date.max()].reset_index(drop=True)
                     z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False)
-
+                    z['input'].reset_index(drop=True)
                     if func.__name__ == 'map':
                             z.pop('typeofhist')
                             z.pop('typeofplot')
@@ -902,6 +901,36 @@ class front:
             return func(self,**kwargs)
         return inner
 
+    def decohist(func):
+        @wraps(func)
+        def inner(self,**kwargs):
+            """Inner method to generate a histogram visualization based on provided keyword arguments.
+
+            Args:
+                **kwargs: Arbitrary keyword arguments that may include:
+                    - typeofhist: The type of histogram to generate.
+                    - output: This argument is removed from kwargs and not used.
+                    - pop: If present, this argument is removed from kwargs and not used.
+
+            Raises:
+                PyvoaError: If no visualization has been set up.
+
+            Returns:
+                The result of the visualization function applied to the generated histogram outcome.
+            """
+            dateslider = kwargs.get('dateslider')
+            typeofhist = kwargs.get('typeofhist')
+            #kwargs.pop('output')
+            if kwargs.get('pop'):
+              kwargs.pop('pop')
+            if self.getvis():
+                z = { **self.getkwargsvisu(), **kwargs  }
+                self.outcome = self.allvisu.hist(**z)
+                return func(self,self.outcome)
+            else:
+                raise PyvoaError(" No visualization has been set up !")
+        return inner
+
     @input_wrapper
     @input_visuwrapper
     @decomap
@@ -938,36 +967,6 @@ class front:
             if not self.batch:
                 plt.show()
             return fig
-
-    def decohist(func):
-        @wraps(func)
-        def inner(self,**kwargs):
-            """Inner method to generate a histogram visualization based on provided keyword arguments.
-
-            Args:
-                **kwargs: Arbitrary keyword arguments that may include:
-                    - typeofhist: The type of histogram to generate.
-                    - output: This argument is removed from kwargs and not used.
-                    - pop: If present, this argument is removed from kwargs and not used.
-
-            Raises:
-                PyvoaError: If no visualization has been set up.
-
-            Returns:
-                The result of the visualization function applied to the generated histogram outcome.
-            """
-            dateslider = kwargs.get('dateslider')
-            typeofhist = kwargs.get('typeofhist')
-            kwargs.pop('output')
-            if kwargs.get('pop'):
-              kwargs.pop('pop')
-            if self.getvis():
-                z = { **self.getkwargsvisu(), **kwargs  }
-                self.outcome = self.allvisu.hist(**z)
-                return func(self,self.outcome)
-            else:
-                raise PyvoaError(" No visualization has been set up !")
-        return inner
 
     @input_wrapper
     @input_visuwrapper
