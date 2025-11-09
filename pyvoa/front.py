@@ -286,7 +286,7 @@ class front:
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
-                if k in kwargs.keys():
+                if k in kwargs.keys() and k != 'when':
                     if isinstance(kwargs[k],list):
                         default[k] = kwargs[k]
                     else:
@@ -365,10 +365,8 @@ class front:
                 if func.__name__ in ['hist','map']:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
-                    z['input_alldates'] = z['input'].reset_index(drop=True)
-                    z['input'] = z['input'].loc[z['input'].date==z['input'].date.max()].reset_index(drop=True)
-                    z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False)
-                    z['input'].reset_index(drop=True)
+
+                    z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False).reset_index(drop=True)
                     if func.__name__ == 'map':
                             z.pop('typeofhist')
                             z.pop('typeofplot')
