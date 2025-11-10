@@ -141,7 +141,6 @@ class AllVisu:
                kwargs['what'] = cols
             if isinstance(kwargs['what'],list):
                  kwargs['what'] = kwargs['what'][0]
-            input['where'] = input['where'].apply(lambda x: str(x)[:10] if pd.notna(x) else x)
             kwargs['input'] = input
             return func(self,**kwargs)
         return inner_decohistopie
