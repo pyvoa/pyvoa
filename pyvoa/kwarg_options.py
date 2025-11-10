@@ -55,7 +55,7 @@ class InputOption():
                         'what':['current','daily','weekly'],\
                         'when':'',\
                         'input':pd.DataFrame(),\
-                        'output':['pandas','geopandas','list','dict','array']
+                        'output':['geopandas','pandas','list','dict','array']
                         }
         self.listargument = list(self.d_batchinput_args.keys())
         self.listargumentvalue = list(self.d_batchinput_args.values())

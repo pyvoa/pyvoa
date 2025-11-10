@@ -275,6 +275,10 @@ class visu_bokeh:
             #input['horihistotext'] = [ '{:.3g}'.format(float(i)) if float(i)>1.e4 or float(i)<0.01 else round(float(i),2) for i in input['right'] ]
             input['horihistotext'] = [str(i) for i in input['horihistotext']]
             input_dates = input.drop(columns='geometry').copy()
+            min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[what]),np.nanmax(input_dates[what]))
+            invViridis256 = Viridis256[::-1]
+            color_mapper = LogColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+
             input = self.add_columns_for_pie_chart(input,what)
 
             input = input[input.date==input.date.max()].sort_values(by = what, ascending=False).head(maxcountrydisplay).reset_index(drop=True)
@@ -316,14 +320,15 @@ class visu_bokeh:
                             source=geocolumndatasrc,
                             frames=frames,
                             source2=columndatasrc,
+                            what=what,
                             dates=unique_dates,
                             div=date_display,
                             maxcountrydisplay=maxcountrydisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
                             x_range = bokeh_figure_linear.x_range,
-                            what=what,
-                            ymax = ymax
+                            ymax = ymax,
+                            color_mapperjs = color_mapper
                         ),
                         code="""
                             const i = cb_obj.value;
@@ -367,7 +372,8 @@ class visu_bokeh:
                             // Tu peux ensuite faire ton labelMap, etc.
                             const labelMap = new Map();
                             for (let j = 0; j < len; j++) {
-                                const where_val = source2.data['where'][j];
+                                const where_val = source2.data['where'][j].slice(0, 10);
+                                console.log(where_val);
                                 let pos = parseInt(ymax * (len - j) / len);
                                 if (!Number.isFinite(pos)) continue;
                                 labelMap.set(pos, String(where_val));
@@ -386,6 +392,9 @@ class visu_bokeh:
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
 
+                            color_mapperjs.high=Math.max.apply(Math, rights);
+                            color_mapperjs.low=Math.min.apply(Math, rights);
+
                             source.change.emit();
                             source2.change.emit();
 
@@ -399,16 +408,14 @@ class visu_bokeh:
                 # CustomJS pour démarrer/arrêter l'animation
 
                 toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code="""
-                    // Stocke l'interval globalement pour pouvoir l'arrêter depuis un autre widget
                     if (cb_obj.active) {
                         // play: démarrer interval si pas déjà présent
                         if (!window._bokeh_play_interval) {
-                            // interval: avance le slider toutes les 700ms (ajuste si besoin)
                             window._bokeh_play_interval = setInterval(function() {
                                 let v = slider.value + 1;
                                 if (v > slider.end) { v = 0; }  // revenir au début
                                 slider.value = v; // déclenche slider_callback
-                            }, 700);
+                            }, 100);
                             cb_obj.label = '❚❚ Pause';
                         }
                     } else {
@@ -421,7 +428,7 @@ class visu_bokeh:
                     }
                 """)
                 toggl.js_on_change('active', toggle_callback)
-            
+
                 from bokeh.models import Div
 
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
@@ -434,11 +441,10 @@ class visu_bokeh:
                 controls = column(toggl, slider, date_display)
                 kwargs['controls'] = controls
 
-            #kwargs['bokeh_figure_log'] = bokeh_figure_log
-
             kwargs['yrange']=yrange
             kwargs['geocolumndatasrc'] = geocolumndatasrc
             kwargs['columndatasrc'] = columndatasrc
+            kwargs['color_mapper']=color_mapper
             kwargs['input'] = input
             return func(self, **kwargs)
         return inner_decodateslider
@@ -503,7 +509,7 @@ class visu_bokeh:
     def bokeh_plot(func):
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
-            input = input.drop(columns='geometry')
+            kwargs['input'] = kwargs['input'].drop(columns='geometry')
             return func(self, **kwargs)
         return  inner_bokeh_plot
 
@@ -557,7 +563,7 @@ class visu_bokeh:
 
 
             fig.add_tools(HoverTool(
-                tooltips=[('where', '@rolloverdisplay'), ('date', '@date{%F}'),
+                tooltips=[('where', '@where'), ('date', '@date{%F}'),
                           (what[0], '@{casesx}' + '{custom}'),
                           (what[1], '@{casesy}' + '{custom}')],
                 formatters={'where': 'printf', '@{casesx}': cases_custom, '@{casesy}': cases_custom,
@@ -572,7 +578,7 @@ class visu_bokeh:
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
 
             fig.legend.label_text_font_size = "12px"
-            panel = TabPanel(child=bokeh_figure, title=axis_type)
+            panel = TabPanel(child=fig, title=axis_type)
             panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
 
@@ -1119,7 +1125,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-            label_dict = dict(zip(ytick_loc, columndatasrc.data['where']))
+            label_dict = dict(zip(ytick_loc, [x[:10] for x in columndatasrc.data['where']]))
             fig.yaxis[0].major_label_overrides = label_dict
             fig.yaxis[0].formatter = NumeralTickFormatter(format="0.0")
 
@@ -1127,7 +1133,9 @@ class visu_bokeh:
             left = 0.01 if axis_type == 'log' else 'left'
             epslion = 0.01 if axis_type == 'log' and min(columndatasrc.data['left']) == 0 else 0.0
             minn = min(columndatasrc.data['left']) + epslion
+            maxx = 1.15*max(columndatasrc.data['right'])
             fig.x_range.start = minn
+            fig.x_range.end = maxx
 
             fig.quad(
                 source=columndatasrc,
@@ -1298,11 +1306,13 @@ class visu_bokeh:
         geocolumndatasrc = kwargs.get('geocolumndatasrc')
         what = kwargs.get('what')
         tile = kwargs.get('tile')
-
+        #color_mapper = kwargs['color_mapper']
         tile = visu_bokeh.convert_tile(tile, 'bokeh')
         wmt = WMTSTileSource(url = tile)
         bokeh_figure = kwargs['bokeh_figure_map']
         bokeh_figure.add_tile(wmt, retina=True)
+        bokeh_figure.height = 350
+        bokeh_figure.width = 450
 
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
@@ -1319,9 +1329,7 @@ class visu_bokeh:
                 min_col_non0 = (np.nanmin(input.loc[input[what]>0.][what]))
         except ValueError:
             pass
-        #min_col, max_col = np.nanmin(intput_pyvoa['cases']),np.nanmax(intput_pyvoa['cases'])
-        #json_data = json.dumps(json.loads(input_uniquecountries.to_json()))
-        #intput_pyvoa = GeoJSONDataSource(geojson=json_data)
+
 
         invViridis256 = Viridis256[::-1]
         if mapoption and 'log' in mapoption:
@@ -1343,15 +1351,12 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
-        if dateslider:
-            bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
-            fill_color = {'field': what, 'transform': color_mapper},
-            line_color = 'black', line_width = 0.25, fill_alpha = 1)
-        else:
-            geocolumndatasrc = GeoJSONDataSource(geojson = input.drop(columns=['date']).to_json())
-            bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
-                            fill_color = {'field': what, 'transform': color_mapper},
-                            line_color = 'black', line_width = 0.25, fill_alpha = 1)
+
+
+        bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
+        fill_color = {'field': what, 'transform': color_mapper},
+        line_color = 'black', line_width = 0.25, fill_alpha = 1)
+
         '''
         if mapoption:
             if 'text' in mapoption or 'textinteger' in mapoption:
@@ -1379,7 +1384,8 @@ class visu_bokeh:
         formatters = {'where': 'printf', '@right': 'printf',})),
         #point_policy = "snap_to_data",callback=callback))  # ,PanTool())
         if dateslider:
-                 bokeh_figure = column(controls, bokeh_figure,)
+             layout = column(controls, bokeh_figure)
+             return layout
         return bokeh_figure
 
     @staticmethod

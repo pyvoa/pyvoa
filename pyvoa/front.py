@@ -282,7 +282,7 @@ class front:
 
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
-
+            default['output'] = default['output'][0]
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
@@ -420,7 +420,6 @@ class front:
             col=list(casted_data.columns)
             mem='{:,}'.format(casted_data[col].memory_usage(deep=True).sum())
             info('Memory usage of all columns: ' + mem + ' bytes')
-
         elif output == 'geopandas':
             casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
             casted_data=gpd.GeoDataFrame(casted_data)
