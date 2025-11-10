@@ -220,6 +220,7 @@ class visu_bokeh:
             height = kwargs.get('height',self.figure_height)
             kwargs['bokeh_figure_linear'] = figure(x_axis_type='linear',y_axis_type='linear',width=width,height=height)
             kwargs['bokeh_figure_log'] = figure(x_axis_type='log',y_axis_type='linear',width=width,height=height)
+            kwargs['bokeh_figure_loglog'] = figure(x_axis_type='log',y_axis_type='log',width=width,height=height)
             kwargs['bokeh_figure_map'] = figure(x_axis_type = 'mercator', y_axis_type = 'mercator', match_aspect = True)
             kwargs['bokeh_figure_linear_date'] = figure( y_axis_type = 'linear', x_axis_type = 'datetime')
             kwargs['bokeh_figure_log_date'] = figure( y_axis_type = 'log', x_axis_type = 'datetime')
@@ -237,6 +238,10 @@ class visu_bokeh:
             bokeh_figure_log = kwargs.get('bokeh_figure_log')
 
             dateslider = kwargs.get('dateslider')
+            if func.__name__ == 'bokeh_histo' and dateslider == True:
+                print('dateslider not implemented in this current version ...')
+                dateslider = False
+
             mapoption = kwargs.get('mapoption')
             maxcountrydisplay = kwargs['maxcountrydisplay']
 
@@ -434,6 +439,7 @@ class visu_bokeh:
             kwargs['yrange']=yrange
             kwargs['geocolumndatasrc'] = geocolumndatasrc
             kwargs['columndatasrc'] = columndatasrc
+            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_decodateslider
 
@@ -981,6 +987,7 @@ class visu_bokeh:
     ''' VERTICAL HISTO '''
 
     @deco_bokeh
+    @decodateslider
     def bokeh_histo(self, **kwargs):
         '''
             -----------------
@@ -1004,12 +1011,21 @@ class visu_bokeh:
 
         input = kwargs.get('input')
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
-        min_val = input['cases'].min()
-        max_val =  input['cases'].max()
-        if bins:
-            bins = bins
-        else:
-            if len(uniqloc) == 1:
+        uniqloc = list(input['where'].unique())
+        which  = kwargs.get('which')
+        if isinstance(which,list):
+            which = which[0]
+
+        dfigures = {
+                    'linear':kwargs.get('bokeh_figure_linear'),
+                    'loglog':kwargs.get('bokeh_figure_loglog')
+                    }
+
+        min_val = input[which].min()
+        max_val =  input[which].max()
+
+        if not bins:
+            if len(input[which].unique()) == 1:
                 bins = 2
                 min_val = 0.
             else:
@@ -1020,14 +1036,15 @@ class visu_bokeh:
 
         contributors = {  i : [] for i in range(bins+1)}
         for i in range(len(input)):
-            rank = bisect.bisect_left(interval, input.iloc[i]['cases'])
-            if rank == bins+1:
-                rank = bins
+            rank = bisect.bisect_left(interval, input.iloc[i][which])
+            if rank >= bins:
+                rank = bins - 1
             contributors[rank].append(input.iloc[i]['where'])
 
         lcolors = iter(self.lcolors)
 
         contributors = dict(sorted(contributors.items()))
+
         frame_histo = pd.DataFrame({
                           'left': [0]+interval[:-1],
                           'right':interval,
@@ -1049,41 +1066,30 @@ class visu_bokeh:
         panels = []
         bottom = 0
         x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
-        for axis_type in ["linear", "linlog", "loglin", "loglog"]:
-            if axis_type == 'linlog':
-                y_axis_type, axis_type_title = 'log', 'logy'
-            if axis_type == 'loglin':
-                x_axis_type, y_axis_type, axis_type_title = 'log', 'linear', 'logx'
+        for axis_type in ["linear", "loglog"]:
+            fig = dfigures[axis_type]
             if axis_type == 'loglog':
                 x_axis_type, y_axis_type = 'log', 'log'
                 axis_type_title = 'loglog'
 
-            try:
-                kwargs.pop('dateslider')
-            except:
-                pass
-            bokeh_figure = self.bokeh_figure(x_axis_type=x_axis_type, y_axis_type=y_axis_type)
-
-            #bokeh_figure.yaxis[0].formatter = PrintfTickFormatter(format = "%4.2e")
-            #bokeh_figure.xaxis[0].formatter = PrintfTickFormatter(format="%4.2e")
-            bokeh_figure.add_tools(hover_tool)
-            bokeh_figure.x_range = Range1d(1.05 * interval[0], 1.05 * interval[-1])
-            bokeh_figure.y_range = Range1d(0, 1.05 * frame_histo['top'].max())
+            fig.add_tools(hover_tool)
+            fig.x_range = Range1d(1.05 * interval[0], 1.05 * interval[-1])
+            fig.y_range = Range1d(0, 1.05 * frame_histo['top'].max())
             if x_axis_type == "log":
                 left = 0.8
                 if frame_histo['left'][0] <= 0:
                     frame_histo.at[0, 'left'] = left
                 else:
                     left  = frame_histo['left'][0]
-                bokeh_figure.x_range = Range1d(left, 10 * interval[-1])
+                fig.x_range = Range1d(left, 10 * interval[-1])
 
             if y_axis_type == "log":
                 bottom = 0.0001
-                bokeh_figure.y_range = Range1d(0.001, 10 * frame_histo['top'].max())
+                fig.y_range = Range1d(0.001, 10 * frame_histo['top'].max())
 
-            bokeh_figure.quad(source=ColumnDataSource(frame_histo), top='top', bottom=bottom, left='left', \
+            fig.quad(source=ColumnDataSource(frame_histo), top='top', bottom=bottom, left='left', \
                              right='right', fill_color='colors')
-            panel = TabPanel(child=bokeh_figure, title=axis_type_title)
+            panel = TabPanel(child=fig, title=axis_type_title)
             panels.append(panel)
         tabs = Tabs(tabs=panels)
         return tabs
