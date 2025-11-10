@@ -53,7 +53,7 @@ class InputOption():
                         [f'normalize:{k}' for k in self.dictpop.keys()],\
                         'which':[''],\
                         'what':['current','daily','weekly'],\
-                        'when':[''],\
+                        'when':'',\
                         'input':pd.DataFrame(),\
                         'output':['pandas','geopandas','list','dict','array']
                         }
