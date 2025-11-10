@@ -397,7 +397,7 @@ class visu_bokeh:
                 slider.js_on_change('value', slider_callback)
                 toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
                 # CustomJS pour démarrer/arrêter l'animation
-                '''
+
                 toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code="""
                     // Stocke l'interval globalement pour pouvoir l'arrêter depuis un autre widget
                     if (cb_obj.active) {
@@ -421,7 +421,7 @@ class visu_bokeh:
                     }
                 """)
                 toggl.js_on_change('active', toggle_callback)
-                '''
+            
                 from bokeh.models import Div
 
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
