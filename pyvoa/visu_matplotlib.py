@@ -88,7 +88,7 @@ class visu_matplotlib:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
         plt.title(title)
-        return plt.gcf()
+        #return plt.gcf()
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
@@ -170,7 +170,7 @@ class visu_matplotlib:
         ax.set_title(title)
         input_sorted = input.sort_values(by=what,ascending=True)
         ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors)
-        return plt.gcf()
+        #return plt.gcf()
 
     @decomatplotlib
     def matplotlib_histo(self,**kwargs):
@@ -185,7 +185,7 @@ class visu_matplotlib:
         bins=len(input['where'])+1
         input = pd.pivot_table(input,index='date', columns='where', values=what)
         input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
-        return plt.gcf()
+        #return plt.gcf()
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
@@ -233,4 +233,4 @@ class visu_matplotlib:
 
         ax.set_axis_off()
         ax.set_title(title)
-        return plt.gcf()
+        #return plt.gcf()

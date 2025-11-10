@@ -82,12 +82,14 @@ class AllVisu:
         @wraps(func)
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
+            which = kwargs.get('which')
+            input = input.sort_values(by = which, ascending=False).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
-            kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
+            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_plot
 
@@ -98,9 +100,14 @@ class AllVisu:
         """
         @wraps(func)
         def inner_hm(self, **kwargs):
+            input = kwargs.get('input')
+            which = kwargs.get('which')
+            if not kwargs['dateslider']:
+                input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
+                if func.__name__ != 'map':
+                    input = input.head(self.maxcountrydisplay)
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
-            input = kwargs['input']
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -109,7 +116,9 @@ class AllVisu:
             if (input[kwargs['what']] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
+
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
+            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -125,26 +134,21 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             locunique = input['where'].unique()
-            #input_first = input.loc[input['where'].isin(locunique[:Max_Countries_Default-1])]
-            #input_others = input.loc[input['where'].isin(locunique[Max_Countries_Default-1:])]
-            #input_others[which] = input_others[which].sum()
-            #input_others['where'] = 'SumOthers'
-            #input_others['code'] = 'SumOthers'
-            #input_others['colors'] = '#FFFFFF'
-            #input_others = input_others.drop_duplicates(['where','code'])
-            #input = pd.concat([input_first,input_others]).head(12).reset_index(drop=True)
-            input = input.sort_values(by=which, ascending=False).head(self.maxcountrydisplay).reset_index(drop=True)
+            input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
             if isinstance(kwargs['what'],list):
                  kwargs['what'] = kwargs['what'][0]
+            input['where'] = input['where'].apply(lambda x: str(x)[:10] if pd.notna(x) else x)
+            kwargs['input'] = input
             return func(self,**kwargs)
         return inner_decohistopie
 
     @decoplot
     def plot(self,**kwargs):
+        input = kwargs.get('input')
         typeofplot = kwargs.get('typeofplot')
         vis = kwargs.get('vis')
         fig = None
@@ -190,9 +194,9 @@ class AllVisu:
             elif typeofplot == 'yearly':
                 if input.date.max()-input.date.min() <= dt.timedelta(days=365):
                     print("Yearly will not be used since the time covered is less than 1 year")
-                    fig = visu_matplotlib().bokeh_date_plot(**kwargs)
+                    fig =  visu_bokeh().bokeh_date_plot(**kwargs)
                 else:
-                    fig = visu_matplotlib().bokeh_yearly_plot(**kwargs)
+                    fig =  visu_bokeh().bokeh_yearly_plot(**kwargs)
         else:
             print(" Not implemented yet ")
         return fig
