@@ -418,8 +418,7 @@ class DataParser:
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns={"code_region": "code"})
       else:
-          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')
-
+          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')      
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
