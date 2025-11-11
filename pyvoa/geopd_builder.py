@@ -299,6 +299,7 @@ class GPDBuilder(object):
 
        kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        flatwhere = flat_list(where)
+
        bypopvalue = None
        for w in which:
            kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].bfill()
@@ -319,6 +320,8 @@ class GPDBuilder(object):
                    concatpd = pd.DataFrame()
                    for loca in flatwhere:
                        pdwhere = temppd.loc[temppd['where'] == loca]
+                       if pdwhere.empty:
+                            print("No available data for ",loca)
                        nonneg = getnonnegfunc(pdwhere,w)
                        if concatpd.empty:
                            concatpd = nonneg
@@ -347,6 +350,8 @@ class GPDBuilder(object):
 
            if not wconcatpd.empty:
                input = wconcatpd
+           else:
+               raise PyvoaError('No available data for where = ' + str(where))
            input.loc[:,w+' daily']  = input.groupby('where')[w].diff()
            input.loc[:,w+' weekly'] = input.groupby('where')[w].diff(7)
            input.loc[:,w+' daily']  = input[w + ' daily'].bfill()
