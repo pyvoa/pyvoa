@@ -423,7 +423,7 @@ class front:
                 casted_data = pandy
             else:
                 casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
-                casted_data=gpd.GeoDataFrame(casted_data).reset_index(drop=True)
+                casted_data=gpd.GeoDataFrame(casted_data)
         elif output == 'dict':
             casted_data = pandy.to_dict('split')
         elif output == 'list' or output == 'array':
@@ -436,6 +436,7 @@ class front:
                 casted_data = np.array(pandy)
         else:
             raise PyvoaError('Unknown output.')
+        casted_data=casted_data.reset_index(drop=True)    
         self.outcome = casted_data
         return casted_data
 
