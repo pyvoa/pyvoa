@@ -114,7 +114,6 @@ class front:
         self.lwhat = list(self.av.d_batchinput_args['what'])
         self.lplot = list(self.av.d_graphicsinput_args['typeofplot'])
         self.loption = list(self.av.d_batchinput_args['option'])
-        self.loption.remove('')
 
         self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
@@ -325,9 +324,8 @@ class front:
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
 
-            unique = list(kwargs['input']['where'].unique())
-            legend = front().create_legend(unique)
-            kwargs['legend'] = legend
+            if kwargs['input'].empty:
+                raise PyvoaError('No data available for ' + str(where))
             return func(self,**kwargs)
         return wrapper
 
@@ -421,8 +419,11 @@ class front:
             mem='{:,}'.format(casted_data[col].memory_usage(deep=True).sum())
             info('Memory usage of all columns: ' + mem + ' bytes')
         elif output == 'geopandas':
-            casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
-            casted_data=gpd.GeoDataFrame(casted_data)
+            if 'geometry' in list(pandy.columns):
+                casted_data = pandy
+            else:
+                casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
+                casted_data=gpd.GeoDataFrame(casted_data).reset_index(drop=True)
         elif output == 'dict':
             casted_data = pandy.to_dict('split')
         elif output == 'list' or output == 'array':
