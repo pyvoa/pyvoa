@@ -256,7 +256,6 @@ class GPDBuilder(object):
              - test all arguments an their values
              - nonneg redistribute value in order to remove negative value
        '''
-
        defaultargs = InputOption().d_batchinput_args
        option = kwargs.get('option',defaultargs['option'][0])
        kwargs_valuestesting(option,defaultargs['option'],'option error ... ')
@@ -276,11 +275,11 @@ class GPDBuilder(object):
            input = self.currentdata.get_maingeopandas()
            kwargs['input'] = input
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
-
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
 
        kwargs['input'] = input
+
        input['date'] = pd.to_datetime(input['date'], errors='coerce')
        when_beg_data, when_end_data = input.date.min(), input.date.max()
        when_beg_data, when_end_data = when_beg_data.date(), when_end_data.date()
@@ -301,6 +300,9 @@ class GPDBuilder(object):
        flatwhere = flat_list(where)
 
        bypopvalue = None
+       datesunique = list(input.date.unique())
+       ndates = len(datesunique)
+       nietcountries = []
        for w in which:
            kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].bfill()
            kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].ffill()
@@ -321,12 +323,28 @@ class GPDBuilder(object):
                    for loca in flatwhere:
                        pdwhere = temppd.loc[temppd['where'] == loca]
                        if pdwhere.empty:
-                            print("No available data for ",loca)
+                            p = self.currentdata.get_maingeopandas()
+                            p = p.loc[p['where'].isin([loca])]
+                            code = list(p['code'].unique())
+                            geo=[]
+                            try:
+                                geo = p['geometry'].to_list()
+                            except KeyError:
+                                pass
+                            pdwhere = pd.DataFrame({
+                            'date':     datesunique,
+                            'where':    ndates*[loca],
+                            'code':     ndates*code,
+                             w:         ndates*[0.],
+                            'geometry': geo
+                            })
+                            nietcountries.append(loca)
                        nonneg = getnonnegfunc(pdwhere,w)
                        if concatpd.empty:
                            concatpd = nonneg
                        else:
                            concatpd = pd.concat([concatpd,nonneg])
+                   concatpd = concatpd.dropna(subset=['geometry'])
                    temppd = concatpd
                elif o == 'smooth7':
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
@@ -386,6 +404,8 @@ class GPDBuilder(object):
        others = sorted([c for c in kwargs['input'].columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        kwargs['input'] = kwargs['input'][new_order]
+       if nietcountries:
+           print('No available data for where = ', nietcountries)
        return kwargs
 
    def normbypop(self, pandy, val2norm ,bypop):

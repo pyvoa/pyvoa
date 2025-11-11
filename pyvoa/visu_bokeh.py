@@ -277,7 +277,7 @@ class visu_bokeh:
             input_dates = input.drop(columns='geometry').copy()
             min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[what]),np.nanmax(input_dates[what]))
             invViridis256 = Viridis256[::-1]
-            color_mapper = LogColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+            color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
 
             input = self.add_columns_for_pie_chart(input,what)
 
@@ -367,13 +367,13 @@ class visu_bokeh:
 
                             source2.data['angle'] = angles;
                             //source2.data['textdisplayed'] = source2.data['where'];
-                            console.log()
+
                             //console.log(source2.data['textdisplayed'])
                             // Tu peux ensuite faire ton labelMap, etc.
                             const labelMap = new Map();
                             for (let j = 0; j < len; j++) {
                                 const where_val = source2.data['where'][j].slice(0, 10);
-                                console.log(where_val);
+
                                 let pos = parseInt(ymax * (len - j) / len);
                                 if (!Number.isFinite(pos)) continue;
                                 labelMap.set(pos, String(where_val));
@@ -392,9 +392,10 @@ class visu_bokeh:
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
 
-                            color_mapperjs.high=Math.max.apply(Math, rights);
-                            color_mapperjs.low=Math.min.apply(Math, rights);
+                            color_mapperjs.high = Math.max(...rights);
+                            color_mapperjs.low  = Math.min(...rights);
 
+                            color_mapperjs.change.emit();
                             source.change.emit();
                             source2.change.emit();
 
@@ -1306,7 +1307,7 @@ class visu_bokeh:
         geocolumndatasrc = kwargs.get('geocolumndatasrc')
         what = kwargs.get('what')
         tile = kwargs.get('tile')
-        #color_mapper = kwargs['color_mapper']
+        color_mapper = kwargs['color_mapper']
         tile = visu_bokeh.convert_tile(tile, 'bokeh')
         wmt = WMTSTileSource(url = tile)
         bokeh_figure = kwargs['bokeh_figure_map']
@@ -1332,10 +1333,11 @@ class visu_bokeh:
 
 
         invViridis256 = Viridis256[::-1]
-        if mapoption and 'log' in mapoption:
-            color_mapper = LogColorMapper(palette=invViridis256, low=min_col_non0, high=max_col, nan_color='#ffffff')
-        else:
-            color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+        #if mapoption and 'log' in mapoption:
+        #    color_mapper = LogColorMapper(palette=invViridis256, low=min_col_non0, high=max_col, nan_color='#ffffff')
+        #else:
+        #    color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
         color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
@@ -1375,9 +1377,9 @@ class visu_bokeh:
         #//document.getElementsByClassName('bk-tooltip')[0].style.backgroundColor="transparent";
         #document.getElementsByClassName('bk-tooltip')[0].style.opacity="0.7";
         #""" )
-        tooltips = """
+        tooltips = f"""
                     <b>location: @where<br>
-                    cases: @right </b>
+                    cases: @{what} </b>
                     """
 
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,

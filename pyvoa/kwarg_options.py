@@ -49,7 +49,7 @@ class InputOption():
         self.lpop = ['normalize:'+k for k in self.dictpop.keys()]
         self.d_batchinput_args  = {
                         'where':[''],\
-                        'option':['','nonneg','smooth7','sumall']+\
+                        'option':['nonneg','smooth7','sumall']+\
                         [f'normalize:{k}' for k in self.dictpop.keys()],\
                         'which':[''],\
                         'what':['current','daily','weekly'],\
