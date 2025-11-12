@@ -292,7 +292,7 @@ class visu_bokeh:
                 cols = list(input_dates.columns)
 
                 frames = []
-                #unique_dates =unique_dates[:100]
+                #unique_dates =unique_dates[:200]
                 for d in unique_dates:
                     df_d = input_dates[input_dates['date'] == d].copy()
                     df_d = df_d[cols]
@@ -339,7 +339,10 @@ class visu_bokeh:
 
                             for (let j = 0; j < n; j++) {
                                 const row = {};
-                                for (const k of keys) row[k] = frame[k][j];
+                                for (const k of keys) {
+                                if (frame[k] && frame[k].length > j) row[k] = frame[k][j];
+                                else row[k] = null;
+                            }
                                 rows.push(row);
                             }
                             rows.sort((a, b) => b[what] - a[what]);
@@ -351,12 +354,20 @@ class visu_bokeh:
                                 limited[i]['horihistotexty'] = limited[i]['bottom'] + 0.5 * ymax / maxcountrydisplay;
                             }
 
+                            // Mettre à jour source avec toutes les données
                             for (const k of keys) {
-                                const col = limited.map(r => r[k]);
-                                if (k in source.data) source.data[k] = col;
-                                if (k in source2.data) source2.data[k] = col;
+                                const full_col = rows.map(r => r[k]);
+                                if (k in source.data) source.data[k] = full_col;
                             }
 
+                            // Mettre à jour source2 avec les données limitées
+                            for (const k of keys) {
+                                const limited_col = limited.map(r => r[k]);
+                                if (k in source2.data) source2.data[k] = limited_col;
+                            }
+
+
+                            //console.log(source.data['where'][i],source.data['xs'][i]);
                             const len = source2.data[what].length;
                             const total = source2.data[what].map(Number).reduce((a, b) => a + b, 0);
                             const angles = new Array(len);
@@ -416,7 +427,7 @@ class visu_bokeh:
                                 let v = slider.value + 1;
                                 if (v > slider.end) { v = 0; }  // revenir au début
                                 slider.value = v; // déclenche slider_callback
-                            }, 100);
+                            }, 10);
                             cb_obj.label = '❚❚ Pause';
                         }
                     } else {
