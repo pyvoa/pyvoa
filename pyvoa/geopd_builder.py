@@ -313,39 +313,15 @@ class GPDBuilder(object):
            kwargs['input'] = kwargs['input'].loc[~kwargs['input']['where'].isin(wherenan)]
            #kwargs['which'] = w
            kwargs['input'] = self.whereclustered(**kwargs)
+
            wconcatpd = pd.DataFrame()
            for o in option:
                temppd = kwargs['input']
                if o == 'nonneg':
                    if w.startswith('cur_'):
                        raise PyvoaWarning('The option nonneg cannot be used with instantaneous data, such as : ' + w)
+                   temppd = getnonnegfunc(temppd,w)
                    concatpd = pd.DataFrame()
-                   for loca in flatwhere:
-                       pdwhere = temppd.loc[temppd['where'] == loca]
-                       if pdwhere.empty:
-                            p = self.currentdata.get_maingeopandas()
-                            p = p.loc[p['where'].isin([loca])]
-                            code = list(p['code'].unique())
-                            geo=[]
-                            try:
-                                geo = p['geometry'].to_list()
-                            except KeyError:
-                                pass
-                            pdwhere = pd.DataFrame({
-                            'date':     datesunique,
-                            'where':    ndates*[loca],
-                            'code':     ndates*code,
-                             w:         ndates*[0.],
-                            'geometry': geo
-                            })
-                            nietcountries.append(loca)
-                       nonneg = getnonnegfunc(pdwhere,w)
-                       if concatpd.empty:
-                           concatpd = nonneg
-                       else:
-                           concatpd = pd.concat([concatpd,nonneg])
-                   concatpd = concatpd.dropna(subset=['geometry'])
-                   temppd = concatpd
                elif o == 'smooth7':
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
                     inx7 = temppd.groupby('where').head(7).index
@@ -368,8 +344,6 @@ class GPDBuilder(object):
 
            if not wconcatpd.empty:
                input = wconcatpd
-           else:
-               raise PyvoaError('No available data for where = ' + str(where))
            input.loc[:,w+' daily']  = input.groupby('where')[w].diff()
            input.loc[:,w+' weekly'] = input.groupby('where')[w].diff(7)
            input.loc[:,w+' daily']  = input[w + ' daily'].bfill()
