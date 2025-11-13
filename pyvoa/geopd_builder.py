@@ -221,7 +221,7 @@ class GPDBuilder(object):
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
-                temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="ﬁ").reset_index(drop=True)
+                temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="EPSG:4326").reset_index(drop=True)
                 wherejoined  = ',' .join(flat_list(w))
                 code = temp.loc[temp.date==temp.date.max()]['code']
                 codejoined  = ',' .join(code)
