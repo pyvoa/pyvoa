@@ -83,7 +83,7 @@ class AllVisu:
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
             which = kwargs.get('which')
-            input = input.sort_values(by = which, ascending=False).reset_index(drop=True)
+            input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
             if kwargs['what'] in ['daily','weekly']:

@@ -221,7 +221,7 @@ class GPDBuilder(object):
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
-                temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="EPSG:4326").reset_index(drop=True)
+                temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="ﬁ").reset_index(drop=True)
                 wherejoined  = ',' .join(flat_list(w))
                 code = temp.loc[temp.date==temp.date.max()]['code']
                 codejoined  = ',' .join(code)
@@ -318,8 +318,8 @@ class GPDBuilder(object):
            for o in option:
                temppd = kwargs['input']
                if o == 'nonneg':
-                   if w.startswith('cur_'):
-                       raise PyvoaWarning('The option nonneg cannot be used with instantaneous data, such as : ' + w)
+                   if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
+                        print('The default option nonneg cannot be used with instantaneous data, such as : ' + w)
                    temppd = getnonnegfunc(temppd,w)
                    concatpd = pd.DataFrame()
                elif o == 'smooth7':
