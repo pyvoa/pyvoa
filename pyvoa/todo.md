@@ -1,0 +1,13 @@
+- [ ] Titles
+- [ ] ylabel matplotlib avec des crochets
+- [ ] pas de ylabel ni xlabel avec bokeh
+- [ ] pas de nom de db sur les graphs
+- [ ] pas de nom de la variable avec les histo
+- [ ] ©pyvoa à rajouter
+- [ ] filigrane à ajouter
+- [ ] bug sumall
+- [ ] dans listoption il y a un ' ' 
+- [ ] dessiner les pays même quand il n'y a pas de données 
+- [ ] unifier les typeofhist typeofmap mapoption, etc. … 
+- [ ] date des données pour map et hist
+
