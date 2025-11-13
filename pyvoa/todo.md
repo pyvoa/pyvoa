@@ -11,3 +11,4 @@
 - [ ] unifier les typeofhist typeofmap mapoption, etc. … 
 - [ ] date des données pour map et hist
 - [ ] lorsqu'on demande un hist pie, il y en a deux qui sortent
+- [ ] map bokeh mpoxgh HS
