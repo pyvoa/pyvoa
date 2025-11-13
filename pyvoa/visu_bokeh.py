@@ -241,7 +241,7 @@ class visu_bokeh:
             w_screen = width / 1.5
             h_screen = height / 3.5
             for key, fig in dicfig.items():
-                if key == 'bokeh_figure_linear_date':
+                if key in ['bokeh_figure_linear_date','bokeh_figure_log_date']:
                     maxx = input.date.max()
                     minn = input.date.min()
                     x_center = minn + 0.5 * (maxx - minn)
@@ -676,8 +676,8 @@ class visu_bokeh:
         listfigs = []
         cases_custom = visu_bokeh().rollerJS()
         dbokeh_figure = {
-            'linear': kwargs.get('bokeh_figure_linear'),
-            'log': kwargs.get('bokeh_figure_log')
+            'linear': kwargs.get('bokeh_figure_linear_date'),
+            'log': kwargs.get('bokeh_figure_log_date')
         }
         dicof={'title':kwargs.get('title')}
 
@@ -1482,6 +1482,10 @@ class visu_bokeh:
 
     @staticmethod
     def convertmercator(gdf):
+        '''
+        trick found by dadoun to solve this problem
+        see https://discourse.bokeh.org/t/bokeh-tile-antimeridian-problem/6978
+        '''
         rows = []
 
         for idx, row in gdf.iterrows():
