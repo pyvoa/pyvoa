@@ -76,7 +76,6 @@ from bokeh.models import (
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.models import Panel
 from bokeh.plotting import figure
-from bokeh.io import output_notebook
 
 from bokeh.io import output_notebook
 from pyvoa.kwarg_options import InputOption
@@ -207,6 +206,14 @@ class visu_bokeh:
                   }
                   return s;*/
                 """)
+    # Encode ton image locale
+    @staticmethod
+    def pyvoalogo():
+        with open("../../pyvoa/data/pyvoa_logo2.png", "rb") as f:
+            data = f.read()
+        b64 = base64.b64encode(data).decode("utf-8")
+        url = f"data:image/png;base64,{b64}"
+        return url
 
     def deco_bokeh(func):
         @wraps(func)
@@ -216,8 +223,26 @@ class visu_bokeh:
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
             input['colors'] = input['where'].map(color_map)
             kwargs['input'] = input
+            what = kwargs['what']
+            if isinstance(what,list):
+                what =what[0]
             width  = kwargs.get('width', self.figure_width)
             height = kwargs.get('height',self.figure_height)
+            input = kwargs['input']
+            #maxx = input.date.max()
+            #minn = input.date.min()
+
+            '''
+            kwargs['bokeh_figure_linear'] = figure(x_axis_type='linear',y_axis_type='linear',width=width,height=height)
+            kwargs['bokeh_figure_linear'].image_url(
+                            url=[visu_bokeh().pyvoalogo()],
+                            x=minn+0.5*( maxx - minn ), y=0.5*max(input[what]),
+                            w=self.figure_width/1.5, w_units="screen",
+                            h=self.figure_height/3.5, h_units="screen",
+                            anchor="center",
+                            alpha=0.05
+                        )
+            '''
             kwargs['bokeh_figure_linear'] = figure(x_axis_type='linear',y_axis_type='linear',width=width,height=height)
             kwargs['bokeh_figure_log'] = figure(x_axis_type='log',y_axis_type='linear',width=width,height=height)
             kwargs['bokeh_figure_loglog'] = figure(x_axis_type='log',y_axis_type='log',width=width,height=height)
@@ -640,8 +665,10 @@ class visu_bokeh:
             'log': kwargs.get('bokeh_figure_log')
         }
         dicof={'title':kwargs.get('title')}
+
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
             fig = dbokeh_figure[axis_type]
+
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
 
@@ -662,7 +689,6 @@ class visu_bokeh:
                         leg = legend[loc]
                     else:
                         leg = loc
-
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      color = color, line_width = 3,
                                      legend_label = leg,

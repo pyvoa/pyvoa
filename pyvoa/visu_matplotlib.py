@@ -79,7 +79,6 @@ class visu_matplotlib:
         legend = kwargs.get('legend',None)
         plt.xlabel("Date", fontsize=10)
         plt.ylabel(what, fontsize=10)
-
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
         for col in df.columns:
