@@ -1,10 +1,10 @@
-- [ ] Titles
+- [ ] titles
 - [ ] ylabel matplotlib avec des crochets
 - [ ] pas de ylabel ni xlabel avec bokeh
 - [ ] pas de nom de db sur les graphs
 - [ ] pas de nom de la variable avec les histo
 - [ ] ©pyvoa à rajouter
-- [ ] filigrane à ajouter
+- [ ] filigrane à ajouter dans bokeh et matplotlib
 - [ ] bug sumall
 - [ ] dans listoption il y a un ' ' 
 - [ ] dessiner les pays même quand il n'y a pas de données 
