@@ -322,8 +322,7 @@ class front:
                     kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
-                kwargs['what'] = kwargs['which']
-
+                kwargs['what'] = kwargs['which'] 
             if kwargs['input'].empty:
                 raise PyvoaError('No data available for ' + str(where))
             return func(self,**kwargs)
@@ -436,7 +435,7 @@ class front:
                 casted_data = np.array(pandy)
         else:
             raise PyvoaError('Unknown output.')
-        casted_data=casted_data.reset_index(drop=True)    
+        casted_data=casted_data.reset_index(drop=True)
         self.outcome = casted_data
         return casted_data
 
