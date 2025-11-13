@@ -76,7 +76,6 @@ from bokeh.models import (
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.models import Panel
 from bokeh.plotting import figure
-
 from bokeh.io import output_notebook
 from pyvoa.kwarg_options import InputOption
 
@@ -229,26 +228,39 @@ class visu_bokeh:
             width  = kwargs.get('width', self.figure_width)
             height = kwargs.get('height',self.figure_height)
             input = kwargs['input']
-            #maxx = input.date.max()
-            #minn = input.date.min()
 
-            '''
-            kwargs['bokeh_figure_linear'] = figure(x_axis_type='linear',y_axis_type='linear',width=width,height=height)
-            kwargs['bokeh_figure_linear'].image_url(
-                            url=[visu_bokeh().pyvoalogo()],
-                            x=minn+0.5*( maxx - minn ), y=0.5*max(input[what]),
-                            w=self.figure_width/1.5, w_units="screen",
-                            h=self.figure_height/3.5, h_units="screen",
-                            anchor="center",
-                            alpha=0.05
-                        )
-            '''
-            kwargs['bokeh_figure_linear'] = figure(x_axis_type='linear',y_axis_type='linear',width=width,height=height)
-            kwargs['bokeh_figure_log'] = figure(x_axis_type='log',y_axis_type='linear',width=width,height=height)
-            kwargs['bokeh_figure_loglog'] = figure(x_axis_type='log',y_axis_type='log',width=width,height=height)
-            kwargs['bokeh_figure_map'] = figure(x_axis_type = 'mercator', y_axis_type = 'mercator', match_aspect = True)
-            kwargs['bokeh_figure_linear_date'] = figure( y_axis_type = 'linear', x_axis_type = 'datetime')
-            kwargs['bokeh_figure_log_date'] = figure( y_axis_type = 'log', x_axis_type = 'datetime')
+            dicfig = {}
+            dicfig['bokeh_figure_linear']     = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_log']        = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_loglog']     = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
+            dicfig['bokeh_figure_map']        = figure(x_axis_type='mercator', y_axis_type='mercator')#, match_aspect=True)
+            dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
+
+            logo_url = visu_bokeh().pyvoalogo()
+            w_screen = width / 1.5
+            h_screen = height / 3.5
+            for key, fig in dicfig.items():
+                if key == 'bokeh_figure_linear_date':
+                    maxx = input.date.max()
+                    minn = input.date.min()
+                    x_center = minn + 0.5 * (maxx - minn)
+                    y_center = 0.5 * max(input[what])
+                elif key == 'bokeh_figure_map':
+                    continue
+                else:
+                    x_center = 0.5 * max(input[what])
+                    y_center = 0.5*self.figure_height
+                fig.image_url(
+                    url=[visu_bokeh().pyvoalogo()],
+                    x=x_center,
+                    y=y_center,
+                    w=w_screen, w_units="screen",
+                    h=h_screen, h_units="screen",
+                    anchor="center",
+                    alpha=0.05
+                )
+            kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
         return innerdeco_bokeh
 
@@ -272,7 +284,10 @@ class visu_bokeh:
 
             input_uniquecountries = input.drop_duplicates(subset=["where"]).drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
-            geocolumndatasrc = GeoJSONDataSource(geojson = input_uniquecountries.to_json())
+            input_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
+
+            convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
+            geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
 
             input['left'] = input[what]
             input['right'] = input[what]
@@ -1349,9 +1364,9 @@ class visu_bokeh:
         wmt = WMTSTileSource(url = tile)
         bokeh_figure = kwargs['bokeh_figure_map']
         bokeh_figure.add_tile(wmt, retina=True)
+        #bokeh_figure.add_tile("CartoDB Positron",retina=True)
         bokeh_figure.height = 350
         bokeh_figure.width = 450
-
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
         mapoption = kwargs.get('mapoption')
@@ -1394,8 +1409,24 @@ class visu_bokeh:
 
         bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
         fill_color = {'field': what, 'transform': color_mapper},
-        line_color = 'black', line_width = 0.25, fill_alpha = 1)
+        line_color = 'black', line_width = 0.25)
 
+        '''
+        xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
+        ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
+
+        x_center = xmin + 0.5 * (xmax - xmin)
+        y_center = ymin + 0.5 * (ymax - ymin)
+        bokeh_figure.image_url(
+                url=[visu_bokeh().pyvoalogo()],
+                x=x_center,
+                y=y_center,
+                w=self.figure_width / 1.5, w_units="screen",
+                h=self.figure_height / 3.5, h_units="screen",
+                anchor="center",
+                alpha=0.05
+            )
+        '''
         '''
         if mapoption:
             if 'text' in mapoption or 'textinteger' in mapoption:
@@ -1422,6 +1453,7 @@ class visu_bokeh:
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
         formatters = {'where': 'printf', '@right': 'printf',})),
         #point_policy = "snap_to_data",callback=callback))  # ,PanTool())
+
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
@@ -1433,6 +1465,72 @@ class visu_bokeh:
         export_png(fig, filename = name)
 
     @staticmethod
+    def get_polycoords(geopandasrow):
+        """
+        Take a row of a geopandas as an input (i.e : for index, row in geopdwd.iterrows():...)
+            and returns a tuple (if the geometry is a Polygon) or a list (if the geometry is a multipolygon)
+            of an exterior.coords
+        """
+        geometry = geopandasrow['geometry']
+        all = []
+        if geometry.type == 'Polygon':
+            return list(geometry.exterior.coords)
+        if geometry.type == 'MultiPolygon':
+            for ea in geometry.geoms:
+                all.append(list(ea.exterior.coords))
+        return all
+
+    @staticmethod
+    def convertmercator(gdf):
+        rows = []
+
+        for idx, row in gdf.iterrows():
+            new_poly = []
+
+            # Convertir les polygones / multipolygones
+            if row["geometry"]:
+                for pt in visu_bokeh().get_polycoords(row):
+                    if isinstance(pt, tuple):
+                        # Un point = tuple (lon, lat)
+                        new_poly.append(visu_bokeh().wgs84_to_web_mercator(pt))
+                    elif isinstance(pt, list):
+                        # Liste de points = ring de polygone
+                        shifted = [visu_bokeh().wgs84_to_web_mercator(p) for p in pt]
+                        new_poly.append(sg.Polygon(shifted))
+                    else:
+                        raise TypeError("Unknown geometry element type")
+
+                # Construire la géométrie finale
+                if isinstance(new_poly[0], tuple):
+                    geom = sg.Polygon(new_poly)
+                else:
+                    geom = sg.MultiPolygon(new_poly)
+
+                # Copier toutes les colonnes d’origine
+                new_row = row.copy()
+                new_row["geometry"] = geom
+                rows.append(new_row)
+
+        # Reconstruire un GeoDataFrame complet
+        new_gdf = gpd.GeoDataFrame(rows, crs="epsg:3857")
+        return new_gdf
+
+    @staticmethod
+    def wgs84_to_web_mercator(tuple_xy):
+        """
+        Take a tuple (longitude,latitude) from a coordinate reference system crs=EPSG:4326
+         and converts it to a  longitude/latitude tuple from to Web Mercator format
+        """
+        k = 6378137
+        x = tuple_xy[0] * (k * np.pi / 180.0)
+        if tuple_xy[1] == -90:
+            lat = -89.99
+        else:
+            lat = tuple_xy[1]
+        y = np.log(np.tan((90 + lat) * np.pi / 360.0)) * k
+        return x, y
+
+    @staticmethod
     def convert_tile(tilename, which = 'bokeh'):
         ''' Return tiles url according to folium or bokeh resquested'''
         tile = 'openstreet'
@@ -1442,9 +1540,9 @@ class visu_bokeh:
             else:
                 tile = r'http://c.tile.openstreetmap.org/{Z}/{X}/{Y}.png'
         elif tilename == 'positron':
-            print('Problem with positron tile (huge http resquest need to check), esri is then used ...')
-            tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
-        #    tile = 'https://tiles.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+            #print('Problem with positron tile (huge http resquest need to check), esri is then used ...')
+            #tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
+            tile = 'https://tiles.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
         elif tilename == 'esri':
             tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
         elif tilename == 'stamen':

@@ -324,10 +324,11 @@ class DataParser:
                 pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
             else:
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
-
           if drop and not debug:
               for key,val in drop.items():
                   if key in pandas_temp.columns:
+                      if not isinstance(val,list):
+                          val=[val]
                       for i in val:
                             pandas_temp = pandas_temp.dropna(subset=[key])
                             pandas_temp = pandas_temp[~(pandas_temp[key].str.startswith(i))]
@@ -347,6 +348,7 @@ class DataParser:
              pandas_temp = pandas_temp.replace(replace_field)
 
           pandas_temp = pandas_temp.rename(columns = rename_columns)
+
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
               value_name = None
@@ -372,6 +374,7 @@ class DataParser:
           else:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
+
       whereanddate =  ['date','where']
       notwhereanddate =  [ i  for i in list(pandas_db.columns) if i not in whereanddate ]
       self.available_keywords = notwhereanddate
@@ -386,8 +389,7 @@ class DataParser:
       if 'date' in self.available_keywords:
           self.available_keywords.remove('date')
       if 'where' in self.available_keywords:
-         self.available_keywords.remove('where')
-
+         self.available_keywords.remove('where')   
       locationdb = list(pandas_db['where'].unique())
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}
@@ -418,7 +420,7 @@ class DataParser:
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns={"code_region": "code"})
       else:
-          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')      
+          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
