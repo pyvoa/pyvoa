@@ -277,7 +277,6 @@ class GPDBuilder(object):
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
-
        kwargs['input'] = input
 
        input['date'] = pd.to_datetime(input['date'], errors='coerce')

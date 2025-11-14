@@ -62,7 +62,7 @@ class visu_matplotlib:
 
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
-            fig, ax = plt.subplots(1, 1,figsize=(12, 8))
+            fig, ax = plt.subplots(1, 1,figsize=(8, 4))
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
@@ -77,14 +77,15 @@ class visu_matplotlib:
         plt = kwargs['plt']
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
-        plt.xlabel("Date", fontsize=10)
-        plt.ylabel(what, fontsize=10)
+        plt.xlabel("date", fontsize=10)
+        plt.ylabel(what[0], fontsize=10)
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
         for col in df.columns:
-            label = legend[col[1]] if legend else col
+            label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+
         plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
         plt.title(title)
         #return plt.gcf()
@@ -166,9 +167,15 @@ class visu_matplotlib:
         cmap = plt.get_cmap('Paired')
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
-        ax.set_title(title)
+        legend = kwargs.get('legend',None)
+        print('tiele' ,title)
+
         input_sorted = input.sort_values(by=what,ascending=True)
-        ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors)
+        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+            input_sorted['where'] = 'sum all location'
+        ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
+        ax.set_title(title)
+        plt.xlabel(what)
         #return plt.gcf()
 
     @decomatplotlib

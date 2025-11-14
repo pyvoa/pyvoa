@@ -83,6 +83,7 @@ class AllVisu:
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
             which = kwargs.get('which')
+            what = kwargs.get('what')
             input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
@@ -90,6 +91,11 @@ class AllVisu:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
             kwargs['input'] = input
+            kwargs['legend'] = None
+            if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+                kwargs['legend'] = 'sum all location'
+                if kwargs['kwargsuser']['typeofplot'] == 'date':
+                    kwargs['title'] = what[0] + ' time evolution'
             return func(self, **kwargs)
         return inner_plot
 
@@ -102,6 +108,7 @@ class AllVisu:
         def inner_hm(self, **kwargs):
             input = kwargs.get('input')
             which = kwargs.get('which')
+            what = kwargs.get('what')
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map':
@@ -116,7 +123,10 @@ class AllVisu:
             if (input[kwargs['what']] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
-
+            kwargs['legend'] = None
+            if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+                kwargs['legend'] = 'sum all location'
+                kwargs['title'] = func.__name__ + ' ' + kwargs['typeofhist']
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             return func(self, **kwargs)
