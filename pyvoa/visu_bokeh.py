@@ -208,7 +208,7 @@ class visu_bokeh:
     # Encode ton image locale
     @staticmethod
     def pyvoalogo():
-        with open("../../pyvoa/data/pyvoa_logo2.png", "rb") as f:
+        with open("../../pyvoa/data/pyvoa_logo2.jpg", "rb") as f:
             data = f.read()
         b64 = base64.b64encode(data).decode("utf-8")
         url = f"data:image/png;base64,{b64}"

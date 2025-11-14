@@ -35,6 +35,7 @@ import datetime as dt
 import matplotlib.dates as mdates
 from pyvoa.jsondb_parser import MetaInfo
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 
 class visu_matplotlib:
     '''
@@ -62,7 +63,10 @@ class visu_matplotlib:
 
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
-            fig, ax = plt.subplots(1, 1,figsize=(8, 4))
+            im = mpimg.imread('../../pyvoa/data/pyvoa_logo2.jpg')
+
+            fig, ax = plt.subplots(1, 1,figsize=(8, 5))
+            fig.figimage(im, xo=100, yo=100, alpha=.1)
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
@@ -81,6 +85,8 @@ class visu_matplotlib:
         plt.ylabel(what[0], fontsize=10)
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(1)
         for col in df.columns:
             label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)
@@ -168,7 +174,6 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
-        print('tiele' ,title)
 
         input_sorted = input.sort_values(by=what,ascending=True)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
