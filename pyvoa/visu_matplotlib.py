@@ -63,7 +63,7 @@ class visu_matplotlib:
 
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
-            im = mpimg.imread('../../pyvoa/data/pyvoa_logo2.jpg')
+            im = mpimg.imread(kwargs['logo'])
 
             fig, ax = plt.subplots(1, 1,figsize=(8, 5))
             fig.figimage(im, xo=100, yo=100, alpha=.1)
