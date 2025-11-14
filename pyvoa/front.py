@@ -292,6 +292,7 @@ class front:
                         default[k] = [kwargs[k]]
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
+            kwargs['kwargsuser'] = kwargs.copy()
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
                     kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
@@ -322,7 +323,7 @@ class front:
                     kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
-                kwargs['what'] = kwargs['which'] 
+                kwargs['what'] = kwargs['which']
             if kwargs['input'].empty:
                 raise PyvoaError('No data available for ' + str(where))
             return func(self,**kwargs)

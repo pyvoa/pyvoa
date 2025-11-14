@@ -675,6 +675,7 @@ class visu_bokeh:
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
         legend = kwargs.get('legend',None)
+        title = kwargs.get('title',None)
         panels = []
         listfigs = []
         cases_custom = visu_bokeh().rollerJS()
@@ -704,7 +705,7 @@ class visu_bokeh:
                     inputwhere = input.loc[input['where'] == loc].reset_index(drop = True)
                     pyvoa = ColumnDataSource(inputwhere)
                     if legend:
-                        leg = legend[loc]
+                        leg = legend
                     else:
                         leg = loc
                     r = fig.line(x = 'date', y = val, source = pyvoa,
@@ -751,6 +752,7 @@ class visu_bokeh:
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
             visu_bokeh().bokeh_legend(fig)
+            fig.title = title
             listfigs.append(fig)
         self.set_listfigures(listfigs)
         tabs = Tabs(tabs = panels)
@@ -1175,13 +1177,15 @@ class visu_bokeh:
         from bokeh.models import LogScale, LinearScale
 
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
-
             fig = dbokeh_figure[axis_type]
             fig.y_range = kwargs['yrange']
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
             label_dict = dict(zip(ytick_loc, [x[:10] for x in columndatasrc.data['where']]))
+            if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+                label_dict = {ytick_loc[0]:'sum all location'}
+
             fig.yaxis[0].major_label_overrides = label_dict
             fig.yaxis[0].formatter = NumeralTickFormatter(format="0.0")
 
@@ -1204,6 +1208,7 @@ class visu_bokeh:
                 line_width=1,
                 hover_line_width=2,
             )
+
 
             labels = LabelSet(
                 x='horihistotextx',
