@@ -246,11 +246,14 @@ class visu_bokeh:
                     minn = input.date.min()
                     x_center = minn + 0.5 * (maxx - minn)
                     y_center = 0.5 * max(input[what])
+                    fig.xaxis.axis_label = 'date'
+                    fig.yaxis.axis_label = str(what)
                 elif key == 'bokeh_figure_map':
                     continue
                 else:
                     x_center = 0.5 * max(input[what])
                     y_center = 0.5*self.figure_height
+                    fig.xaxis.axis_label = str(what)
                 fig.image_url(
                     url=[visu_bokeh().pyvoalogo()],
                     x=x_center,
@@ -1367,6 +1370,19 @@ class visu_bokeh:
         #bokeh_figure.add_tile("CartoDB Positron",retina=True)
         bokeh_figure.height = 350
         bokeh_figure.width = 450
+
+        xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
+        ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
+        bokeh_figure.image_url(
+            url=[visu_bokeh().pyvoalogo()],
+            x=0.5*(xmax-xmin),
+            y=0.5*(ymax-ymin),
+            w=bokeh_figure.width, w_units="screen",
+            h=bokeh_figure.height, h_units="screen",
+            anchor="center",
+            alpha=0.05
+        )
+
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
         mapoption = kwargs.get('mapoption')
