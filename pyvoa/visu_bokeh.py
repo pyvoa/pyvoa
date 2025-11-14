@@ -205,14 +205,6 @@ class visu_bokeh:
                   }
                   return s;*/
                 """)
-    # Encode ton image locale
-    @staticmethod
-    def pyvoalogo():
-        with open("../../pyvoa/data/pyvoa_logo2.jpg", "rb") as f:
-            data = f.read()
-        b64 = base64.b64encode(data).decode("utf-8")
-        url = f"data:image/png;base64,{b64}"
-        return url
 
     def deco_bokeh(func):
         @wraps(func)
@@ -237,7 +229,14 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
 
-            logo_url = visu_bokeh().pyvoalogo()
+            def pyvoalogo():
+                with open(kwargs['logo'], "rb") as f:
+                    data = f.read()
+                b64 = base64.b64encode(data).decode("utf-8")
+                url = f"data:image/png;base64,{b64}"
+                return url
+
+            logo_url = pyvoalogo()
             w_screen = width / 1.5
             h_screen = height / 3.5
             for key, fig in dicfig.items():
@@ -255,7 +254,7 @@ class visu_bokeh:
                     y_center = 0.5*self.figure_height
                     fig.xaxis.axis_label = str(what)
                 fig.image_url(
-                    url=[visu_bokeh().pyvoalogo()],
+                    url=[pyvoalogo()],
                     x=x_center,
                     y=y_center,
                     w=w_screen, w_units="screen",

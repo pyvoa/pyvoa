@@ -389,7 +389,7 @@ class DataParser:
       if 'date' in self.available_keywords:
           self.available_keywords.remove('date')
       if 'where' in self.available_keywords:
-         self.available_keywords.remove('where')   
+         self.available_keywords.remove('where')
       locationdb = list(pandas_db['where'].unique())
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}

@@ -41,6 +41,8 @@ except ImportError:
 if BOKEH_AVAILABLE:
     from pyvoa.visu_bokeh import visu_bokeh
 
+import importlib.resources as pkg_resources
+import pyvoa
 
 class AllVisu:
     """
@@ -73,6 +75,8 @@ class AllVisu:
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self.maxcountrydisplay  = 12
+        pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
+        self.logo = pathmetadb+'/pyvoa_logo2.jpg'
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
@@ -84,6 +88,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             what = kwargs.get('what')
+            kwargs['logo'] = self.logo
             input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
@@ -94,8 +99,8 @@ class AllVisu:
             kwargs['legend'] = None
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-                if kwargs['kwargsuser']['typeofplot'] == 'date':
-                    kwargs['title'] = what[0] + ' time evolution'
+            if kwargs['kwargsuser']['typeofplot'] == 'date':
+                kwargs['title'] = what[0] + ' time evolution'
             return func(self, **kwargs)
         return inner_plot
 
@@ -109,6 +114,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             what = kwargs.get('what')
+            kwargs['logo'] = self.logo
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map':
@@ -124,9 +130,13 @@ class AllVisu:
                 print("All values seems to be null ... nothing to plot")
                 return
             kwargs['legend'] = None
+            typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-                kwargs['title'] = func.__name__ + ' ' + kwargs['typeofhist']
+                if typeofhist:
+                    kwargs['title'] = func.__name__ + ' ' + typeofhist
+                else:
+                    kwargs['title'] = func.__name__
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             return func(self, **kwargs)
