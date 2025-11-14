@@ -75,6 +75,7 @@ class AllVisu:
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self.maxcountrydisplay  = 12
+        self.maxlettersdisplay = 10
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/pyvoa_logo2.jpg'
 
@@ -115,6 +116,7 @@ class AllVisu:
             which = kwargs.get('which')
             what = kwargs.get('what')
             kwargs['logo'] = self.logo
+            kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map':

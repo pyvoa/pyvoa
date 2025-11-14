@@ -174,10 +174,12 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
+        maxletters = kwargs['maxlettersdisplay']
 
         input_sorted = input.sort_values(by=what,ascending=True)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
+        input_sorted['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input_sorted['where']]
         ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
         ax.set_title(title)
         plt.xlabel(what)
