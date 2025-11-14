@@ -206,6 +206,14 @@ class visu_bokeh:
                   return s;*/
                 """)
 
+    @staticmethod
+    def pyvoalogo(logo):
+        with open(logo, "rb") as f:
+            data = f.read()
+        b64 = base64.b64encode(data).decode("utf-8")
+        url = f"data:image/png;base64,{b64}"
+        return url
+
     def deco_bokeh(func):
         @wraps(func)
         def innerdeco_bokeh(self,**kwargs):
@@ -214,6 +222,7 @@ class visu_bokeh:
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
             input['colors'] = input['where'].map(color_map)
             kwargs['input'] = input
+            logo = kwargs['logo']
             what = kwargs['what']
             if isinstance(what,list):
                 what =what[0]
@@ -229,14 +238,8 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
 
-            def pyvoalogo():
-                with open(kwargs['logo'], "rb") as f:
-                    data = f.read()
-                b64 = base64.b64encode(data).decode("utf-8")
-                url = f"data:image/png;base64,{b64}"
-                return url
 
-            logo_url = pyvoalogo()
+            logo_url = visu_bokeh.pyvoalogo(logo)
             w_screen = width / 1.5
             h_screen = height / 3.5
             for key, fig in dicfig.items():
@@ -254,7 +257,7 @@ class visu_bokeh:
                     y_center = 0.5*self.figure_height
                     fig.xaxis.axis_label = str(what)
                 fig.image_url(
-                    url=[pyvoalogo()],
+                    url=[logo_url],
                     x=x_center,
                     y=y_center,
                     w=w_screen, w_units="screen",
@@ -1377,10 +1380,12 @@ class visu_bokeh:
 
         xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
         ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
+        logo = kwargs['logo']
+        logo_url = visu_bokeh.pyvoalogo(logo)
         bokeh_figure.image_url(
-            url=[visu_bokeh().pyvoalogo()],
-            x=0.5*(xmax-xmin),
-            y=0.5*(ymax-ymin),
+            url=[logo_url],
+            x=0.25*bokeh_figure.width,
+            y=0.25*bokeh_figure.height,
             w=bokeh_figure.width, w_units="screen",
             h=bokeh_figure.height, h_units="screen",
             anchor="center",
