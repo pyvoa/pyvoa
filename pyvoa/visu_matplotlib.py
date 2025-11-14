@@ -64,9 +64,12 @@ class visu_matplotlib:
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
             im = mpimg.imread(kwargs['logo'])
-
-            fig, ax = plt.subplots(1, 1,figsize=(8, 5))
-            fig.figimage(im, xo=100, yo=100, alpha=.1)
+            h, w = im.shape[:2]
+            fig, ax = plt.subplots(1, 1,figsize=(10, 5))
+            fig_w, fig_h = fig.get_size_inches() * fig.dpi
+            xo = int(0.25*(fig_w-w))
+            yo = int(0.3 * fig_h)
+            fig.figimage(im, xo=xo, yo=yo, alpha=.1)
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
