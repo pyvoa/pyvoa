@@ -1166,7 +1166,7 @@ class visu_bokeh:
         dateslider = kwargs.get('dateslider')
         columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
-
+        maxletters = kwargs['maxlettersdisplay']
         dbokeh_figure = {
             'linear': kwargs.get('bokeh_figure_linear'),
             'log': kwargs.get('bokeh_figure_log')
@@ -1181,7 +1181,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-            label_dict = dict(zip(ytick_loc, [x[:10] for x in columndatasrc.data['where']]))
+            label_dict = dict(zip(ytick_loc, [x[:maxletters] for x in columndatasrc.data['where']]))
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 label_dict = {ytick_loc[0]:'sum all location'}
 
