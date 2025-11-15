@@ -115,6 +115,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             what = kwargs.get('what')
+            when = kwargs.get('when')
             kwargs['logo'] = self.logo
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             if not kwargs['dateslider']:
@@ -135,10 +136,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-                if typeofhist:
-                    kwargs['title'] = func.__name__ + ' ' + typeofhist
-                else:
-                    kwargs['title'] = func.__name__
+            kwargs['title'] = self.database_name + ' database at ' + when[0].split(':')[1]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             return func(self, **kwargs)

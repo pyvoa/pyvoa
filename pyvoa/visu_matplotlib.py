@@ -94,10 +94,9 @@ class visu_matplotlib:
             label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-
         plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
         plt.title(title)
-        #return plt.gcf()
+
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
@@ -159,10 +158,12 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
+        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+            input['where'] = 'sum all location'
+        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input['where']]
         input = input.set_index('where')
         input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='where', labeldistance=None,ax=ax)
-        return plt.gcf()
 
     @decomatplotlib
     def matplotlib_horizontal_histo(self,**kwargs):
@@ -186,7 +187,6 @@ class visu_matplotlib:
         ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
         ax.set_title(title)
         plt.xlabel(what)
-        #return plt.gcf()
 
     @decomatplotlib
     def matplotlib_histo(self,**kwargs):
@@ -199,9 +199,9 @@ class visu_matplotlib:
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         bins=len(input['where'])+1
+        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input_sorted['where']]
         input = pd.pivot_table(input,index='date', columns='where', values=what)
         input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
-        #return plt.gcf()
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
@@ -249,4 +249,3 @@ class visu_matplotlib:
 
         ax.set_axis_off()
         ax.set_title(title)
-        #return plt.gcf()
