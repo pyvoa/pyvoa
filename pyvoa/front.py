@@ -290,13 +290,15 @@ class front:
                         default[k] = kwargs[k]
                     else:
                         default[k] = [kwargs[k]]
+                default['when'] = kwargs['when']
+
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
+
             if kwargs['where'][0] == '':
                 if self.gpdbuilder:
                     kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
-
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
 

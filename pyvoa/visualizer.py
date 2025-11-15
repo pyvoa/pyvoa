@@ -89,6 +89,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             what = kwargs.get('what')
+            when = kwargs.get('when')
             kwargs['logo'] = self.logo
             input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
@@ -102,6 +103,7 @@ class AllVisu:
                 kwargs['legend'] = 'sum all location'
             if kwargs['kwargsuser']['typeofplot'] == 'date':
                 kwargs['title'] = what[0] + ' time evolution'
+            kwargs['title'] = self.database_name + ' time evolution between ' + str(when[0])
             return func(self, **kwargs)
         return inner_plot
 
