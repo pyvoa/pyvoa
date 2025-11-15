@@ -63,6 +63,7 @@ class visu_matplotlib:
 
     def decomatplotlib(func):
         def wrapper(self,**kwargs):
+            title = kwargs.get('title')
             im = mpimg.imread(kwargs['logo'])
             h, w = im.shape[:2]
             fig, ax = plt.subplots(1, 1,figsize=(10, 5))
@@ -80,7 +81,6 @@ class visu_matplotlib:
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
         what = kwargs.get('what')
-        title = kwargs.get('title')
         plt = kwargs['plt']
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
@@ -95,14 +95,12 @@ class visu_matplotlib:
             lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
-        plt.title(title)
 
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
         input = kwargs.get('input')
         what = kwargs.get('what')
-        title = kwargs.get('title')
         plt = kwargs['plt']
         ax = kwargs['ax']
         loc = list(input['where'].unique())
@@ -114,8 +112,6 @@ class visu_matplotlib:
             lines=plt.plot(pandy[what[0]], pandy[what[1]])
             leg.append(col)
         plt.legend(leg)
-        plt.title(title)
-        return plt.gcf()
 
     @decomatplotlib
     def matplotlib_yearly_plot(self,**kwargs):
@@ -142,8 +138,6 @@ class visu_matplotlib:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
             ax = plt.plot(df.index,df,label=f'{i}')
         plt.legend(d)
-        plt.title(title)
-        return plt.gcf()
 
     @decomatplotlib
     def matplotlib_pie(self,**kwargs):
