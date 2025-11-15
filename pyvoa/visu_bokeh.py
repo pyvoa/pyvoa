@@ -238,6 +238,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_map']        = figure(x_axis_type='mercator', y_axis_type='mercator')#, match_aspect=True)
             dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
+            dicfig['bokeh_figure_spiral']     = figure(width=width, height=height)
 
 
             logo_url = visu_bokeh.pyvoalogo(logo)
@@ -251,7 +252,7 @@ class visu_bokeh:
                     y_center = 0.5 * max(input[what])
                     fig.xaxis.axis_label = 'date'
                     fig.yaxis.axis_label = str(what)
-                elif key == 'bokeh_figure_map':
+                elif key == 'bokeh_figure_map' or key == 'bokeh_figure_spiral':
                     fig.title = title
                     continue
                 else:
@@ -776,7 +777,7 @@ class visu_bokeh:
         dicof={'title':kwargs.get('title')}
         dicof['match_aspect']=True
 
-        bokeh_figure = kwargs.get('bokeh_figure_linear')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
+        bokeh_figure = kwargs.get('bokeh_figure_spiral')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
 
         if len(input['where'].unique()) > 1 :
             print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
