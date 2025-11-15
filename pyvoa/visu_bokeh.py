@@ -224,6 +224,7 @@ class visu_bokeh:
             kwargs['input'] = input
             logo = kwargs['logo']
             what = kwargs['what']
+            title = kwargs['title']
             if isinstance(what,list):
                 what =what[0]
             width  = kwargs.get('width', self.figure_width)
@@ -251,6 +252,7 @@ class visu_bokeh:
                     fig.xaxis.axis_label = 'date'
                     fig.yaxis.axis_label = str(what)
                 elif key == 'bokeh_figure_map':
+                    fig.title = title
                     continue
                 else:
                     x_center = 0.5 * max(input[what])
@@ -265,6 +267,8 @@ class visu_bokeh:
                     anchor="center",
                     alpha=0.05
                 )
+                fig.title = title
+
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
         return innerdeco_bokeh
@@ -754,7 +758,7 @@ class visu_bokeh:
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
             visu_bokeh().bokeh_legend(fig)
-            fig.title = title
+
             listfigs.append(fig)
         self.set_listfigures(listfigs)
         tabs = Tabs(tabs = panels)
@@ -1235,7 +1239,6 @@ class visu_bokeh:
                 point_policy="snap_to_data"
             )
             fig.add_tools(hover_tool)
-
             panel = TabPanel(child=fig, title=axis_type)
             new_panels.append(panel)
 
@@ -1244,7 +1247,6 @@ class visu_bokeh:
         if dateslider:
             layout = column(controls, tabs)
             tabs = layout
-
         return tabs
 
 
