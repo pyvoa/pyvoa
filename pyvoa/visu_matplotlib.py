@@ -88,8 +88,6 @@ class visu_matplotlib:
         plt.ylabel(what[0], fontsize=10)
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         leg=[]
-        if isinstance(df.columns, pd.MultiIndex):
-            df.columns = df.columns.get_level_values(1)
         for col in df.columns:
             label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)

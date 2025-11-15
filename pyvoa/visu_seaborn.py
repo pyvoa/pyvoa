@@ -77,14 +77,11 @@ class visu_seaborn:
         def inner_plot(self, **kwargs):
             import matplotlib.pyplot as plt
             import seaborn as sns
-            fig, ax = plt.subplots(1, 1,figsize=(12, 8))
+            fig, ax = plt.subplots(1, 1,figsize=(8, 6))
+            title = kwargs.get('title')
+            plt.title(title)
             input = kwargs.get('input')
             which = kwargs.get('which')
-            title = f"Graphique de {which}"
-            if 'where' in kwargs:
-                title += f" - {kwargs.get('where')}"
-            kwargs['title'] = title
-            loc = list(input['where'].unique())
             kwargs['plt'] = plt
             kwargs['sns'] = sns
             return func(self, **kwargs)
@@ -119,7 +116,6 @@ class visu_seaborn:
         """
         input = kwargs['input']
         what = kwargs['what']
-        title = kwargs.get('title')
         plt = kwargs.get('plt')
         legend = kwargs.get('legend',None)
         sns = kwargs.get('sns')
@@ -140,12 +136,9 @@ class visu_seaborn:
                 style=label_col,
                 legend='full',
             )
-        plt.legend(title=what)
-        #plt.title(title)
-
+        plt.legend(title=what[0])
         plt.xlabel('Date')
         plt.xticks(rotation=45)
-        return plt.gcf()
 
     @decoplotseaborn
     def seaborn_yearly_plot(self, **kwargs):
@@ -171,51 +164,25 @@ class visu_seaborn:
                 label=str(i),    # la légende affichera les années
                 color=color
             )
-
-
         plt.title(title)
         plt.xlabel("Jour de l'année ")
         plt.ylabel(what)
         plt.legend(title="Anneé", bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
-        return plt.gcf()
 
     @decoplotseaborn
     def seaborn_versus_plot(self, **kwargs):
         input = kwargs['input']
         what = kwargs['what']
-        title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
         sns.lineplot(data=input, x=what[0], y=what[1], hue='where',color='colors')
         plt.legend(title = "where", loc= "upper right",bbox_to_anchor=(1.04, 1))
-        plt.title(title)
         plt.xlabel(what[0])
         plt.ylabel(what[1])
-        return plt.gcf()
-
 
     @decoplotseaborn
-    @decohistseaborn
-    def seaborn_hist(self, **kwargs):
-        """
-        Create a seaborn vertical histogram with which on y-axis.
-        """
-        filtered_input = kwargs['filtered_input']
-        what = kwargs['what']
-        title = kwargs.get('title')
-        legend = kwargs.get('legend',None)
-        # Créer le graphique
-        sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(14, 7))
-        sns.barplot(data=filtered_input, x='where', y=what, palette="viridis")
-        #plt.title(title)
-        plt.xlabel('')  # Suppression de l'étiquette de l'axe x
-        plt.ylabel(which)
-        plt.xticks(rotation=70, ha='center')  # Rotation à 70 degrés et alignement central
-        return plt.gcf()
-
     @decohistseaborn
     def seaborn_hist_value(self, **kwargs):
         """
@@ -223,17 +190,12 @@ class visu_seaborn:
         """
         input = kwargs['input']
         what = kwargs['what']
-        title = kwargs.get('title')
-        if isinstance(which, list):
-            which = which[0]
-
+        sns = kwargs.get('sns')
+        plt = kwargs.get('plt')
         sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(14, 7))
-        sns.histplot(data=filtered_input, x=what, bins=24, color='blue', kde=True)
-        plt.title(title)
-        plt.xlabel(which)
-        plt.ylabel('Fréquence')
-        return plt.gcf()
+        sns.histplot(data=input, x=what, bins=24, color='blue', kde=True)
+        plt.xlabel(what)
+        plt.ylabel('Frequency')
 
     ######SEABORN HIST HORIZONTALE#########
     @decoplotseaborn
@@ -249,12 +211,15 @@ class visu_seaborn:
         sns = kwargs.get('sns')
         legend = kwargs.get('legend',None)
         sns.set_theme(style="whitegrid")
+        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+            input['where'] = 'sum all location'
+        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input['where']]
         sns.barplot(data=input, x=what, y='where', palette="viridis", errorbar=None)
         #plt.title(title)
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        return plt.gcf()
+
 
     ######SEABORN BOXPLOT#########
     @decoplotseaborn
@@ -267,12 +232,10 @@ class visu_seaborn:
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(14, 7))
         plt.pie(input[what], labels=input['where'], autopct='%1.1f%%')
-        plt.xlabel(which)
+        plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)
-        return plt.gcf()
 
     ######SEABORN heatmap#########
     @decoplotseaborn
@@ -294,10 +257,8 @@ class visu_seaborn:
         total = data_pivot.sum().sum()
 
         sns.heatmap(data_pivot, annot=True, fmt=".1f", linewidths=.5, cmap='plasma')
-        plt.title(f'Heatmap of {which.replace("_", " ").capitalize()} by Month and Year')
         plt.xlabel('Year')
         plt.ylabel('Month')
 
         # Afficher le total en dehors du graphique
         plt.text(0, data_pivot.shape[0] + 1, f'Total: {total}', fontsize=12)
-        return plt.gcf()
