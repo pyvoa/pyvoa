@@ -45,7 +45,9 @@ import bisect
 from functools import wraps
 
 from pyvoa.jsondb_parser import MetaInfo
-
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.image as mpimg
 class visu_seaborn:
     ######SEABORN#########
     ######################
@@ -75,13 +77,15 @@ class visu_seaborn:
         """
         @wraps(func)
         def inner_plot(self, **kwargs):
-            import matplotlib.pyplot as plt
-            import seaborn as sns
-            fig, ax = plt.subplots(1, 1,figsize=(8, 6))
+            im = mpimg.imread(kwargs['logo'])
+            h, w = im.shape[:2]
+            fig, ax = plt.subplots(1, 1,figsize=(10, 5))
+            fig_w, fig_h = fig.get_size_inches() * fig.dpi
+            xo = int(0.25*(fig_w-w))
+            yo = int(0.3 * fig_h)
+            fig.figimage(im, xo=xo, yo=yo, alpha=.1)
             title = kwargs.get('title')
             plt.title(title)
-            input = kwargs.get('input')
-            which = kwargs.get('which')
             kwargs['plt'] = plt
             kwargs['sns'] = sns
             return func(self, **kwargs)
