@@ -12,3 +12,7 @@
 - [ ] date des données pour map et hist
 - [ ] lorsqu'on demande un hist pie, il y en a deux qui sortent
 - [ ] map bokeh mpoxgh HS
+- [ ] virer warning sur dateutil (e.g. pour JHU-USA)
+- [ ] virer warning sur geo_point_2d (e.g. pour SPF)
+- [ ] traits non continus avec seaborn
+- [ ] dans matplotlib / seaborn limiter le nom des pays (plot) 
