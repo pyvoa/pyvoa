@@ -87,12 +87,13 @@ class visu_matplotlib:
         plt.xlabel("date", fontsize=10)
         plt.ylabel(what[0], fontsize=10)
         df = pd.pivot_table(input,index='date', columns='where', values=what)
+        df.columns = df.columns.get_level_values(1)
         leg=[]
         for col in df.columns:
             label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        plt.legend(title="where", loc="upper left", fontsize=8, title_fontsize=10)
+        plt.legend(loc="upper left", fontsize=8, title_fontsize=10)
 
 
     @decomatplotlib
