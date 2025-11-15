@@ -42,7 +42,7 @@ import shapely.geometry as sg
 import datetime as dt
 import bisect
 from functools import wraps
-
+import datetime as dt
 from pyvoa.jsondb_parser import MetaInfo
 from bokeh.models import (
 ColumnDataSource,
@@ -239,11 +239,14 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
             dicfig['bokeh_figure_spiral']     = figure(width=width, height=height)
+            dicfig['bokeh_figure_yearly']       = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
 
 
             logo_url = visu_bokeh.pyvoalogo(logo)
             w_screen = width / 1.5
             h_screen = height / 3.5
+            w_units="screen"
+            h_units="screen"
             for key, fig in dicfig.items():
                 if key in ['bokeh_figure_linear_date','bokeh_figure_log_date']:
                     maxx = input.date.max()
@@ -252,9 +255,13 @@ class visu_bokeh:
                     y_center = 0.5 * max(input[what])
                     fig.xaxis.axis_label = 'date'
                     fig.yaxis.axis_label = str(what)
-                elif key == 'bokeh_figure_map' or key == 'bokeh_figure_spiral':
+                elif key == 'bokeh_figure_spiral':
+                    x_center = 0.
+                    y_center = 0.
                     fig.title = title
-                    continue
+                elif key == 'bokeh_figure_yearly':
+                    x_center = 365./2
+                    y_center = 0.5*max(input[what])
                 else:
                     x_center = 0.5 * max(input[what])
                     y_center = 0.5*self.figure_height
@@ -263,8 +270,8 @@ class visu_bokeh:
                     url=[logo_url],
                     x=x_center,
                     y=y_center,
-                    w=w_screen, w_units="screen",
-                    h=h_screen, h_units="screen",
+                    w=w_screen,
+                    h=h_screen, h_units=h_units,w_units=w_units,
                     anchor="center",
                     alpha=0.05
                 )
@@ -778,7 +785,6 @@ class visu_bokeh:
         dicof['match_aspect']=True
 
         bokeh_figure = kwargs.get('bokeh_figure_spiral')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
-
         if len(input['where'].unique()) > 1 :
             print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
@@ -975,8 +981,8 @@ class visu_bokeh:
         guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
         mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
         dbokeh_figure = {
-            'linear': kwargs.get('bokeh_figure_linear'),
-            'log': kwargs.get('bokeh_figure_log')
+            'linear': kwargs.get('bokeh_figure_yearly'),
+            'log': kwargs.get('bokeh_figure_yearly')
         }
 
         input = input.loc[input['where'] == input['where'][0]].copy()
@@ -1022,9 +1028,8 @@ class visu_bokeh:
                 cross= CrosshairTool()
                 fig.add_tools(cross)
 
-            if axis_type == 'linear':
-                if maxou  < 1e4 :
-                    fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
+
+            fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
 
             fig.legend.label_text_font_size = "12px"
             panel = TabPanel(child=fig, title = axis_type)
@@ -1035,12 +1040,12 @@ class visu_bokeh:
             fig.legend.click_policy="hide"
 
             minyear=input.date.min().year
-            labelspd=input.loc[(input.allyears.eq(2023)) & (input.date.dt.day.eq(1))]
-            fig.xaxis.ticker = list(labelspd['dayofyear'].astype(int))
-            replacelabelspd =  labelspd['date'].apply(lambda x: str(x.strftime("%b")))
-            #label_dict = dict(zip(input.loc[input.allyears.eq(minyear)]['daymonth'],input.loc[input.allyears.eq(minyear)]['date'].apply(lambda x: str(x.day)+'/'+str(x.month))))
-            fig.xaxis.major_label_overrides = dict(zip(list(labelspd['dayofyear'].astype(int)),list(replacelabelspd)))
 
+            months = pd.date_range("2023-01-01", "2023-12-01", freq="MS")
+            month_doys = months.dayofyear
+            month_labels = months.strftime("%b")
+            fig.xaxis.ticker = list(month_doys)
+            fig.xaxis.major_label_overrides = dict(zip(month_doys, month_labels))
             visu_bokeh().bokeh_legend(fig)
             listfigs.append(fig)
 
