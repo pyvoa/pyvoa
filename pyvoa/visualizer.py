@@ -94,16 +94,17 @@ class AllVisu:
             input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())[:self.maxcountrydisplay]
             input = input.loc[input['where'].isin(locunique)]
+            input['where'] = input['where'].cat.remove_unused_categories()
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-            kwargs['input'] = input
             kwargs['legend'] = None
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if kwargs['kwargsuser']['typeofplot'] == 'date':
                 kwargs['title'] = what[0] + ' time evolution'
             kwargs['title'] = self.database_name + ' time evolution between ' + str(when[0])
+            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_plot
 
@@ -274,7 +275,7 @@ class AllVisu:
             fig = visu_matplotlib().matplotlib_map(**kwargs)
         elif vis == 'seaborn':
             if mapoption:
-                PyvoaWarning("No mapoption is avalaible for matplotlib")
+                print("No map is avalaible for seaborn")
             fig = visu_seaborn().seaborn_heatmap(**kwargs)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
             if mapoption:

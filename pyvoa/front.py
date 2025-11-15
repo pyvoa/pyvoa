@@ -290,7 +290,7 @@ class front:
                         default[k] = kwargs[k]
                     else:
                         default[k] = [kwargs[k]]
-                default['when'] = kwargs['when']
+                default['when'] = kwargs.get('when')
 
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
