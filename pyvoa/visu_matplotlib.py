@@ -223,15 +223,15 @@ class visu_matplotlib:
                                 legend_kwds={'label': what,
                                 'orientation': "horizontal","pad": 0.001})
 
+        input = input.to_crs(epsg=3857)
         if tile == 'openstreet':
-            input = input.to_crs(epsg=3857)
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik)
         elif tile == 'esri':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
         elif tile == 'stamen':
-            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
+            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
             PyvoaWarning("Couldn't find stamen for matplolib use esri ....")
-            input = input.to_crs(epsg=4326)
+            #input = input.to_crs(epsg=4326)
         elif tile == 'positron':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.CartoDB.PositronNoLabels)
         else:

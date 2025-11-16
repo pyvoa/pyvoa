@@ -309,11 +309,10 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
             #if self.getkwargsvisu()['vis']:
-            #    pass
-
-            if kwargs['input'].empty:
-                kwargs = self.gpdbuilder.get_stats(**kwargs)
-
+            #
+            input = kwargs['input'].get('input')
+            if not input:
+                kwargs = self.gpdbuilder.get_stats(**kwargs)    
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('normalize:'):
@@ -326,8 +325,7 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
-            if kwargs['input'].empty:
-                raise PyvoaError('No data available for ' + str(where))
+
             return func(self,**kwargs)
         return wrapper
 
@@ -405,6 +403,7 @@ class front:
         """
         output = kwargs.get('output')
         pandy = kwargs.get('input')
+        where = kwargs.get('where')
 
         self.setnamefunction(self.get)
         if output == 'pandas':
