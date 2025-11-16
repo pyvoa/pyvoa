@@ -17,5 +17,7 @@
 - [ ] traits non continus avec seaborn
 - [X] dans matplotlib / seaborn limiter le nom des pays (plot)
 - [X] pf.hist(typeofhist='value')  plante (mpoxgh)
-- [ ] plantage quand seaborn non installé
-- [ ] impossible de faire un plot avec imed
+- [X] plantage quand seaborn non installé
+- [ ] impossible de faire un plot quelle que soit la base
+- [ ] quand folium installé, pas de plot avec ?  
+
