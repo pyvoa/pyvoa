@@ -106,9 +106,10 @@ class AllVisu:
             which = kwargs.get('which')
             what = kwargs.get('what')
             when = kwargs.get('when')
+            kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logo
             input = input.sort_values(by=['date']).reset_index(drop=True)
-            locunique = list(input['where'].unique())[:self.maxcountrydisplay]
+            locunique = list(input['where'].unique())
             input = input.loc[input['where'].isin(locunique)]
             input['where'] = input['where'].cat.remove_unused_categories()
             if kwargs['what'] in ['daily','weekly']:
@@ -121,6 +122,7 @@ class AllVisu:
                 kwargs['title'] = what[0] + ' time evolution'
             kwargs['title'] = self.database_name + ' time evolution between ' + str(when[0])
             kwargs['input'] = input
+            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             return func(self, **kwargs)
         return inner_plot
 
