@@ -119,6 +119,10 @@ class visu_seaborn:
         Create a seaborn line plot with date on x-axis and which on y-axis.
         """
         input = kwargs['input']
+        nb = kwargs['maxlettersdisplay']
+        loca = list(input['where'].unique())[:kwargs['maxcountrydisplay']]
+        input = input[input['where'].isin(loca)]
+        input['where'] = [k[:nb] for k in input['where']]
         what = kwargs['what']
         plt = kwargs.get('plt')
         legend = kwargs.get('legend',None)
@@ -127,7 +131,7 @@ class visu_seaborn:
         df = input.copy()
         for idx, i in enumerate(what):
             label_col = f'where_{i}'
-            df[label_col] = df['where'].astype(str) + ', ' + i
+            df[label_col] = df['where']
             label_name = legend.get(i, i) if legend else i
             if st and idx < len(st):
                 dashes = st[idx]
@@ -140,7 +144,7 @@ class visu_seaborn:
                 style=label_col,
                 legend='full',
             )
-        plt.legend(title=what[0])
+        plt.legend(title='Locations')
         plt.xlabel('Date')
         plt.xticks(rotation=45)
 

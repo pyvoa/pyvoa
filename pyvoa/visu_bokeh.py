@@ -722,6 +722,7 @@ class visu_bokeh:
                         leg = legend
                     else:
                         leg = loc
+                    leg = leg[:kwargs['maxlettersdisplay']]
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      color = color, line_width = 3,
                                      legend_label = leg,

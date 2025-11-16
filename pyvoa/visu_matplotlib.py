@@ -80,6 +80,11 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
+        input = kwargs['input']
+        nb = kwargs['maxlettersdisplay']
+        loca = list(input['where'].unique())[:kwargs['maxcountrydisplay']]
+        input = input[input['where'].isin(loca)]
+        input['where'] = [k[:nb] for k in input['where']]
         what = kwargs.get('what')
         plt = kwargs['plt']
         ax = kwargs['ax']
