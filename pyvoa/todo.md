@@ -1,19 +1,19 @@
-- [ ] titles
-- [ ] ylabel matplotlib avec des crochets
-- [ ] pas de ylabel ni xlabel avec bokeh
-- [ ] pas de nom de db sur les graphs
-- [ ] pas de nom de la variable avec les histo
-- [ ] ©pyvoa à rajouter
-- [ ] filigrane à ajouter dans bokeh et matplotlib
-- [ ] bug sumall
-- [ ] dans listoption il y a un ' ' 
+- [X] titles
+- [X] ylabel matplotlib avec des crochets
+- [X] pas de ylabel ni xlabel avec bokeh
+- [X] pas de nom de db sur les graphs
+- [X] pas de nom de la variable avec les histo
+- [NO] ©pyvoa à rajouter 
+- [X] filigrane à ajouter dans bokeh et matplotlib
+- [X] bug sumall
+- [X] dans listoption il y a un ' ' 
 - [ ] dessiner les pays même quand il n'y a pas de données 
 - [ ] unifier les typeofhist typeofmap mapoption, etc. … 
-- [ ] date des données pour map et hist
-- [ ] lorsqu'on demande un hist pie, il y en a deux qui sortent
-- [ ] map bokeh mpoxgh HS
+- [X] date des données pour map et hist
+- [X] lorsqu'on demande un hist pie, il y en a deux qui sortent
+- [X] map bokeh mpoxgh HS
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] traits non continus avec seaborn
-- [ ] dans matplotlib / seaborn limiter le nom des pays (plot)
-- [ ] pf.hist(typeofhist='value')  plante (mpoxgh)
+- [X] dans matplotlib / seaborn limiter le nom des pays (plot)
+- [X] pf.hist(typeofhist='value')  plante (mpoxgh)
