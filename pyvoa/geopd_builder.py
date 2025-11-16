@@ -67,14 +67,14 @@ class GPDBuilder(object):
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self._gi = coge.GeoInfo()
-
+        self.alllocationsgeo = None
         try:
             if self.granularity == 'country':
                    self.geo = coge.GeoManager('name')
                    geopan = gpd.GeoDataFrame()#crs="EPSG:4326")
                    info = coge.GeoInfo()
-                   allcountries = self.geo.get_GeoRegion().get_countries_from_region('world')
-                   geopan['where'] = [self.geo.to_standard(c)[0] for c in allcountries]
+                   self.alllocationsgeo = self.geo.get_GeoRegion().get_countries_from_region('world')
+                   geopan['where'] = [self.geo.to_standard(c)[0] for c in self.alllocationsgeo]
                    geopan = info.add_field(field=['geometry'],input=geopan ,geofield='where')
                    geopan = gpd.GeoDataFrame(geopan, geometry=geopan.geometry, crs="EPSG:4326")
                    geopan = geopan[geopan['where'] != 'Antarctica']
@@ -92,10 +92,12 @@ class GPDBuilder(object):
                              tmp = where_kindgeo.rename(columns={'name_region': 'where'})
                              tmp = tmp.loc[tmp.code_region=='999']
                              self.boundary_metropole =tmp['geometry'].total_bounds
+                        self.alllocationsgeo = self.geo.get_data()
                    elif self.granularity == 'subregion':
                         list_dep_metro = None
                         where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
                         where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
+                        self.alllocationsgeo = self.geo.get_data(True)
                    else:
                        raise PyvoaTypeError('What is the granularity of your  database ?')
         except:
@@ -204,6 +206,7 @@ class GPDBuilder(object):
         input = kwargs['input']
         which = kwargs['which']
         where = kwargs['where']
+
         #where = [i.title() for i in where]
         option = kwargs['option']
         newpd = pd.DataFrame()
@@ -230,7 +233,6 @@ class GPDBuilder(object):
                 temp['where'] = len(temp)*[wherejoined]
                 temp['code'] = len(temp)*[codejoined]
                 temp['geometry'] = len(temp)*[geometryjoined]
-
                 if newpd.empty:
                     newpd = temp
                 else:
@@ -239,9 +241,12 @@ class GPDBuilder(object):
             where = flat_list(where)
             if self.db_world:
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
+                self.alllocationsgeo = self.geo.to_standard(self.alllocationsgeo,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
+                self.alllocationsgeo = self.subregions_deployed(self.alllocationsgeo,self.granularity)
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
+
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
         where_geometry_none = newpd[newpd['geometry'].isna()]['where'].unique()
         if where_geometry_none.size>0:
@@ -273,11 +278,10 @@ class GPDBuilder(object):
 
        if input.empty:
            input = self.currentdata.get_maingeopandas()
-           kwargs['input'] = input
+
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
-       kwargs['input'] = input
 
        input['date'] = pd.to_datetime(input['date'], errors='coerce')
        when_beg_data, when_end_data = input.date.min(), input.date.max()
@@ -303,19 +307,20 @@ class GPDBuilder(object):
        ndates = len(datesunique)
        nietcountries = []
        for w in which:
-           kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].bfill()
-           kwargs['input'].loc[:,w] = kwargs['input'].groupby('where')[w].ffill()
-           where_alldate_nan = kwargs['input'].groupby('where')[w].apply(lambda x: x.isna().all())
+           input.loc[:,w] = input.groupby('where')[w].bfill()
+           input.loc[:,w] = input.groupby('where')[w].ffill()
+           where_alldate_nan = input.groupby('where')[w].apply(lambda x: x.isna().all())
            wherenan = where_alldate_nan[where_alldate_nan].index.tolist()
            if wherenan:
                PyvoaWarning('drop ' + str(wherenan) +' : value is NAN for all the date  ')
-           kwargs['input'] = kwargs['input'].loc[~kwargs['input']['where'].isin(wherenan)]
-           #kwargs['which'] = w
-           kwargs['input'] = self.whereclustered(**kwargs)
+           input = input.loc[~input['where'].isin(wherenan)]
+
+           kwargs['input'] = input
+           input = self.whereclustered(**kwargs)
 
            wconcatpd = pd.DataFrame()
            for o in option:
-               temppd = kwargs['input']
+               temppd = input
                if o == 'nonneg':
                    if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
                         print('The default option nonneg cannot be used with instantaneous data, such as : ' + w)
@@ -351,32 +356,30 @@ class GPDBuilder(object):
            if bypopvalue is not None:
               for i in [w+' daily',w+' weekly']:
                  input = self.normbypop(input, i ,bypopvalue)
-           kwargs['input'] = input
-           kwargs['input'] = kwargs['input'].reset_index(drop=True)
 
        if 'geometry' in input.columns:
-          kwargs['input'] = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
+         input = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):
            kwargs['which'] = [kwargs['which']]
        where_ordered_bylastvalues = list(
-            kwargs['input']
+            input
             .groupby('where')
             .tail(1)
             .sort_values(by=kwargs['which'][0], ascending=False)['where']
             .unique()
             )
-       kwargs['input']['where'] = pd.Categorical(
-            kwargs['input']['where'],
+       input['where'] = pd.Categorical(
+            input['where'],
             categories=where_ordered_bylastvalues,
             ordered=True
             )
-       kwargs['input'] = kwargs['input'].sort_values(by=['where','date'])
+       input = input.sort_values(by=['where','date'])
 
        prefix = ['date', 'where', 'code']
        suffix = ['geometry']
-       others = sorted([c for c in kwargs['input'].columns if c not in prefix + suffix])
+       others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
-       kwargs['input'] = kwargs['input'][new_order]
+       kwargs['input'] = input[new_order].reset_index(drop=True)
        if nietcountries:
            print('No available data for where = ', nietcountries)
        return kwargs
