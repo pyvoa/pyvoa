@@ -28,8 +28,6 @@ import geopandas as gpd
 import pandas as pd
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwarg_options import InputOption
-from pyvoa.visu_matplotlib import visu_matplotlib
-from pyvoa.visu_seaborn import visu_seaborn
 from pyvoa.error import *
 
 try:
@@ -37,6 +35,24 @@ try:
     BOKEH_AVAILABLE = True
 except ImportError:
     BOKEH_AVAILABLE = False
+
+try:
+    import matplotlib
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+
+try:
+    import seaborn
+    SEABORN_AVAILABLE = True
+except ImportError:
+    SEABORN_AVAILABLE = False
+
+if MATPLOTLIB_AVAILABLE:
+    from pyvoa.visu_matplotlib import visu_matplotlib
+
+if SEABORN_AVAILABLE:
+    from pyvoa.visu_seaborn import visu_seaborn
 
 if BOKEH_AVAILABLE:
     from pyvoa.visu_bokeh import visu_bokeh
