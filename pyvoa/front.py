@@ -2,14 +2,14 @@
 '''
 
 # -*- coding: utf-8 -*-
-Project : PyvoA
-Date :    april 2020 - mai 2025
+Project : Pyvoa
+Date :    april 2020 - november 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pyvoa_fr
+Copyright ©pyvoa_org
 License: See joint LICENSE file
 https://pyvoa.org/
 
-Date :    April 2020 - May 2025
+Date :    April 2020 - November 2025
 '''
 
 # --- Imports ----------------------------------------------------------
