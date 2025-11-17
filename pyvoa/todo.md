@@ -1,23 +1,15 @@
-- [X] titles
-- [X] ylabel matplotlib avec des crochets
-- [X] pas de ylabel ni xlabel avec bokeh
-- [X] pas de nom de db sur les graphs
-- [X] pas de nom de la variable avec les histo
-- [NO] ©pyvoa à rajouter 
-- [X] filigrane à ajouter dans bokeh et matplotlib
-- [X] bug sumall
-- [X] dans listoption il y a un ' ' 
+- [ ] titles matplotlib absents
+- [ ] pas de nom de db sur les graphs avec matplotlib 
+- [ ] bug sumall sur seaborn
 - [ ] dessiner les pays même quand il n'y a pas de données 
 - [ ] unifier les typeofhist typeofmap mapoption, etc. … 
-- [X] date des données pour map et hist
-- [X] lorsqu'on demande un hist pie, il y en a deux qui sortent
-- [X] map bokeh mpoxgh HS
+- [ ] map bokeh mpoxgh HS setlocalepbl ? 
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] traits non continus avec seaborn
-- [X] dans matplotlib / seaborn limiter le nom des pays (plot)
-- [X] pf.hist(typeofhist='value')  plante (mpoxgh)
-- [X] plantage quand seaborn non installé
-- [ ] impossible de faire un plot quelle que soit la base
+- [ ] pf.hist(typeofhist='value')  plante (mpoxgh)
 - [ ] quand folium installé, pas de plot avec ?  
-
+- [ ] seaborn : ralonger les noms coupés à 20 caractères
+- [ ] seaborn : mettre des … dans les plot
+- [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
+- [ ] pas de map en seaborn ? 
