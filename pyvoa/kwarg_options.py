@@ -71,7 +71,6 @@ class InputOption():
                         'tile' : ['openstreet','esri','stamen','positron'],\
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
-                        'mapoption':['text','textinteger','spark','label%','log','unsorted','dense'],\
                         'guideline':[False,True],\
                         'ax_type':['linear', 'log']
                         }
