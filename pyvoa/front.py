@@ -312,7 +312,7 @@ class front:
             #
             input = kwargs['input'].get('input')
             if not input:
-                kwargs = self.gpdbuilder.get_stats(**kwargs)    
+                kwargs = self.gpdbuilder.get_stats(**kwargs)
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('normalize:'):
