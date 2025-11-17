@@ -127,21 +127,18 @@ class visu_seaborn:
         plt = kwargs.get('plt')
         legend = kwargs.get('legend',None)
         sns = kwargs.get('sns')
-        st=['-','--',':']
+        st={k:i for k,i in  enumerate(['-','--',':'])}
         df = input.copy()
         for idx, i in enumerate(what):
             label_col = f'where_{i}'
             df[label_col] = df['where']
             label_name = legend.get(i, i) if legend else i
-            if st and idx < len(st):
-                dashes = st[idx]
-
             sns.lineplot(
                 data=df,
                 x='date',
                 y=i,
                 hue=label_col,
-                style=label_col,
+                linestyle=st[idx],
                 legend='full',
             )
         plt.legend(title='Locations')
