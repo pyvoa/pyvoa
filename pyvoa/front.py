@@ -86,7 +86,7 @@ class front:
         get(**kwargs): Retrieves and processes data based on the specified output format.
         listoutput(): Returns the list of currently available output types for the get() function.
         listvis(): Returns the list of currently available visualizations for the map() function.
-        listwhom(detailed=False): Returns the list of currently available GPDBuilders for geopd_builder data in PyCoA.
+        listwhom(detailed=False): Returns the list of currently available GPDBuilders for geopd_builder data in Pyvoa.
         listwhat(): Returns the list of currently available types of series.
         listhist(): Returns the list of currently available types of histograms.
         listplot(): Returns the list of currently available types of plots.
@@ -1047,7 +1047,7 @@ class front:
             None
         """
         global _db
-        kwargs_keystesting(kwargs, ['pandas','saveformat','savename'], 'Bad args used in the pycoa.saveoutput function.')
+        kwargs_keystesting(kwargs, ['pandas','saveformat','savename'], 'Bad args used in the pyvoa.saveoutput function.')
         pandy = kwargs.get('pandas', pd.DataFrame())
         saveformat = kwargs.get('saveformat', 'excel')
         savename = kwargs.get('savename', '')
@@ -1073,7 +1073,7 @@ class front:
             The result of the database merger operation.
         """
         global _db
-        kwargs_keystesting(kwargs,['coapandas'], 'Bad args used in the pycoa.merger function.')
+        kwargs_keystesting(kwargs,['coapandas'], 'Bad args used in the pyvoa.merger function.')
         listpandy = kwargs.get('coapandas',[])
         return _db.merger(coapandas = listpandy)
 

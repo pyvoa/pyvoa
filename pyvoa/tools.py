@@ -46,11 +46,11 @@ _coacache_module_info = importlib.util.find_spec("coacache")
 if _coacache_module_info != None:
     _coacache_folder = _coacache_module_info.submodule_search_locations[0]
 
-# Verbosity of pycoa
+# Verbosity of pyvoa
 _verbose_mode = 1 # default
 pklpath = ".cache/"
 # ----------------------------------------------------
-# --- Usefull functions for pycoa.--------------------
+# --- Usefull functions for pyvoa.--------------------
 # ----------------------------------------------------
 def get_verbose_mode():
     """Return the verbose mode
@@ -319,7 +319,7 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     One may add a suffix to the local filename if known.
     """
 
-    tmpdir=os.path.join(gettempdir(),"pycoa.data"+"_"+getuser())
+    tmpdir=os.path.join(gettempdir(),"pyvoa.data"+"_"+getuser())
     if not os.path.exists(tmpdir):
         os.makedirs(tmpdir)
 

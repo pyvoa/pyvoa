@@ -488,7 +488,7 @@ class GeoInfo():
     """GeoInfo class definition. No inheritance from any other class.
 
     It should raise only PyvoaError and derived exceptions in case
-    of errors (see pycoa.error)
+    of errors (see pyvoa.error)
     """
 
     _list_field={\
@@ -820,7 +820,7 @@ class GeoRegion():
     class.
 
     It should raise only PyvoaError and derived exceptions in case
-    of errors (see pycoa.error)
+    of errors (see pyvoa.error)
     """
 
     _source_dict={"UN_M49":"https://en.wikipedia.org/w/index.php?title=UN_M49&oldid=986603718", # pointing the previous correct ref . https://en.wikipedia.org/wiki/UN_M49",\
