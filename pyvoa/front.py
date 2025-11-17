@@ -68,7 +68,6 @@ class front:
         lwhat (list): List of available 'what' options for data processing.
         lhist (list): List of available histogram types.
         loption (list): List of available options for data processing.
-        lmapoption (list): List of available map options.
         ltiles (list): List of available tile options for maps.
         largument (list): List of available keyword argument keys for chart functions.
         listchartkargsvalues (list): List of available keyword argument values for chart functions.
@@ -115,7 +114,6 @@ class front:
         self.lplot = list(self.av.d_graphicsinput_args['typeofplot'])
         self.loption = list(self.av.d_batchinput_args['option'])
 
-        self.lmapoption = list(self.av.d_graphicsinput_args['mapoption'])
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
 
         self.largument = self.av.listargument
@@ -211,19 +209,7 @@ class front:
 
     def help(self,):
         return h.display_full_help()
-
-
-    @staticmethod
-    def create_legend(mylist):
-        legend={}
-        for i in mylist:
-            w = i.split(',')
-            if len(w)>3:
-                legend[i]=str(w[:3]).replace('[','').replace(']','')+'...'
-            else:
-                legend[i]=w[0]
-        return legend
-
+        
     def input_wrapper(func):
         """
         Decorator for handling input argument testing and formatting for
@@ -703,19 +689,6 @@ class front:
         """
         return self.lpop
 
-    def listmapoption(self):
-        """Returns the value of the lmapoption attribute.
-
-        This method retrieves the current setting of the lmapoption attribute from the instance.
-
-        Returns:
-            The value of the lmapoption attribute.
-        """
-        if self.av.pdcharts[self.vis]['map']:
-            return self.av.pdcharts[self.vis]['map']
-        else:
-            raise PyvoaError('Map not implement for '+ self.vis)
-
     def getwhom(self, db = None, detailed=False,return_error=True):
         """Retrieves the database instance associated with the current object.
 
@@ -863,7 +836,6 @@ class front:
                 self: The instance of the class.
                 **kwargs: Additional keyword arguments that may include:
                     - where (str): A condition to filter data.
-                    - mapoption (str): Options for mapping, which may include 'dense'.
                     - output: Optional output parameter (ignored in processing).
                     - bypop: Optional population parameter (ignored in processing).
                     - dateslider: Optional date slider parameter (default is None).
@@ -877,14 +849,13 @@ class front:
             """
             input = kwargs.get('input')
             where = kwargs.get('where')
-            mapoption = kwargs.get('mapoption')
 
             if 'output' in kwargs:
                 kwargs.pop('output')
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
-            mapoption = kwargs.get('mapoption', None)
+            maption = None
             if 'dense' in mapoption:
                 if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
                     self.gpdbuilder.gettypeofgeometry().set_dense_geometry()

@@ -67,6 +67,7 @@ class visu_matplotlib:
             im = mpimg.imread(kwargs['logo'])
             h, w = im.shape[:2]
             fig, ax = plt.subplots(1, 1,figsize=(10, 5))
+            ax.set_title(title)
             fig_w, fig_h = fig.get_size_inches() * fig.dpi
             xo = int(0.25*(fig_w-w))
             yo = int(0.3 * fig_h)
@@ -91,6 +92,7 @@ class visu_matplotlib:
         legend = kwargs.get('legend',None)
         plt.xlabel("date", fontsize=10)
         plt.ylabel(what[0], fontsize=10)
+        input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
         df = pd.pivot_table(input,index='date', columns='where', values=what)
         df.columns = df.columns.get_level_values(1)
         leg=[]
@@ -156,9 +158,10 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
+        nb = kwargs.get('maxlettersdisplay')
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
-        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input['where']]
+        input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
         input = input.set_index('where')
         input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='where', labeldistance=None,ax=ax)
@@ -181,7 +184,7 @@ class visu_matplotlib:
         input_sorted = input.sort_values(by=what,ascending=True)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
-        input_sorted['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input_sorted['where']]
+        input_sorted['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input_sorted['where']]
         ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
         ax.set_title(title)
         plt.xlabel(what)
@@ -197,7 +200,10 @@ class visu_matplotlib:
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         bins=len(input['where'])+1
-        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input_sorted['where']]
+
+        maxletters = kwargs['maxlettersdisplay']
+        input['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input['where']]
+
         input = pd.pivot_table(input,index='date', columns='where', values=what)
         input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
 
@@ -216,7 +222,6 @@ class visu_matplotlib:
         plt.axis('off')
         input = kwargs.get('input')
         what = kwargs.get('what')
-        mapoption = kwargs.get('mapoption')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
         input.plot(column = what, ax=ax,legend=True,
@@ -236,14 +241,6 @@ class visu_matplotlib:
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.CartoDB.PositronNoLabels)
         else:
             PyvoaError("Don't know what kind of tile is it ...")
-
-        if 'text' in mapoption:
-            centroids = input['geometry'].centroid
-            for idx, centroid in enumerate(centroids):
-                if centroid:
-                    x, y = centroid.x, centroid.y
-                    annotation = input.iloc[idx][what]
-                    annotation =  annotation.round(2)
 
         ax.set_axis_off()
         ax.set_title(title)

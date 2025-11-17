@@ -64,7 +64,7 @@ if BOKEH_AVAILABLE:
     from pyvoa.visu_bokeh import visu_bokeh
 
 if FOLIUM_AVAILABLE:
-    from pyvoa.visu_folium import visu_folium    
+    from pyvoa.visu_folium import visu_folium
 
 import importlib.resources as pkg_resources
 import pyvoa
@@ -294,25 +294,12 @@ class AllVisu:
         FILL IT
         '''
         vis = kwargs.get('vis')
-        mapoption = kwargs.get('mapoption')
         input = kwargs.get('input')
         if vis == 'matplotlib':
-            if mapoption:
-                PyvoaWarning("No mapoption is avalaible for matplotlib")
             fig = visu_matplotlib().matplotlib_map(**kwargs)
         elif vis == 'seaborn':
-            if mapoption:
-                print("No map is avalaible for seaborn")
             fig = visu_seaborn().seaborn_heatmap(**kwargs)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
-            if mapoption:
-                if 'spark' in mapoption or 'spiral' in mapoption:
-                    fig = visu_bokeh().pycoa_pimpmap(**kwargs)
-                elif 'text' or 'exploded' or 'dense' in mapoption:
-                    fig = visu_bokeh().bokeh_map(**kwargs)
-                else:
-                    PyvoaWarning("What kind of pimp map you want ?!")
-            else:
                 fig = visu_bokeh().bokeh_map(**kwargs)
         elif vis == 'folium':
             fig = visu_folium().folium_map(**kwargs)

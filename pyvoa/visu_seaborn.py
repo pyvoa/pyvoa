@@ -88,6 +88,10 @@ class visu_seaborn:
             plt.title(title)
             kwargs['plt'] = plt
             kwargs['sns'] = sns
+            input = kwargs['input']
+            nb = kwargs['maxlettersdisplay']
+            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
+            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_plot
 
@@ -122,7 +126,6 @@ class visu_seaborn:
         nb = kwargs['maxlettersdisplay']
         loca = list(input['where'].unique())[:kwargs['maxcountrydisplay']]
         input = input[input['where'].isin(loca)]
-        input['where'] = [k[:nb] for k in input['where']]
         what = kwargs['what']
         plt = kwargs.get('plt')
         legend = kwargs.get('legend',None)
@@ -132,7 +135,7 @@ class visu_seaborn:
         for idx, i in enumerate(what):
             label_col = f'where_{i}'
             df[label_col] = df['where']
-            label_name = legend.get(i, i) if legend else i
+            label_name = legend if legend else i
             sns.lineplot(
                 data=df,
                 x='date',

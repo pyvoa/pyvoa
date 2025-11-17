@@ -296,7 +296,6 @@ class visu_bokeh:
                 print('dateslider not implemented in this current version ...')
                 dateslider = False
 
-            mapoption = kwargs.get('mapoption')
             maxcountrydisplay = kwargs['maxcountrydisplay']
 
             input_uniquecountries = input.drop_duplicates(subset=["where"]).drop(columns=['date']).reset_index(drop=True)
@@ -578,7 +577,10 @@ class visu_bokeh:
     def bokeh_plot(func):
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
-            kwargs['input'] = kwargs['input'].drop(columns='geometry')
+            input=kwargs['input']
+            nb = kwargs['maxlettersdisplay']
+            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
+            kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
         return  inner_bokeh_plot
 
@@ -688,7 +690,6 @@ class visu_bokeh:
         what = kwargs.get('what')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
-        legend = kwargs.get('legend',None)
         title = kwargs.get('title',None)
         panels = []
         listfigs = []
@@ -701,7 +702,6 @@ class visu_bokeh:
 
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
             fig = dbokeh_figure[axis_type]
-
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
 
@@ -718,14 +718,9 @@ class visu_bokeh:
                     color = input['colors'][input['where']==loc].iloc[0]
                     inputwhere = input.loc[input['where'] == loc].reset_index(drop = True)
                     pyvoa = ColumnDataSource(inputwhere)
-                    if legend:
-                        leg = legend
-                    else:
-                        leg = loc
-                    leg = leg[:kwargs['maxlettersdisplay']]
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      color = color, line_width = 3,
-                                     legend_label = leg,
+                                     legend_label = loc,
                                      hover_line_width = 4, name = val, line_dash=line_style[i%4])
                     r_list.append(r)
                     maxou=max(maxou,np.nanmax(inputwhere[val]))
@@ -1176,7 +1171,6 @@ class visu_bokeh:
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
         mode = kwargs.get('mode')
-        mapoption = kwargs.get('mapoption')
         dateslider = kwargs.get('dateslider')
         columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
@@ -1403,7 +1397,6 @@ class visu_bokeh:
 
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
-        mapoption = kwargs.get('mapoption')
         min_col, max_col, min_col_non0 = 3*[0.]
         try:
             if dateslider:
@@ -1419,22 +1412,11 @@ class visu_bokeh:
 
 
         invViridis256 = Viridis256[::-1]
-        #if mapoption and 'log' in mapoption:
-        #    color_mapper = LogColorMapper(palette=invViridis256, low=min_col_non0, high=max_col, nan_color='#ffffff')
-        #else:
-        #    color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
-
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
         color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
 
-        if mapoption and 'label%' in mapoption:
-            color_bar.formatter = BasicTickFormatter(use_scientific=False)
-            color_bar.formatter = NumeralTickFormatter(format="0.0%")
-
         bokeh_figure.add_layout(color_bar, 'below')
-        #self.bokeh_figure().add_layout(Title(text=self.subtitle, text_font_size="8pt", text_font_style="italic"), 'below')
-
         bokeh_figure.xaxis.visible = False
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
@@ -1445,40 +1427,6 @@ class visu_bokeh:
         fill_color = {'field': what, 'transform': color_mapper},
         line_color = 'black', line_width = 0.25)
 
-        '''
-        xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
-        ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
-
-        x_center = xmin + 0.5 * (xmax - xmin)
-        y_center = ymin + 0.5 * (ymax - ymin)
-        bokeh_figure.image_url(
-                url=[visu_bokeh().pyvoalogo()],
-                x=x_center,
-                y=y_center,
-                w=self.figure_width / 1.5, w_units="screen",
-                h=self.figure_height / 3.5, h_units="screen",
-                anchor="center",
-                alpha=0.05
-            )
-        '''
-        '''
-        if mapoption:
-            if 'text' in mapoption or 'textinteger' in mapoption:
-                if 'textinteger' in mapoption:
-                    columndatasrc.data[what] = columndatasrc.data[what].astype(float).astype(int).astype(str)
-                input.loc[:,'centroidx'] = input['geometry'].to_crs(3035).centroid.x
-                input.loc[:,'centroidy'] = input['geometry'].to_crs(3035).centroid.y
-                labels = LabelSet(
-                    x = 'centroidx',
-                    y = 'centroidy',
-                    text = 'cases',
-                    source = columndatasrc, text_font_size='10px',text_color='white',background_fill_color='grey',background_fill_alpha=0.5)
-                bokeh_figure.add_layout(labels)
-        '''
-        #callback = CustomJS(code="""
-        #//document.getElementsByClassName('bk-tooltip')[0].style.backgroundColor="transparent";
-        #document.getElementsByClassName('bk-tooltip')[0].style.opacity="0.7";
-        #""" )
         tooltips = f"""
                     <b>location: @where<br>
                     cases: @{what} </b>
@@ -1486,8 +1434,6 @@ class visu_bokeh:
 
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
         formatters = {'where': 'printf', '@right': 'printf',})),
-        #point_policy = "snap_to_data",callback=callback))  # ,PanTool())
-
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
