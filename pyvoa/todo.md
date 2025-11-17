@@ -6,10 +6,10 @@
 - [ ] map bokeh mpoxgh HS setlocalepbl ? 
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
-- [ ] traits non continus avec seaborn
+- [X] traits non continus avec seaborn
 - [ ] pf.hist(typeofhist='value')  plante (mpoxgh)
-- [ ] quand folium installé, pas de plot avec ?  
+- [X] quand folium installé, pas de plot avec ?  
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : mettre des … dans les plot
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
-- [ ] pas de map en seaborn ? 
+- [NON] pas de map en seaborn ? 
