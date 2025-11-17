@@ -1,15 +1,16 @@
-- [ ] titles matplotlib absents
-- [ ] pas de nom de db sur les graphs avec matplotlib 
-- [ ] bug sumall sur seaborn
+- [X] titles matplotlib absents
+- [X] pas de nom de db sur les graphs avec matplotlib 
+- [X] bug sumall sur seaborn
 - [ ] dessiner les pays même quand il n'y a pas de données 
-- [ ] unifier les typeofhist typeofmap mapoption, etc. … 
+- [X] unifier les typeofhist typeofmap mapoption, etc. … 
+- [X] virer listmaptoption et mapoption
 - [ ] map bokeh mpoxgh HS setlocalepbl ? 
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [X] traits non continus avec seaborn
-- [ ] pf.hist(typeofhist='value')  plante (mpoxgh)
+- [X] pf.hist(typeofhist='value')  plante (mpoxgh)
 - [X] quand folium installé, pas de plot avec ?  
-- [ ] seaborn : ralonger les noms coupés à 20 caractères
-- [ ] seaborn : mettre des … dans les plot
+- [X] seaborn : ralonger les noms coupés à 20 caractères
+- [X] seaborn : mettre des … dans les plot
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
 - [NON] pas de map en seaborn ? 
