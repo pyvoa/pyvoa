@@ -33,7 +33,6 @@ import io
 from io import BytesIO
 import base64
 import copy
-import locale
 import inspect
 import importlib
 
@@ -1269,14 +1268,6 @@ class visu_bokeh:
         df['text_size'] = '8pt'
 
         df['textdisplayed'] = df['where'].str.pad(36, side = "left")
-        try:
-            locale.setlocale(locale.LC_ALL, 'en_US')
-        except:
-            try:
-                locale.setlocale(locale.LC_ALL, 'en_US.utf8')
-            except:
-                raise PyvoaError("Locale setting problem. Please contact support@pyvoa.org")
-
         df['textdisplayed2'] =  ['      '+str(round(100*i,1))+'%' for i in df['percentage']]
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed']=''
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed2']=''
