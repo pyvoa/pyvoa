@@ -48,6 +48,12 @@ try:
 except ImportError:
     SEABORN_AVAILABLE = False
 
+try:
+    import folium
+    FOLIUM_AVAILABLE = True
+except ImportError:
+    FOLIUM_AVAILABLE = False
+
 if MATPLOTLIB_AVAILABLE:
     from pyvoa.visu_matplotlib import visu_matplotlib
 
@@ -56,6 +62,9 @@ if SEABORN_AVAILABLE:
 
 if BOKEH_AVAILABLE:
     from pyvoa.visu_bokeh import visu_bokeh
+
+if FOLIUM_AVAILABLE:
+    from pyvoa.visu_folium import visu_folium    
 
 import importlib.resources as pkg_resources
 import pyvoa
@@ -306,7 +315,7 @@ class AllVisu:
             else:
                 fig = visu_bokeh().bokeh_map(**kwargs)
         elif vis == 'folium':
-            fig = visu_matplotlib().bokeh_mapfolium(**kwargs)
+            fig = visu_folium().folium_map(**kwargs)
         else:
             raise PyvoaError('Waiting for a valid visualisation. So far: \'bokeh\', \'folium\' or \'matplotlib\' \
             aka matplotlib .See help.')
