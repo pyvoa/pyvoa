@@ -3,8 +3,8 @@ import argparse
 # Basic metadata
 __version__ = '3.0.1'
 __author__ = 'Tristan Beau, Julien Browaeys, Olivier Dadoun'
-__github__ = 'https://github.com/src.project/pycoa'
-__web__ = 'http://pycoa.fr/'
+__github__ = 'https://github.com/pyvoa/pyvoa'
+__web__ = 'http://pyvoa.org/'
 
 # ANSI color codes
 BLUE = "\033[94m"
@@ -37,7 +37,7 @@ def display_full_help():
         ('listplot', "List available plot types"),
         ('listtile', "List available map textures"),
         ('listvisu', "List available visualization options for maps"),
-        ('dir(pycoa)', "Display all available methods")
+        ('dir(pyvoa)', "Display all available methods")
     ]
     for command, description in list_commands:
         print(f"  {GREEN}{command.ljust(30)}{RESET}{description}")
@@ -83,11 +83,11 @@ def display_full_help():
     # -------------------------
     print(f"{BLUE}{BOLD}Examples:{RESET}\n")
     examples = [
-        ('listwhich', "pycoa.listwhich()"),
-        ('plot', "pycoa.plot(where=['France', 'Italy', 'United Kingdom'])"),
-        ('map', "pycoa.map(where='world', what='daily', when='01/04/2020')"),
-        ('hist', "pycoa.hist(where='Middle Africa', which='tot_confirmed', what='cumul')"),
-        ('get', "pycoa.get(where='USA', what='daily', which='tot_recovered', output='pandas')")
+        ('listwhich', "pyvoa.listwhich()"),
+        ('plot', "pyvoa.plot(where=['France', 'Italy', 'United Kingdom'])"),
+        ('map', "pyvoa.map(where='world', what='daily', when='01/04/2020')"),
+        ('hist', "pyvoa.hist(where='Middle Africa', which='tot_confirmed', what='cumul')"),
+        ('get', "pyvoa.get(where='USA', what='daily', which='tot_recovered', output='pandas')")
     ]
     for cmd, ex in examples:
         print(f"  {GREEN}{cmd.ljust(30)}{RESET}{BOLD}{ex}{RESET}")

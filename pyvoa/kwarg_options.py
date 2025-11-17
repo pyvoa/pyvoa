@@ -13,7 +13,7 @@ Module : pyvoa.kwarg_options
 About :
 -------
 
-An interface module to easily plot pycoa_data with bokeh
+An interface module to easily plot pyvoa_data with bokeh
 
 """
 from pyvoa.tools import kwargs_keystesting

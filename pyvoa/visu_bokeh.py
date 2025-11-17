@@ -1275,7 +1275,7 @@ class visu_bokeh:
             try:
                 locale.setlocale(locale.LC_ALL, 'en_US.utf8')
             except:
-                raise PyvoaError("Locale setting problem. Please contact support@pycoa_fr")
+                raise PyvoaError("Locale setting problem. Please contact support@pyvoa.org")
 
         df['textdisplayed2'] =  ['      '+str(round(100*i,1))+'%' for i in df['percentage']]
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed']=''

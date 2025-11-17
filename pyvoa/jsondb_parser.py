@@ -48,7 +48,7 @@ class MetaInfo:
         It returns a dictionnary with:
             * key: epidemiological variable
             * values:
-                - new variable name for pycoa.purpose, if needed. By default is an empty string ''
+                - new variable name for pyvoa.purpose, if needed. By default is an empty string ''
                 - desciption of the variable. By default is an empty string '' but it is highly recommended to describe the variable
                 - url of the csv where the epidemiological variable is
                 - url of the master i.e where some general description could be located. By default is an empty string ''
@@ -178,7 +178,7 @@ class MetaInfo:
 
       def test(dico,lm):
           sig = 1
-          msg = 'pycoa.json meta structure is validated'
+          msg = 'pyvoa.json meta structure is validated'
           for i in lm:
               try:
                  dico[i]
@@ -229,7 +229,7 @@ class DataParser:
             self.get_echoinfo()
         except:
             raise PyvoaDbError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
-                "You may contact support@pycoa.fr. Thanks.")
+                "You may contact contact@pyvoa.org . Thanks.")
 
   def get_echoinfo(self):
       info('Few information concernant the selected database : ', self.db)

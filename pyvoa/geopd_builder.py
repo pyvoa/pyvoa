@@ -49,7 +49,7 @@ class GPDBuilder(object):
    """
    def __init__(self, db_name):
         """
-            Main pycoa.class:
+            Main pyvoa.class:
             - call the get_parser
             - call the geo
             - call the display
@@ -437,14 +437,14 @@ class GPDBuilder(object):
 
    def saveoutput(self,**kwargs):
        '''
-       saveoutput pycoa. pandas as an  output file selected by output argument
-       'pandas': pycoa.pandas
+       saveoutput pyvoa. pandas as an  output file selected by output argument
+       'pandas': pycvoa.pandas
        'saveformat': excel or csv (default excel)
-       'savename': pycoa.ut (default)
+       'savename': pyvoa.out (default)
        '''
        possibleformat=['excel','csv']
        saveformat = 'excel'
-       savename = 'pycoa.ut'
+       savename = 'pyvoa.out'
        pandyori = ''
        if 'saveformat' in kwargs:
             saveformat = kwargs['saveformat']

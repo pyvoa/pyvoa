@@ -13,7 +13,7 @@ Module : pyvoa.visualizer
 About :
 -------
 
-An interface module to easily plot pycoa_data with bokeh
+An interface module to easily plot pyvoa_data with bokeh
 
 """
 from functools import wraps
@@ -88,9 +88,9 @@ class AllVisu:
         verb("Init of AllVisu() with db=" + str(db_name))
         self.database_name = db_name
         self.currentmetadata = MetaInfo().getcurrentmetadata(db_name)
-        self.setchartsfunctions = [method for method in dir(AllVisu) if callable(getattr(AllVisu, method)) and method.startswith("pycoa_") and not method.startswith("__")]
+        self.setchartsfunctions = [method for method in dir(AllVisu) if callable(getattr(AllVisu, method)) and method.startswith("pyvoa_") and not method.startswith("__")]
         self.geopan = gpd.GeoDataFrame()
-        self.pycoa_geopandas = False
+        self.pyvoa_geopandas = False
         self.geom = []
         self.listfigs = []
         self.dchartkargs = {}

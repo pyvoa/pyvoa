@@ -11,7 +11,7 @@ Module : pyvoa.visu_folium
 About :
 -------
 
-An interface module to easily plot pycoa_data with bokeh
+An interface module to easily plot pyvoa_data with bokeh
 
 """
 import folium
