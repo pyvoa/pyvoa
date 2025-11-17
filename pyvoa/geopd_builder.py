@@ -241,10 +241,10 @@ class GPDBuilder(object):
             where = flat_list(where)
             if self.db_world:
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
-                self.alllocationsgeo = self.geo.to_standard(self.alllocationsgeo,output='list',interpret_region=True)
+                #self.alllocationsgeo = self.geo.to_standard(self.alllocationsgeo,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
-                self.alllocationsgeo = self.subregions_deployed(self.alllocationsgeo,self.granularity)
+                #self.alllocationsgeo = self.subregions_deployed(self.alllocationsgeo,self.granularity)
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
 
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
