@@ -1,6 +1,6 @@
 - [ ] dessiner les pays même quand il n'y a pas de données 
 - [ ] ajouter un typeofmap (notamment pour l'option dense)
-- [ ] map et hist bokeh mpoxgh HS setlocalepbl ? 
+- [X] map et hist bokeh mpoxgh HS setlocalepbl ? 
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
