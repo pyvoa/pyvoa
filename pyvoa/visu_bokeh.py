@@ -68,6 +68,8 @@ DatetimeTickFormatter,
 Legend,
 LegendItem,
 Text,
+Div,
+Row
 )
 from bokeh.models import (
     Toggle
@@ -225,7 +227,7 @@ class visu_bokeh:
             what = kwargs['what']
             title = kwargs['title']
             if isinstance(what,list):
-                what =what[0]
+                what = what[0]
             width  = kwargs.get('width', self.figure_width)
             height = kwargs.get('height',self.figure_height)
             input = kwargs['input']
@@ -247,35 +249,10 @@ class visu_bokeh:
             w_units="screen"
             h_units="screen"
             for key, fig in dicfig.items():
-                if key in ['bokeh_figure_linear_date','bokeh_figure_log_date']:
-                    maxx = input.date.max()
-                    minn = input.date.min()
-                    x_center = minn + 0.5 * (maxx - minn)
-                    y_center = 0.5 * max(input[what])
-                    fig.xaxis.axis_label = 'date'
-                    fig.yaxis.axis_label = str(what)
-                elif key == 'bokeh_figure_spiral':
-                    x_center = 0.
-                    y_center = 0.
-                    fig.title = title
-                elif key == 'bokeh_figure_yearly':
-                    x_center = 365./2
-                    y_center = 0.5*max(input[what])
-                else:
-                    x_center = 0.5 * max(input[what])
-                    y_center = 0.5*self.figure_height
-                    fig.xaxis.axis_label = str(what)
-                fig.image_url(
-                    url=[logo_url],
-                    x=x_center,
-                    y=y_center,
-                    w=w_screen,
-                    h=h_screen, h_units=h_units,w_units=w_units,
-                    anchor="center",
-                    alpha=0.05
-                )
                 fig.title = title
-
+                dicfig[key]=fig
+            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:200px; opacity: 0.1"></div>')
+            kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
         return innerdeco_bokeh
@@ -648,7 +625,7 @@ class visu_bokeh:
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
 
             fig.legend.label_text_font_size = "12px"
-            panel = TabPanel(child=fig, title=axis_type)
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title=axis_type)
             panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
 
@@ -748,7 +725,7 @@ class visu_bokeh:
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
 
             fig.legend.label_text_font_size = "12px"
-            panel = TabPanel(child=fig, title = axis_type)
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
             panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
 
@@ -938,7 +915,7 @@ class visu_bokeh:
             fig.add_layout(Legend(items = [li1, li2]))
             fig.legend.location = 'top_left'
             layout = row(column(row(s1, s2), row(fig)))
-            panel = TabPanel(child = layout, title = axis_type)
+            panel = TabPanel(child=Row(layout,kwargs['watermark']), title = axis_type)
             panels.append(panel)
 
         tabs = Tabs(tabs = panels)
@@ -1027,7 +1004,7 @@ class visu_bokeh:
             fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
 
             fig.legend.label_text_font_size = "12px"
-            panel = TabPanel(child=fig, title = axis_type)
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
             panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
 
@@ -1160,7 +1137,7 @@ class visu_bokeh:
 
             fig.quad(source=ColumnDataSource(frame_histo), top='top', bottom=bottom, left='left', \
                              right='right', fill_color='colors')
-            panel = TabPanel(child=fig, title=axis_type_title)
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title=axis_type_title)
             panels.append(panel)
         tabs = Tabs(tabs=panels)
         return tabs
@@ -1239,7 +1216,7 @@ class visu_bokeh:
                 point_policy="snap_to_data"
             )
             fig.add_tools(hover_tool)
-            panel = TabPanel(child=fig, title=axis_type)
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title=axis_type)
             new_panels.append(panel)
 
         tabs = Tabs(tabs=new_panels)
