@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """
 Project : PyvoA
-Date :    april 2020 - november 2025
+Date :    april 2020 - march 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pyvoa_org
+Copyright ©pyvoa_fr
 License: See joint LICENSE file
 https://pyvoa.org/
 
@@ -49,7 +49,7 @@ class GPDBuilder(object):
    """
    def __init__(self, db_name):
         """
-            Main pyvoa.class:
+            Main pycoa.class:
             - call the get_parser
             - call the geo
             - call the display
@@ -206,13 +206,17 @@ class GPDBuilder(object):
         input = kwargs['input']
         which = kwargs['which']
         where = kwargs['where']
+        option=kwargs.get('option')
+        dpop = InputOption().dictpop
 
-        #where = [i.title() for i in where]
-        option = kwargs['option']
+        has_normalize = any(o.startswith("normalize:") for o in option)
+        has_sumall = "sumall" in option
+
+        which = kwargs.get('which')
         newpd = pd.DataFrame()
         if not isinstance(where[0],list):
             where = [where]
-        if 'sumall' in option:
+        if has_sumall:
             for w in where:
                 temp = pd.DataFrame()
                 if not isinstance(w,list):
@@ -223,20 +227,37 @@ class GPDBuilder(object):
                     w_s = self.geo.to_standard(w,output='list',interpret_region=True)
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
+
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
+                if has_normalize:
+                    for idx,i in enumerate(dpop.keys()):
+                        if idx==0:
+                            temptemp = self.normbypop(temp,which[0],i)
+                        else:
+                            temptemp = pd.merge(temptemp,self.normbypop(temp,which[0],i),how="outer")
+                    temp = temptemp
+
                 temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="EPSG:4326").reset_index(drop=True)
                 wherejoined  = ',' .join(flat_list(w))
                 code = temp.loc[temp.date==temp.date.max()]['code']
                 codejoined  = ',' .join(code)
+                if has_normalize:
+                    population = temp.loc[temp.date==temp.date.max()]['population']
+                    populationsum = np.nansum(population)
+
                 geometryjoined = temp.loc[temp.date == temp.date.max()]["geometry"].unary_union
                 temp = temp.groupby(['date'])[which].sum().reset_index()
+
                 temp['where'] = len(temp)*[wherejoined]
                 temp['code'] = len(temp)*[codejoined]
                 temp['geometry'] = len(temp)*[geometryjoined]
+                if has_normalize:
+                    temp['population'] = len(temp)*[populationsum]
                 if newpd.empty:
                     newpd = temp
                 else:
                     newpd = pd.concat([newpd,temp])
+
         else:
             where = flat_list(where)
             if self.db_world:
@@ -305,8 +326,10 @@ class GPDBuilder(object):
        bypopvalue = None
        datesunique = list(input.date.unique())
        ndates = len(datesunique)
-       nietcountries = []
+
        for w in which:
+           option = kwargs.get('option',defaultargs['option'][0])
+
            input.loc[:,w] = input.groupby('where')[w].bfill()
            input.loc[:,w] = input.groupby('where')[w].ffill()
            where_alldate_nan = input.groupby('where')[w].apply(lambda x: x.isna().all())
@@ -317,6 +340,15 @@ class GPDBuilder(object):
 
            kwargs['input'] = input
            input = self.whereclustered(**kwargs)
+           has_normalize = any(o.startswith("normalize:") for o in option)
+           has_sumall = "sumall" in option
+
+           if has_sumall and has_normalize:
+                option.remove('sumall')
+                normalize = [x for x in option if x.startswith('normalize:')]
+                option = [x for x in option if not x.startswith('normalize:')]
+                normalize = re.sub(r'normalize:', '', normalize[0])
+                option.append('sumallandnormalize:'+normalize)
 
            wconcatpd = pd.DataFrame()
            for o in option:
@@ -336,10 +368,14 @@ class GPDBuilder(object):
                     else:
                         temppd = temppd.groupby(['where','code','date','geometry']).sum(numeric_only=True).reset_index()
                elif o.startswith('normalize:'):
-                     input = self.normbypop(input, w ,o)
-                     kwargs['input'] = input
+                     temppd = self.normbypop(temppd , w ,o)
+                     kwargs['input'] = temppd
                      temppd = self.whereclustered(**kwargs)
                      bypopvalue=o
+               elif o.startswith('sumallandnormalize:'):
+                    bypop = re.sub(r'sumalland', '', o)
+                    dpop = InputOption().dictpop
+                    temppd.loc[:,w+' '+bypop]=temppd[w]/temppd ['population']*dpop[re.sub(r'normalize:', '', bypop)]
 
                if wconcatpd.empty:
                     wconcatpd = temppd
@@ -380,11 +416,9 @@ class GPDBuilder(object):
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        kwargs['input'] = input[new_order].reset_index(drop=True)
-       if nietcountries:
-           print('No available data for where = ', nietcountries)
        return kwargs
 
-   def normbypop(self, pandy, val2norm ,bypop):
+   def normbypop(self, pandy , val2norm ,bypop):
     """
         Return a pandas with a normalisation column add by population
         * can normalize by '100', '1k', '100k' or '1M' and the new which
@@ -394,9 +428,10 @@ class GPDBuilder(object):
         raise PyvoaError('normbypop problem, your pandas seems to be empty ....')
     value = re.sub(r'normalize:', '', bypop)
     clust = list(pandy['where'].unique())
-    pop_field='population'
-    uniquepandy = pandy.groupby('where').first().reset_index()
 
+    pop_field='population'
+
+    uniquepandy = pandy.groupby('where').first().reset_index()
     if self.db_world == True:
         try:
             uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population',overload=True)
@@ -437,14 +472,14 @@ class GPDBuilder(object):
 
    def saveoutput(self,**kwargs):
        '''
-       saveoutput pyvoa. pandas as an  output file selected by output argument
-       'pandas': pycvoa.pandas
+       saveoutput pycoa. pandas as an  output file selected by output argument
+       'pandas': pycoa.pandas
        'saveformat': excel or csv (default excel)
-       'savename': pyvoa.out (default)
+       'savename': pycoa.ut (default)
        '''
        possibleformat=['excel','csv']
        saveformat = 'excel'
-       savename = 'pyvoa.out'
+       savename = 'pycoa.ut'
        pandyori = ''
        if 'saveformat' in kwargs:
             saveformat = kwargs['saveformat']
