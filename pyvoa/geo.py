@@ -39,6 +39,7 @@ import shapely.ops as so
 import bs4
 import numpy as np
 import io
+import math
 
 from pyvoa.tools import verb,kwargs_test,get_local_from_url,dotdict,tostdstring
 from pyvoa.error import *
@@ -1308,7 +1309,7 @@ class GeoCountry():
             com_df=pd.DataFrame([{'Code département':'980','population_subregion':(5985+10124+34065+281674+12067)}])
             pop_fra=pd.concat([pop_fra,com_df]).reset_index()
             #pop_fra=pop_fra.append(com_df).reset_index()
-            geo_com=self._country_data[self._country_data.code_subregion.isin(['975','977','978','986','987'])][['geometry']]
+            geo_com=self._country_data[self._country_data.code_subregion.isin(['975','977','978','986','987'])][['geometry']] # resp. Saint-Pierre-et-Miquelon, Saint-Barthélemy, Saint-Martin, Wallis et Futuna, Polynésie française
             geo_com['smthing']=0
             geo_com=geo_com.dissolve(by='smthing')['geometry']
             self._country_data=pd.concat([self._country_data,\
@@ -1703,7 +1704,10 @@ class GeoCountry():
             self._country_data['geometry']=tmp
 
             # Remove COM with dense geometry true, too many islands to manage
-            self._country_data=self._country_data[self._country_data.code_subregion!='980']
+            #self._country_data=self._country_data[self._country_data.code_subregion!='980']
+            frcomdata=self._country_data[self._country_data.code_subregion=='980']
+            comdensedata = pack_polygons_grid_by_area(self._country_data[self._country_data.code_subregion=='980'].explode(), gap=0.05, x=-11,y=37,ascending=True)
+            self._country_data.loc[self._country_data.code_subregion=='980','geometry'] = sg.MultiPolygon(comdensedata.geometry.values)
 
         elif self.get_country() == 'USA':
             tmp = []
@@ -2449,3 +2453,103 @@ class GeoCountry():
         prop.append('code_subregion')
         return data.merge(self.get_data(region_merging)[prop],how='left',left_on=input_key,\
                             right_on=geofield)
+
+# Other Geometrical usefull functions...
+
+def pack_polygons_grid_by_area(gdf, gap=0.0, x=0.0, y=0.0, n_cols=None, ascending=False):
+    """
+    Place polygons from a GeoDataFrame / GeoSeries into a grid, sorted by area.
+
+    Parameters
+    ----------
+    gdf : GeoDataFrame or GeoSeries
+        Contains Shapely polygons.
+    gap : float
+        Minimum spacing (in coordinate units) between the bounding boxes
+        of polygons, horizontally and vertically.
+    x : float
+        Additionnal translation in x (default 0.)
+    y : float
+        Additionnal translation in y (default 0.)
+    n_cols : int or None
+        Number of columns in the grid.
+        If None, compute approx. sqrt(n) for a roughly square grid.
+    ascending : bool
+        If False (default): largest polygons first.
+        If True : smallest polygons first.
+
+    Returns
+    -------
+    Same type as input (GeoDataFrame or GeoSeries),
+    with translated geometries and reindexed by area.
+    """
+    # Normalize to GeoDataFrame to preserve attributes if any
+    input_is_geoseries = isinstance(gdf, gpd.GeoSeries)
+    if input_is_geoseries:
+        df = gpd.GeoDataFrame(geometry=gdf, crs=gdf.crs)
+    else:
+        df = gdf.copy()
+
+    # Compute polygon areas and sort
+    df["area_tmp__"] = df.geometry.area
+    df = df.sort_values("area_tmp__", ascending=ascending).reset_index(drop=True)
+
+    # Compute bounding box sizes
+    widths = []
+    heights = []
+    for geom in df.geometry:
+        if geom.is_empty:
+            continue
+        minx, miny, maxx, maxy = geom.bounds
+        widths.append(maxx - minx)
+        heights.append(maxy - miny)
+
+    # If all geometries are empty, return the sorted geometries only
+    if len(widths) == 0:
+        df = df.drop(columns=["area_tmp__"])
+        return df.geometry if input_is_geoseries else df
+
+    max_w = max(widths)
+    max_h = max(heights)
+
+    # Size of each cell in the grid (max bounding box + gap)
+    cell_w = max_w + gap
+    cell_h = max_h + gap
+
+    n = len(df)
+    if n_cols is None:
+        n_cols = int(math.ceil(math.sqrt(n)))  # approx. square grid
+    n_rows = int(math.ceil(n / n_cols))
+
+    new_geoms = []
+
+    for idx, geom in enumerate(df.geometry):
+        if geom.is_empty:
+            new_geoms.append(geom)
+            continue
+
+        # Row and column index in the grid (0-based)
+        row = idx // n_cols
+        col = idx % n_cols
+
+        # Origin (bottom-left corner) of the grid cell
+        cell_x = col * cell_w
+        cell_y = row * cell_h
+
+        minx, miny, maxx, maxy = geom.bounds
+
+        # Align the lower-left corner of the bounding box to (cell_x, cell_y)
+        dx = cell_x - minx
+        dy = cell_y - miny
+
+        new_geom = sa.translate(geom, xoff=dx+x, yoff=dy+y)
+        new_geoms.append(new_geom)
+
+    df = df.drop(columns=["area_tmp__"])
+    df["geometry"] = new_geoms
+
+    # Return result in the same type as input
+    if input_is_geoseries:
+        return df.geometry
+    else:
+        return df
