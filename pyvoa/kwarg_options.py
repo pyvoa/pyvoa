@@ -66,7 +66,7 @@ class InputOption():
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['location','value','pie'],\
                         'typeofplot':['date','compare','versus','spiral','yearly'],
-                        'typeofmap':['dense'],\
+                        'typeofmap':['not dense','dense'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','folium','seaborn'],\
                         'tile' : ['openstreet','esri','stamen','positron'],\

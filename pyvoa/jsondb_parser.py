@@ -324,6 +324,7 @@ class DataParser:
                 pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
             else:
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
+
           if drop and not debug:
               for key,val in drop.items():
                   if key in pandas_temp.columns:
@@ -332,7 +333,6 @@ class DataParser:
                       for i in val:
                             pandas_temp = pandas_temp.dropna(subset=[key])
                             pandas_temp = pandas_temp[~(pandas_temp[key].str.startswith(i))]
-                      #pandas_temp = pandas_temp.loc[~pandas_temp[key].isin(val)]
 
           if selections:
               for key,val in selections.items():
@@ -433,6 +433,7 @@ class DataParser:
           PyvoaError("what locationmode in your json file is supposed to be ?")
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
+
       pandas_db = pandas_db.merge(geopd[['code','geometry']], how = 'inner', on='code')
       return pandas_db
 
