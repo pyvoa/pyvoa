@@ -209,7 +209,7 @@ class front:
 
     def help(self,):
         return h.display_full_help()
-        
+
     def input_wrapper(func):
         """
         Decorator for handling input argument testing and formatting for
@@ -294,8 +294,7 @@ class front:
 
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
-            #if self.getkwargsvisu()['vis']:
-            #
+
             input = kwargs['input'].get('input')
             if not input:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
@@ -849,14 +848,13 @@ class front:
             """
             input = kwargs.get('input')
             where = kwargs.get('where')
-
+            mapoption = kwargs.get('typeofmap')
             if 'output' in kwargs:
                 kwargs.pop('output')
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
-            maption = None
-            if 'dense' in mapoption:
+            if mapoption == 'dense':
                 if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
                     self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
                     new_geo = self.gpdbuilder.geo.get_data()
@@ -865,10 +863,13 @@ class front:
                     new_geo['where'] = new_geo['where'].apply(lambda x: x.upper())
 
                     new_geo = new_geo.set_index('where')['geometry'].to_dict()
-
                     input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
                     input['where'] = input['where'].apply(lambda x: x.title())
                     kwargs['input'] = input
+            elif mapoption == 'not dense':
+                kwargs['input'] = input
+            else:
+                raise PyvoaError('Argument not reconized ... '+mapoption)
             return func(self,**kwargs)
         return inner
 
