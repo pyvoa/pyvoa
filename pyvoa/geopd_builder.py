@@ -162,7 +162,6 @@ class GPDBuilder(object):
         exploded = []
         for i in listloc:
             if typeloc == 'subregion':
-                #print(i,self.geo.is_region(i),self.geo.is_subregion(i))
                 if self.geo.is_region(i):
                     i = [self.geo.is_region(i)]
                     tmp = self.geo.get_subregions_from_list_of_region_names(i,output='name')
