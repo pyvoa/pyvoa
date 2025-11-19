@@ -5,3 +5,4 @@
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
+- [ ] pbl proportions logo pyvoa avec bokeh
