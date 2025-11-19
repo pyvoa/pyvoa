@@ -67,14 +67,13 @@ class GPDBuilder(object):
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self._gi = coge.GeoInfo()
-        self.alllocationsgeo = None
         try:
             if self.granularity == 'country':
                    self.geo = coge.GeoManager('name')
                    geopan = gpd.GeoDataFrame()#crs="EPSG:4326")
                    info = coge.GeoInfo()
-                   self.alllocationsgeo = self.geo.get_GeoRegion().get_countries_from_region('world')
-                   geopan['where'] = [self.geo.to_standard(c)[0] for c in self.alllocationsgeo]
+                   alllocationsgeo = self.geo.get_GeoRegion().get_countries_from_region('world')
+                   geopan['where'] = [self.geo.to_standard(c)[0] for c in alllocationsgeo]
                    geopan = info.add_field(field=['geometry'],input=geopan ,geofield='where')
                    geopan = gpd.GeoDataFrame(geopan, geometry=geopan.geometry, crs="EPSG:4326")
                    geopan = geopan[geopan['where'] != 'Antarctica']
@@ -92,12 +91,10 @@ class GPDBuilder(object):
                              tmp = where_kindgeo.rename(columns={'name_region': 'where'})
                              tmp = tmp.loc[tmp.code_region=='999']
                              self.boundary_metropole =tmp['geometry'].total_bounds
-                        self.alllocationsgeo = self.geo.get_data()
                    elif self.granularity == 'subregion':
                         list_dep_metro = None
                         where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
                         where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
-                        self.alllocationsgeo = self.geo.get_data(True)
                    else:
                        raise PyvoaTypeError('What is the granularity of your  database ?')
         except:
@@ -163,9 +160,9 @@ class GPDBuilder(object):
 
    def subregions_deployed(self,listloc,typeloc='subregion'):
         exploded = []
-        a = self.geo.get_data()
         for i in listloc:
             if typeloc == 'subregion':
+                #print(i,self.geo.is_region(i),self.geo.is_subregion(i))
                 if self.geo.is_region(i):
                     i = [self.geo.is_region(i)]
                     tmp = self.geo.get_subregions_from_list_of_region_names(i,output='name')
@@ -242,6 +239,8 @@ class GPDBuilder(object):
                 code = temp.loc[temp.date==temp.date.max()]['code']
                 codejoined  = ',' .join(code)
                 if has_normalize:
+                    if 'population_subregion' in list(temp.columns):
+                        temp=temp.rename(columns={"population_subregion": "population"})
                     population = temp.loc[temp.date==temp.date.max()]['population']
                     populationsum = np.nansum(population)
 
@@ -262,10 +261,8 @@ class GPDBuilder(object):
             where = flat_list(where)
             if self.db_world:
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
-                #self.alllocationsgeo = self.geo.to_standard(self.alllocationsgeo,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
-                #self.alllocationsgeo = self.subregions_deployed(self.alllocationsgeo,self.granularity)
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
 
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
