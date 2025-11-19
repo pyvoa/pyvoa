@@ -6,3 +6,4 @@
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] pbl proportions logo pyvoa avec bokeh
+- [ ] typeofmap='dense' ne marche pas plusieurs fois de suite…
