@@ -271,7 +271,7 @@ class front:
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
-                if k in kwargs.keys() and k != 'when':
+                if k in kwargs.keys() and k not in ['when','input']:
                     if isinstance(kwargs[k],list):
                         default[k] = kwargs[k]
                     else:
@@ -295,8 +295,8 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
-            input = kwargs['input'].get('input')
-            if not input:
+            input = kwargs.get('input')
+            if input.empty:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
             found_bypop = None
             for w in kwargs['option']:
