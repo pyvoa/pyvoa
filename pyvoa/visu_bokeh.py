@@ -251,7 +251,7 @@ class visu_bokeh:
             for key, fig in dicfig.items():
                 fig.title = title
                 dicfig[key]=fig
-            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:200px; opacity: 0.1"></div>')
+            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
             kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
@@ -276,10 +276,12 @@ class visu_bokeh:
 
             input_uniquecountries = input.drop_duplicates(subset=["where"]).drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
-            input_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
 
-            convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
-            geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
+
+            if 'geometry' in list(input_uniquecountries.columns):
+                passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
+                convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
+                geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
 
             input['left'] = input[what]
             input['right'] = input[what]
@@ -306,7 +308,11 @@ class visu_bokeh:
             input['horihistotext'] = input['right'].apply(_fmt)
             #input['horihistotext'] = [ '{:.3g}'.format(float(i)) if float(i)>1.e4 or float(i)<0.01 else round(float(i),2) for i in input['right'] ]
             input['horihistotext'] = [str(i) for i in input['horihistotext']]
-            input_dates = input.drop(columns='geometry').copy()
+            if 'geometry' in list(input.columns):
+                input_dates = input.drop(columns='geometry').copy()
+            else:
+                input_dates = input.copy()
+
             min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[what]),np.nanmax(input_dates[what]))
             invViridis256 = Viridis256[::-1]
             color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
@@ -314,7 +320,8 @@ class visu_bokeh:
             input = self.add_columns_for_pie_chart(input,what)
 
             input = input[input.date==input.date.max()].sort_values(by = what, ascending=False).head(maxcountrydisplay).reset_index(drop=True)
-            input = input.drop(columns='geometry')
+            if 'geometry' in list(input.columns):
+                input = input.drop(columns='geometry')
 
             columndatasrc = ColumnDataSource(data = input)
             if dateslider:
@@ -486,7 +493,8 @@ class visu_bokeh:
                 kwargs['controls'] = controls
 
             kwargs['yrange']=yrange
-            kwargs['geocolumndatasrc'] = geocolumndatasrc
+            if 'geometry' in list(input_uniquecountries.columns):
+                kwargs['geocolumndatasrc'] = geocolumndatasrc
             kwargs['columndatasrc'] = columndatasrc
             kwargs['color_mapper']=color_mapper
             kwargs['input'] = input
@@ -556,7 +564,8 @@ class visu_bokeh:
             input=kwargs['input']
             nb = kwargs['maxlettersdisplay']
             input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
-            kwargs['input'] = input.drop(columns='geometry')
+            if 'geometry' in list(input.columns):
+                kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
         return  inner_bokeh_plot
 

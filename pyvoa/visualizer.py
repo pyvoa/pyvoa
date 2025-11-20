@@ -120,7 +120,7 @@ class AllVisu:
             input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = list(input['where'].unique())
             input = input.loc[input['where'].isin(locunique)]
-            input['where'] = input['where'].cat.remove_unused_categories()
+            #input['where'] = input['where'].cat.remove_unused_categories()
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -295,6 +295,8 @@ class AllVisu:
         '''
         vis = kwargs.get('vis')
         input = kwargs.get('input')
+        if 'geometry' not in list(input.columns):
+            raise PyvoaError('No geometry in you pandas, map can not be called ...')
         if vis == 'matplotlib':
             fig = visu_matplotlib().matplotlib_map(**kwargs)
         elif vis == 'seaborn':

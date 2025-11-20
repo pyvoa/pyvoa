@@ -28,15 +28,12 @@
 			{
 				"name":"tot_P",
 				"alias":"P",
-				"description":"Nombre total de tests positifs",
-				"cumulative":true
-
+				"description":"Nombre total de tests positifs"
 			},
 			{
 				"name":"tot_T",
 				"alias":"T",
-				"description":"Nombre total de tests réalisés",
-				"cumulative":true
+				"description":"Nombre total de tests réalisés"
 			},
 			{
 				"name":"where",
@@ -65,9 +62,7 @@
 			},
 		    {
 				"name":"tot_dchosp",
-				"alias":"dchosp",
-				"cumulative":true
-
+				"alias":"dchosp"
 		    },
 		    {	   
 				"name":"cur_hosp",
