@@ -78,10 +78,10 @@ class InputOption():
 
         self.pdcharts = pd.DataFrame({
             'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly']","'typeofhist'=['location','value','pie']",\
-                "'typeofmap'=['dense','not dense']" ],
+                "'typeofmap'=['not dense','dense']" ],
             'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
             'bokeh': ["'typeofplot'=['date', 'compare', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",
-            "'typeofmap'=['dense','not dense']"]
+            "'typeofmap'=['not dense','dense']"]
             }, index=['plot', 'hist','map'])
 
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())

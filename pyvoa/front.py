@@ -271,12 +271,14 @@ class front:
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
-                if k in kwargs.keys() and k != 'when':
+                if k in kwargs.keys() and k not in ['when','input']:
                     if isinstance(kwargs[k],list):
                         default[k] = kwargs[k]
                     else:
                         default[k] = [kwargs[k]]
                 default['when'] = kwargs.get('when')
+
+            input = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
@@ -295,9 +297,18 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
-            input = kwargs['input'].get('input')
-            if not input:
+            if not input.empty:
+                if not all(i in input.columns for i in ['where', 'date']):
+                    raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
+                kwargs['input'] = input
+                when = kwargs.get('when')
+                if when:
+                 kwargs['when'] = when
+                else:
+                    kwargs['when'] = [str(input.date.min())+':'+str(pd.to_datetime(input.date.max()) )]
+            else:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
+
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('normalize:'):
@@ -310,7 +321,6 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
-
             return func(self,**kwargs)
         return wrapper
 
@@ -847,6 +857,8 @@ class front:
                 Any exceptions raised by the `func` or during the processing of geometry settings.
             """
             input = kwargs.get('input')
+            if 'geometry' not in list(input.columns):
+                raise PyvoaError('No geometry inside your pandas, map can not be asked')
             where = kwargs.get('where')
             mapoption = kwargs.get('typeofmap')
             if 'output' in kwargs:
@@ -854,22 +866,25 @@ class front:
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
-            if mapoption == 'dense':
+            if not mapoption == 'dense':
                 if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
-                    self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
+
                     new_geo = self.gpdbuilder.geo.get_data()
                     granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
                     new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
                     new_geo['where'] = new_geo['where'].apply(lambda x: x.upper())
-
                     new_geo = new_geo.set_index('where')['geometry'].to_dict()
                     input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
                     input['where'] = input['where'].apply(lambda x: x.title())
                     kwargs['input'] = input
-            elif mapoption == 'not dense':
+                    self.gpdbuilder.gettypeofgeometry().set_exploded_geometry()
+            elif not mapoption == 'not dense':
+                #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                 kwargs['input'] = input
+                self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
             else:
                 raise PyvoaError('Argument not reconized ... '+mapoption)
+
             return func(self,**kwargs)
         return inner
 
