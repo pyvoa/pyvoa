@@ -705,7 +705,7 @@ class visu_bokeh:
                     pyvoa = ColumnDataSource(inputwhere)
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      color = color, line_width = 3,
-                                     legend_label = loc,
+                                     legend_label = loc+', '+val,
                                      hover_line_width = 4, name = val, line_dash=line_style[i%4])
                     r_list.append(r)
                     maxou=max(maxou,np.nanmax(inputwhere[val]))
