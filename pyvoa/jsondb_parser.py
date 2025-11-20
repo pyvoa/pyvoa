@@ -321,7 +321,7 @@ class DataParser:
             where_conditions = pdata.loc[pdata['name'] == 'where', 'alias']
             if not where_conditions.empty:
                 wh = where_conditions.values[0]
-                pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
+                pandas_temp[coltocumul] = pandas_temp[coltocumul] #pandas_temp.groupby(wh)[coltocumul].cumsum()
             else:
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
 
@@ -360,7 +360,7 @@ class DataParser:
 
 
           if usecols and ('semaine' in usecols or 'week' in usecols):
-             pandas_temp['date'] = [ week_to_date(i) for i in pandas_temp['date']]
+                 pandas_temp['date'] = [ week_to_date(i) for i in pandas_temp['date']]
              #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
              #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
 
@@ -369,18 +369,20 @@ class DataParser:
           if granularity == 'country' and 'where' not in list(pdata.name):
               pandas_temp['where'] = place
           pandas_temp['where'] = pandas_temp['where'].astype('string')
+
+          whereanddate =  ['date','where']
+          notwhereanddate =  [ i  for i in list(pandas_temp.columns) if i not in whereanddate ]
+          self.available_keywords = notwhereanddate
+          pandas_temp[notwhereanddate] = pandas_temp[notwhereanddate].apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", ".", regex=False), errors="coerce"))
+          pandas_temp = pandas_temp[whereanddate+notwhereanddate]
+          pandas_temp = pandas_temp.groupby(whereanddate).sum(min_count=1).reset_index()
+
           if pandas_db.empty:
               pandas_db = pandas_temp
           else:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
 
-      whereanddate =  ['date','where']
-      notwhereanddate =  [ i  for i in list(pandas_db.columns) if i not in whereanddate ]
-      self.available_keywords = notwhereanddate
-      pandas_db[notwhereanddate] = pandas_db[notwhereanddate].apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", ".", regex=False), errors="coerce"))
-      pandas_db = pandas_db[whereanddate+notwhereanddate]
-      pandas_db = pandas_db.groupby(whereanddate).sum(min_count=1).reset_index()
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db = pandas_db.sort_values(['where','date'])
 
