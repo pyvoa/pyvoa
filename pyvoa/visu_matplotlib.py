@@ -81,7 +81,6 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
-        input = kwargs['input']
         nb = kwargs['maxlettersdisplay']
         loca = list(input['where'].unique())[:kwargs['maxcountrydisplay']]
         input = input[input['where'].isin(loca)]
@@ -94,8 +93,7 @@ class visu_matplotlib:
         plt.ylabel(what[0], fontsize=10)
         input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
         df = pd.pivot_table(input,index='date', columns='where', values=what)
-        df.columns = df.columns.get_level_values(1)
-        leg=[]
+
         for col in df.columns:
             label = legend if legend else col
             lines = plt.plot(df.index, df[col],label=label)
