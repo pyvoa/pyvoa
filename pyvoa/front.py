@@ -278,7 +278,7 @@ class front:
                         default[k] = [kwargs[k]]
                 default['when'] = kwargs.get('when')
 
-            input = kwargs.get('input')
+            input = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
@@ -298,11 +298,16 @@ class front:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
             if not input.empty:
-                if not all(i in input.columns for i in ['where', 'date','geometry']):
-                    raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")    
+                if not all(i in input.columns for i in ['where', 'date']):
+                    raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
                 kwargs['input'] = input
-
-            kwargs = self.gpdbuilder.get_stats(**kwargs)
+                when = kwargs.get('when')
+                if when:
+                 kwargs['when'] = when
+                else:
+                    kwargs['when'] = [str(input.date.min())+':'+str(pd.to_datetime(input.date.max()) )]
+            else:
+                kwargs = self.gpdbuilder.get_stats(**kwargs)
 
             found_bypop = None
             for w in kwargs['option']:
@@ -316,7 +321,6 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
-
             return func(self,**kwargs)
         return wrapper
 
@@ -853,6 +857,8 @@ class front:
                 Any exceptions raised by the `func` or during the processing of geometry settings.
             """
             input = kwargs.get('input')
+            if 'geometry' not in list(input.columns):
+                raise PyvoaError('No geometry inside your pandas, map can not be asked')
             where = kwargs.get('where')
             mapoption = kwargs.get('typeofmap')
             if 'output' in kwargs:

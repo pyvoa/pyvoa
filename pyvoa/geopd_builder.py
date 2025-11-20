@@ -199,7 +199,10 @@ class GPDBuilder(object):
             - sum all the geometry
         upper str comparision to be insensitive case
         '''
-        input = kwargs['input']
+        input = kwargs.get('input')
+        if 'geometry' not in list(input.columns):
+            return input
+
         which = kwargs['which']
         where = kwargs['where']
         option=kwargs.get('option')
