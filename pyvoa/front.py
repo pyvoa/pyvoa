@@ -854,22 +854,25 @@ class front:
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
-            if mapoption == 'dense':
+            if not mapoption == 'dense':
                 if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
-                    self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
+
                     new_geo = self.gpdbuilder.geo.get_data()
                     granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
                     new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
                     new_geo['where'] = new_geo['where'].apply(lambda x: x.upper())
-
                     new_geo = new_geo.set_index('where')['geometry'].to_dict()
                     input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
                     input['where'] = input['where'].apply(lambda x: x.title())
                     kwargs['input'] = input
-            elif mapoption == 'not dense':
+                    self.gpdbuilder.gettypeofgeometry().set_exploded_geometry()
+            elif not mapoption == 'not dense':
+                #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                 kwargs['input'] = input
+                self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
             else:
                 raise PyvoaError('Argument not reconized ... '+mapoption)
+
             return func(self,**kwargs)
         return inner
 
