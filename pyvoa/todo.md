@@ -6,3 +6,6 @@
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] typeofmap='dense' ne marche pas plusieurs fois de suite…
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
+- [ ] plus de nom de variable (plot bokeh, sumall)
+- [ ] placer un logo pyvoa avec fond transparent (souci visible notamment avec hist )
+- [ ] problème de légende quand plot avec 2 which 
