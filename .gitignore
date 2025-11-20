@@ -3,4 +3,5 @@ venv/
 .DS_Store
 .cache
 examples/notebooks/.ipynb_checkpoints/
+examples/tests/.ipynb_checkpoints/
 pyvoa.egg-info/
