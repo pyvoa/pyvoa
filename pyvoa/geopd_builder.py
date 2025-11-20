@@ -319,7 +319,8 @@ class GPDBuilder(object):
            kwargs['input'] = input
            when_beg_data,when_end_data = when_beg, when_end
 
-       kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
+       #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
+       kwargs['when']=[when_beg_data.strftime("%Y-%m-%d")+':'+when_end_data.strftime("%Y-%m-%d")]
        flatwhere = flat_list(where)
 
        bypopvalue = None
