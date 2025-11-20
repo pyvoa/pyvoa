@@ -278,6 +278,8 @@ class front:
                         default[k] = [kwargs[k]]
                 default['when'] = kwargs.get('when')
 
+            input = kwargs.get('input')
+
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
@@ -295,9 +297,13 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
-            input = kwargs.get('input')
-            if input.empty:
-                kwargs = self.gpdbuilder.get_stats(**kwargs)
+            if not input.empty:
+                if not all(i in input.columns for i in ['where', 'date','geometry']):
+                    raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")    
+                kwargs['input'] = input
+
+            kwargs = self.gpdbuilder.get_stats(**kwargs)
+
             found_bypop = None
             for w in kwargs['option']:
                 if w.startswith('normalize:'):
