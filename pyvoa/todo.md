@@ -6,3 +6,6 @@
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] pbl proportions logo pyvoa avec bokeh
+- [ ] typeofmap='dense' ne marche pas plusieurs fois de suite…
+- [ ] bug à partir de fin d'embre 2020 sur les données spf
+- [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
