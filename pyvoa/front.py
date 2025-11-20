@@ -301,7 +301,7 @@ class front:
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
                 kwargs['input'] = input
-                when = kwargs.get('when')
+                when = kwargs.get('g')
                 if when:
                  kwargs['when'] = when
                 else:
