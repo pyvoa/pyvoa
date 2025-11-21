@@ -154,8 +154,7 @@ class PyvoaWarning(Exception):
     """Base class for exceptions in PYVOA."""
 
     def __init__(self, message):
-        if pt.get_verbose_mode()>1:
-            blinking_centered_text('PYVOA Warning !',message, blinking=0,text_color='black', bg_color='orange')
+        blinking_centered_text('PYVOA Warning !',message, blinking=0,text_color='black', bg_color='yellow')
         Exception(message)
 
 class PyvoaError(Exception):
