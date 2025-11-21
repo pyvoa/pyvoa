@@ -4,7 +4,6 @@
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
-- [ ] typeofmap='dense' ne marche pas plusieurs fois de suite…
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
 - [ ] plus de nom de variable (plot bokeh, sumall)
 - [ ] placer un logo pyvoa avec fond transparent (souci visible notamment avec hist )
@@ -13,7 +12,5 @@
 - [ ] récupérer la figure en matplotlib pour édition ultérieure
 - [ ] problème de géométrie dense (matplotlib / spf) → ne marche pas
 - [ ] pbl avec l'indicateur mobile sur bokeh (valeur = NAN). Exemple spf : pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
-- [ ] pbl dense geometry. exemple avec mpoxgh / map()
 - [ ] disponibilité de jhu ? pour avoir des informations quotidiennes et non hebdo comme actuellement dans owid… ? Ce serait l'idéal
 - [ ] pas de centrage sur la métropole quand demandé. spf. pf.map(where='métropole',which='tot_dchosp',typeofmap='dense')
-- [ ] pbl de zoom avec spf et dateslider / pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True) 
