@@ -194,6 +194,7 @@ class front:
         visu = self.getvis()
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
+            print('Available key-words, which ∈', self.listwhich())
             return
         else:
             if reload:
@@ -575,7 +576,7 @@ class front:
         Returns:
             The value of the loption attribute.
         """
-        return [x for x in self.loption if x != ''] 
+        return [x for x in self.loption if x != '']
 
     def listargument(self,):
         """Returns the keys of the largument attribute.
