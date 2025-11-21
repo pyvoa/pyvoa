@@ -66,7 +66,7 @@ class InputOption():
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['location','value','pie'],\
                         'typeofplot':['date','compare','versus','spiral','yearly'],
-                        'typeofmap':['not dense','dense'],\
+                        'typeofmap':[None,'not dense','dense'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','folium','seaborn'],\
                         'tile' : ['openstreet','esri','stamen','positron'],\
@@ -78,10 +78,10 @@ class InputOption():
 
         self.pdcharts = pd.DataFrame({
             'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly']","'typeofhist'=['location','value','pie']",\
-                "'typeofmap'=['not dense','dense']" ],
+                "'typeofmap'=[None,'not dense','dense']" ],
             'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
             'bokeh': ["'typeofplot'=['date', 'compare', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",
-            "'typeofmap'=['not dense','dense']"]
+            "'typeofmap'=[None,'not dense','dense']"]
             }, index=['plot', 'hist','map'])
 
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
