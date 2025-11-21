@@ -135,14 +135,12 @@ class visu_seaborn:
         for idx, i in enumerate(what):
             label_col = f'where_{i}'
             df[label_col] = df['where']
-            label_name = legend if legend else i
             sns.lineplot(
                 data=df,
-                x='date',
+                x="date",
                 y=i,
-                hue=label_col,
+                label=f"{i}",
                 linestyle=st[idx],
-                legend='full',
             )
         plt.legend(title='Locations')
         plt.xlabel('Date')
