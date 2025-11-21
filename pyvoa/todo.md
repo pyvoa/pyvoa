@@ -1,5 +1,5 @@
 - [ ] dessiner les pays même quand il n'y a pas de données 
-- [X] map et hist bokeh mpoxgh HS setlocalepbl ? 
+- [X] map bokeh mpoxgh HS setlocalepbl ? 
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
@@ -13,3 +13,4 @@
 - [ ] récupérer la figure en matplotlib pour édition ultérieure
 - [ ] problème de géométrie dense (matplotlib / spf) → ne marche pas
 - [ ] pbl avec l'indicateur mobile sur bokeh (valeur = NAN). Exemple spf : pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
+- [ ] pbl dense geometry. exemple avec mpoxgh / map()
