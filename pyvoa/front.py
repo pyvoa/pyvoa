@@ -867,6 +867,9 @@ class front:
             mapoption = kwargs.get('typeofmap',None)
             if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
                 mapoption = kwargs.get('typeofmap','not dense')
+            else:
+                PyvoaWarning('typeofmap not compatible with this db, dummy argument')
+                mapoption = None
 
 
             if 'output' in kwargs:
