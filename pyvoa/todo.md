@@ -17,4 +17,3 @@
 - [ ] disponibilité de jhu ? pour avoir des informations quotidiennes et non hebdo comme actuellement dans owid… ? Ce serait l'idéal
 - [ ] pas de centrage sur la métropole quand demandé. spf. pf.map(where='métropole',which='tot_dchosp',typeofmap='dense')
 - [ ] pbl de zoom avec spf et dateslider / pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True) 
-- [ ] matplotlib + dateslider → pas d'erreur alors que ce n'est pas supporté
