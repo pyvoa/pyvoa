@@ -863,14 +863,20 @@ class front:
             if 'geometry' not in list(input.columns):
                 raise PyvoaError('No geometry inside your pandas, map can not be asked')
             where = kwargs.get('where')
-            mapoption = kwargs.get('typeofmap')
+
+            mapoption = kwargs.get('typeofmap',None)
+            if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
+                mapoption = kwargs.get('typeofmap','not dense')
+
+
             if 'output' in kwargs:
                 kwargs.pop('output')
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
-            if not mapoption == 'dense':
-                if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
+            if mapoption:
+                if mapoption == 'dense':
+                    self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
                     new_geo = self.gpdbuilder.geo.get_data()
                     granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
                     new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
@@ -879,13 +885,10 @@ class front:
                     input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
                     input['where'] = input['where'].apply(lambda x: x.title())
                     kwargs['input'] = input
-                    self.gpdbuilder.gettypeofgeometry().set_exploded_geometry()
-            elif not mapoption == 'not dense':
-                #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
-                kwargs['input'] = input
-                self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
-            else:
-                raise PyvoaError('Argument not reconized ... '+mapoption)
+
+                else:
+                    #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
+                    kwargs['input'] = input
 
             return func(self,**kwargs)
         return inner
