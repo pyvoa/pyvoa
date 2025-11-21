@@ -236,7 +236,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear']     = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log']        = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_loglog']     = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_map']        = figure(x_axis_type='mercator', y_axis_type='mercator')#, match_aspect=True)
+            dicfig['bokeh_figure_map']        = figure(x_axis_type='mercator', y_axis_type='mercator', match_aspect=True)
             dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
             dicfig['bokeh_figure_spiral']     = figure(width=width, height=height)
@@ -244,10 +244,6 @@ class visu_bokeh:
 
 
             logo_url = visu_bokeh.pyvoalogo(logo)
-            w_screen = width / 1.5
-            h_screen = height / 3.5
-            w_units="screen"
-            h_units="screen"
             for key, fig in dicfig.items():
                 fig.title = title
                 dicfig[key]=fig
@@ -367,7 +363,7 @@ class visu_bokeh:
                             ylabellog=bokeh_figure_log.yaxis[0],
                             x_range = bokeh_figure_linear.x_range,
                             ymax = ymax,
-                            color_mapperjs = color_mapper
+                            color_mapperjs = color_mapper,
                         ),
                         code="""
                             const i = cb_obj.value;
@@ -1355,8 +1351,6 @@ class visu_bokeh:
         bokeh_figure = kwargs['bokeh_figure_map']
         bokeh_figure.add_tile(wmt, retina=True)
         #bokeh_figure.add_tile("CartoDB Positron",retina=True)
-        bokeh_figure.height = 350
-        bokeh_figure.width = 450
 
         xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
         ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
