@@ -130,7 +130,8 @@ class AllVisu:
             if kwargs['kwargsuser']['typeofplot'] == 'date':
                 kwargs['title'] = what[0] + ' time evolution'
             kwargs['title'] = self.database_name + ' time evolution between ' + str(when[0])
-            kwargs['input'] = input
+            loc=list(input['where'].unique())
+            kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             return func(self, **kwargs)
         return inner_plot
