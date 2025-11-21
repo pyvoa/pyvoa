@@ -99,6 +99,7 @@ class visu_matplotlib:
             lines = plt.plot(df.index, df[col],label=label)
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         plt.legend(loc="upper left", fontsize=8, title_fontsize=10)
+        return ax
 
 
     @decomatplotlib
