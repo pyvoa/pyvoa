@@ -297,6 +297,7 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
+
             if not input.empty:
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
@@ -574,7 +575,7 @@ class front:
         Returns:
             The value of the loption attribute.
         """
-        return self.loption
+        return [x for x in self.loption if x != ''] 
 
     def listargument(self,):
         """Returns the keys of the largument attribute.
@@ -857,6 +858,7 @@ class front:
                 Any exceptions raised by the `func` or during the processing of geometry settings.
             """
             input = kwargs.get('input')
+            originalinput = input.copy()
             if 'geometry' not in list(input.columns):
                 raise PyvoaError('No geometry inside your pandas, map can not be asked')
             where = kwargs.get('where')
@@ -868,7 +870,6 @@ class front:
             dateslider = kwargs.get('dateslider', None)
             if not mapoption == 'dense':
                 if not self.gpdbuilder.gettypeofgeometry().is_dense_geometry():
-
                     new_geo = self.gpdbuilder.geo.get_data()
                     granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
                     new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
