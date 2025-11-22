@@ -247,7 +247,8 @@ class visu_bokeh:
             for key, fig in dicfig.items():
                 fig.title = title
                 dicfig[key]=fig
-            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
+            #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
+            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
             kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
