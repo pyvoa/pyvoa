@@ -82,8 +82,6 @@ class visu_matplotlib:
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
         nb = kwargs['maxlettersdisplay']
-        loca = list(input['where'].unique())[:kwargs['maxcountrydisplay']]
-        input = input[input['where'].isin(loca)]
         input['where'] = [k[:nb] for k in input['where']]
         what = kwargs.get('what')
         plt = kwargs['plt']
@@ -91,15 +89,20 @@ class visu_matplotlib:
         legend = kwargs.get('legend',None)
         plt.xlabel("date", fontsize=10)
         plt.ylabel(what[0], fontsize=10)
-        input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
-        df = pd.pivot_table(input,index='date', columns='where', values=what)
+        st=['-','--',':']
+        for idx, i in enumerate(what):
+            df = pd.pivot_table(input, index='date', columns='where', values=i)
+            for where in df.columns:
+                plt.plot(
+                    df.index,
+                    df[where],
+                    label=f"{where} — {i}",   # label unique
+                    linestyle=st[idx]
+                )
 
-        for col in df.columns:
-            label = legend if legend else col
-            lines = plt.plot(df.index, df[col],label=label)
+        plt.legend(loc="upper right", fontsize=8, title_fontsize=10)
+        plt.legend(title=", ".join(what),ncol=len(what))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        plt.legend(loc="upper left", fontsize=8, title_fontsize=10)
-        return ax
 
 
     @decomatplotlib
