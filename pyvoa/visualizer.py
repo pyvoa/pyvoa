@@ -129,7 +129,7 @@ class AllVisu:
                 kwargs['legend'] = 'sum all location'
             if kwargs['kwargsuser']['typeofplot'] == 'date':
                 kwargs['title'] = what[0] + ' time evolution'
-            kwargs['title'] = self.database_name + ' time evolution between ' + str(when[0])
+            kwargs['title'] = self.database_name.upper() + ' time evolution between ' + str(when[0])
             loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
@@ -167,7 +167,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['title'] = self.database_name + ' database at ' + when[0].split(':')[1]
+            kwargs['title'] = self.database_name.upper() + ' database at ' + when[0].split(':')[1]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             return func(self, **kwargs)
