@@ -625,9 +625,9 @@ class visu_bokeh:
 
             for loc in input['where'].unique():
                 pandaloc = input.loc[input['where'] == loc].sort_values(by='date', ascending=True)
-                pandaloc.rename(columns={what[0]: 'casesx', what[1]: 'casesy'}, inplace=True)
-                fig.line(x='casesx', y='casesy',
-                                 source=ColumnDataSource(pandaloc), legend_label=pandaloc['where'].iloc[0],
+                #pandaloc.rename(columns={what[0]: 'casesx', what[1]: 'casesy'}, inplace=True)
+                fig.line(x=what[0], y=what[1],
+                                 source=ColumnDataSource(pandaloc), legend_label=f"{loc}",
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
 
             fig.legend.label_text_font_size = "12px"
@@ -635,7 +635,7 @@ class visu_bokeh:
             panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
 
-            fig.legend.location = "top_left"
+            fig.legend.location = "top_right"
             listfigs.append(fig)
             visu_bokeh().bokeh_legend(fig)
         self.set_listfigures(listfigs)
@@ -727,7 +727,7 @@ class visu_bokeh:
             if axis_type == 'linear':
                 if maxi  < 1e4 :
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-            
+
             fig.legend.spacing = 10
             fig.legend.ncols = len(what)
             fig.legend.visible = True
