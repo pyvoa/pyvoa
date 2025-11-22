@@ -669,6 +669,7 @@ class visu_bokeh:
                  if [dd/mm/yyyy:] up to max date
         '''
         input = kwargs.get('input')
+
         what = kwargs.get('what')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
@@ -686,29 +687,26 @@ class visu_bokeh:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
-
-            lcolors = iter(self.lcolors)
             i = 0
             r_list=[]
-            maxou=-1000
-            lcolors = iter(self.lcolors)
+            maxi=-1000
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
-            maxou, minou=0, 0
+            maxi, mini=0, 0
             tooltips=[]
-            for val in what:
-                for loc in list(input['where'].unique()):
-                    color = input['colors'][input['where']==loc].iloc[0]
-                    inputwhere = input.loc[input['where'] == loc].reset_index(drop = True)
-                    pyvoa = ColumnDataSource(inputwhere)
+            for idx,val in enumerate(what):
+                for ldx,loc in enumerate(list(input['where'].unique())):
+                    pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
+                    colors = pyvoa.data['colors']
                     r = fig.line(x = 'date', y = val, source = pyvoa,
-                                     color = color, line_width = 3,
-                                     legend_label = loc+',  '+val,
-                                     hover_line_width = 4, name = val, line_dash=line_style[i%4])
+                                     line_width = 3,
+                                     color=colors[ldx],
+                                     legend_label=f"{loc}, {val}",
+                                     hover_line_width = 4, name = val, line_dash=line_style[idx])
                     r_list.append(r)
-                    maxou=max(maxou,np.nanmax(inputwhere[val]))
-                    minou=max(minou,np.nanmin(inputwhere[val]))
+                    maxi=max(maxi,np.nanmax(input[val]))
+                    mini=max(mini,np.nanmin(input[val]))
 
-                    if minou <0.01:
+                    if mini <0.01:
                         tooltips.append([('where', '@where'), ('date', '@date{%F}'), (r.name, '@$name')])
                     else:
                         tooltips.append([('where', '@where'), ('date', '@date{%F}'), (r.name, '@$name{0,0.0}')])
@@ -727,20 +725,19 @@ class visu_bokeh:
                     fig.add_tools(cross)
 
             if axis_type == 'linear':
-                if maxou  < 1e4 :
+                if maxi  < 1e4 :
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-
+            
+            fig.legend.spacing = 10
+            fig.legend.ncols = len(what)
+            fig.legend.visible = True
             fig.legend.label_text_font_size = "12px"
-            panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
-            panels.append(panel)
             fig.legend.background_fill_alpha = 0.6
-
-            fig.legend.location  = "top_left"
             fig.legend.click_policy="hide"
             fig.legend.label_text_font_size = '8pt'
-            if len(what) > 1 and len(what)*len(input['where'].unique())>16:
-                PyvoaWarning('To much labels to be displayed ...')
-                fig.legend.visible=False
+
+            panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
+            panels.append(panel)
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
             visu_bokeh().bokeh_legend(fig)
@@ -979,7 +976,7 @@ class visu_bokeh:
             fig = dbokeh_figure[axis_type]
             i = 0
             r_list=[]
-            maxou=-1000
+            maxi=-1000
             input['cases']=input[which]
             line_style = ['solid', 'dashed', 'dotted', 'dotdash']
             colors = itertools.cycle(self.lcolors)
@@ -995,7 +992,7 @@ class visu_bokeh:
                         color=next(colors), line_width=3,
                         legend_label=leg, hover_line_width=4, name='cases'
                     )
-                    #maxou=max(maxou,np.nanmax(pyvoa.data['cases']))
+                    #maxi=max(maxi,np.nanmax(pyvoa.data['cases']))
 
             label = which
             tooltips = [('where', '@rolloverdisplay'), ('date', '@date{%F}'), ('Cases', '@cases{0,0.0}')]

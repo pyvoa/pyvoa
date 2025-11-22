@@ -132,7 +132,7 @@ class visu_seaborn:
         st={k:i for k,i in  enumerate(['-','--',':'])}
         df = input.copy()
         for idx, i in enumerate(what):
-            df[f"legend_{i}"] = df["where"] + " – " + i
+            df[f"legend_{i}"] = df["where"] #+ " – " + i
             #label_col = f'where_{i}'
             #df[label_col] = df['where']
             sns.lineplot(
@@ -142,8 +142,8 @@ class visu_seaborn:
                 linestyle=st[idx],
                 hue=f"legend_{i}"
             )
-        plt.legend(title='Locations')
-        plt.xlabel('Date')
+        plt.legend(title=", ".join(what),ncol=len(what))
+        plt.xlabel('date')
         plt.xticks(rotation=45)
 
     @decoplotseaborn
