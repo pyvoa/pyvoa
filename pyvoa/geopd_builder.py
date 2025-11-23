@@ -291,6 +291,8 @@ class GPDBuilder(object):
           which = [self.currentdata.get_available_keywords()[0]]
           kwargs['which'] = which
 
+       what =  kwargs.get('what')
+
        kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
        when = kwargs.get('when')
 
@@ -298,7 +300,7 @@ class GPDBuilder(object):
 
        if input.empty:
            input = self.currentdata.get_maingeopandas()
-     
+
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
@@ -358,8 +360,7 @@ class GPDBuilder(object):
                if o == 'nonneg':
                    if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
                         print('The default option nonneg cannot be used with instantaneous data, such as : ' + w)
-                   temppd = getnonnegfunc(temppd,w)
-                   concatpd = pd.DataFrame()
+                   temppd = getnonnegfunc(temppd, w)
                elif o == 'smooth7':
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
                     inx7 = temppd.groupby('where').head(7).index
@@ -386,14 +387,13 @@ class GPDBuilder(object):
 
            if not wconcatpd.empty:
                input = wconcatpd
-           input.loc[:,w+' daily']  = input.groupby('where')[w].diff()
-           input.loc[:,w+' weekly'] = input.groupby('where')[w].diff(7)
-           input.loc[:,w+' daily']  = input[w + ' daily'].bfill()
-           input.loc[:,w+' weekly'] = input[w + ' weekly'].bfill()
 
-           if bypopvalue is not None:
-              for i in [w+' daily',w+' weekly']:
-                 input = self.normbypop(input, i ,bypopvalue)
+           windows = {' daily':1,' weekly':7}
+           for k,v in windows.items():
+               input.loc[:,w+k]  = input.groupby('where')[w].diff(v)
+               input.loc[:,w+k]  = input[w + k].bfill()
+               if bypopvalue is not None:
+                  input = self.normbypop(input, w+k ,bypopvalue)
 
        if 'geometry' in input.columns:
          input = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
