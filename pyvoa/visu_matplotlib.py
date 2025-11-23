@@ -96,17 +96,17 @@ class visu_matplotlib:
                 label = f"{where}"
                 if len(what)>1:
                     label =f"{where} — {i}"
-                plt.plot(
+                ax.plot(
                     df.index,
                     df[where],
-                    label=label, 
+                    label=label,
                     linestyle=st[idx]
                 )
 
         plt.legend(loc="upper right", fontsize=8, title_fontsize=10)
         plt.legend(title=", ".join(what),ncol=len(what))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        return kwargs['fig']
+        return ax
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
@@ -120,10 +120,10 @@ class visu_matplotlib:
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
-            lines=plt.plot(pandy[what[0]], pandy[what[1]])
+            ax.plot(pandy[what[0]], pandy[what[1]])
             leg.append(col)
         plt.legend(leg)
-        return kwargs['fig']
+        return ax
 
     @decomatplotlib
     def matplotlib_yearly_plot(self,**kwargs):
@@ -148,9 +148,9 @@ class visu_matplotlib:
         d = input.allyears.unique()
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
-            ax = plt.plot(df.index,df,label=f'{i}')
+            ax = ax.plot(df.index,df,label=f'{i}')
         plt.legend(d)
-        return kwargs['fig']
+        return ax
 
     @decomatplotlib
     def matplotlib_pie(self,**kwargs):
@@ -170,9 +170,9 @@ class visu_matplotlib:
             input['where'] = 'sum all location'
         input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
         input = input.set_index('where')
-        input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
+        return input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='where', labeldistance=None,ax=ax)
-        return kwargs['fig']
+
 
     @decomatplotlib
     def matplotlib_horizontal_histo(self,**kwargs):
@@ -190,13 +190,13 @@ class visu_matplotlib:
         maxletters = kwargs['maxlettersdisplay']
 
         input_sorted = input.sort_values(by=what,ascending=True)
+        ax.set_title(title)
+        plt.xlabel(what)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
         input_sorted['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input_sorted['where']]
-        ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
-        ax.set_title(title)
-        plt.xlabel(what)
-        return kwargs['fig']
+        return ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
+
 
     @decomatplotlib
     def matplotlib_histo(self,**kwargs):
@@ -214,8 +214,7 @@ class visu_matplotlib:
         input['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input['where']]
 
         input = pd.pivot_table(input,index='date', columns='where', values=what)
-        input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
-        return kwargs['fig']
+        return input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
@@ -237,6 +236,8 @@ class visu_matplotlib:
         input.plot(column = what, ax=ax,legend=True,
                                 legend_kwds={'label': what,
                                 'orientation': "horizontal","pad": 0.001})
+        ax.set_axis_off()
+        ax.set_title(title)
 
         input = input.to_crs(epsg=3857)
         if tile == 'openstreet':
@@ -246,12 +247,9 @@ class visu_matplotlib:
         elif tile == 'stamen':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
             PyvoaWarning("Couldn't find stamen for matplolib use esri ....")
-            #input = input.to_crs(epsg=4326)
         elif tile == 'positron':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.CartoDB.PositronNoLabels)
         else:
             PyvoaError("Don't know what kind of tile is it ...")
 
-        ax.set_axis_off()
-        ax.set_title(title)
-        return kwargs['fig']
+        return cx

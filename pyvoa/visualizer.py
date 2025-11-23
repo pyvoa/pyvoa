@@ -232,7 +232,7 @@ class AllVisu:
             elif typeofplot == 'spiral':
                 fig = visu_bokeh().bokeh_spiral_plot(**kwargs)
             elif typeofplot == 'versus':
-                    fig = visu_bokeh().bokeh_versus_plot(**kwargs)
+                fig = visu_bokeh().bokeh_versus_plot(**kwargs)
             elif typeofplot == 'compare':
                 if self.granularity == 'nation' and self.granularity != 'World':
                     print('typeofplot is compare with a national DB granularity, use date plot instead ...')
@@ -249,7 +249,7 @@ class AllVisu:
                     fig =  visu_bokeh().bokeh_yearly_plot(**kwargs)
         else:
             print(" Not implemented yet ")
-        return fig
+        return
 
     @decohistomap
     @decohistopie
