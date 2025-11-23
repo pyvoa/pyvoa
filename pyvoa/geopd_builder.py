@@ -412,7 +412,8 @@ class GPDBuilder(object):
             ordered=True
             )
        input = input.sort_values(by=['where','date'])
-
+       if input.empty:
+           raise PyvoaError('Data seems to be empty for :'+str(where))
        prefix = ['date', 'where', 'code']
        suffix = ['geometry']
        others = sorted([c for c in input.columns if c not in prefix + suffix])
