@@ -403,41 +403,42 @@ def getnonnegfunc(mypd,which):
     if isinstance(which,list):
         raise PyvoaError('getnonnegfunc do not accepte a list ...')
     else:
-        whichvalues = mypd[which]
         reconstructed = pd.DataFrame()
-        try:
-            y0 = whichvalues.values[0] # integrated offset at t=0
-        except:
-            y0 = 0
-        if np.isnan(y0):
-            y0 = 0
-        pa = whichvalues.diff()
-        yy = pa.values
-        ind = list(pa.index)
-        where_nan = np.isnan(yy)
-        yy[where_nan] = 0.
-        indices=np.where(yy < 0)[0]
-        for kk in np.where(yy < 0)[0]:
-            k = int(kk)
-            val_to_repart = -yy[k]
-            if k < np.size(yy)-1:
-                yy[k] = (yy[k+1]+yy[k-1])/2
-            else:
-                yy[k] = yy[k-1]
-            val_to_repart = val_to_repart + yy[k]
-            s = np.nansum(yy[0:k])
-            if not any([i !=0 for i in yy[0:k]]) == True and s == 0:
-                yy[0:k] = 0.
-            elif s == 0:
-                yy[0:k] = np.nan*np.ones(k)
-            else:
-                yy[0:k] = yy[0:k]*(1-float(val_to_repart)/s)
-        whichvalues = whichvalues.copy()
-        whichvalues.loc[ind] = np.cumsum(yy)+y0 # do not forget the offset
-        if reconstructed.empty:
-            reconstructed = mypd
-        else:
-            reconstructed = pd.concat([mypd,whichvalues])
+        loc = list(mypd['where'].unique())
+        for i in loc:
+            lpd = mypd.loc[mypd['where']==i]
+            whichvalues = lpd[which]
+            try:
+                y0 = whichvalues.values[0] # integrated offset at t=0
+            except:
+                y0 = 0
+            if np.isnan(y0):
+                y0 = 0
+            pa = whichvalues.diff()
+            yy = pa.values
+            ind = list(pa.index)
+            where_nan = np.isnan(yy)
+            yy[where_nan] = 0.
+            indices=np.where(yy < 0)[0]
+            for kk in np.where(yy < 0)[0]:
+                k = int(kk)
+                val_to_repart = -yy[k]
+                if k < np.size(yy)-1:
+                    yy[k] = (yy[k+1]+yy[k-1])/2
+                else:
+                    yy[k] = yy[k-1]
+                val_to_repart = val_to_repart + yy[k]
+                s = np.nansum(yy[0:k])
+                if not any([i !=0 for i in yy[0:k]]) == True and s == 0:
+                    yy[0:k] = 0.
+                elif s == 0:
+                    yy[0:k] = np.nan*np.ones(k)
+                else:
+                    yy[0:k] = yy[0:k]*(1-float(val_to_repart)/s)
+            whichvalues = whichvalues.copy()
+            whichvalues.loc[ind] = np.cumsum(yy)+y0 # do not forget the offset
+            lpd.loc[:,which]=whichvalues
+            reconstructed = pd.concat([reconstructed,lpd])
     return reconstructed
 
 def return_nonan_dates_pandas(df = None, field = None):
