@@ -1,0 +1,52 @@
+{
+  "header": "JHU Word DB no more available...",
+    "geoinfo": {
+    "granularity": "country",
+    "iso3": "WLD",
+    "locationmode":"name"
+  },
+  "replace":{
+          "Turkey":"Türkiye"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/10082179/files/jhu_time_series_covid19_deaths_global.csv",
+	 "namedata":"tot_deaths", 
+	 "urlparent":"https://github.com/CSSEGISandData/COVID-19",
+	 "separator":",",
+  	 "dropcolumns":["Province/State","Lat","Long"],
+	 "columns": [
+		 {
+		    "name":"where",
+    		    "alias":"Country/Region"	
+		}
+		  ]
+  		},
+  	{	
+	 "urldata": "https://zenodo.org/records/10082179/files/jhu_time_series_covid19_confirmed_global.csv",
+	 "namedata":"tot_confirmed", 
+	 "urlparent":"https://github.com/CSSEGISandData/COVID-19",
+	 "separator":",",
+  	 "dropcolumns":["Province/State","Lat","Long"],
+	 "columns": [
+		 {
+		    "name":"where",
+    		    "alias":"Country/Region"	
+		}
+		  ]
+  		},
+  	{	
+	 "urldata": "https://zenodo.org/records/10082179/files/jhu_time_series_covid19_recovered_global.csv",
+	 "namedata":"tot_recovered", 
+	 "urlparent":"https://github.com/CSSEGISandData/COVID-19",
+	 "separator":",",
+  	 "dropcolumns":["Province/State","Lat","Long"],
+	 "columns": [
+		 {
+		    "name":"where",
+    		    "alias":"Country/Region"	
+		}
+		  ]
+  		}
+	]
+}		
