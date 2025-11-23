@@ -28,11 +28,13 @@
 			{
 				"name":"tot_P",
 				"alias":"P",
+				"cumulative":true,
 				"description":"Nombre total de tests positifs"
 			},
 			{
 				"name":"tot_T",
 				"alias":"T",
+				"cumulative":true,
 				"description":"Nombre total de tests réalisés"
 			},
 			{

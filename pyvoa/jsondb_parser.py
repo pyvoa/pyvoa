@@ -274,6 +274,7 @@ class DataParser:
                pdata['description'] = pdata['description'].fillna(value='No description')
           else:
               pdata['description'] = 'No description'
+
           if 'cumulative' in list(pdata.columns):
              pdata['cumulative'] = pdata['cumulative'].fillna(value=False)
           else:
@@ -320,7 +321,7 @@ class DataParser:
             where_conditions = pdata.loc[pdata['name'] == 'where', 'alias']
             if not where_conditions.empty:
                 wh = where_conditions.values[0]
-                pandas_temp[coltocumul] = pandas_temp[coltocumul] #pandas_temp.groupby(wh)[coltocumul].cumsum()
+                pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
             else:
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
 
