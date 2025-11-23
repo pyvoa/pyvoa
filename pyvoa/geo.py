@@ -290,7 +290,7 @@ class GeoManager():
         elif not isinstance(w,list):
             raise PyvoaTypeError('Waiting for str, list of str or pandas'
                 'as input of get_standard function member of GeoManager')
-
+        wini=w.copy()
         w=[v.title() for v in w] # capitalize first letter of each name
 
         w0=w.copy()
@@ -352,9 +352,9 @@ class GeoManager():
         if output=='list':
             return n
         elif output=='dict':
-            return dict(zip(w0, n))
+            return dict(zip(wini, n))
         elif output=='pandas':
-            return pd.DataFrame([{'inputname':w0,self._standard:n}])
+            return pd.DataFrame([{'inputname':wini,self._standard:n}])
         else:
             return None # should not be here
 
