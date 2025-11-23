@@ -93,10 +93,13 @@ class visu_matplotlib:
         for idx, i in enumerate(what):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
+                label = f"{where}"
+                if len(what)>1:
+                    label =f"{where} — {i}"
                 plt.plot(
                     df.index,
                     df[where],
-                    label=f"{where} — {i}",   # label unique
+                    label=label, 
                     linestyle=st[idx]
                 )
 
