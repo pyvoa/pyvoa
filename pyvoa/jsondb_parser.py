@@ -225,7 +225,6 @@ class DataParser:
                     PyvoaError('Granularity problem: neither country, region or subregion')
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
-
             self.get_echoinfo()
         except:
             raise PyvoaDbError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
@@ -385,7 +384,6 @@ class DataParser:
 
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db = pandas_db.sort_values(['where','date'])
-
       self.available_keywords = list(pandas_db.columns)
 
       if 'date' in self.available_keywords:
@@ -396,15 +394,22 @@ class DataParser:
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}
       geopd = pd.DataFrame()
+
       if granularity == 'country':
           info = coge.GeoInfo()
-          if locationmode == "code":
-            g = coge.GeoManager('name')
+          if locationmode == "name":
+              g = coge.GeoManager('name')
+              locationdb  = g.to_standard(locationdb,output='list',db = self.db)
+              g = coge.GeoManager('iso3')
+              namecode  = g.to_standard(locationdb,output='dict',db = self.db)
+              codenamedico = {k.upper():v.upper() for k,v in namecode.items()}
+          elif locationmode == "code":
+              g = coge.GeoManager('name')
+              namecode  = g.to_standard(locationdb,output='dict',db = self.db)
+              codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
           else:
-            g = coge.GeoManager('iso3')
-          namecode  = g.to_standard(locationdb,output='dict',db = self.db)
-          codenamedico = {k.upper():v.title() for k,v in namecode.items()}
-          geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
+              raise PyvoaError("Geo interpretation wrong ! not code nor name ...")
+          geopd=pd.DataFrame({'where':codenamedico.keys(),'code':codenamedico.values()})
           geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
           geopd = self.geo.get_subregion_list()
@@ -412,31 +417,34 @@ class DataParser:
               geopd = geopd.loc[geopd.code_subregion.isin(locationdb)]
           else:
               geopd = geopd.loc[geopd.name_subregion.isin(locationdb)]
-          geopd['name_subregion'] = geopd['name_subregion'].str.title()
+          geopd['name_subregion'] = geopd['name_subregion'].str.upper()
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
-          geopd = geopd.rename(columns={"code_subregion": "code"})
+          geopd = geopd.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
       elif granularity == 'region':
           geopd = self.geo.get_region_list()
           codenamedico = self.geo.get_data().set_index('code_region')['name_region'].to_dict()
-          #geopd['name_region'] = geopd['name_region'].str.title()
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
-          geopd = geopd.rename(columns={"code_region": "code"})
+          geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
       else:
           raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')
+
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
           pandas_db['where'] = pandas_db['code'].map(codenamedico)
       elif locationmode == "name":
-          pandas_db['where'] = pandas_db['where'].str.title()
-          reverse={v:k for k,v in codenamedico.items()}
-          pandas_db['code'] = pandas_db['where'].map(reverse)
+          pandas_db['where'] = pandas_db['where'].str.upper()
+          #reverse={v:k for k,v in codenamedico.items()}
+          pandas_db['code'] = pandas_db['where'].map(codenamedico)
       else:
           PyvoaError("what locationmode in your json file is supposed to be ?")
+      if 'where' in pandas_db.columns:
+          pandas_db=pandas_db.drop(columns='where')
+      pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
+      pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
 
-      pandas_db = pandas_db.merge(geopd[['code','geometry']], how = 'inner', on='code')
       return pandas_db
 
   def get_db(self,):

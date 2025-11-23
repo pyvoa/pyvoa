@@ -298,10 +298,11 @@ class GPDBuilder(object):
 
        if input.empty:
            input = self.currentdata.get_maingeopandas()
-
+     
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
+
 
        input['date'] = pd.to_datetime(input['date'], errors='coerce')
        when_beg_data, when_end_data = input.date.min(), input.date.max()
@@ -320,6 +321,7 @@ class GPDBuilder(object):
            when_beg_data,when_end_data = when_beg, when_end
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
+
        kwargs['when']=[when_beg_data.strftime("%Y-%m-%d")+':'+when_end_data.strftime("%Y-%m-%d")]
        flatwhere = flat_list(where)
 

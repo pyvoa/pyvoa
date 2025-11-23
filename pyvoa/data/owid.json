@@ -19,7 +19,7 @@
 	 "separator":",",
   	 "columns": [
     			{
-		    "name":"where",
+		   "name":"where",
     		   "alias":"iso_code"	
 			},
 			{
