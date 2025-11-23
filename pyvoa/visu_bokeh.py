@@ -696,11 +696,14 @@ class visu_bokeh:
             for idx,val in enumerate(what):
                 for ldx,loc in enumerate(list(input['where'].unique())):
                     pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
+                    label = f"{loc}"
                     colors = pyvoa.data['colors']
+                    if len(what)>1:
+                        label=f"{loc}, {val}"
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      line_width = 3,
                                      color=colors[ldx],
-                                     legend_label=f"{loc}, {val}",
+                                     legend_label=label,
                                      hover_line_width = 4, name = val, line_dash=line_style[idx])
                     r_list.append(r)
                     maxi=max(maxi,np.nanmax(input[val]))
@@ -727,7 +730,7 @@ class visu_bokeh:
             if axis_type == 'linear':
                 if maxi  < 1e4 :
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-
+            fig.legend.title=", ".join(what)        
             fig.legend.spacing = 10
             fig.legend.ncols = len(what)
             fig.legend.visible = True
