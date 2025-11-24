@@ -249,7 +249,7 @@ class AllVisu:
                     fig =  visu_bokeh().bokeh_yearly_plot(**kwargs)
         else:
             print(" Not implemented yet ")
-        return
+        return fig
 
     @decohistomap
     @decohistopie
