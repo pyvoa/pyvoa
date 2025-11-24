@@ -303,9 +303,9 @@ class front:
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
                 kwargs['input'] = input
-                when = kwargs.get('g')
+                when = kwargs.get('when')
                 if when:
-                 kwargs['when'] = when
+                    kwargs['when'] = when
                 else:
                     kwargs['when'] = [str(input.date.min())+':'+str(pd.to_datetime(input.date.max()) )]
             else:
@@ -401,7 +401,7 @@ class front:
         output = kwargs.get('output')
         pandy = kwargs.get('input')
         where = kwargs.get('where')
-
+        
         self.setnamefunction(self.get)
         if output == 'pandas':
             def color_df(val):

@@ -266,6 +266,7 @@ def extract_dates(when):
             raise PyvoaError("Too many dates given. Expecting 1 or 2 with : as a separator. ")
         if len(w) == 1:
             w1=check_valid_date(w[0])
+            return w1,w1
         if len(w) > 1:
             if w[1] != '':
                 w1=check_valid_date(w[1])
