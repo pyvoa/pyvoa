@@ -7,6 +7,5 @@
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
 - [ ] placer un logo pyvoa avec fond transparent (souci visible notamment avec hist )
 - [TROP compliqué car cas bokeh != matplotlib j'ai mis en UPPER LA DB] titre avec base en gras et/ou lettres capitales. Suivi de " : "
-- [ ] récupérer la figure en matplotlib pour édition ultérieure
 - [je n'ai pas le pb] pbl avec l'indicateur mobile sur bokeh (valeur = NAN). Exemple spf : pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
 - [ ] pas de centrage sur la métropole quand demandé. spf. pf.map(where='métropole',which='tot_dchosp',typeofmap='dense')
