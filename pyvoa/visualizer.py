@@ -82,7 +82,6 @@ class AllVisu:
             pass
         else:
             self.kindgeo = kindgeo
-        self.when_beg, self.when_end = dt.date(1, 1, 1), dt.date(1, 1, 1)
 
         self.database_name = None
         verb("Init of AllVisu() with db=" + str(db_name))
@@ -200,6 +199,8 @@ class AllVisu:
     def plot(self,**kwargs):
         input = kwargs.get('input')
         typeofplot = kwargs.get('typeofplot')
+        if input.date.max() == input.date.min():
+            raise PyvoaError("Only one date ! Plot is meaning less here")
         vis = kwargs.get('vis')
         fig = None
         if (typeofplot == 'yearly' or typeofplot == 'spiral') and \

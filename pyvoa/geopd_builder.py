@@ -318,12 +318,12 @@ class GPDBuilder(object):
            if when_end > when_end_data:
                 when_end = when_end_data
                 PyvoaWarning("No available data after "+str(when_end_data) + ' - ' + str(when_end) + ' is considered')
-           input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
+           if when_beg != when_end:
+               input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
            kwargs['input'] = input
            when_beg_data,when_end_data = when_beg, when_end
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
-
        kwargs['when']=[when_beg_data.strftime("%Y-%m-%d")+':'+when_end_data.strftime("%Y-%m-%d")]
        flatwhere = flat_list(where)
 
@@ -336,6 +336,7 @@ class GPDBuilder(object):
 
            input.loc[:,w] = input.groupby('where')[w].bfill()
            input.loc[:,w] = input.groupby('where')[w].ffill()
+
            where_alldate_nan = input.groupby('where')[w].apply(lambda x: x.isna().all())
            wherenan = where_alldate_nan[where_alldate_nan].index.tolist()
            if wherenan:
@@ -395,6 +396,9 @@ class GPDBuilder(object):
                if bypopvalue is not None:
                   input = self.normbypop(input, w+k ,bypopvalue)
 
+       if when_beg == when_end:
+          input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
+
        if 'geometry' in input.columns:
          input = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):
@@ -412,6 +416,7 @@ class GPDBuilder(object):
             ordered=True
             )
        input = input.sort_values(by=['where','date'])
+
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
        prefix = ['date', 'where', 'code']

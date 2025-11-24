@@ -247,8 +247,8 @@ class visu_bokeh:
             for key, fig in dicfig.items():
                 fig.title = title
                 dicfig[key]=fig
-            #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
-            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
+            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
+            #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
             kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
@@ -731,14 +731,13 @@ class visu_bokeh:
                 if maxi  < 1e4 :
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
             fig.legend.title=", ".join(what)
-            fig.legend.spacing = 10
             fig.legend.ncols = len(what)
             fig.legend.visible = True
-            fig.legend.label_text_font_size = "12px"
             fig.legend.background_fill_alpha = 0.6
             fig.legend.click_policy="hide"
             fig.legend.label_text_font_size = '8pt'
             fig.legend.spacing = 5
+            fig.legend.location = "top_left"
             panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
             panels.append(panel)
             fig.xaxis.formatter = DatetimeTickFormatter(
