@@ -84,11 +84,10 @@ class visu_matplotlib:
         nb = kwargs['maxlettersdisplay']
         input['where'] = [k[:nb] for k in input['where']]
         what = kwargs.get('what')
-        plt = kwargs['plt']
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
-        plt.xlabel("date", fontsize=10)
-        plt.ylabel(what[0], fontsize=10)
+        ax.set_xlabel("date", fontsize=10)
+        ax.set_ylabel(what[0], fontsize=10)
         st=['-','--',':']
         for idx, i in enumerate(what):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
@@ -103,8 +102,7 @@ class visu_matplotlib:
                     linestyle=st[idx]
                 )
 
-        plt.legend(loc="upper right", fontsize=8, title_fontsize=10)
-        plt.legend(title=", ".join(what),ncol=len(what))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(what),ncol=len(what))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
         return ax
 
@@ -112,17 +110,16 @@ class visu_matplotlib:
     def matplotlib_versus_plot(self,**kwargs):
         input = kwargs.get('input')
         what = kwargs.get('what')
-        plt = kwargs['plt']
         ax = kwargs['ax']
         loc = list(input['where'].unique())
-        plt.xlabel(what[0], fontsize=10)
-        plt.ylabel(what[1], fontsize=10)
+        ax.set_xlabel()(what[0], fontsize=10)
+        ax.set_ylabel()(what[1], fontsize=10)
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
             ax.plot(pandy[what[0]], pandy[what[1]])
             leg.append(col)
-        plt.legend(leg)
+        ax.legend(leg)
         return ax
 
     @decomatplotlib
@@ -149,7 +146,7 @@ class visu_matplotlib:
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
             ax = ax.plot(df.index,df,label=f'{i}')
-        plt.legend(d)
+        ax.legend(d)
         return ax
 
     @decomatplotlib
@@ -191,7 +188,7 @@ class visu_matplotlib:
 
         input_sorted = input.sort_values(by=what,ascending=True)
         ax.set_title(title)
-        plt.xlabel(what)
+        ax.set_xlabel(what)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
         input_sorted['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input_sorted['where']]
@@ -226,9 +223,8 @@ class visu_matplotlib:
         from mpl_toolkits.axes_grid1 import make_axes_locatable
         import contextily as cx
         import xyzservices
-        plt = kwargs.get('plt')
         ax = kwargs.get('ax')
-        plt.axis('off')
+        ax.axis('off')
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
