@@ -101,7 +101,7 @@ class AllVisu:
         self.maxcountrydisplay  = 12
         self.maxlettersdisplay = 10
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
-        self.logo = pathmetadb+'/pyvoa_logo2.jpg'
+        self.logo = pathmetadb+'/logo-pyvoa.png'
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
