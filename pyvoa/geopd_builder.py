@@ -310,6 +310,7 @@ class GPDBuilder(object):
        when_beg_data, when_end_data = input.date.min(), input.date.max()
        when_beg_data, when_end_data = when_beg_data.date(), when_end_data.date()
 
+       when_beg, when_end = dt.date(1,1,1), dt.date.today()
        if when:
            when_beg, when_end = extract_dates(when)
            if when_beg < when_beg_data:

@@ -1422,6 +1422,7 @@ class visu_bokeh:
 
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
         formatters = {'where': 'printf', '@right': 'printf',})),
+        bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
