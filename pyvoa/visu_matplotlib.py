@@ -218,11 +218,7 @@ class visu_matplotlib:
         '''
          matplotlib map display
         '''
-        from matplotlib.colors import Normalize
-        from matplotlib import cm
-        from mpl_toolkits.axes_grid1 import make_axes_locatable
         import contextily as cx
-        import xyzservices
         ax = kwargs.get('ax')
         ax.axis('off')
         input = kwargs.get('input')
@@ -248,4 +244,4 @@ class visu_matplotlib:
         else:
             PyvoaError("Don't know what kind of tile is it ...")
 
-        return cx
+        return ax
