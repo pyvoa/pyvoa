@@ -227,7 +227,7 @@ class visu_matplotlib:
         tile = kwargs.get('tile')
         input.plot(column = what, ax=ax,legend=True,
                                 legend_kwds={'label': what,
-                                'orientation': "horizontal","pad": 0.001})
+                                'orientation': "horizontal","pad": 0.01, 'shrink': 0.5})
         ax.set_axis_off()
         ax.set_title(title)
 
