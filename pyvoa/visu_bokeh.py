@@ -730,7 +730,7 @@ class visu_bokeh:
             if axis_type == 'linear':
                 if maxi  < 1e4 :
                     fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-            fig.legend.title=", ".join(what)        
+            fig.legend.title=", ".join(what)
             fig.legend.spacing = 10
             fig.legend.ncols = len(what)
             fig.legend.visible = True
@@ -1351,10 +1351,28 @@ class visu_bokeh:
         wmt = WMTSTileSource(url = tile)
         bokeh_figure = kwargs['bokeh_figure_map']
         bokeh_figure.add_tile(wmt, retina=True)
-        #bokeh_figure.add_tile("CartoDB Positron",retina=True)
 
-        xmin, xmax = bokeh_figure.x_range.start, bokeh_figure.x_range.end
-        ymin, ymax = bokeh_figure.y_range.start, bokeh_figure.y_range.end
+        def geosource_bounds(geosource):
+            import json
+            from shapely.geometry import shape
+            data = json.loads(geosource.geojson)
+            xs, ys = [], []
+            for feature in data["features"]:
+                geom = shape(feature["geometry"])
+                x_min, y_min, x_max, y_max = geom.bounds
+                xs += [x_min, x_max]
+                ys += [y_min, y_max]
+            return min(xs), min(ys), max(xs), max(ys)
+        xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
+        # padding pour zoom confortable
+        pad_x = (xmax - xmin) * 0.05
+        pad_y = (ymax - ymin) * 0.05
+
+        bokeh_figure.x_range.start = xmin - pad_x
+        bokeh_figure.x_range.end   = xmax + pad_x
+        bokeh_figure.y_range.start = ymin - pad_y
+        bokeh_figure.y_range.end   = ymax + pad_y
+
         logo = kwargs['logo']
         logo_url = visu_bokeh.pyvoalogo(logo)
         bokeh_figure.image_url(
@@ -1393,7 +1411,6 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
-
 
         bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
         fill_color = {'field': what, 'transform': color_mapper},
