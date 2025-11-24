@@ -738,7 +738,7 @@ class visu_bokeh:
             fig.legend.background_fill_alpha = 0.6
             fig.legend.click_policy="hide"
             fig.legend.label_text_font_size = '8pt'
-
+            fig.legend.spacing = 5
             panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
             panels.append(panel)
             fig.xaxis.formatter = DatetimeTickFormatter(
