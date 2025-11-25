@@ -18,3 +18,4 @@ Exemple
 pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020') # d'une part
 pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',when='05/05/2020') # d'autre part → on n'obtient pas pareil.
 - [ ] en bokeh / owid / pf.map(dateslider=True,when=':31/12/2020') # → quand on fait "play" les proportions changent !
+- [ ] Pas de variable indiquée sur les histos bokeh.
