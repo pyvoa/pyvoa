@@ -91,7 +91,6 @@ def safe_output_notebook():
 safe_output_notebook()
 
 #output_notebook(hide_banner=True)
-
 from bokeh.layouts import (
 row,
 column,
@@ -121,10 +120,8 @@ class visu_bokeh:
         self.av = InputOption()
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
-        self.figure_height = 400
-        self.figure_width = 580
-        self.graph_height = 400
-        self.graph_width = 400
+        self.figure_height = 380
+        self.figure_width = 500
         self.listfigs = None
 
     @staticmethod
@@ -233,14 +230,14 @@ class visu_bokeh:
             input = kwargs['input']
 
             dicfig = {}
-            dicfig['bokeh_figure_linear']     = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
-            dicfig['bokeh_figure_log']        = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
-            dicfig['bokeh_figure_loglog']     = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_map']        = figure(x_axis_type='mercator', y_axis_type='mercator', match_aspect=True)
-            dicfig['bokeh_figure_linear_date']= figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
-            dicfig['bokeh_figure_log_date']   = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_spiral']     = figure(width=width, height=height)
-            dicfig['bokeh_figure_yearly']       = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
+            dicfig['bokeh_figure_linear']      = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_log']         = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_loglog']      = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
+            dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=width, height=height, match_aspect=False)
+            dicfig['bokeh_figure_linear_date'] = figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
+            dicfig['bokeh_figure_log_date']    = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
+            dicfig['bokeh_figure_spiral']      = figure(width=width, height=height)
+            dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
 
 
             logo_url = visu_bokeh.pyvoalogo(logo)
@@ -263,6 +260,7 @@ class visu_bokeh:
 
             bokeh_figure_linear = kwargs.get('bokeh_figure_linear')
             bokeh_figure_log = kwargs.get('bokeh_figure_log')
+            bokeh_figure_map = kwargs.get('bokeh_figure_map')
 
             dateslider = kwargs.get('dateslider')
             if func.__name__ == 'bokeh_histo' and dateslider == True:
@@ -274,7 +272,6 @@ class visu_bokeh:
             input_uniquecountries = input.drop_duplicates(subset=["where"]).drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
 
-
             if 'geometry' in list(input_uniquecountries.columns):
                 passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
                 convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
@@ -285,7 +282,7 @@ class visu_bokeh:
             input['left'] = input['left'].apply(lambda x: 0 if x > 0 else x)
             input['right'] = input['right'].apply(lambda x: 0 if x < 0 else x)
             input['horihistotextx'] = input['right']
-            ymax = self.graph_height
+            ymax = self.figure_height
             indices = [i % maxcountrydisplay for i in range(len(input))]
             input['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay
                 for i in indices]
@@ -328,7 +325,8 @@ class visu_bokeh:
                 cols = list(input_dates.columns)
 
                 frames = []
-                #unique_dates =unique_dates[:200]
+
+                #unique_dates = unique_dates[::-1]
                 for d in unique_dates:
                     df_d = input_dates[input_dates['date'] == d].copy()
                     df_d = df_d[cols]
@@ -346,10 +344,35 @@ class visu_bokeh:
                             frame[c] = []
                     frames.append(frame)
 
+                def geosource_bounds(geosource):
+                    import json
+                    from shapely.geometry import shape
+                    data = json.loads(geosource.geojson)
+                    xs, ys = [], []
+                    for feature in data["features"]:
+                        geom = shape(feature["geometry"])
+                        x_min, y_min, x_max, y_max = geom.bounds
+                        xs += [x_min, x_max]
+                        ys += [y_min, y_max]
+                    return min(xs), min(ys), max(xs), max(ys)
+                xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
+                pad_x = (xmax - xmin) * 0.05
+                pad_y = (ymax - ymin) * 0.05
+                bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
+                bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
+                ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
+                bokeh_figure_map.min_border = 0
+
+                bokeh_figure_map.x_range.start = xmin - pad_x
+                bokeh_figure_map.x_range.end   = xmax + pad_x
+                bokeh_figure_map.y_range.start = ymin - pad_y
+                bokeh_figure_map.y_range.end   = ymax + pad_y
+
                 from bokeh.models import Slider, CustomJS, Div
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
                 from bokeh.models import CustomJS
+
 
                 slider_callback = CustomJS(
                         args=dict(
@@ -362,7 +385,12 @@ class visu_bokeh:
                             maxcountrydisplay=maxcountrydisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
-                            x_range = bokeh_figure_linear.x_range,
+                            bokeh_figure_map = bokeh_figure_map,
+                            mapxmin = xmin - pad_x,
+                            mapxmax = xmax + pad_x,
+                            mapymin = ymin - pad_y,
+                            mapymax = ymax + pad_y,
+                            #x_range = bokeh_figure_linear.x_range,
                             ymax = ymax,
                             color_mapperjs = color_mapper,
                         ),
@@ -390,20 +418,24 @@ class visu_bokeh:
                                 limited[i]['horihistotexty'] = limited[i]['bottom'] + 0.5 * ymax / maxcountrydisplay;
                             }
 
-                            // Mettre à jour source avec toutes les données
                             for (const k of keys) {
-                                const full_col = rows.map(r => r[k]);
-                                if (k in source.data) source.data[k] = full_col;
+                                if (k === "xs" || k === "ys") continue;
+                                const full_col = rows.map(r => r[k]).filter(v => v !== undefined);
+                                if (k in source.data) {
+                                    source.data[k] = full_col;
+                                }
                             }
 
-                            // Mettre à jour source2 avec les données limitées
+
+                            bokeh_figure_map.x_range.bounds = [mapxmin, mapxmax]
+                            bokeh_figure_map.y_range.bounds = [mapymin, mapymax]
+                            console.log("--->2",bokeh_figure_map.x_range.start,bokeh_figure_map.x_range.end);
+
                             for (const k of keys) {
                                 const limited_col = limited.map(r => r[k]);
                                 if (k in source2.data) source2.data[k] = limited_col;
                             }
 
-
-                            //console.log(source.data['where'][i],source.data['xs'][i]);
                             const len = source2.data[what].length;
                             const total = source2.data[what].map(Number).reduce((a, b) => a + b, 0);
                             const angles = new Array(len);
@@ -431,19 +463,11 @@ class visu_bokeh:
                             const lefts = source2.data['left'];
                             const rights = source2.data['right'];
 
-                            var maxx = Math.max.apply(Math, rights);
-                            var minx = Math.min.apply(Math, lefts);
-                            x_range.end =  1.2 * maxx;
-                            x_range.start =  1.05 * minx;
-
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
 
-                            color_mapperjs.high = Math.max(...rights);
-                            color_mapperjs.low  = Math.min(...rights);
-
-                            color_mapperjs.change.emit();
                             source.change.emit();
+                            bokeh_figure_map.change.emit();
                             source2.change.emit();
 
                             div.text = '<b>' + dates[i] + '</b>';
@@ -1351,27 +1375,6 @@ class visu_bokeh:
         bokeh_figure = kwargs['bokeh_figure_map']
         bokeh_figure.add_tile(wmt, retina=True)
 
-        def geosource_bounds(geosource):
-            import json
-            from shapely.geometry import shape
-            data = json.loads(geosource.geojson)
-            xs, ys = [], []
-            for feature in data["features"]:
-                geom = shape(feature["geometry"])
-                x_min, y_min, x_max, y_max = geom.bounds
-                xs += [x_min, x_max]
-                ys += [y_min, y_max]
-            return min(xs), min(ys), max(xs), max(ys)
-        xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
-        # padding pour zoom confortable
-        pad_x = (xmax - xmin) * 0.05
-        pad_y = (ymax - ymin) * 0.05
-
-        bokeh_figure.x_range.start = xmin - pad_x
-        bokeh_figure.x_range.end   = xmax + pad_x
-        bokeh_figure.y_range.start = ymin - pad_y
-        bokeh_figure.y_range.end   = ymax + pad_y
-
         logo = kwargs['logo']
         logo_url = visu_bokeh.pyvoalogo(logo)
         bokeh_figure.image_url(
@@ -1386,19 +1389,9 @@ class visu_bokeh:
 
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
-        min_col, max_col, min_col_non0 = 3*[0.]
-        try:
-            if dateslider:
-                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[what]),
-                                                         np.nanmax(input[what]))
-                min_col_non0 = (np.nanmin(input.loc[input[what]>0.][what]))
-            else:
-                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[what]),
-                                                         np.nanmax(input[what]))
-                min_col_non0 = (np.nanmin(input.loc[input[what]>0.][what]))
-        except ValueError:
-            pass
 
+
+        min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[what]), np.nanmax(input[what]))
 
         invViridis256 = Viridis256[::-1]
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
@@ -1422,7 +1415,7 @@ class visu_bokeh:
 
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
         formatters = {'where': 'printf', '@right': 'printf',})),
-        bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
+        #bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
