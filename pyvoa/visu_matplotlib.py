@@ -103,7 +103,7 @@ class visu_matplotlib:
                 )
 
         ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(what),ncol=len(what))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
         return ax
 
     @decomatplotlib
