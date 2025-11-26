@@ -120,8 +120,8 @@ class visu_bokeh:
         self.av = InputOption()
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
-        self.figure_height = 380
-        self.figure_width = 500
+        self.figure_height = 400
+        self.figure_width = 480
         self.listfigs = None
 
     @staticmethod
@@ -241,9 +241,9 @@ class visu_bokeh:
             logo_url = visu_bokeh.pyvoalogo(logo)
             for key, fig in dicfig.items():
                 if key == "bokeh_figure_map" and kwargs['dateslider']:
-                    fig.title = None
-                else:
                     fig.title = title
+                else:
+                    fig.title = title + str(kwargs['kwargsuser']['when'])
                 dicfig[key]=fig
             d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
             #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
