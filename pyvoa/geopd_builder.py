@@ -430,7 +430,7 @@ class GPDBuilder(object):
    def normbypop(self, pandy , val2norm ,bypop):
     """
         Return a pandas with a normalisation column add by population
-        * can normalize by '100', '1k', '100k' or '1M' and the new which
+        * can normalize by '100', '1k', '10k', '100k' or '1M' and the new which
     """
     dpop = InputOption().dictpop
     if pandy.empty:

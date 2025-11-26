@@ -45,7 +45,7 @@ class InputOption():
         Option visualisation !
     """
     def __init__(self):
-        self.dictpop = {'pop':1.,'pop100':100,'pop1k':1e3,'pop100k':1e5,'pop1M':1e6}
+        self.dictpop = {'pop':1.,'pop100':100,'pop1k':1e3,'pop10k':1e4,'pop100k':1e5,'pop1M':1e6}
         self.lpop = ['normalize:'+k for k in self.dictpop.keys()]
         self.d_batchinput_args  = {
                         'where':[''],\
