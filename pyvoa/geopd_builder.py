@@ -325,7 +325,7 @@ class GPDBuilder(object):
            when_beg_data,when_end_data = when_beg, when_end
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
-       kwargs['when']=[when_beg_data.strftime("%Y-%m-%d")+':'+when_end_data.strftime("%Y-%m-%d")]
+       kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
        flatwhere = flat_list(where)
 
        bypopvalue = None
@@ -502,7 +502,7 @@ class GPDBuilder(object):
        else:
           pandyori = kwargs['pandas']
        pandy = pandyori
-       pandy['date']=pandy['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+       pandy['date']=pandy['date'].apply(lambda x: x.strftime('%d/%m/%Y'))
        if saveformat == 'excel':
            pandy.to_excel(savename+'.xlsx',index=False, na_rep='NAN')
        elif saveformat == 'csv':
