@@ -132,6 +132,10 @@ class AllVisu:
             loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
+
+            if kwargs['kwargsuser']['what'] != 'current':
+                kwargs['which'] = kwargs['what']
+
             return func(self, **kwargs)
         return inner_plot
 
@@ -166,9 +170,12 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['title'] = self.database_name.upper() + ' database at ' + when[0].split(':')[1]
+            kwargs['title'] = self.database_name.upper() + ' database \n'
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
+            if kwargs['kwargsuser']['what'] != 'current':
+                kwargs['which'] = kwargs['what']
+
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
