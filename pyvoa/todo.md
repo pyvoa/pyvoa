@@ -21,3 +21,5 @@ pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',when='05/05/2020'
 - [ ] Pas de variable indiquée sur les histos bokeh
 - [ ] Pas de variable indiquée sur les maps bokeh
 - [ ] quand on sauve un bokeh, le logo disparait
+- [ ] ajouter normalisation pop10k
+- [ ] souci avec pandas externe et le sumall (cf chat)
