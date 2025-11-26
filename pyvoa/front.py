@@ -401,7 +401,7 @@ class front:
         output = kwargs.get('output')
         pandy = kwargs.get('input')
         where = kwargs.get('where')
-        
+
         self.setnamefunction(self.get)
         if output == 'pandas':
             def color_df(val):
@@ -1127,7 +1127,7 @@ class front:
                 save(self.outcome)
                 #
             else:
-                self.outcome.savefig(name)
+                self.outcome.figure.savefig(name)
             print('Figure :', name, ' has been saved ')
         else:
             PyvoaError('savefig can\'t be used to store a panda DataFrame')
