@@ -292,14 +292,13 @@ class GPDBuilder(object):
           kwargs['which'] = which
 
        what =  kwargs.get('what')
-
-       kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
        when = kwargs.get('when')
 
        input = kwargs['input']
 
-       if input.empty:
-           input = self.currentdata.get_maingeopandas()
+       if kwargs['kwargsuser']['input'].empty:
+            kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
+            input = self.currentdata.get_maingeopandas()
 
        anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
        input = input.loc[:,~input.columns.isin(anticolumns)]

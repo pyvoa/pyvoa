@@ -12,15 +12,5 @@
 - [ ] spf / sumall → légende "Ain, Aisne… → indiquer "sumall" ? ou "France" ? quand rien n'est précisé…
 - [ ] souci sur l'axe des dates pour → pf.setwhom('jhu-usa',reload=False)
 pf.plot(when='18/03/2020:01/04/2020',what='daily',which='tot_deaths',option='sumall')
-- [ ] spf / pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020') → pas de variable indiquée sur le graphe
-- [ ] pbl avec le dateslider. 
-Exemple 
-pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020') # d'une part
-pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',when='05/05/2020') # d'autre part → on n'obtient pas pareil.
-- [ ] en bokeh / owid / pf.map(dateslider=True,when=':31/12/2020') # → quand on fait "play" les proportions changent !
 - [ ] Pas de variable indiquée sur les histos bokeh
-- [ ] Pas de variable indiquée sur les maps bokeh
 - [ ] quand on sauve un bokeh, le logo disparait
-- [ ] ajouter normalisation pop10k
-- [ ] souci avec pandas externe et le sumall (cf chat)
-- [ ] nom de la variable avec les cartes (en normal ET en dateslider)
