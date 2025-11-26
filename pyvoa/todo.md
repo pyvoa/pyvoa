@@ -24,3 +24,4 @@ pf.map(where='métropole',which='tot_dchosp',typeofmap='dense',when='05/05/2020'
 - [ ] ajouter normalisation pop10k
 - [ ] souci avec pandas externe et le sumall (cf chat)
 - [ ] nom de la variable avec les cartes (en normal ET en dateslider)
+- [ ] avec un pandas externe, obligation de charger une base avant. Ce qui est idiot.
