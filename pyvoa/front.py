@@ -307,9 +307,9 @@ class front:
                 if when:
                     kwargs['when'] = when
                 else:
-                    kwargs['when'] = [str(input.date.min())+':'+str(pd.to_datetime(input.date.max()) )]
-            else:
-                kwargs = self.gpdbuilder.get_stats(**kwargs)
+                    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
+                
+            kwargs = self.gpdbuilder.get_stats(**kwargs)
 
             found_bypop = None
             for w in kwargs['option']:
