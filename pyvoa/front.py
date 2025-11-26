@@ -308,7 +308,8 @@ class front:
                     kwargs['when'] = when
                 else:
                     kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
-                
+                kwargs['kwargsuser']['input']=input    
+
             kwargs = self.gpdbuilder.get_stats(**kwargs)
 
             found_bypop = None
