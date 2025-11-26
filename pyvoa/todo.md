@@ -14,3 +14,4 @@
 pf.plot(when='18/03/2020:01/04/2020',what='daily',which='tot_deaths',option='sumall')
 - [ ] Pas de variable indiquée sur les histos bokeh
 - [ ] quand on sauve un bokeh, le logo disparait
+- [ ] avec un pandas externe, obligation de charger une base avant. Ce qui est idiot.
