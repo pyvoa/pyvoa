@@ -301,14 +301,14 @@ class front:
 
             if not input.empty:
                 if not all(i in input.columns for i in ['where', 'date']):
-                    raise PyvoaError("Minimal requierement for your input pandas : 'where', 'date' and 'geometry' must be in the columns name")
+                    raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
                 kwargs['input'] = input
                 when = kwargs.get('when')
                 if when:
                     kwargs['when'] = when
                 else:
                     kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
-                kwargs['kwargsuser']['input']=input    
+                kwargs['kwargsuser']['input']=input
 
             kwargs = self.gpdbuilder.get_stats(**kwargs)
 
