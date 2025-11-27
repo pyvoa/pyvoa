@@ -272,6 +272,8 @@ class visu_bokeh:
             maxcountrydisplay = kwargs['maxcountrydisplay']
             maxlettersdisplay = kwargs['maxlettersdisplay']
 
+            lhist = ['bokeh_pie','bokeh_horizonhisto']
+
             def _fmt(v):
                 fv = float(v)
                 if fv == 0:
@@ -280,32 +282,32 @@ class visu_bokeh:
                     return '{:.3g}'.format(fv)
                 return str(round(fv, 2))
 
-            input = self.add_columns_for_pie_chart(input,which)
-
             ymax = self.figure_height
             def addhistoposition(mypd):
-                    mypd['left'] = mypd[which]
-                    mypd['right'] = mypd[which]
-                    mypd['horihistotext'] = mypd['right'].apply(_fmt)
-                    mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
-                    mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
-                    mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
-                    mypd['horihistotextx'] = mypd['right']
-                    indices = [i % maxcountrydisplay for i in range(len(mypd))]
-                    mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-                    mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
-                    mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
-                    mypd['horihistotextx'] = mypd['right']
-                    return mypd
+                mypd['left'] = mypd[which]
+                mypd['right'] = mypd[which]
+                mypd['horihistotext'] = mypd['right'].apply(_fmt)
+                mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
+                mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
+                mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
+                mypd['horihistotextx'] = mypd['right']
+                indices = [i % maxcountrydisplay for i in range(len(mypd))]
+                mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
+                mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
+                mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
+                mypd['horihistotextx'] = mypd['right']
+                return mypd
 
-            input = addhistoposition(input)
-            yrange = Range1d(min(input['bottom']), max(input['top']))
+            if func.__name__ in lhist:
+                input = addhistoposition(input)
+                yrange = Range1d(min(input['bottom']), max(input['top']))
 
             input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
 
             if 'geometry' in list(input_uniquecountries.columns):
-                input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
+                if func.__name__ in lhist:
+                    input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
                 input_uniquecountries['cases']=input_uniquecountries[which]
                 passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
                 convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
@@ -315,7 +317,6 @@ class visu_bokeh:
                 input_dates = input.drop(columns='geometry').copy()
             else:
                 input_dates = input.copy()
-
 
             if dateslider:
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
@@ -348,8 +349,10 @@ class visu_bokeh:
                     frames.append(frame)
 
                 input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
-                input_dates = addhistoposition(input_dates)
-                yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
+                if func.__name__ in lhist:
+                    input_dates = addhistoposition(input_dates)
+                    input_dates = self.add_columns_for_pie_chart(input_dates,which)
+                    yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
                 columndatasrc = ColumnDataSource(data = input_dates)
 
                 from bokeh.models import Slider, CustomJS, Div
@@ -396,7 +399,6 @@ class visu_bokeh:
                             const len = sourcehisto.data[which].length;
 
                             const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
-                            console.log(sorted_rows);
                             const limited = sorted_rows.slice(0, maxcountrydisplay);
                             const allColumns = Object.keys(sourcehisto.data);
 
@@ -406,6 +408,8 @@ class visu_bokeh:
                             }
 
                             const labelMap = new Map();
+                            const total = sourcehisto.data[which].map(Number).reduce((a, b) => a + b, 0);
+                            const angles = new Array(len);
 
                             for (let j = 0; j < len; j++) {
                                 const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay);
@@ -416,8 +420,11 @@ class visu_bokeh:
                                 let pos = parseInt(ymax * (len - j) / len);
                                 if (!Number.isFinite(pos)) continue;
                                 labelMap.set(pos, String(where_val));
+
+                                sourcehisto.data['angle'][j] =  (sourcehisto.data[which][j] / total) * 2 * Math.PI;
                             }
 
+                            console.log(sourcehisto.data['angle'],sourcehisto.data[which])
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
                             sourcehisto.change.emit();
@@ -466,6 +473,7 @@ class visu_bokeh:
                 kwargs['controls'] = controls
             else:
                 input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
+                input_dates = self.add_columns_for_pie_chart(input_dates,which)
                 columndatasrc = ColumnDataSource(data = input_dates)
 
             def geosource_bounds(geosource):
@@ -498,7 +506,8 @@ class visu_bokeh:
             invViridis256 = Viridis256[::-1]
             color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
 
-            kwargs['yrange']=yrange
+            if func.__name__ in lhist:
+                kwargs['yrange']=yrange
             if 'geometry' in list(input_uniquecountries.columns):
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
             kwargs['columndatasrc'] = columndatasrc
@@ -1283,7 +1292,6 @@ class visu_bokeh:
             - dateslider = None if True
                     - orientation = horizontal
         '''
-        input = kwargs.get('input')
         columndatasrc = kwargs.get('columndatasrc')  # doit être ColumnDataSource
         fig = kwargs.get('bokeh_figure_linear')
         controls = kwargs.get('controls', None)
