@@ -425,6 +425,8 @@ class GPDBuilder(object):
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
             new_order.remove('geometry')
+       if 'code' not in input.columns:
+           new_order.remove('code')         
        kwargs['input'] = input[new_order].reset_index(drop=True)
        return kwargs
 
