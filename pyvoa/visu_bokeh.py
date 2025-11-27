@@ -274,32 +274,10 @@ class visu_bokeh:
 
             lhist = ['bokeh_pie','bokeh_horizonhisto']
 
-            def _fmt(v):
-                fv = float(v)
-                if fv == 0:
-                    return '0'
-                if abs(fv) >= 1.e4 or (abs(fv) > 0 and abs(fv) < 0.01):
-                    return '{:.3g}'.format(fv)
-                return str(round(fv, 2))
-
             ymax = self.figure_height
-            def addhistoposition(mypd):
-                mypd['left'] = mypd[which]
-                mypd['right'] = mypd[which]
-                mypd['horihistotext'] = mypd['right'].apply(_fmt)
-                mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
-                mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
-                mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
-                mypd['horihistotextx'] = mypd['right']
-                indices = [i % maxcountrydisplay for i in range(len(mypd))]
-                mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-                mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
-                mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
-                mypd['horihistotextx'] = mypd['right']
-                return mypd
 
             if func.__name__ in lhist:
-                input = addhistoposition(input)
+                input = self.addcolumnshisto(input,which,maxcountrydisplay)
                 yrange = Range1d(min(input['bottom']), max(input['top']))
 
             input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
@@ -350,8 +328,8 @@ class visu_bokeh:
 
                 input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
                 if func.__name__ in lhist:
-                    input_dates = addhistoposition(input_dates)
-                    input_dates = self.add_columns_for_pie_chart(input_dates,which)
+                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplay)
+                    input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
                 columndatasrc = ColumnDataSource(data = input_dates)
 
@@ -473,7 +451,7 @@ class visu_bokeh:
                 kwargs['controls'] = controls
             else:
                 input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
-                input_dates = self.add_columns_for_pie_chart(input_dates,which)
+                input_dates = self.addcolumnspie(input_dates,which)
                 columndatasrc = ColumnDataSource(data = input_dates)
 
             def geosource_bounds(geosource):
@@ -1248,9 +1226,32 @@ class visu_bokeh:
             tabs = layout
         return tabs
 
+    def addcolumnshisto(self,mypd,which,maxcountrydisplay):
+        ymax = self.figure_height
+        mypd['left'] = mypd[which]
+        mypd['right'] = mypd[which]
+        def _fmt(v):
+            fv = float(v)
+            if fv == 0:
+                return '0'
+            if abs(fv) >= 1.e4 or (abs(fv) > 0 and abs(fv) < 0.01):
+                return '{:.3g}'.format(fv)
+            return str(round(fv, 2))
+
+        mypd['horihistotext'] = mypd['right'].apply(_fmt)
+        mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
+        mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
+        mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
+        mypd['horihistotextx'] = mypd['right']
+        indices = [i % maxcountrydisplay for i in range(len(mypd))]
+        mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
+        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
+        mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
+        mypd['horihistotextx'] = mypd['right']
+        return mypd
 
     ''' PIE '''
-    def add_columns_for_pie_chart(self,df,column_name):
+    def addcolumnspie(self,df,column_name):
         df = df.copy()
         column_sum = df[column_name].sum()
         df['percentage'] = df[column_name]/column_sum
