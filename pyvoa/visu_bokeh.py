@@ -239,7 +239,7 @@ class visu_bokeh:
 
             logo_url = visu_bokeh.pyvoalogo(logo)
             for key, fig in dicfig.items():
-                if (key == "bokeh_figure_map" or func.__name__ == 'bokeh_horizonhisto') and kwargs['dateslider']:
+                if (key == "bokeh_figure_map" or func.__name__ == 'bokeh_horizonhisto' or func.__name__ == 'bokeh_pie') and kwargs['dateslider']:
                     fig.title = title
                 else:
                     fig.title = title + str(kwargs['kwargsuser']['when'])
@@ -400,6 +400,11 @@ class visu_bokeh:
                                 labelMap.set(pos, String(where_val));
 
                                 sourcehisto.data['angle'][j] =  (sourcehisto.data[which][j] / total) * 2 * Math.PI;
+                                sourcehisto.data['textdisplayed'][j] = sourcehisto.data['where'].map(w =>
+                                String(w).padStart(36, " "))[j];
+                                const value = sourcehisto.data[which][j];
+                                const percent = (total === 0) ? 0 : (100 * value / total);
+                                sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
                             }
 
                             console.log(sourcehisto.data['angle'],sourcehisto.data[which])
