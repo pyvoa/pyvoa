@@ -237,10 +237,9 @@ class visu_bokeh:
             dicfig['bokeh_figure_spiral']      = figure(width=width, height=height)
             dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
 
-
             logo_url = visu_bokeh.pyvoalogo(logo)
             for key, fig in dicfig.items():
-                if key == "bokeh_figure_map" and kwargs['dateslider']:
+                if (key == "bokeh_figure_map" or func.__name__ == 'bokeh_horizonhisto') and kwargs['dateslider']:
                     fig.title = title
                 else:
                     fig.title = title + str(kwargs['kwargsuser']['when'])
@@ -271,6 +270,7 @@ class visu_bokeh:
                 dateslider = False
 
             maxcountrydisplay = kwargs['maxcountrydisplay']
+            maxlettersdisplay = kwargs['maxlettersdisplay']
 
             def _fmt(v):
                 fv = float(v)
@@ -281,25 +281,31 @@ class visu_bokeh:
                 return str(round(fv, 2))
 
             input = self.add_columns_for_pie_chart(input,which)
-            input['left'] = input[which]
-            input['right'] = input[which]
-            input['horihistotext'] = input['right'].apply(_fmt)
-            input['horihistotext'] = [str(i) for i in input['horihistotext']]
-            input['left'] = input['left'].apply(lambda x: 0 if x > 0 else x)
-            input['right'] = input['right'].apply(lambda x: 0 if x < 0 else x)
-            input['horihistotextx'] = input['right']
+
             ymax = self.figure_height
-            indices = [i % maxcountrydisplay for i in range(len(input))]
-            input['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-            input['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
+            def addhistoposition(mypd):
+                    mypd['left'] = mypd[which]
+                    mypd['right'] = mypd[which]
+                    mypd['horihistotext'] = mypd['right'].apply(_fmt)
+                    mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
+                    mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
+                    mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
+                    mypd['horihistotextx'] = mypd['right']
+                    indices = [i % maxcountrydisplay for i in range(len(mypd))]
+                    mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
+                    mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
+                    mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
+                    mypd['horihistotextx'] = mypd['right']
+                    return mypd
+
+            input = addhistoposition(input)
             yrange = Range1d(min(input['bottom']), max(input['top']))
-            input['horihistotexty'] = input['bottom'] + 0.5*ymax/maxcountrydisplay
-            input['horihistotextx'] = input['right']
 
             input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
 
             if 'geometry' in list(input_uniquecountries.columns):
+                input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
                 input_uniquecountries['cases']=input_uniquecountries[which]
                 passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
                 convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
@@ -310,7 +316,7 @@ class visu_bokeh:
             else:
                 input_dates = input.copy()
 
-            columndatasrc = ColumnDataSource(data = input_dates)
+
             if dateslider:
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
                 unique_dates = input_dates['date'].unique().tolist()
@@ -340,6 +346,12 @@ class visu_bokeh:
                         else:
                             frame[c] = []
                     frames.append(frame)
+
+                input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
+                input_dates = addhistoposition(input_dates)
+                yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
+                columndatasrc = ColumnDataSource(data = input_dates)
+
                 from bokeh.models import Slider, CustomJS, Div
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
@@ -347,13 +359,14 @@ class visu_bokeh:
 
                 slider_callback = CustomJS(
                         args=dict(
-                            source=geocolumndatasrc,
                             frames=frames,
-                            source2=columndatasrc,
+                            sourcemap=geocolumndatasrc,
+                            sourcehisto=columndatasrc,
                             which=which,
                             dates=unique_dates,
                             div=date_display,
                             maxcountrydisplay=maxcountrydisplay,
+                            maxlettersdisplay=maxlettersdisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
                             ymax = ymax,
@@ -364,6 +377,7 @@ class visu_bokeh:
                             const keys = Object.keys(frame);
                             const rows = [];
 
+                            //FOR MAP
                             for (let j = 0; j < frame[which].length; j++) {
                                 let r = {};
                                 for (const k of keys) {
@@ -373,10 +387,41 @@ class visu_bokeh:
                             }
 
                             for (const k of keys) {
-                                source.data[k] = rows.map(r => r[k]);
-                                source.data['cases'] = source.data[which];
+                                sourcemap.data[k] = rows.map(r => r[k]);
+                                sourcemap.data['cases'] = sourcemap.data[which];
                             }
-                            source.change.emit();
+                            sourcemap.change.emit();
+
+                            // For HISTO
+                            const len = sourcehisto.data[which].length;
+
+                            const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
+                            console.log(sorted_rows);
+                            const limited = sorted_rows.slice(0, maxcountrydisplay);
+                            const allColumns = Object.keys(sourcehisto.data);
+
+                             for (const col of allColumns) {
+                                const limited_col = limited.map(r => r[col]);
+                                sourcehisto.data[col] = limited_col;
+                            }
+
+                            const labelMap = new Map();
+
+                            for (let j = 0; j < len; j++) {
+                                const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay);
+                                sourcehisto.data['top'][j]    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
+                                sourcehisto.data['bottom'][j] = ymax * (maxcountrydisplay - j) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay;
+                                sourcehisto.data['horihistotexty'][j] = sourcehisto.data['bottom'][j] + 0.5 * ymax / maxcountrydisplay;
+
+                                let pos = parseInt(ymax * (len - j) / len);
+                                if (!Number.isFinite(pos)) continue;
+                                labelMap.set(pos, String(where_val));
+                            }
+
+                            ylabellinear.major_label_overrides = labelMap;
+                            ylabellog.major_label_overrides    = labelMap;
+                            sourcehisto.change.emit();
+
                             div.text = '<b>' + dates[i] + '</b>';
                         """
                     )
@@ -419,6 +464,9 @@ class visu_bokeh:
                 slider.js_on_change('value', slider_date_div_cb)
                 controls = column(toggl, slider, date_display)
                 kwargs['controls'] = controls
+            else:
+                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
+                columndatasrc = ColumnDataSource(data = input_dates)
 
             def geosource_bounds(geosource):
                 import json
@@ -431,6 +479,7 @@ class visu_bokeh:
                     xs += [x_min, x_max]
                     ys += [y_min, y_max]
                 return min(xs), min(ys), max(xs), max(ys)
+
 
             xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
             pad_x = (xmax - xmin) * 0.05
@@ -1156,7 +1205,6 @@ class visu_bokeh:
                 line_width=1,
                 hover_line_width=2,
             )
-
 
             labels = LabelSet(
                 x='horihistotextx',
