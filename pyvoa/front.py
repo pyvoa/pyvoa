@@ -280,14 +280,18 @@ class front:
                 default['when'] = kwargs.get('when')
 
             input = kwargs.get('input',pd.DataFrame())
-
             kwargs = {**default, **dicovisu}
             kwargs['what']=kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
 
             if kwargs['where'][0] == '':
-                if self.gpdbuilder:
-                    kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                if input.empty:
+                    if self.gpdbuilder:
+                        kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                else:
+                    kwargs['where'] = list(input['where'].unique())
+
+
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
 
@@ -302,12 +306,13 @@ class front:
             if not input.empty:
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                kwargs['input'] = input
+
                 when = kwargs.get('when')
                 if when:
                     kwargs['when'] = when
                 else:
                     kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
+                kwargs['input'] = input.loc[input['where'].isin(kwargs['where'])]    
                 kwargs['kwargsuser']['input']=input
 
             kwargs = self.gpdbuilder.get_stats(**kwargs)

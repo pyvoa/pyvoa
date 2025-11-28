@@ -218,6 +218,7 @@ class GPDBuilder(object):
         newpd = pd.DataFrame()
         if not isinstance(where[0],list):
             where = [where]
+
         if has_sumall:
             for w in where:
                 temp = pd.DataFrame()
@@ -268,6 +269,7 @@ class GPDBuilder(object):
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
+
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
 
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
@@ -307,7 +309,6 @@ class GPDBuilder(object):
        input = input.loc[:,~input.columns.isin(anticolumns)]
        where = kwargs.get('where')
 
-
        input['date'] = pd.to_datetime(input['date'], errors='coerce')
        when_beg_data, when_end_data = input.date.min(), input.date.max()
        when_beg_data, when_end_data = when_beg_data.date(), when_end_data.date()
@@ -346,6 +347,7 @@ class GPDBuilder(object):
            wherenan = where_alldate_nan[where_alldate_nan].index.tolist()
            if wherenan:
                PyvoaWarning('drop ' + str(wherenan) +' : value is NAN for all the date  ')
+
            input = input.loc[~input['where'].isin(wherenan)]
 
            kwargs['input'] = input
