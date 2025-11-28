@@ -16,7 +16,6 @@ pf.plot(when='18/03/2020:01/04/2020',what='daily',which='tot_deaths',option='sum
 - [ ] quand on sauve un bokeh, le logo disparait
 - [ ] avec un pandas externe, obligation de charger une base avant. Ce qui est idiot.
 - [ ] impossible de faire un plot avec pf.plot(input = ..." ) Requiert "geometry" et "code" …. ? 
-- [ ] le tot_T et le tot_P ne sont pas cumulatifs dans spf
 - [ ] ne pas boucler le film avec DateSlider
 - [ ] hist avec dateslider immonde. Exemple : pf.hist(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020')
 - [ ] CE QUI NE MARCHE PAS : 
