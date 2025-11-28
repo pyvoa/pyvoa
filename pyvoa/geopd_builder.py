@@ -384,7 +384,12 @@ class GPDBuilder(object):
                if wconcatpd.empty:
                     wconcatpd = temppd
                else:
-                    wconcatpd = pd.concat([wconcatpd,temppd])
+                    concatpd = pd.concat(
+                    [wconcatpd, temppd.drop(columns=['geometry'], errors='ignore')],
+                    axis=1,
+                    join="inner"
+)
+
 
            if not wconcatpd.empty:
                input = wconcatpd
@@ -426,7 +431,7 @@ class GPDBuilder(object):
        if 'geometry' not in input.columns:
             new_order.remove('geometry')
        if 'code' not in input.columns:
-           new_order.remove('code')         
+           new_order.remove('code')
        kwargs['input'] = input[new_order].reset_index(drop=True)
        return kwargs
 
