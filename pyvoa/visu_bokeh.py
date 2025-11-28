@@ -432,7 +432,16 @@ class visu_bokeh:
                         if (!window._bokeh_play_interval) {
                             window._bokeh_play_interval = setInterval(function() {
                                 let v = slider.value + 1;
-                                if (v > slider.end) { v = 0; }  // revenir au début
+
+                                if (v > slider.end) {
+                                    // Stopper à la fin
+                                    clearInterval(window._bokeh_play_interval);
+                                    window._bokeh_play_interval = null;
+                                    cb_obj.active = false;
+                                    cb_obj.label = '► Play';
+                                    return;
+                                }
+
                                 slider.value = v; // déclenche slider_callback
                             }, 10);
                             cb_obj.label = '❚❚ Pause';
