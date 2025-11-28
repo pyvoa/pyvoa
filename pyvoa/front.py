@@ -403,6 +403,10 @@ class front:
         pandy = kwargs.get('input')
         where = kwargs.get('where')
 
+        if 'geometry' not in list(pandy.columns):
+            output = 'pandas'
+        if isinstance(output,list):
+            output=output[0]
         self.setnamefunction(self.get)
         if output == 'pandas':
             def color_df(val):
@@ -413,16 +417,18 @@ class front:
                 else:
                     return black
 
+            if 'geometry' in list(pandy.columns):
+                pandy = pandy.drop(columns='geometry')
             casted_data = pandy
-            col=list(casted_data.columns)
-            mem='{:,}'.format(casted_data[col].memory_usage(deep=True).sum())
+            col=list(pandy.columns)
+            mem='{:,}'.format(pandy[col].memory_usage(deep=True).sum())
             info('Memory usage of all columns: ' + mem + ' bytes')
         elif output == 'geopandas':
             if 'geometry' in list(pandy.columns):
                 casted_data = pandy
             else:
                 casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
-                casted_data=gpd.GeoDataFrame(casted_data)
+                casted_data = gpd.GeoDataFrame(casted_data)
         elif output == 'dict':
             casted_data = pandy.to_dict('split')
         elif output == 'list' or output == 'array':
