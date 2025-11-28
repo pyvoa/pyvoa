@@ -296,6 +296,10 @@ class visu_bokeh:
             else:
                 input_dates = input.copy()
 
+            invViridis256 = Viridis256[::-1]
+            color_mapper = LinearColorMapper(palette=invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
+            color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
+                        border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
                 unique_dates = input_dates['date'].unique().tolist()
@@ -351,6 +355,7 @@ class visu_bokeh:
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
                             ymax = ymax,
+                            color_mapperjs = color_mapper
                         ),
                         code="""
                             const i = cb_obj.value;
@@ -372,7 +377,8 @@ class visu_bokeh:
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
                             sourcemap.change.emit();
-
+                            color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
+                             console.log(color_mapperjs.high);
                             // For HISTO
                             const len = sourcehisto.data[which].length;
 
@@ -694,11 +700,11 @@ class visu_bokeh:
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
             maxi, mini=0, 0
             tooltips=[]
+            colors = list(input['colors'].unique())
             for idx,val in enumerate(which):
                 for ldx,loc in enumerate(list(input['where'].unique())):
                     pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
                     label = f"{loc}"
-                    colors = pyvoa.data['colors']
                     if len(which)>1:
                         label=f"{loc}, {val}"
                     r = fig.line(x = 'date', y = val, source = pyvoa,

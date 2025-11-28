@@ -355,7 +355,8 @@ class GPDBuilder(object):
                 normalize = re.sub(r'normalize:', '', normalize[0])
                 option.append('sumallandnormalize:'+normalize)
 
-           wconcatpd = pd.DataFrame()
+           concatpd = pd.DataFrame()
+           basecolumns=list(input.columns)
            for o in option:
                temppd = input
                if o == 'nonneg':
@@ -379,20 +380,14 @@ class GPDBuilder(object):
                elif o.startswith('sumallandnormalize:'):
                     bypop = re.sub(r'sumalland', '', o)
                     dpop = InputOption().dictpop
-                    temppd.loc[:,w+' '+bypop]=temppd[w]/temppd ['population']*dpop[re.sub(r'normalize:', '', bypop)]
-
-               if wconcatpd.empty:
-                    wconcatpd = temppd
+                    temppd.loc[:,w+' '+bypop]=temppd[w]/temppd['population']*dpop[re.sub(r'normalize:', '', bypop)]
+               if concatpd.empty:
+                    concatpd = temppd
                else:
-                    concatpd = pd.concat(
-                    [wconcatpd, temppd.drop(columns=['geometry'], errors='ignore')],
-                    axis=1,
-                    join="inner"
-)
+                    concatpd = pd.merge(concatpd, temppd,  how="right", on=basecolumns)
 
-
-           if not wconcatpd.empty:
-               input = wconcatpd
+           if not concatpd.empty:
+               input = concatpd
 
            windows = {' daily':1,' weekly':7}
            for k,v in windows.items():
@@ -420,12 +415,13 @@ class GPDBuilder(object):
             categories=where_ordered_bylastvalues,
             ordered=True
             )
+
        input = input.sort_values(by=['where','date'])
 
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
-       prefix = ['date', 'where', 'code']
-       suffix = ['geometry']
+       prefix = ['date', 'where']
+       suffix = [ 'code','geometry']
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
