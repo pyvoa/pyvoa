@@ -211,6 +211,9 @@ class GPDBuilder(object):
         has_normalize = any(o.startswith("normalize:") for o in option)
         has_sumall = "sumall" in option
 
+        if has_sumall and kwargs['typeofmap']=='dense':
+            raise PyvoaError("dense + sumall not compatible ...")
+
         which = kwargs.get('which')
         newpd = pd.DataFrame()
         if not isinstance(where[0],list):
@@ -331,9 +334,11 @@ class GPDBuilder(object):
        datesunique = list(input.date.unique())
        ndates = len(datesunique)
 
+       prefix = ['date', 'where']
+       suffix = ['code','geometry']
+
        for w in which:
            option = kwargs.get('option',defaultargs['option'][0])
-
            input.loc[:,w] = input.groupby('where')[w].bfill()
            input.loc[:,w] = input.groupby('where')[w].ffill()
 
@@ -368,10 +373,14 @@ class GPDBuilder(object):
                     inx7 = temppd.groupby('where').head(7).index
                     temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
-                    if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
-                        temppd = temppd.groupby(['where','code','date','geometry']).mean().reset_index()
+                    if 'geometry' in list(temppd.columns):
+                        if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
+                            temppd = temppd.groupby(prefix+suffix).mean().reset_index()
+                        else:
+                            temppd = temppd.groupby(prefix+suffix).sum(numeric_only=True).reset_index()
                     else:
-                        temppd = temppd.groupby(['where','code','date','geometry']).sum(numeric_only=True).reset_index()
+                        temppd = temppd.groupby('date').agg(
+                            where=('where', lambda x: ','.join(x)), **{w: (w, 'sum')}).reset_index()
                elif o.startswith('normalize:'):
                      temppd = self.normbypop(temppd , w ,o)
                      kwargs['input'] = temppd
@@ -420,8 +429,6 @@ class GPDBuilder(object):
 
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
-       prefix = ['date', 'where']
-       suffix = [ 'code','geometry']
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
