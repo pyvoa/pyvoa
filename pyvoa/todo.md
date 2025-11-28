@@ -26,3 +26,4 @@ pf.hist(where='métropole',which='tot_dchosp',dateslider=True,when=':31/12/2020'
 pf.plot(where='métropole',which='tot_T',typeofmap='dense',when=':31/12/2020')
 OWID
 pf.map(dateslider=True,which='total_cases_per_million',when=':31/12/2020')
+- [ ] dans les histos (au moins), on n'est pas à 20 caractères pour les lieux. Et il n'y a plus les " … " 
