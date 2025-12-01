@@ -16,11 +16,9 @@ pf.plot(when='18/03/2020:01/04/2020',what='daily',which='tot_deaths',option='sum
 - [ ] quand on sauve un bokeh, le logo disparait
 - [ ] avec un pandas externe, obligation de charger une base avant. Ce qui est idiot.
 - [ ] hist avec dateslider immonde. Exemple : pf.hist(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020')
-- [ ] CE QUI NE MARCHE PAS : 
-SPF
-pf.map(where='métropole',which='tot_dchosp',option="normalize:pop1M",typeofmap='dense',dateslider=True,when=':31/12/2020')
-pf.hist(where='métropole',which='tot_dchosp',dateslider=True,when=':31/12/2020',option=["normalize:pop1M","nonneg"])
-pf.plot(where='métropole',which='tot_T',typeofmap='dense',when=':31/12/2020')
-OWID
+- [ ] SPF crash : pf.hist(where='métropole',which='tot_dchosp',dateslider=True,when=':31/12/2020',option=["normalize:pop1M","nonneg"])
+OWID PBL : 
 pf.map(dateslider=True,which='total_cases_per_million',when=':31/12/2020')
 - [ ] dans les histos (au moins), on n'est pas à 20 caractères pour les lieux. Et il n'y a plus les " … " 
+- [ ] mettre les puissances de 10 sur les abscisses (matplotlib et bokeh)
+- [ ] problème de l'export png du bokeh : définition pourrie (screenshot meilleur)
