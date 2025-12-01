@@ -143,7 +143,7 @@ class visu_matplotlib:
         d = input.allyears.unique()
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
-            ax = ax.plot(df.index,df,label=f'{i}')
+            ax.plot(df.index,df,label=f'{i}')
         ax.legend(d)
         return ax
 
