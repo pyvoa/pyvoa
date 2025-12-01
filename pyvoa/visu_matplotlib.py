@@ -81,19 +81,17 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
-        nb = kwargs['maxlettersdisplay']
-        input['where'] = [k[:nb] for k in input['where']]
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
         ax.set_xlabel("date", fontsize=10)
-        ax.set_ylabel(what[0], fontsize=10)
+        ax.set_ylabel(which[0], fontsize=10)
         st=['-','--',':']
-        for idx, i in enumerate(what):
+        for idx, i in enumerate(which):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
                 label = f"{where}"
-                if len(what)>1:
+                if len(which)>1:
                     label =f"{where} — {i}"
                 ax.plot(
                     df.index,
@@ -102,7 +100,7 @@ class visu_matplotlib:
                     linestyle=st[idx]
                 )
 
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(what),ncol=len(what))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(which),ncol=len(which))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
         return ax
 
