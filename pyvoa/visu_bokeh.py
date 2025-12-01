@@ -239,7 +239,7 @@ class visu_bokeh:
 
             logo_url = visu_bokeh.pyvoalogo(logo)
             for key, fig in dicfig.items():
-                fig.title = title 
+                fig.title = title
                 #if (key == "bokeh_figure_map" or func.__name__ == 'bokeh_horizonhisto' or func.__name__ == 'bokeh_pie') and kwargs['dateslider']:
                 #    fig.title = title
                 #else:
@@ -691,7 +691,7 @@ class visu_bokeh:
         }
         dicof={'title':kwargs.get('title')}
 
-        legend = kwargs.get('legend',None)
+        legend = kwargs.get('legend', None)
 
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
             fig = dbokeh_figure[axis_type]
@@ -711,8 +711,8 @@ class visu_bokeh:
                         label = legend
                     else:
                         label = f"{loc}"
-                    if len(which)>1:
-                        label=f"{loc}, {val}"
+                        if len(which)>1:
+                            label=f"{loc}, {val}"
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      line_width = 3,
                                      color=colors[ldx],

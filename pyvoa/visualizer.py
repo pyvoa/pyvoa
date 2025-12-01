@@ -131,7 +131,6 @@ class AllVisu:
             loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
-
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
 
