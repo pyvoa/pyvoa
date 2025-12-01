@@ -309,6 +309,18 @@ class GPDBuilder(object):
        else:
            input = input.loc[input['where'].isin(where)]
 
+       date_max_by_where = input.groupby('where')['date'].max()
+       needs_reindex = date_max_by_where.nunique() > 1
+       if needs_reindex:
+            PyvoaWarning("Your data is irregular, date will be reindexed ! ")
+            all_dates = input['date'].unique()
+            input = (
+                input.set_index('date')
+                        .groupby('where')
+                        .apply(lambda g: g.reindex(all_dates).ffill().bfill())
+                    .reset_index('date').reset_index(drop=True)
+            )
+
        if not pd.api.types.is_datetime64_any_dtype(input['date']):
            input['date'] = pd.to_datetime(input['date'], errors='coerce')
 
