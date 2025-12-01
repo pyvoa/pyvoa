@@ -464,7 +464,7 @@ class front:
                             .apply(lambda g: g.reindex(all_dates).ffill().bfill())
                         .reset_index('date').reset_index(drop=True)
                 )
-                
+
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
             last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
             where_ordered_bylastvalues = last_rows['where'].tolist()
@@ -574,6 +574,7 @@ class front:
 
     @input_wrapper
     @input_visuwrapper
+    @decoget
     @decomap
     def map(self,**kwargs):
         """Maps the visualization with the provided keyword arguments.
@@ -611,6 +612,7 @@ class front:
 
     @input_wrapper
     @input_visuwrapper
+    @decoget
     @decohist
     def hist(self,fig):
         """Generates and displays a histogram figure.
