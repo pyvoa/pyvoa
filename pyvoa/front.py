@@ -453,18 +453,6 @@ class front:
             else:
                 raise PyvoaError('Unknown output.')
 
-            date_max_by_where = casted_data.groupby('where')['date'].max()
-            needs_reindex = date_max_by_where.nunique() > 1
-            if needs_reindex:
-                PyvoaWarning("Your data is irregular, date will be reindexed ! ")
-                all_dates = casted_data['date'].unique()
-                casted_data = (
-                    casted_data.set_index('date')
-                            .groupby('where')
-                            .apply(lambda g: g.reindex(all_dates).ffill().bfill())
-                        .reset_index('date').reset_index(drop=True)
-                )
-
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
             last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
             where_ordered_bylastvalues = last_rows['where'].tolist()
@@ -473,10 +461,9 @@ class front:
                 categories=where_ordered_bylastvalues,
                 ordered=True
             )
-            self.where_ordered_bylastvalues = where_ordered_bylastvalues
+            kwargs['whereordered'] = where_ordered_bylastvalues
             casted_data = casted_data.sort_values(['date', 'where']).reset_index(drop=True)
             kwargs['input'] = casted_data
-            kwargs['whereordered'] = self.where_ordered_bylastvalues
             return func(self,**kwargs)
         return inner
 
