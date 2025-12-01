@@ -286,8 +286,9 @@ class front:
 
             kwargs = {**default, **dicovisu}
             kwargs['what'] = kwargs['what'][0]
-            kwargs['kwargsuser'] = kwargs.copy()
             input = kwargs.get('input',pd.DataFrame())
+            kwargs['kwargsuser'] = kwargs.copy()
+
             where =  kwargs['where']
 
             if kwargs['where'][0] == '':
