@@ -69,7 +69,7 @@ class InputOption():
                         'typeofmap':[None,'not dense','dense'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','folium','seaborn'],\
-                        'tile' : ['openstreet','esri','stamen','positron'],\
+                        'tile' : ['esri','openstreet','stamen','positron'],\
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
                         'guideline':[False,True],\
