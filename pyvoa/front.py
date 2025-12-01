@@ -130,6 +130,7 @@ class front:
         self.namefunction = None
         self._setkwargsvisu = None
         self.batch = False
+        self.pdoutcome = None
 
     def whattodo(self,):
         """Generates a DataFrame summarizing available methods and their options.
@@ -245,6 +246,7 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
+
             if self.gpdbuilder == '':
                 raise PyvoaError("Does setwhom has been defined ???")
 
@@ -266,9 +268,11 @@ class front:
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
 
+
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
+            default['input'] = kwargs.get('input')
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
@@ -278,16 +282,21 @@ class front:
                     else:
                         default[k] = [kwargs[k]]
                 default['when'] = kwargs.get('when')
-
-            input = kwargs.get('input',pd.DataFrame())
+                default['input'] = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
-            kwargs['what']=kwargs['what'][0]
+            kwargs['what'] = kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
+            input = kwargs.get('input',pd.DataFrame())
+            where =  kwargs['where']
 
             if kwargs['where'][0] == '':
-                if self.gpdbuilder:
-                    kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                if input.empty:
+                    if self.gpdbuilder:
+                        kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                else:
+                    kwargs['where'] = list(input['where'].unique())
+
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
 
@@ -298,17 +307,18 @@ class front:
             if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
                 raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
-
             if not input.empty:
+                PyvoaWarning("In your DataFrame : the date must be in pd.to_datetime format !")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                kwargs['input'] = input
+
                 when = kwargs.get('when')
-                if when:
-                    kwargs['when'] = when
-                else:
-                    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
-                kwargs['kwargsuser']['input']=input
+
+                #if not when:
+                #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
+                #input = input.loc[input['where'].isin(kwargs['where'])]
+                #kwargs['input'] = input
+                kwargs['kwargsuser']['input'] = input
 
             kwargs = self.gpdbuilder.get_stats(**kwargs)
 
@@ -362,7 +372,7 @@ class front:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
 
-                    z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False).reset_index(drop=True)
+                    #z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False).reset_index(drop=True)
                     if func.__name__ == 'map':
                             z.pop('typeofhist')
                             z.pop('typeofplot')
@@ -372,78 +382,314 @@ class front:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
         return inner
 
-    @input_wrapper
-    def get(self,**kwargs):
-        """Retrieve and process data based on the specified output format.
+    def decoget(func):
+        @wraps(func)
+        def inner(self,**kwargs):
+            """Retrieve and process data based on the specified output format.
 
-        This method accepts a pandas DataFrame as input and converts it into various formats
-        such as pandas DataFrame, GeoPandas DataFrame, dictionary, list, or numpy array
-        based on the 'output' keyword argument. It also logs memory usage for the DataFrame
-        if the output is set to 'pandas'.
+            This method accepts a pandas DataFrame as input and converts it into various formats
+            such as pandas DataFrame, GeoPandas DataFrame, dictionary, list, or numpy array
+            based on the 'output' keyword argument. It also logs memory usage for the DataFrame
+            if the output is set to 'pandas'.
+
+            Args:
+                **kwargs: Arbitrary keyword arguments. Expected keys include:
+                    - 'input': A pandas DataFrame to be processed.
+                    - 'output': A string indicating the desired output format.
+                                Options include 'pandas', 'geopandas', 'dict', 'list', or 'array'.
+
+            Returns:
+                The processed data in the specified output format.
+
+            Raises:
+                PyvoaError: If the specified output format is unknown.
+
+            Notes:
+                - If the output is 'pandas', the method will log the memory usage of the DataFrame.
+                - If the output is 'geopandas', it merges the input DataFrame with geometry data.
+                - If the output is 'dict', it converts the DataFrame to a dictionary.
+                - If the output is 'list' or 'array', it converts the DataFrame to a list or numpy array respectively.
+            """
+            output = kwargs.get('output')
+            pandy = kwargs.get('input')
+            which = kwargs.get('which')[0]
+
+            if 'geometry' not in list(pandy.columns):
+                output = 'pandas'
+            if isinstance(output,list):
+                output=output[0]
+            self.setnamefunction(self.get)
+            if output == 'pandas':
+                def color_df(val):
+                    if val.columns=='date':
+                        return 'blue'
+                    elif val.columns=='where':
+                        return 'red'
+                    else:
+                        return black
+
+                if 'geometry' in list(pandy.columns):
+                    pandy = pandy.drop(columns='geometry')
+                casted_data = pandy
+                col=list(pandy.columns)
+                mem='{:,}'.format(pandy[col].memory_usage(deep=True).sum())
+                info('Memory usage of all columns: ' + mem + ' bytes')
+            elif output == 'geopandas':
+                if 'geometry' in list(pandy.columns):
+                    casted_data = pandy
+                else:
+                    casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
+                    casted_data = gpd.GeoDataFrame(casted_data)
+            elif output == 'dict':
+                casted_data = pandy.to_dict('split')
+            elif output == 'list' or output == 'array':
+                my_list = []
+                for keys, values in pandy.items():
+                    vc = [i for i in values]
+                    my_list.append(vc)
+                casted_data = my_list
+                if output == 'array':
+                    casted_data = np.array(pandy)
+            else:
+                raise PyvoaError('Unknown output.')
+
+            last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
+            last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
+            where_ordered_bylastvalues = last_rows['where'].tolist()
+            casted_data['where'] = pd.Categorical(
+                casted_data['where'],
+                categories=where_ordered_bylastvalues,
+                ordered=True
+            )
+            kwargs['whereordered'] = where_ordered_bylastvalues
+            casted_data = casted_data.sort_values(['date', 'where']).reset_index(drop=True)
+            kwargs['input'] = casted_data
+            return func(self,**kwargs)
+        return inner
+
+    @input_wrapper
+    @decoget
+    def get(self,**kwargs):
+        return kwargs['input']
+
+    def decomap(func):
+        @wraps(func)
+        def inner(self,**kwargs):
+            """Inner function to process input parameters and modify geometry settings.
+
+            Args:
+                self: The instance of the class.
+                **kwargs: Additional keyword arguments that may include:
+                    - where (str): A condition to filter data.
+                    - output: Optional output parameter (ignored in processing).
+                    - bypop: Optional population parameter (ignored in processing).
+                    - dateslider: Optional date slider parameter (default is None).
+                    - input (DataFrame): Input data that may be modified based on geometry settings.
+
+            Returns:
+                The result of the function `func` after processing the input parameters.
+
+            Raises:
+                Any exceptions raised by the `func` or during the processing of geometry settings.
+            """
+            input = kwargs.get('input')
+            originalinput = input.copy()
+            if 'geometry' not in list(input.columns):
+                raise PyvoaError('No geometry inside your pandas, map can not be asked')
+            where = kwargs.get('where')
+
+            mapoption = kwargs.get('typeofmap',None)
+            if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
+                mapoption = kwargs.get('typeofmap','not dense')
+            else:
+                PyvoaWarning('typeofmap not compatible with this db, dummy argument')
+                mapoption = None
+
+
+            if 'output' in kwargs:
+                kwargs.pop('output')
+            if 'pop' in kwargs:
+                kwargs.pop('pop')
+            dateslider = kwargs.get('dateslider', None)
+            if mapoption:
+                if mapoption == 'dense':
+                    self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
+                    new_geo = self.gpdbuilder.geo.get_data()
+                    granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
+                    new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
+                    new_geo['where'] = new_geo['where'].apply(lambda x: x.upper())
+                    new_geo = new_geo.set_index('where')['geometry'].to_dict()
+                    input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
+                    input['where'] = input['where'].apply(lambda x: x.title())
+                    kwargs['input'] = input
+
+                else:
+                    #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
+                    kwargs['input'] = input
+
+            return func(self,**kwargs)
+        return inner
+
+    def decohist(func):
+        @wraps(func)
+        def inner(self,**kwargs):
+            """Inner method to generate a histogram visualization based on provided keyword arguments.
+
+            Args:
+                **kwargs: Arbitrary keyword arguments that may include:
+                    - typeofhist: The type of histogram to generate.
+                    - output: This argument is removed from kwargs and not used.
+                    - pop: If present, this argument is removed from kwargs and not used.
+
+            Raises:
+                PyvoaError: If no visualization has been set up.
+
+            Returns:
+                The result of the visualization function applied to the generated histogram outcome.
+            """
+            dateslider = kwargs.get('dateslider')
+            typeofhist = kwargs.get('typeofhist')
+            #kwargs.pop('output')
+            if kwargs.get('pop'):
+              kwargs.pop('pop')
+            if self.getvis():
+                z = { **self.getkwargsvisu(), **kwargs  }
+                return func(self,self.allvisu.hist(**z))
+            else:
+                raise PyvoaError(" No visualization has been set up !")
+        return inner
+
+    @input_wrapper
+    @input_visuwrapper
+    @decoget
+    @decomap
+    def map(self,**kwargs):
+        """Maps the visualization with the provided keyword arguments.
+
+        This method checks if a display is set up. If it is, it combines the visualization keyword arguments with the provided keyword arguments and applies the mapping. If no display is set up, it raises a `PyvoaError`.
 
         Args:
-            **kwargs: Arbitrary keyword arguments. Expected keys include:
-                - 'input': A pandas DataFrame to be processed.
-                - 'output': A string indicating the desired output format.
-                            Options include 'pandas', 'geopandas', 'dict', 'list', or 'array'.
+            **kwargs: Additional keyword arguments to be passed to the mapping function.
 
         Returns:
-            The processed data in the specified output format.
+            The outcome of the mapping operation.
 
         Raises:
-            PyvoaError: If the specified output format is unknown.
-
-        Notes:
-            - If the output is 'pandas', the method will log the memory usage of the DataFrame.
-            - If the output is 'geopandas', it merges the input DataFrame with geometry data.
-            - If the output is 'dict', it converts the DataFrame to a dictionary.
-            - If the output is 'list' or 'array', it converts the DataFrame to a list or numpy array respectively.
+            PyvoaError: If no visualization has been set up.
         """
-        output = kwargs.get('output')
-        pandy = kwargs.get('input')
-        where = kwargs.get('where')
-
-        if 'geometry' not in list(pandy.columns):
-            output = 'pandas'
-        if isinstance(output,list):
-            output=output[0]
-        self.setnamefunction(self.get)
-        if output == 'pandas':
-            def color_df(val):
-                if val.columns=='date':
-                    return 'blue'
-                elif val.columns=='where':
-                    return 'red'
-                else:
-                    return black
-
-            if 'geometry' in list(pandy.columns):
-                pandy = pandy.drop(columns='geometry')
-            casted_data = pandy
-            col=list(pandy.columns)
-            mem='{:,}'.format(pandy[col].memory_usage(deep=True).sum())
-            info('Memory usage of all columns: ' + mem + ' bytes')
-        elif output == 'geopandas':
-            if 'geometry' in list(pandy.columns):
-                casted_data = pandy
-            else:
-                casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
-                casted_data = gpd.GeoDataFrame(casted_data)
-        elif output == 'dict':
-            casted_data = pandy.to_dict('split')
-        elif output == 'list' or output == 'array':
-            my_list = []
-            for keys, values in pandy.items():
-                vc = [i for i in values]
-                my_list.append(vc)
-            casted_data = my_list
-            if output == 'array':
-                casted_data = np.array(pandy)
+        self.setnamefunction(self.map)
+        if self.getvis():
+            z = {**kwargs , **self.getkwargsvisu()}
+            fig = self.allvisu.map(**z)
+            #return self.outcome
         else:
-            raise PyvoaError('Unknown output.')
-        casted_data=casted_data.reset_index(drop=True)
-        self.outcome = casted_data
-        return casted_data
+            raise PyvoaError(" No visualization has been set up !")
+        #fig = self.outcome
+        if self.getvis() == 'bokeh':
+            from bokeh.io import (
+            show,
+            )
+            if not self.batch:
+                show(fig)
+        else:
+            import matplotlib.pyplot as plt
+            if not self.batch:
+                plt.show()
+            return fig
+
+    @input_wrapper
+    @input_visuwrapper
+    @decoget
+    @decohist
+    def hist(self,fig):
+        """Generates and displays a histogram figure.
+
+        This method sets the function name, stores the provided figure, and displays it using the appropriate visualization library based on the current display setting.
+
+        Args:
+            fig: The figure object to be displayed, typically a histogram.
+
+        Returns:
+            The figure object if the display setting is not 'bokeh'.
+
+        Raises:
+            ImportError: If 'bokeh' is specified but the library is not installed.
+        """
+        self.setnamefunction(self.hist)
+        if self.getvis() == 'bokeh':
+            from bokeh.io import (
+            show,
+            )
+            if not self.batch:
+                show(fig)
+        else:
+            import matplotlib.pyplot as plt
+            if not self.batch:
+                plt.show()
+            return fig
+
+    def decoplot(func):
+        @wraps(func)
+        def inner(self,**kwargs):
+            """Inner method to plot visualization based on provided keyword arguments.
+
+            This method checks if a display is set up and, if so, merges the visualization keyword arguments with any additional keyword arguments provided. It then calls the plotting function and returns the outcome. If no display is set up, it raises a PyvoaError.
+
+            Args:
+                **kwargs: Additional keyword arguments to be passed to the plotting function.
+
+            Returns:
+                The outcome of the plotting function.
+
+            Raises:
+                PyvoaError: If no visualization has been set up.
+            """
+            input=kwargs['input']
+
+            which = kwargs.get('which')
+            typeofplot = kwargs.get('typeofplot',self.listplot()[0])
+            kwargs.pop('output')
+
+            if typeofplot == 'versus' and len(which)>2:
+                PyvoaError(" versu can be used with 2 variables and only 2 !")
+            if kwargs.get('pop'):
+                kwargs.pop('pop')
+            if self.getvis():
+                z = {**self.getkwargsvisu(),**kwargs}
+                return func(self,self.allvisu.plot(**z))
+            else:
+                PyvoaError(" No visualization has been set up !")
+        return inner
+
+    @input_wrapper
+    @input_visuwrapper
+    @decoget
+    @decoplot
+    def plot(self,fig):
+        """Plots the given figure using the appropriate display method.
+
+        This method checks the current display setting and uses Bokeh to show the plot if the display is set to 'bokeh'. If the display is not set to 'bokeh', it simply returns the figure.
+
+        Args:
+            fig: The figure to be plotted.
+
+        Returns:
+            If the display is not 'bokeh', returns the input figure. Otherwise, displays the figure using Bokeh.
+        """
+        self.setnamefunction(self.plot)
+        ''' show plot '''
+        if self.getvis() == 'bokeh':
+            from bokeh.io import (
+            show,
+            )
+            if not self.batch:
+                show(fig)
+        else:
+            import matplotlib.pyplot as plt
+            if not self.batch:
+                plt.show()
+            return fig
+
 
     def setnamefunction(self,name):
         """Sets the name of the function.
@@ -845,220 +1091,6 @@ class front:
         """
         return self.vis
 
-    def decomap(func):
-        @wraps(func)
-        def inner(self,**kwargs):
-            """Inner function to process input parameters and modify geometry settings.
-
-            Args:
-                self: The instance of the class.
-                **kwargs: Additional keyword arguments that may include:
-                    - where (str): A condition to filter data.
-                    - output: Optional output parameter (ignored in processing).
-                    - bypop: Optional population parameter (ignored in processing).
-                    - dateslider: Optional date slider parameter (default is None).
-                    - input (DataFrame): Input data that may be modified based on geometry settings.
-
-            Returns:
-                The result of the function `func` after processing the input parameters.
-
-            Raises:
-                Any exceptions raised by the `func` or during the processing of geometry settings.
-            """
-            input = kwargs.get('input')
-            originalinput = input.copy()
-            if 'geometry' not in list(input.columns):
-                raise PyvoaError('No geometry inside your pandas, map can not be asked')
-            where = kwargs.get('where')
-
-            mapoption = kwargs.get('typeofmap',None)
-            if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
-                mapoption = kwargs.get('typeofmap','not dense')
-            else:
-                PyvoaWarning('typeofmap not compatible with this db, dummy argument')
-                mapoption = None
-
-
-            if 'output' in kwargs:
-                kwargs.pop('output')
-            if 'pop' in kwargs:
-                kwargs.pop('pop')
-            dateslider = kwargs.get('dateslider', None)
-            if mapoption:
-                if mapoption == 'dense':
-                    self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
-                    new_geo = self.gpdbuilder.geo.get_data()
-                    granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
-                    new_geo = new_geo.rename(columns={'name_'+granularity:'where'})
-                    new_geo['where'] = new_geo['where'].apply(lambda x: x.upper())
-                    new_geo = new_geo.set_index('where')['geometry'].to_dict()
-                    input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
-                    input['where'] = input['where'].apply(lambda x: x.title())
-                    kwargs['input'] = input
-
-                else:
-                    #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
-                    kwargs['input'] = input
-
-            return func(self,**kwargs)
-        return inner
-
-    def decohist(func):
-        @wraps(func)
-        def inner(self,**kwargs):
-            """Inner method to generate a histogram visualization based on provided keyword arguments.
-
-            Args:
-                **kwargs: Arbitrary keyword arguments that may include:
-                    - typeofhist: The type of histogram to generate.
-                    - output: This argument is removed from kwargs and not used.
-                    - pop: If present, this argument is removed from kwargs and not used.
-
-            Raises:
-                PyvoaError: If no visualization has been set up.
-
-            Returns:
-                The result of the visualization function applied to the generated histogram outcome.
-            """
-            dateslider = kwargs.get('dateslider')
-            typeofhist = kwargs.get('typeofhist')
-            #kwargs.pop('output')
-            if kwargs.get('pop'):
-              kwargs.pop('pop')
-            if self.getvis():
-                z = { **self.getkwargsvisu(), **kwargs  }
-                self.outcome = self.allvisu.hist(**z)
-                return func(self,self.outcome)
-            else:
-                raise PyvoaError(" No visualization has been set up !")
-        return inner
-
-    @input_wrapper
-    @input_visuwrapper
-    @decomap
-    def map(self,**kwargs):
-        """Maps the visualization with the provided keyword arguments.
-
-        This method checks if a display is set up. If it is, it combines the visualization keyword arguments with the provided keyword arguments and applies the mapping. If no display is set up, it raises a `PyvoaError`.
-
-        Args:
-            **kwargs: Additional keyword arguments to be passed to the mapping function.
-
-        Returns:
-            The outcome of the mapping operation.
-
-        Raises:
-            PyvoaError: If no visualization has been set up.
-        """
-        self.setnamefunction(self.map)
-        if self.getvis():
-            z = {**kwargs , **self.getkwargsvisu()}
-            self.outcome = self.allvisu.map(**z)
-            #return self.outcome
-        else:
-            raise PyvoaError(" No visualization has been set up !")
-        fig = self.outcome
-        if self.getvis() == 'bokeh':
-            from bokeh.io import (
-            show,
-            )
-            if not self.batch:
-                show(fig)
-        else:
-            import matplotlib.pyplot as plt
-            if not self.batch:
-                plt.show()
-            return fig
-
-    @input_wrapper
-    @input_visuwrapper
-    @decohist
-    def hist(self,fig):
-        """Generates and displays a histogram figure.
-
-        This method sets the function name, stores the provided figure, and displays it using the appropriate visualization library based on the current display setting.
-
-        Args:
-            fig: The figure object to be displayed, typically a histogram.
-
-        Returns:
-            The figure object if the display setting is not 'bokeh'.
-
-        Raises:
-            ImportError: If 'bokeh' is specified but the library is not installed.
-        """
-        self.setnamefunction(self.hist)
-        if self.getvis() == 'bokeh':
-            from bokeh.io import (
-            show,
-            )
-            if not self.batch:
-                show(fig)
-        else:
-            import matplotlib.pyplot as plt
-            if not self.batch:
-                plt.show()
-            return fig
-
-    def decoplot(func):
-        @wraps(func)
-        def inner(self,**kwargs):
-            """Inner method to plot visualization based on provided keyword arguments.
-
-            This method checks if a display is set up and, if so, merges the visualization keyword arguments with any additional keyword arguments provided. It then calls the plotting function and returns the outcome. If no display is set up, it raises a PyvoaError.
-
-            Args:
-                **kwargs: Additional keyword arguments to be passed to the plotting function.
-
-            Returns:
-                The outcome of the plotting function.
-
-            Raises:
-                PyvoaError: If no visualization has been set up.
-            """
-            input = kwargs.get('input')
-            which = kwargs.get('which')
-            typeofplot = kwargs.get('typeofplot',self.listplot()[0])
-            kwargs.pop('output')
-            if typeofplot == 'versus' and len(which)>2:
-                PyvoaError(" versu can be used with 2 variables and only 2 !")
-            if kwargs.get('pop'):
-                kwargs.pop('pop')
-            if self.getvis():
-                z = {**self.getkwargsvisu(),**kwargs}
-                self.outcome = self.allvisu.plot(**z)
-                return func(self,self.outcome)
-            else:
-                PyvoaError(" No visualization has been set up !")
-        return inner
-
-    @input_wrapper
-    @input_visuwrapper
-    @decoplot
-    def plot(self,fig):
-        """Plots the given figure using the appropriate display method.
-
-        This method checks the current display setting and uses Bokeh to show the plot if the display is set to 'bokeh'. If the display is not set to 'bokeh', it simply returns the figure.
-
-        Args:
-            fig: The figure to be plotted.
-
-        Returns:
-            If the display is not 'bokeh', returns the input figure. Otherwise, displays the figure using Bokeh.
-        """
-        self.setnamefunction(self.plot)
-        ''' show plot '''
-        if self.getvis() == 'bokeh':
-            from bokeh.io import (
-            show,
-            )
-            if not self.batch:
-                show(fig)
-        else:
-            import matplotlib.pyplot as plt
-            if not self.batch:
-                plt.show()
-            return fig
 
     def saveoutput(self,**kwargs):
         """Save output to a specified format.
