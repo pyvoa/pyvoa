@@ -116,8 +116,8 @@ class AllVisu:
             when = kwargs.get('when')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logo
-            input = input.sort_values(by=['date']).reset_index(drop=True)
-            locunique = list(input['where'].unique())
+            #input = input.sort_values(by=['date']).reset_index(drop=True)
+            locunique = kwargs['whereordered']
             input = input.loc[input['where'].isin(locunique)]
             #input['where'] = input['where'].cat.remove_unused_categories()
             if kwargs['what'] in ['daily','weekly']:
@@ -131,6 +131,7 @@ class AllVisu:
             loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
+
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
 

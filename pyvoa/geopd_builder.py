@@ -218,6 +218,7 @@ class GPDBuilder(object):
         newpd = pd.DataFrame()
         if not isinstance(where[0],list):
             where = [where]
+
         if has_sumall:
             for w in where:
                 temp = pd.DataFrame()
@@ -268,6 +269,7 @@ class GPDBuilder(object):
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
+
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
 
         newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
@@ -294,25 +296,39 @@ class GPDBuilder(object):
           which = [self.currentdata.get_available_keywords()[0]]
           kwargs['which'] = which
 
-       what =  kwargs.get('what')
-       when = kwargs.get('when')
-
-       input = kwargs['input']
-
-       if kwargs['kwargsuser']['input'].empty:
-            kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
-            input = self.currentdata.get_maingeopandas()
-
-       anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
-       input = input.loc[:,~input.columns.isin(anticolumns)]
+       input = kwargs.get('input')
+       what  = kwargs.get('what')
+       when  = kwargs.get('when')
        where = kwargs.get('where')
 
+       if input.empty:
+            kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
+            input = self.currentdata.get_maingeopandas()
+            anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
+            input = input.loc[:,~input.columns.isin(anticolumns)]
+       else:
+           input = input.loc[input['where'].isin(where)]
 
-       input['date'] = pd.to_datetime(input['date'], errors='coerce')
+       date_max_by_where = input.groupby('where')['date'].max()
+       needs_reindex = date_max_by_where.nunique() > 1
+       if needs_reindex:
+            PyvoaWarning("Your data is irregular, date will be reindexed ! ")
+            all_dates = input['date'].unique()
+            input = (
+                input.set_index('date')
+                        .groupby('where')
+                        .apply(lambda g: g.reindex(all_dates).ffill().bfill())
+                    .reset_index('date').reset_index(drop=True)
+            )
+
+       if not pd.api.types.is_datetime64_any_dtype(input['date']):
+           input['date'] = pd.to_datetime(input['date'], errors='coerce')
+
        when_beg_data, when_end_data = input.date.min(), input.date.max()
        when_beg_data, when_end_data = when_beg_data.date(), when_end_data.date()
 
        when_beg, when_end = dt.date(1,1,1), dt.date.today()
+
        if when:
            when_beg, when_end = extract_dates(when)
            if when_beg < when_beg_data:
@@ -325,6 +341,8 @@ class GPDBuilder(object):
                input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
            kwargs['input'] = input
            when_beg_data,when_end_data = when_beg, when_end
+       else:
+            when_beg, when_end = input.date.min(), input.date.max()
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
@@ -339,14 +357,13 @@ class GPDBuilder(object):
 
        for w in which:
            option = kwargs.get('option',defaultargs['option'][0])
-           input.loc[:,w] = input.groupby('where')[w].bfill()
-           input.loc[:,w] = input.groupby('where')[w].ffill()
 
-           where_alldate_nan = input.groupby('where')[w].apply(lambda x: x.isna().all())
-           wherenan = where_alldate_nan[where_alldate_nan].index.tolist()
-           if wherenan:
-               PyvoaWarning('drop ' + str(wherenan) +' : value is NAN for all the date  ')
-           input = input.loc[~input['where'].isin(wherenan)]
+           input[w] = (
+           input.groupby('where')[w]
+                 .apply(lambda s: s.bfill().ffill())
+                 .reset_index(level=0, drop=True)
+                 .fillna(0)
+                 )
 
            kwargs['input'] = input
            input = self.whereclustered(**kwargs)
@@ -395,11 +412,6 @@ class GPDBuilder(object):
                else:
                     concatpd = pd.merge(concatpd, temppd,  how="right", on=basecolumns)
 
-           if has_sumall and has_normalize:
-               option.append('sumall')
-               option = [opt for opt in option if not opt.startswith('sumallandnormalize')]
-               kwargs['kwargsuser']['option']=option
-
            if not concatpd.empty:
                input = concatpd
 
@@ -417,21 +429,11 @@ class GPDBuilder(object):
          input = gpd.GeoDataFrame(input, geometry=input.geometry, crs='EPSG:4326').reset_index(drop=True)
        if not isinstance(kwargs['which'],list):
            kwargs['which'] = [kwargs['which']]
-       where_ordered_bylastvalues = list(
-            input
-            .groupby('where')
-            .tail(1)
-            .sort_values(by=kwargs['which'][0], ascending=False)['where']
-            .unique()
-            )
-       input['where'] = pd.Categorical(
-            input['where'],
-            categories=where_ordered_bylastvalues,
-            ordered=True
-            )
 
-       input = input.sort_values(by=['where','date'])
 
+       #input = input.sort_values(by=["date",which[0]],ascending=[True,False]).reset_index(drop=True)
+       #input = input.sort_values(by=['where','date'])
+       #input = input.reset_index(drop=True)
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
        others = sorted([c for c in input.columns if c not in prefix + suffix])
