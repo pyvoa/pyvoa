@@ -111,15 +111,13 @@ class AllVisu:
         @wraps(func)
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
+            loca = list(input.loc[input.date==input.date.max()]['where'].unique())
             which = kwargs.get('which')
             what = kwargs.get('what')
             when = kwargs.get('when')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logo
-            input = input.sort_values(by=['date']).reset_index(drop=True)
-            locunique = list(input['where'].unique())
-            input = input.loc[input['where'].isin(locunique)]
-            #input['where'] = input['where'].cat.remove_unused_categories()
+
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -129,13 +127,11 @@ class AllVisu:
             if kwargs['kwargsuser']['typeofplot'] == 'date':
                 kwargs['title'] = what[0] + ' time evolution'
             kwargs['title'] = self.database_name.upper() + ' time evolution between ' + str(when[0])
-            loc=list(input['where'].unique())
-            kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
-            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
 
+            kwargs['input'] = input.loc[input['where'].isin(loca[:self.maxcountrydisplay])]
+            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
-
             return func(self, **kwargs)
         return inner_plot
 

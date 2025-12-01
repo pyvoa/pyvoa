@@ -575,8 +575,6 @@ class visu_bokeh:
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
             input=kwargs['input']
-            nb = kwargs['maxlettersdisplay']
-            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
@@ -685,7 +683,6 @@ class visu_bokeh:
                  if [dd/mm/yyyy:] up to max date
         '''
         input = kwargs.get('input')
-
         which = kwargs.get('which')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
@@ -709,16 +706,18 @@ class visu_bokeh:
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
             maxi, mini=0, 0
             tooltips=[]
-            colors = list(input['colors'].unique())
+
+            lwhere = kwargs['whereordered']
+            lcolor = list(input.loc[input['where'].isin(lwhere)]['colors'])
             for idx,val in enumerate(which):
-                for ldx,loc in enumerate(list(input['where'].unique())):
+                for ldx,loc in enumerate(lwhere):
                     pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
                     label = f"{loc}"
                     if len(which)>1:
                         label=f"{loc}, {val}"
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      line_width = 3,
-                                     color=colors[ldx],
+                                     color=lcolor[ldx],
                                      legend_label=label,
                                      hover_line_width = 4, name = val, line_dash=line_style[idx])
                     r_list.append(r)
@@ -1265,7 +1264,7 @@ class visu_bokeh:
         mypd['horihistotextx'] = mypd['right']
         indices = [i % maxcountrydisplay for i in range(len(mypd))]
         mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
+        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / guntrydisplay for i in indices]
         mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
         mypd['horihistotextx'] = mypd['right']
         return mypd
