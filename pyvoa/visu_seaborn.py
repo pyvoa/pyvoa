@@ -88,10 +88,6 @@ class visu_seaborn:
             plt.title(title)
             kwargs['plt'] = plt
             kwargs['sns'] = sns
-            input = kwargs['input']
-            nb = kwargs['maxlettersdisplay']
-            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
-            kwargs['input'] = input
             return func(self, **kwargs)
         return inner_plot
 
