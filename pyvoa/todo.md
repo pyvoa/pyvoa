@@ -24,3 +24,4 @@ pf.map(dateslider=True,which='total_cases_per_million',when=':31/12/2020')
 - [ ] problème de l'export png du bokeh : définition pourrie (screenshot meilleur)
 - [ ] pour une spiral : pas de nom de variable tracé
 - [ ] pour une spiral : pas de logo pyvoa en bokeh
+- [ ] pas le même min / max avec et sans dateslider
