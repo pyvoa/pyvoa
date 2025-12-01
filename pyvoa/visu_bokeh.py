@@ -445,7 +445,7 @@ class visu_bokeh:
                                 }
 
                                 slider.value = v; // déclenche slider_callback
-                            }, 10);
+                            }, 100);
                             cb_obj.label = '❚❚ Pause';
                         }
                     } else {
