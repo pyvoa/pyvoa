@@ -81,17 +81,20 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
-        which = kwargs.get('which')
+        nb = kwargs['maxlettersdisplay']
+        input['where'] = [k[:nb] for k in input['where']]
+        what = kwargs.get('what')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
+        
         ax.set_xlabel("date", fontsize=10)
-        ax.set_ylabel(which[0], fontsize=10)
+        ax.set_ylabel(what[0], fontsize=10)
         st=['-','--',':']
-        for idx, i in enumerate(which):
+        for idx, i in enumerate(what):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
                 label = f"{where}"
-                if len(which)>1:
+                if len(what)>1:
                     label =f"{where} — {i}"
                 ax.plot(
                     df.index,
@@ -100,7 +103,7 @@ class visu_matplotlib:
                     linestyle=st[idx]
                 )
 
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(which),ncol=len(which))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(what),ncol=len(what))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
         return ax
 
@@ -143,7 +146,7 @@ class visu_matplotlib:
         d = input.allyears.unique()
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
-            ax.plot(df.index,df,label=f'{i}')
+            ax = ax.plot(df.index,df,label=f'{i}')
         ax.legend(d)
         return ax
 
