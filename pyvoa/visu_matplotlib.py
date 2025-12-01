@@ -86,14 +86,17 @@ class visu_matplotlib:
         what = kwargs.get('what')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
-        
+
         ax.set_xlabel("date", fontsize=10)
         ax.set_ylabel(what[0], fontsize=10)
         st=['-','--',':']
         for idx, i in enumerate(what):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
-                label = f"{where}"
+                if legend:
+                    label = legend
+                else:
+                    label = f"{where}"
                 if len(what)>1:
                     label =f"{where} — {i}"
                 ax.plot(

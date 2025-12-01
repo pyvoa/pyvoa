@@ -376,11 +376,9 @@ class visu_bokeh:
                                 sourcemap.data[k] = rows.map(r => r[k]);
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
-
-                            color_mapperjs.low=Math.min.apply(Math, sourcemap.data['cases']);
-                            color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
-                            console.log(color_mapperjs.high);
                             sourcemap.change.emit();
+                            color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
+                             console.log(color_mapperjs.high);
                             // For HISTO
                             const len = sourcehisto.data[which].length;
 
@@ -434,18 +432,9 @@ class visu_bokeh:
                         if (!window._bokeh_play_interval) {
                             window._bokeh_play_interval = setInterval(function() {
                                 let v = slider.value + 1;
-
-                                if (v > slider.end) {
-                                    // Stopper à la fin
-                                    clearInterval(window._bokeh_play_interval);
-                                    window._bokeh_play_interval = null;
-                                    cb_obj.active = false;
-                                    cb_obj.label = '► Play';
-                                    return;
-                                }
-
+                                if (v > slider.end) { v = 0; }  // revenir au début
                                 slider.value = v; // déclenche slider_callback
-                            }, 100);
+                            }, 10);
                             cb_obj.label = '❚❚ Pause';
                         }
                     } else {
@@ -503,9 +492,9 @@ class visu_bokeh:
             bokeh_figure_map.y_range.end   = ymax + pad_y
 
             min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
-            bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
-                            fill_color = {'field': 'cases', 'transform': color_mapper},
-                            line_color = 'black', line_width = 0.25, fill_alpha = 1)
+            invViridis256 = Viridis256[::-1]
+            color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+
             if func.__name__ in lhist:
                 kwargs['yrange']=yrange
             if 'geometry' in list(input_uniquecountries.columns):
@@ -577,6 +566,8 @@ class visu_bokeh:
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
             input=kwargs['input']
+            nb = kwargs['maxlettersdisplay']
+            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
@@ -685,6 +676,7 @@ class visu_bokeh:
                  if [dd/mm/yyyy:] up to max date
         '''
         input = kwargs.get('input')
+
         which = kwargs.get('which')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
@@ -698,6 +690,8 @@ class visu_bokeh:
         }
         dicof={'title':kwargs.get('title')}
 
+        legend = kwargs.get('legend',None)
+
         for axis_type in self.av.d_graphicsinput_args['ax_type']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
@@ -708,18 +702,19 @@ class visu_bokeh:
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
             maxi, mini=0, 0
             tooltips=[]
-
-            lwhere = kwargs['whereordered']
-            lcolor = list(input.loc[input['where'].isin(lwhere)]['colors'])
+            colors = list(input['colors'].unique())
             for idx,val in enumerate(which):
-                for ldx,loc in enumerate(lwhere):
+                for ldx,loc in enumerate(list(input['where'].unique())):
                     pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
-                    label = f"{loc}"
+                    if legend:
+                        label = legend
+                    else:
+                        label = f"{loc}"
                     if len(which)>1:
                         label=f"{loc}, {val}"
                     r = fig.line(x = 'date', y = val, source = pyvoa,
                                      line_width = 3,
-                                     color=lcolor[ldx],
+                                     color=colors[ldx],
                                      legend_label=label,
                                      hover_line_width = 4, name = val, line_dash=line_style[idx])
                     r_list.append(r)
@@ -1187,7 +1182,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-            label_dict = dict(zip(ytick_loc, [x if len(x)<maxletters else x[:maxletters]+'...' for x in columndatasrc.data['where']] ))
+            label_dict = dict(zip(ytick_loc, [x[:maxletters] for x in columndatasrc.data['where']]))
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 label_dict = {ytick_loc[0]:'sum all location'}
 
@@ -1266,7 +1261,7 @@ class visu_bokeh:
         mypd['horihistotextx'] = mypd['right']
         indices = [i % maxcountrydisplay for i in range(len(mypd))]
         mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / guntrydisplay for i in indices]
+        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
         mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
         mypd['horihistotextx'] = mypd['right']
         return mypd
@@ -1382,15 +1377,13 @@ class visu_bokeh:
         input = kwargs.get('input')
         geocolumndatasrc = kwargs.get('geocolumndatasrc')
         which = kwargs.get('which')
-        color_mapper = kwargs['color_mapper']
-        bokeh_figure = kwargs['bokeh_figure_map']
 
         tile = kwargs.get('tile')
-
-        if kwargs['typeofmap']!='dense':
-            tile = visu_bokeh.convert_tile(tile, 'bokeh')
-            wmt = WMTSTileSource(url = tile)
-            bokeh_figure.add_tile(wmt, retina=True)
+        color_mapper = kwargs['color_mapper']
+        tile = visu_bokeh.convert_tile(tile, 'bokeh')
+        wmt = WMTSTileSource(url = tile)
+        bokeh_figure = kwargs['bokeh_figure_map']
+        bokeh_figure.add_tile(wmt, retina=True)
 
         logo = kwargs['logo']
         logo_url = visu_bokeh.pyvoalogo(logo)
