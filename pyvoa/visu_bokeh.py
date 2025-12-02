@@ -775,6 +775,9 @@ class visu_bokeh:
         dicof['match_aspect']=True
 
         bokeh_figure = kwargs.get('bokeh_figure_spiral')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
+        bokeh_figure.xaxis.visible = False
+        bokeh_figure.yaxis.visible = False
+
         if len(input['where'].unique()) > 1 :
             print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
@@ -811,7 +814,7 @@ class visu_bokeh:
         date=input['date'],
         cases=input['cases']
         ))
-        bokeh_figure.line( x = 'x', y = 'y', source = pyvoa, legend_label = input['where'][0],
+        bokeh_figure.line( x = 'x', y = 'y', source = pyvoa, legend_label = which[0] +', '+ input['where'][0],
                         line_width = 3, line_color = 'blue')
         circle = bokeh_figure.circle('x', 'y', size=2, source=pyvoa)
 
