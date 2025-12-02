@@ -301,13 +301,16 @@ class visu_bokeh:
             color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
                         border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
+                input_dates = input_dates.sort_values(by=['date', 'where'])
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
-                unique_dates = input_dates['date'].unique().tolist()
+                unique_dates = input_dates['date'].drop_duplicates().tolist()
                 unique_where = input_dates['where'].unique().tolist()
+                #unique_dates = [i.strftime("%d/%m/%Y") for i in unique_dates]
                 frames = []
                 cols = list(input_dates.columns)
                 frames = []
-                unique_dates = unique_dates[::-1]
+                #unique_dates = unique_dates[::-1]
+
                 for d in unique_dates:
                     df_d = input_dates[input_dates['date'] == d].copy()
                     df_d['where'] = pd.Categorical(
@@ -376,12 +379,14 @@ class visu_bokeh:
                                 sourcemap.data[k] = rows.map(r => r[k]);
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
-
+                            console.log(sourcemap.data['cases']);
                             color_mapperjs.low=Math.min.apply(Math, sourcemap.data['cases']);
                             color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
                             sourcemap.change.emit();
 
+
                             // For HISTO
+
                             const len = sourcehisto.data[which].length;
 
                             const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
@@ -401,7 +406,7 @@ class visu_bokeh:
                                 const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay);
                                 sourcehisto.data['top'][j]    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
                                 sourcehisto.data['bottom'][j] = ymax * (maxcountrydisplay - j) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay;
-                                sourcehisto.data['horihistotexty'][j] = sourcehisto.data['bottom'][j] + 0.5 * ymax / maxcountrydisplay;
+                                sourcehisto.data['horihistotexty'] = sourcehisto.data['bottom'][j] + 0.5 * ymax / maxcountrydisplay;
 
                                 let pos = parseInt(ymax * (len - j) / len);
                                 if (!Number.isFinite(pos)) continue;
@@ -443,7 +448,6 @@ class visu_bokeh:
                                     cb_obj.label = '► Play';
                                     return;
                                 }
-
                                 slider.value = v; // déclenche slider_callback
                             }, 100);
                             cb_obj.label = '❚❚ Pause';
@@ -503,6 +507,7 @@ class visu_bokeh:
             bokeh_figure_map.y_range.end   = ymax + pad_y
 
             min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
+
             bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                             fill_color = {'field': 'cases', 'transform': color_mapper},
                             line_color = 'black', line_width = 0.25, fill_alpha = 1)
@@ -1182,7 +1187,7 @@ class visu_bokeh:
     def bokeh_horizonhisto(self, **kwargs):
         mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
-        columndatasrc = kwargs.get('columndatasrc')
+        columndatasrc = kwargs.get('g')
         controls = kwargs.get('controls', None)
         maxletters = kwargs['maxlettersdisplay']
         dbokeh_figure = {
