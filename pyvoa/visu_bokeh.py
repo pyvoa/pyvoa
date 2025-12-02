@@ -234,7 +234,6 @@ class visu_bokeh:
             dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=width, height=height, match_aspect=False)
             dicfig['bokeh_figure_linear_date'] = figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']    = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_spiral']      = figure(width=width, height=height)
             dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
 
             logo_url = visu_bokeh.pyvoalogo(logo)
@@ -774,7 +773,7 @@ class visu_bokeh:
         dicof={'title':kwargs.get('title')}
         dicof['match_aspect']=True
 
-        bokeh_figure = kwargs.get('bokeh_figure_spiral')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
+        bokeh_figure = kwargs.get('bokeh_figure_linear')#(x_range=[-borne, borne], y_range=[-borne, borne], **dicof)
         bokeh_figure.xaxis.visible = False
         bokeh_figure.yaxis.visible = False
 
@@ -838,7 +837,9 @@ class visu_bokeh:
         bokeh_figure.legend.background_fill_alpha = 0.6
         bokeh_figure.legend.location = "top_left"
         bokeh_figure.legend.click_policy="hide"
-        return bokeh_figure
+        panel = TabPanel(child=Row(bokeh_figure,kwargs['watermark']))
+        tabs = Tabs(tabs = [panel])
+        return tabs
 
     ''' SCROLLINGMENU PLOT '''
     @deco_bokeh
