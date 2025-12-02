@@ -379,16 +379,12 @@ class visu_bokeh:
                                 sourcemap.data[k] = rows.map(r => r[k]);
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
-                            console.log(sourcemap.data['cases']);
                             color_mapperjs.low=Math.min.apply(Math, sourcemap.data['cases']);
                             color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
                             sourcemap.change.emit();
 
-
                             // For HISTO
-
                             const len = sourcehisto.data[which].length;
-
                             const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
                             const limited = sorted_rows.slice(0, maxcountrydisplay);
                             const allColumns = Object.keys(sourcehisto.data);
@@ -419,8 +415,6 @@ class visu_bokeh:
                                 const percent = (total === 0) ? 0 : (100 * value / total);
                                 sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
                             }
-
-                            console.log(sourcehisto.data['angle'],sourcehisto.data[which])
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
                             sourcehisto.change.emit();
@@ -1187,7 +1181,7 @@ class visu_bokeh:
     def bokeh_horizonhisto(self, **kwargs):
         mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
-        columndatasrc = kwargs.get('g')
+        columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
         maxletters = kwargs['maxlettersdisplay']
         dbokeh_figure = {
