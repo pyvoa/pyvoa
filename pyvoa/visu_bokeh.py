@@ -376,9 +376,11 @@ class visu_bokeh:
                                 sourcemap.data[k] = rows.map(r => r[k]);
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
-                            sourcemap.change.emit();
+
+                            color_mapperjs.low=Math.min.apply(Math, sourcemap.data['cases']);
                             color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
-                             console.log(color_mapperjs.high);
+                            sourcemap.change.emit();
+
                             // For HISTO
                             const len = sourcehisto.data[which].length;
 
@@ -492,8 +494,9 @@ class visu_bokeh:
             bokeh_figure_map.y_range.end   = ymax + pad_y
 
             min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
-            invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette=invViridis256, low=min_col, high=max_col, nan_color='#ffffff')
+            bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
+                            fill_color = {'field': 'cases', 'transform': color_mapper},
+                            line_color = 'black', line_width = 0.25, fill_alpha = 1)
 
             if func.__name__ in lhist:
                 kwargs['yrange']=yrange
@@ -1382,16 +1385,17 @@ class visu_bokeh:
         input = kwargs.get('input')
         geocolumndatasrc = kwargs.get('geocolumndatasrc')
         which = kwargs.get('which')
-
-        tile = kwargs.get('tile')
         color_mapper = kwargs['color_mapper']
-        tile = visu_bokeh.convert_tile(tile, 'bokeh')
-        wmt = WMTSTileSource(url = tile)
         bokeh_figure = kwargs['bokeh_figure_map']
-        bokeh_figure.add_tile(wmt, retina=True)
+        tile = kwargs.get('tile')
+        if kwargs['typeofmap']!='dense':
+            tile = visu_bokeh.convert_tile(tile, 'bokeh')
+            wmt = WMTSTileSource(url = tile)
+            bokeh_figure.add_tile(wmt, retina=True)
 
         logo = kwargs['logo']
         logo_url = visu_bokeh.pyvoalogo(logo)
+
         bokeh_figure.image_url(
             url=[logo_url],
             x=0.25*bokeh_figure.width,
