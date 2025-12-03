@@ -379,10 +379,11 @@ class visu_bokeh:
                                 sourcemap.data[k] = rows.map(r => r[k]);
                                 sourcemap.data['cases'] = sourcemap.data[which];
                             }
-                            color_mapperjs.low=Math.min.apply(Math, sourcemap.data['cases']);
-                            color_mapperjs.high=Math.max.apply(Math, sourcemap.data['cases']);
+                            const values = sourcemap.data['cases'].filter(v => Number.isFinite(v));
+                            color_mapperjs.low=Math.min.apply(Math, values);
+                            color_mapperjs.high=Math.max.apply(Math, values);
                             sourcemap.change.emit();
-
+                            console.log(sourcemap.data['cases'],Math.max.apply(Math, sourcemap.data['cases']));
                             // For HISTO
                             const len = sourcehisto.data[which].length;
                             const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
