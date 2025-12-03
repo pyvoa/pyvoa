@@ -14,7 +14,9 @@
 - [ ] dans les histos (au moins), on n'est pas à 20 caractères pour les lieux. Et il n'y a plus les " … " 
 - [ ] mettre les puissances de 10 sur les abscisses (matplotlib et bokeh)
 - [ ] problème de l'export png du bokeh : définition pourrie (screenshot meilleur)
-- [ ] retour du bug SPF → pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
 - [ ] Bug TypeOfMap ? typeofmap not compatible with this db, dummy argument : bokeh / owid / pf.map(which='total_people_vaccinated_per_hundred',dateslider=True,when='01/01/2021:31/12/2022') 
 - [ ] possible d'avoir en bokeh directement l'onglet "log" ? 
 - [ ] quid de la représentation log en matplotlib ? 
+- [ ] re-ajout d'un bin "others" pour les pie
+- [ ] pour les histos par valeur → pas de limitation en nombre de cas pour avoir une belle distrib'. 
+- [ ] pour les histos par valeur → légende en bokeh
