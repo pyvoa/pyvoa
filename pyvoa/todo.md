@@ -3,7 +3,6 @@
 - [ ] seaborn : ralonger les noms coupés à 20 caractères
 - [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
-- [ ] placer un logo pyvoa avec fond transparent (souci visible notamment avec hist )
 - [ ] logo pyvoa trop gros avec matplotlib et seaborn
 - [ ] ajouter les ":" après le nom de la base en capitale
 - [ ] virer seaborn ? virer folium ? des visus dispo ? 
@@ -11,8 +10,11 @@
 - [ ] bokeh, aux environs du logo, on n'a pas de curseur donnant les résultats
 - [ ] quand on sauve un bokeh, le logo disparait
 - [ ] avec un pandas externe, obligation de charger une base avant. Ce qui est idiot.
-- [ ] hist avec dateslider immonde. Exemple : pf.hist(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020')
-- [ ] SPF crash : pf.hist(where='métropole',which='tot_dchosp',dateslider=True,when=':31/12/2020',option=["normalize:pop1M","nonneg"])
+- [ ] pas de warning dateslider + matplotlib => hist avec dateslider immonde. Exemple : pf.hist(where='métropole',which='tot_dchosp',typeofmap='dense',dateslider=True,when=':31/12/2020')
 - [ ] dans les histos (au moins), on n'est pas à 20 caractères pour les lieux. Et il n'y a plus les " … " 
 - [ ] mettre les puissances de 10 sur les abscisses (matplotlib et bokeh)
 - [ ] problème de l'export png du bokeh : définition pourrie (screenshot meilleur)
+- [ ] retour du bug SPF → pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
+- [ ] Bug TypeOfMap ? typeofmap not compatible with this db, dummy argument : bokeh / owid / pf.map(which='total_people_vaccinated_per_hundred',dateslider=True,when='01/01/2021:31/12/2022') 
+- [ ] possible d'avoir en bokeh directement l'onglet "log" ? 
+- [ ] quid de la représentation log en matplotlib ? 
