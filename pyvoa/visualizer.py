@@ -153,7 +153,7 @@ class AllVisu:
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
-                if func.__name__ != 'map':
+                if func.__name__ != 'map' and  kwargs['typeofhist'] != 'value':
                     input = input.head(self.maxcountrydisplay)
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
