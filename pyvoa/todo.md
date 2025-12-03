@@ -16,4 +16,3 @@
 - [ ] dans les histos (au moins), on n'est pas à 20 caractères pour les lieux. Et il n'y a plus les " … " 
 - [ ] mettre les puissances de 10 sur les abscisses (matplotlib et bokeh)
 - [ ] problème de l'export png du bokeh : définition pourrie (screenshot meilleur)
-- [ ] problème des dates défilant dans un film avec dateslider : ce n'est pas croissant
