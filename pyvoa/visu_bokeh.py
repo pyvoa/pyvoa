@@ -121,7 +121,7 @@ class visu_bokeh:
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
         self.figure_height = 400
-        self.figure_width = 480
+        self.figure_width = 490
         self.listfigs = None
 
     @staticmethod
