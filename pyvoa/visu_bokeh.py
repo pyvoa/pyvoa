@@ -1185,6 +1185,7 @@ class visu_bokeh:
         columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
         maxletters = kwargs['maxlettersdisplay']
+        title = kwargs['title']
         dbokeh_figure = {
             'linear': kwargs.get('bokeh_figure_linear'),
             'log': kwargs.get('bokeh_figure_log')
@@ -1213,7 +1214,7 @@ class visu_bokeh:
             maxx = 1.15*max(columndatasrc.data['right'])
             fig.x_range.start = minn
             fig.x_range.end = maxx
-
+            fig.title = title
             fig.quad(
                 source=columndatasrc,
                 top='top',
