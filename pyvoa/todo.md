@@ -20,3 +20,5 @@
 - [ ] re-ajout d'un bin "others" pour les pie
 - [ ] pour les histos par valeur → pas de limitation en nombre de cas pour avoir une belle distrib'. 
 - [ ] pour les histos par valeur → légende en bokeh
+- [ ] pour les histos par valeur → résultats complètement différents entre matplotlib et bokeh
+- [ ] Base HS (reload=True) → IMED, JHU-USA, sciensano (sans compter celles déjà virés…)
