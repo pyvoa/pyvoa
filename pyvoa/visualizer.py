@@ -169,7 +169,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['title'] = self.database_name.upper() + ' database, ' + str(kwargs['which'])
+            kwargs['title'] = self.database_name.upper() + ' database, ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
