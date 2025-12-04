@@ -213,9 +213,14 @@ class visu_matplotlib:
 
         maxletters = kwargs['maxlettersdisplay']
         input['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input['where']]
-
+        color_sumothers = "#000000"
+        color_others = "#1f77b4"
+        unique_items = sorted(input["where"].unique())
         input = pd.pivot_table(input,index='date', columns='where', values=what)
-        return input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
+        ax = input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles, input.columns, title="Where")
+        return ax
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
