@@ -147,14 +147,32 @@ class AllVisu:
         def inner_hm(self, **kwargs):
             input = kwargs.get('input')
             which = kwargs.get('which')
+            which = which[0]
             what = kwargs.get('what')
             when = kwargs.get('when')
             kwargs['logo'] = self.logo
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
-            if not kwargs['dateslider']:
+            if not kwargs['dateslider'] and func.__name__ != 'map':
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and  kwargs['typeofhist'] != 'value':
                     input = input.head(self.maxcountrydisplay)
+                if kwargs['typeofhist'] == 'value':
+                    top = input.iloc[:self.maxcountrydisplay]
+                    others = input.iloc[self.maxcountrydisplay:]
+                    rest = {col: ['SumOthers'] for col in top.columns}
+                    for i in [which,which+' daily',which+' weekly']:
+                        total = others[i].apply(
+                            lambda x: x[0] if isinstance(x, list) else x
+                            ).sum()
+                        rest[i] = [total]
+                    if kwargs['kwargsuser']['vis'] == 'bokeh':
+                        rest["where"] = ["_".join(others["where"].astype(str).unique())]
+                    rest['date'] = [input['date'].iloc[0]]
+                    rest['colors'] = ['#FFFFFF']
+                    rest = pd.DataFrame(rest)
+                    input = pd.concat([top, rest], ignore_index=True)
+                    input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
+
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
             if kwargs['what'] in ['daily','weekly']:

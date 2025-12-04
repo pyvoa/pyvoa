@@ -1069,7 +1069,6 @@ class visu_bokeh:
     ''' VERTICAL HISTO '''
 
     @deco_bokeh
-    @decodateslider
     def bokeh_histo(self, **kwargs):
         '''
             -----------------
@@ -1155,7 +1154,7 @@ class visu_bokeh:
                 axis_type_title = 'loglog'
 
             fig.add_tools(hover_tool)
-            fig.x_range = Range1d(1.05 * interval[0], 1.05 * interval[-1])
+            fig.x_range = Range1d(interval[0], interval[-1])
             fig.y_range = Range1d(0, 1.05 * frame_histo['top'].max())
             if x_axis_type == "log":
                 left = 0.8
@@ -1381,12 +1380,11 @@ class visu_bokeh:
 
         fig.add_layout(labels)
         fig.add_layout(labels2)
-        fig = Row(fig,kwargs['watermark'])
+        fig = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
             layout = column(controls, fig)
             return layout
         return fig
-
 
     @deco_bokeh
     @decodateslider
