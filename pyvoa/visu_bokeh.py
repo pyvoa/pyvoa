@@ -1380,7 +1380,7 @@ class visu_bokeh:
 
         fig.add_layout(labels)
         fig.add_layout(labels2)
-        fig = Row(bokeh_figure,kwargs['watermark'])
+        fig = Row(fig,kwargs['watermark'])
         if dateslider:
             layout = column(controls, fig)
             return layout

@@ -383,7 +383,9 @@ class DataParser:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
 
+
       pandas_db = fill_missing_dates(pandas_db)
+
       pandas_db = pandas_db.sort_values(['where','date'])
       self.available_keywords = list(pandas_db.columns)
 
@@ -418,6 +420,7 @@ class DataParser:
               geopd = geopd.loc[geopd.code_subregion.isin(locationdb)]
           else:
               geopd = geopd.loc[geopd.name_subregion.isin(locationdb)]
+
           geopd['name_subregion'] = geopd['name_subregion'].str.upper()
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
           geopd = geopd.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
@@ -435,12 +438,13 @@ class DataParser:
           pandas_db['where'] = pandas_db['code'].map(codenamedico)
       elif locationmode == "name":
           pandas_db['where'] = pandas_db['where'].str.upper()
-          #reverse={v:k for k,v in codenamedico.items()}
-          pandas_db['code'] = pandas_db['where'].map(codenamedico)
+          namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
+          pandas_db['code'] = pandas_db['where'].map(namecodedico)
       else:
           PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
+
       pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
       pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
