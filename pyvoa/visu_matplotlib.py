@@ -239,7 +239,7 @@ class visu_matplotlib:
                                 'orientation': "horizontal","pad": 0.01, 'shrink': 0.5})
         ax.set_axis_off()
         ax.set_title(title)
-
+        
         input = input.to_crs(epsg=3857)
         if tile == 'openstreet':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik)
