@@ -1,3 +1,6 @@
+# version 0.4.0
+- huge modifications ! Olivier please add a summary
+
 # version 0.3.1
 - cosmetic and docstrings
 - version for pip, first full version 

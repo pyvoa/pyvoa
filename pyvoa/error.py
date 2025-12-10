@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Project : Pyvoa
-Date :    april 2020 - november 2025
+Date :    april 2020 - december 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
 Copyright ©pyvoa_fr
 License: See joint LICENSE file
