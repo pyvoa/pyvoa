@@ -1,3 +1,5 @@
+# Internal working file !
+
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
 - [ ] ralonger les noms coupés à 20 caractères
