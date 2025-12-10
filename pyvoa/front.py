@@ -3,11 +3,13 @@
 
 # -*- coding: utf-8 -*-
 Project : Pyvoa
-Date :    april 2020 - december 2025
+Date :    april 2020 - november 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
 Copyright ©pyvoa_org
 License: See joint LICENSE file
 https://pyvoa.org/
+
+Date :    April 2020 - November 2025
 '''
 
 # --- Imports ----------------------------------------------------------
@@ -741,7 +743,15 @@ class front:
         return self.lvisu
 
     def listmap(self,):
-        return [ i for i in list(self.av.d_graphicsinput_args['typeofmap']) if i ]
+        try:
+            import folium
+            FOLIUM_AVAILABLE = True
+        except ImportError:
+            FOLIUM_AVAILABLE = False
+        optmap = [ i for i in list(self.av.d_graphicsinput_args['typeofmap']) if i ]
+        if not FOLIUM_AVAILABLE:
+            optmap.remove('folium')
+        return optmap
 
     def listwhom(self, detailed = False):
         """Lists the names of databases and their associated metadata.
