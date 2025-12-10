@@ -740,6 +740,8 @@ class front:
         Returns:
             list: The visualization list.
         """
+        if 'seaborn' in self.lvisu:
+            self.lvisu.remove('seaborn')
         return self.lvisu
 
     def listmap(self,):
