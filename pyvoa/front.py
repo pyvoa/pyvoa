@@ -268,7 +268,6 @@ class front:
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             mustbealist = ['where','which','option']
 
-
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
@@ -285,7 +284,9 @@ class front:
                 default['input'] = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
-            kwargs['what'] = kwargs['what'][0]
+            kwargs['what'] = kwargs.get('what',kwargs['what'][0])
+            if isinstance(kwargs['what'],list):
+                kwargs['what'] = kwargs['what'][0]
             input = kwargs.get('input',pd.DataFrame())
             kwargs['kwargsuser'] = kwargs.copy()
 
@@ -335,6 +336,7 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
+
             return func(self,**kwargs)
         return wrapper
 
@@ -500,19 +502,24 @@ class front:
             where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)
+
             if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
                 mapoption = kwargs.get('typeofmap','not dense')
             else:
                 PyvoaWarning('typeofmap not compatible with this db, dummy argument')
                 mapoption = None
 
-
             if 'output' in kwargs:
                 kwargs.pop('output')
             if 'pop' in kwargs:
                 kwargs.pop('pop')
             dateslider = kwargs.get('dateslider', None)
+
             if mapoption:
+                if 'folium' in mapoption:
+                    mapoption.remove('folium')
+                    print(self.av.test_add_graphics_libraries(['folium']))
+                    #self.setvis('folium')
                 if mapoption == 'dense':
                     self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
                     new_geo = self.gpdbuilder.geo.get_data()
@@ -523,7 +530,6 @@ class front:
                     input['geometry'] = input['where'].apply(lambda x: x.upper()).map(new_geo)
                     input['where'] = input['where'].apply(lambda x: x.title())
                     kwargs['input'] = input
-
                 else:
                     #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                     kwargs['input'] = input
@@ -735,6 +741,9 @@ class front:
             list: The visualization list.
         """
         return self.lvisu
+
+    def listmap(self,):
+        return [ i for i in list(self.av.d_graphicsinput_args['typeofmap']) if i ]
 
     def listwhom(self, detailed = False):
         """Lists the names of databases and their associated metadata.
