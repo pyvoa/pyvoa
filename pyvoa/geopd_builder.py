@@ -416,7 +416,7 @@ class GPDBuilder(object):
            if not concatpd.empty:
                input = concatpd
 
-           windows = {' daily':1,' weekly':7}
+           windows = InputOption().windows
            for k,v in windows.items():
                input.loc[:,w+k]  = input.groupby('where')[w].diff(v)
                input.loc[:,w+k]  = input[w + k].bfill()
@@ -495,7 +495,8 @@ class GPDBuilder(object):
         val2norm=[val2norm]
 
     for i in val2norm:
-            pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*dpop[value]
+        var = i+' '+bypop
+        pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*dpop[value]
     return pandy
 
    def saveoutput(self,**kwargs):

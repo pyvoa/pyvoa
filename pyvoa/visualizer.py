@@ -152,6 +152,7 @@ class AllVisu:
             when = kwargs.get('when')
             kwargs['logo'] = self.logo
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
+            windows =  InputOption().windows
             if not kwargs['dateslider'] and func.__name__ != 'map':
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and  kwargs['typeofhist'] != 'value':
@@ -160,7 +161,8 @@ class AllVisu:
                     top = input.iloc[:self.maxcountrydisplay]
                     others = input.iloc[self.maxcountrydisplay:]
                     rest = {col: ['SumOthers'] for col in top.columns}
-                    for i in [which,which+' daily',which+' weekly']:
+                    windows_which = [which.replace(' ',i+' ') for i in windows.keys() ]
+                    for i in [which]+windows_which:
                         total = others[i].apply(
                             lambda x: x[0] if isinstance(x, list) else x
                             ).sum()
