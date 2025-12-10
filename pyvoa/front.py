@@ -745,13 +745,8 @@ class front:
         return self.lvisu
 
     def listmap(self,):
-        try:
-            import folium
-            FOLIUM_AVAILABLE = True
-        except ImportError:
-            FOLIUM_AVAILABLE = False
         optmap = [ i for i in list(self.av.d_graphicsinput_args['typeofmap']) if i ]
-        if not FOLIUM_AVAILABLE:
+        if 'folium' in optmap:
             optmap.remove('folium')
         return optmap
 
