@@ -66,10 +66,10 @@ class InputOption():
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['location','value','pie'],\
                         'typeofplot':['date','compare','versus','spiral','yearly'],
-                        'typeofmap':[None,'not dense','dense'],\
+                        'typeofmap':[None,'not dense','dense','folium'],\
                         'bins':10,\
-                        'vis':['matplotlib','bokeh','folium','seaborn'],\
-                        'tile' : ['esri','openstreet','stamen','positron'],\
+                        'vis':['matplotlib','bokeh','seaborn'],\
+                        'tile' : ['openstreet','esri','stamen','positron'],\
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
                         'guideline':[False,True],\
@@ -84,6 +84,7 @@ class InputOption():
             "'typeofmap'=[None,'not dense','dense']"]
             }, index=['plot', 'hist','map'])
 
+        self.windows = {' daily':1,' weekly':7}    
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
         self.dicokfront = {}
 
