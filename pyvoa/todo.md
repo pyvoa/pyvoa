@@ -1,7 +1,7 @@
 - [ ] virer warning sur dateutil (e.g. pour JHU-USA)
 - [ ] virer warning sur geo_point_2d (e.g. pour SPF)
-- [ ] seaborn : ralonger les noms coupés à 20 caractères
-- [ ] seaborn : logo pyvoao limité à l'intérieur du rond du pie
+- [ ] ralonger les noms coupés à 20 caractères
+- [ ] matplotlib : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
 - [ ] logo pyvoa trop gros avec matplotlib et seaborn
 - [ ] ajouter les ":" après le nom de la base en capitale
@@ -21,4 +21,5 @@
 - [ ] pour les histos par valeur → pas de limitation en nombre de cas pour avoir une belle distrib'. 
 - [ ] pour les histos par valeur → légende en bokeh
 - [ ] pour les histos par valeur → résultats complètement différents entre matplotlib et bokeh
-- [ ] Base HS (reload=True) → IMED, JHU-USA, sciensano (sans compter celles déjà virés…)
+- [ ] map matplotlib → les pays ne sont pas tous dessinés avec mpoxgh par exemple
+- [ ] plus de pf.listmap() dans le front ? Pourtant pf.listchart() donne bien les 3 options possibles.
