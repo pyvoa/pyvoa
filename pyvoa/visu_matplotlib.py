@@ -75,6 +75,11 @@ class visu_matplotlib:
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
+            return func(self,**kwargs)
+        return wrapper
+
+    def decomatplotlibhist(func):
+        def wrapper(self,**kwargs):
             input = kwargs['input']
             input = input.loc[input.date==input.date.max()]
             input = input.sort_values(by='where', ascending = True).reset_index(drop=True)
@@ -158,6 +163,7 @@ class visu_matplotlib:
         return ax
 
     @decomatplotlib
+    @decomatplotlibhist
     def matplotlib_pie(self,**kwargs):
         '''
          matplotlib pie chart
@@ -180,6 +186,7 @@ class visu_matplotlib:
 
 
     @decomatplotlib
+    @decomatplotlibhist
     def matplotlib_horizontal_histo(self,**kwargs):
         '''
         matplotlib horizon histo
@@ -204,6 +211,7 @@ class visu_matplotlib:
 
 
     @decomatplotlib
+    @decomatplotlibhist
     def matplotlib_histo(self,**kwargs):
         '''
         matplotlib vertical histo
@@ -227,6 +235,7 @@ class visu_matplotlib:
         return ax
 
     @decomatplotlib
+    @decomatplotlibhist
     def matplotlib_map(self,**kwargs):
         '''
          matplotlib map display
