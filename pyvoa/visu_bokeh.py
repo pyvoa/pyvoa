@@ -2,7 +2,7 @@
 
 """
 Project : PyvoA
-Date :    april 2020 - december 2025
+Date :    april 2020 - november 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
 Copyright ©pyvoa_org
 License: See joint LICENSE file
@@ -1441,7 +1441,7 @@ class visu_bokeh:
         bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
         formatters = {'where': 'printf', '@right': 'printf',})),
 
-        bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
+        #bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
