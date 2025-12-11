@@ -259,8 +259,8 @@ class visu_matplotlib:
         elif tile == 'esri':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
         elif tile == 'stamen':
-            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
-            PyvoaWarning("Couldn't find stamen for matplolib use esri ....")
+            #cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
+            PyvoaWarning("Couldn't find stamen for matplolib use default tile ....")
         elif tile == 'positron':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.CartoDB.PositronNoLabels)
         else:
