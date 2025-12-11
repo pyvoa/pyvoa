@@ -257,7 +257,8 @@ class visu_matplotlib:
         if tile == 'openstreet':
             cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik)
         elif tile == 'esri':
-            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
+            PyvoaWarning("Problem occurs wiht esri and matplolib use default tile ....")
+            #cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
         elif tile == 'stamen':
             #cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
             PyvoaWarning("Couldn't find stamen for matplolib use default tile ....")
