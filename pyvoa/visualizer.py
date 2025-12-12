@@ -213,8 +213,11 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             locunique = input['where'].unique()
+            vis = kwargs.get('vis')
             input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
             kwargs['input'] = input
+            if kwargs['dateslider'] and vis != 'bokeh':
+                raise PyvoaError('dateslider available only visu Bokeh')
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
