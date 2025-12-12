@@ -628,7 +628,8 @@ class front:
             show,
             )
             if not self.batch:
-                show(fig)
+                if fig:
+                    show(fig)
         else:
             import matplotlib.pyplot as plt
             if not self.batch:
