@@ -23,3 +23,4 @@
 - [ ] pour les histos par valeur → légende en bokeh
 - [ ] pour les histos par valeur → résultats complètement différents entre matplotlib et bokeh
 - [ ] map matplotlib → les pays ne sont pas tous dessinés avec mpoxgh par exemple
+- [ ] tester sous windows
