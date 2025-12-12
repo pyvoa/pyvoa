@@ -1,13 +1,12 @@
-# Internal working file !
+# Internal working file !... 
 
-- [ ] virer warning sur dateutil (e.g. pour JHU-USA)
-- [ ] virer warning sur geo_point_2d (e.g. pour SPF)
-- [ ] ralonger les noms coupés à 20 caractères
+- [ ] supprimer warning sur dateutil (e.g. pour JHU-USA)
+- [ ] supprimer warning sur geo_point_2d (e.g. pour SPF)
+- [ ] rallonger les noms coupés à 20 caractères
 - [ ] matplotlib : logo pyvoao limité à l'intérieur du rond du pie
 - [ ] warning matplotlib avec map (spf, typeofmap dense) : The inferred zoom level of 22 is not valid for the current tile provider
 - [ ] logo pyvoa trop gros avec matplotlib et seaborn
 - [ ] ajouter les ":" après le nom de la base en capitale
-- [ ] virer seaborn ? virer folium ? des visus dispo ? 
 - [ ] bokeh, au niveau du curseur, des NaN s'affichent. e.g. avec spf / pf.plot(which='cur_rea',where="Ile-de-France",option='sumall',when='22/03/2020:28/03/2021')
 - [ ] bokeh, aux environs du logo, on n'a pas de curseur donnant les résultats
 - [ ] quand on sauve un bokeh, le logo disparait
@@ -24,4 +23,3 @@
 - [ ] pour les histos par valeur → légende en bokeh
 - [ ] pour les histos par valeur → résultats complètement différents entre matplotlib et bokeh
 - [ ] map matplotlib → les pays ne sont pas tous dessinés avec mpoxgh par exemple
-- [ ] plus de pf.listmap() dans le front ? Pourtant pf.listchart() donne bien les 3 options possibles.
