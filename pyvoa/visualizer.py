@@ -2,7 +2,7 @@
 
 """
 Project : PyvoA
-Date :    april 2020 - december 2025
+Date :    april 2020 - november 2025
 Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
 Copyright ©pyvoa_org
 License: See joint LICENSE file
@@ -127,7 +127,7 @@ class AllVisu:
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if func.__name__ == 'plot':
-                kwargs['title'] = self.database_name.upper() + ' time evolution between ' + str(when)
+                kwargs['title'] = self.database_name.upper() +', '+ str(which) + ' time evolution between ' + str(when)
             loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
