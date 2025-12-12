@@ -1,7 +1,7 @@
 import argparse
 
 # Basic metadata
-__version__ = '0.4.1'
+__version__ = '0.4.2'
 __author__ = 'Tristan Beau, Julien Browaeys, Olivier Dadoun'
 __github__ = 'https://github.com/pyvoa/pyvoa'
 __web__ = 'http://pyvoa.org/'
