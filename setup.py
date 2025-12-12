@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pyvoa",  
-    version="0.4.0",  
+    version="0.4.1",  
     author="pyvoa.org",
     author_email="contact@pyvoa.org",
     description="Python virus open analysis. See more on pyvoa.org",
@@ -10,7 +10,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/pyvoa/pyvoa",  # Link to github deposit
     packages=find_packages(), 
-    package_data={'pyvoa' :['data/*.json']},
+    package_data={'pyvoa' :['data/*.json','data/*.png']},
     install_requires=[
         "pandas",
         "geopandas",
