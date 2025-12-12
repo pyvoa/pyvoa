@@ -161,7 +161,10 @@ class AllVisu:
                     top = input.iloc[:self.maxcountrydisplay]
                     others = input.iloc[self.maxcountrydisplay:]
                     rest = {col: ['SumOthers'] for col in top.columns}
-                    windows_which = [which.replace(' ',i+' ') for i in windows.keys() ]
+                    if 'normalize' in which:
+                        windows_which = [ which.replace(' ',i+' ') for i in windows.keys() ]
+                    else:
+                        windows_which = [ which + i for i in windows.keys() ]
                     for i in [which]+windows_which:
                         total = others[i].apply(
                             lambda x: x[0] if isinstance(x, list) else x
