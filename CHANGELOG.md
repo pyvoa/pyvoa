@@ -1,10 +1,8 @@
 # version 0.4.0
-- huge modifications ! Olivier please add a summary
 - Most of the work consisted in adding decorators to the classes.
 - Jupyter is not mandatory to use pyvoa; it can be used from a console. 
 - add json description of the database
 - we use one class per visualization
-
 
 # version 0.3.1
 - cosmetic and docstrings
