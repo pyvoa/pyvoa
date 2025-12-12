@@ -2,6 +2,7 @@ pyvoa/__pycache__
 venv/
 .DS_Store
 .cache
+.vscode/
 examples/notebooks/.ipynb_checkpoints/
 examples/tests/.ipynb_checkpoints/
 pyvoa/.ipynb_checkpoints/
