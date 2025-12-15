@@ -24,4 +24,4 @@
 - [ ] pour les histos par valeur → résultats complètement différents entre matplotlib et bokeh
 - [ ] map matplotlib → les pays ne sont pas tous dessinés avec mpoxgh par exemple
 - [ ] tester sous windows
-- [ ] éviter un plantage bokeh lorsque les données sont vides (contrairement à matplotlib qui ne sort rien sans planter)
+- [ ] replace and remove error.py  by logging https://docs.python.org/3/howto/logging.html
