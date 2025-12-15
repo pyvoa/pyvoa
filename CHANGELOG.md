@@ -1,3 +1,6 @@
+# versions 0.4.1, 0.4.2
+- cosmetic changes
+
 # version 0.4.0
 - Most of the work consisted in adding decorators to the classes.
 - Jupyter is not mandatory to use pyvoa; it can be used from a console. 
