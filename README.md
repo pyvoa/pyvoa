@@ -1,5 +1,5 @@
 # pyvoa
-[Pyvoa](pyvoa.org) (Python Virus Open Analysis) is a collection of Python™ code that provides:
+[Pyvoa](https://pyvoa.org) (Python Virus Open Analysis) is a collection of Python™ code that provides:
 
  - easy access to COVID-19 databases, as well as other viral datasets;
  - tools to visualize and analyze data, such as time series and maps.
