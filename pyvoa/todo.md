@@ -25,3 +25,4 @@
 - [ ] map matplotlib → les pays ne sont pas tous dessinés avec mpoxgh par exemple
 - [ ] tester sous windows
 - [ ] replace and remove error.py  by logging https://docs.python.org/3/howto/logging.html
+- [ ] séparation avec espace des nombres, groupés par 3 chiffres (notamment sur le survol en bokeh)
