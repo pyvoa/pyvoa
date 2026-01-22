@@ -31,6 +31,7 @@ import time
 import os.path
 import requests
 from tempfile import gettempdir
+from pathlib import Path
 from getpass import getuser
 from zlib import crc32
 from urllib.parse import urlparse
@@ -48,7 +49,11 @@ if _coacache_module_info != None:
 
 # Verbosity of pyvoa
 _verbose_mode = 1 # default
-pklpath = ".cache/"
+
+maintmpdir=os.path.join(Path.home(),".cache")
+tmpdir=os.path.join(maintmpdir,"pyvoa.data"+"_"+getuser())
+pklpath=tmpdir 
+
 # ----------------------------------------------------
 # --- Usefull functions for pyvoa.--------------------
 # ----------------------------------------------------
@@ -320,7 +325,9 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     One may add a suffix to the local filename if known.
     """
 
-    tmpdir=os.path.join(gettempdir(),"pyvoa.data"+"_"+getuser())
+    # Force no update of the file
+    expiration_time=0
+
     if not os.path.exists(tmpdir):
         os.makedirs(tmpdir)
 
@@ -351,6 +358,9 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     local_filename=local_tmp_filename
     try:
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        verb('Instead of using original URL '+url)
+        url='https://zenodo.org/api/records/18335464/files/'+local_base_filename+'/content'
+        verb('using zenodo archived file '+url)
         urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
         fp=open(local_filename,'wb')
         fp.write(urlfile.content)
@@ -464,7 +474,7 @@ def return_nonan_dates_pandas(df = None, field = None):
 def readpkl(filepkl):
   if filepkl is None:
         raise PyvoaError("readpkl requires 'filepkl'")
-  filepkl = pklpath+filepkl
+  filepkl = os.path.join(pklpath,filepkl)
   if not os.path.isfile(filepkl):
      if not os.path.exists(pklpath):
           os.makedirs(pklpath)
@@ -484,7 +494,7 @@ def dumppkl(filepkl,whattodump):
         raise PyvoaError("dumppkl requires both 'filepkl' and 'whattodump'")
    if not os.path.exists(pklpath):
        os.makedirs(pklpath)
-   filepkl = pklpath+filepkl
+   filepkl = os.path.join(pklpath,filepkl)
    with open(filepkl, 'wb') as f:
         pickle.dump(whattodump,f)
 
