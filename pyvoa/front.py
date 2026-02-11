@@ -131,7 +131,7 @@ class front:
         self.namefunction = None
         self._setkwargsvisu = None
         self.batch = False
-        self.pdoutcome = None
+        self.outcome = None
 
     def whattodo(self,):
         """Generates a DataFrame summarizing available methods and their options.
@@ -603,6 +603,7 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
+            self.outcome = fig    
             return fig
 
     @input_wrapper
@@ -635,6 +636,7 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
+            self.outcome = fig
             return fig
 
     def decoplot(func):
@@ -697,6 +699,7 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
+                self.outcome = fig
             return fig
 
 
