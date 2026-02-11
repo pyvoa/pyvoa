@@ -28,7 +28,8 @@ from pyvoa.tools import (
     info,
     flat_list,
     all_or_none_lists,
-    readpkl
+    readpkl,
+    set_verbose_mode
 )
 
 import pyvoa.geopd_builder as coco
