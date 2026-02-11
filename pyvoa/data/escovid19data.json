@@ -9,10 +9,6 @@
   	{	
 	 "urldata": "https://zenodo.org/records/11222021/files/escovid19data_covid19-provincias-spain_consolidated.csv?download=1",
 	 "urlparent":"https://raw.githubusercontent.com/montera34/escovid19data/master/data/output/covid19-provincias-spain_consolidated.csv",
-	"drop":
-	    {   
-	    "iso_code": "OWID_"
-	    },  
 	 "separator":",",
   	 "columns": [
     			{
