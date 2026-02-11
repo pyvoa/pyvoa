@@ -1,0 +1,39 @@
+{
+  "header": "escovid19data",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "ESP",
+    "locationmode":"code"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222021/files/escovid19data_covid19-provincias-spain_consolidated.csv?download=1",
+	 "urlparent":"https://raw.githubusercontent.com/montera34/escovid19data/master/data/output/covid19-provincias-spain_consolidated.csv",
+	"drop":
+	    {   
+	    "iso_code": "OWID_"
+	    },  
+	 "separator":",",
+  	 "columns": [
+    			{
+		   "name":"where",
+    		   "alias":"ine_code"	
+			},
+			{
+			"name":"date"
+             	       },
+		       {"alias":"deceased","name":"tot_deaths","cumulative":true},
+                       {"alias":"cases_accumulated","name":"tot_cases","cumulative":true},
+                       {"alias":"activos","name":"cur_cases"},
+                       {"alias":"hospitalized","name":"cur_hosp"},
+                       {"alias":"hospitalized_accumulated","name":"tot_hosp","cumulative":true},
+                       {"alias":"intensive_care","name":"cur_icu"},
+                       {"alias":"recovered","name":"tot_recovered","cumulative":true},
+                       {"alias":"cases_per_cienmil","name":"cur_cases_per100k"},
+                       {"alias":"intensive_care_per_1000000","name":"cur_icu_per1M"},
+                       {"alias":"deceassed_per_100000","name":"tot_deaths_per100k","cumulative":true},
+                       {"alias":"hospitalized_per_100000","name":"cur_hosp_per100k"}
+	 ]
+	}
+  ]
+}  
