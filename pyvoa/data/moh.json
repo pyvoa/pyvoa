@@ -1,0 +1,72 @@
+{
+  "header": "dgs",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "MYS",
+    "locationmode":"name"
+  },
+
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222014/files/moh_cases_state.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/cases_state.csv",
+	 "separator":",",
+  	 "columns": [
+    			{
+		   "name":"where",
+    		   "alias":"state"	
+			},
+			{
+			"name":"date"
+             	       },
+		       {"name":"cases_new"},
+		       {"name":"cases_active","cumulative":true}
+	 ]
+	},
+{
+         "urldata": "https://zenodo.org/records/11222014/files/moh_deaths_state.csv?content",
+         "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/moh_deaths_state.csv",
+         "separator":",",
+         "columns": [
+                        {
+                   "name":"where",
+                   "alias":"state"                
+                        },
+                        {
+                        "name":"date"
+                       },
+                       {"name":"deaths_new"}
+         ]
+        },
+	{
+         "urldata": "https://zenodo.org/records/11222014/files/moh_icu.csv?content",
+         "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/icu.csv",
+         "separator":",",
+         "columns": [
+                        {
+                   "name":"where",
+                   "alias":"state"
+                        },
+                        {
+                        "name":"date"
+                       },
+		       {"name":"beds_icu_covid"}
+	 ]
+        },
+	{
+         "urldata": "https://zenodo.org/records/11222014/files/moh_vax_state.csv?content",
+         "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/moh_vax_state.csv",
+         "separator":",",
+         "columns": [
+                        {
+                   "name":"where",
+                   "alias":"state"
+                        },
+                        {
+                        "name":"date"
+                       },
+                       {"name":"vax","alias":"daily_partial"}
+	 ]
+	}
+  ]
+}  
