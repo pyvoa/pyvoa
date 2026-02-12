@@ -1,0 +1,26 @@
+{
+  "header": "dgs",
+    "geoinfo": {
+    "granularity": "region",
+    "iso3": "PRT",
+    "locationmode":"code"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222023/files/dgs_data_concelhos_new.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos_new.csv",
+	 "separator":",",
+  	 "columns": [
+    			{
+		   "name":"where",
+    		   "alias":"denominazione_regione"	
+			},
+			{
+			"alias":"data",
+			"name":"date"
+             	       },
+		       {"alias":"confirmados_1","name":"tot_cases","cumulative":true}
+	 ]
+	}
+  ]
+}  
