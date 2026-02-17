@@ -90,12 +90,10 @@ class visu_matplotlib:
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
         input = kwargs.get('input')
-        nb = kwargs['maxlettersdisplay']
-        input['where'] = [k[:nb] for k in input['where']]
         what = kwargs.get('what')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
-
+        kwargs['dicodisplayloc']
         ax.set_xlabel("date", fontsize=10)
         ax.set_ylabel(what[0], fontsize=10)
         st=['-','--',':']
@@ -105,9 +103,9 @@ class visu_matplotlib:
                 if legend:
                     label = legend
                 else:
-                    label = f"{where}"
+                    label = f"{kwargs['dicodisplayloc'][where]}"
                 if len(what)>1:
-                    label =f"{where} — {i}"
+                    label =f"{kwargs['dicodisplayloc'][where]} — {i}"
                 ax.plot(
                     df.index,
                     df[where],
@@ -176,10 +174,9 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
         ax.set_title(title)
-        nb = kwargs.get('maxlettersdisplay')
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
-        input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
+        input['where']= [kwargs['dicodisplayloc'][w] for w in input['where']]
         input = input.set_index('where')
         return input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='where', labeldistance=None,ax=ax)
@@ -199,14 +196,13 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
-        maxletters = kwargs['maxlettersdisplay']
 
         input_sorted = input.sort_values(by=what,ascending=True)
         ax.set_title(title)
         ax.set_xlabel(what)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
-        input_sorted['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input_sorted['where']]
+        input_sorted['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
         return ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
 
 
@@ -222,9 +218,7 @@ class visu_matplotlib:
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         bins=len(input['where'])+1
-
-        maxletters = kwargs['maxlettersdisplay']
-        input['where'] = [ (w[:maxletters] + '…') if len(w) > maxletters else w for w in input['where']]
+        input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
         color_sumothers = "#000000"
         color_others = "#1f77b4"
         unique_items = sorted(input["where"].unique())
