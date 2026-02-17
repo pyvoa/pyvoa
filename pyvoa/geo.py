@@ -41,7 +41,7 @@ import numpy as np
 import io
 import math
 
-from pyvoa.tools import verb,kwargs_test,get_local_from_url,dotdict,tostdstring
+from pyvoa.tools import verb,kwargs_test,get_local_from_url,dotdict,tostdstring,get_verbose_mode
 from pyvoa.error import *
 
 # ---------------------------------------------------------------------
@@ -1258,7 +1258,13 @@ class GeoCountry():
         # --- 'FRA' case ---------------------------------------------------------------------------------------
         if self._country=='FRA':
             #self._country_data = gpd.read_file('zip://'+get_local_from_url(url,0,'.zip'))
+
+            # avoid "Skipping field geo_point_2d: unsupported OGR type: 3" warning
+            if get_verbose_mode() < 2:
+                sys.stderr = io.StringIO()
             self._country_data = gpd.read_file(get_local_from_url(url,0))
+            if get_verbose_mode() < 2:
+                sys.stderr = sys.__stderr__
 
             # adding a flag for subregion (departements)
             self._country_data['flag_subregion']=self._source_dict['FRA']['Subregion Flags']+'img/dept/sticker_plaque_immat_'+\
