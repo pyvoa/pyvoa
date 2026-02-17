@@ -99,7 +99,7 @@ class AllVisu:
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self.maxcountrydisplay  = 12
-        self.maxlettersdisplay = 10
+        self.maxlettersdisplay = 20
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
 
