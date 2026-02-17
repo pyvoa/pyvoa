@@ -117,10 +117,8 @@ class AllVisu:
             when = kwargs.get('when')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logosmall
-            #input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = kwargs['whereordered']
             input = input.loc[input['where'].isin(locunique)]
-            #input['where'] = input['where'].cat.remove_unused_categories()
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -128,7 +126,7 @@ class AllVisu:
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if func.__name__ == 'plot':
-                kwargs['title'] = self.database_name.upper() +', '+ str(which) + ' time evolution between ' + str(when)
+                kwargs['title'] = self.database_name.upper() + ' database: '+ str(which) + ' time evolution between ' + str(when)
             loc=list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
 
@@ -195,7 +193,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['title'] = self.database_name.upper() + ' database, ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
+            kwargs['title'] = self.database_name.upper() + ' database: ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
