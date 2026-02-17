@@ -119,7 +119,6 @@ class visu_seaborn:
         Create a seaborn line plot with date on x-axis and which on y-axis.
         """
         input = kwargs['input']
-        nb = kwargs['maxlettersdisplay']
         loca = list(input['where'].unique())
         what = kwargs['what']
         plt = kwargs.get('plt')
@@ -128,7 +127,7 @@ class visu_seaborn:
         st={k:i for k,i in  enumerate(['-','--',':'])}
         df = input.copy()
         for idx, i in enumerate(what):
-            df[f"legend_{i}"] = df["where"] #+ " – " + i
+            df[f"legend_{i}"] = [kwargs['dicodisplayloc'][w] for w in input['where']]
             #label_col = f'where_{i}'
             #df[label_col] = df['where']
             sns.lineplot(
@@ -167,9 +166,9 @@ class visu_seaborn:
                 color=color
             )
         plt.title(title)
-        plt.xlabel("Jour de l'année ")
+        plt.xlabel("Day of year")
         plt.ylabel(what)
-        plt.legend(title="Anneé", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title="year", bbox_to_anchor=(1.05, 1), loc='upper left')
         plt.tight_layout()
 
     @decoplotseaborn
@@ -215,7 +214,7 @@ class visu_seaborn:
         sns.set_theme(style="whitegrid")
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
-        input['where'] = [ (w[:10] + '…') if len(w) > 10 else w for w in input['where']]
+        input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
         sns.barplot(data=input, x=what, y='where', palette="viridis", errorbar=None)
         #plt.title(title)
         plt.xlabel(what)
@@ -234,7 +233,7 @@ class visu_seaborn:
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
-        plt.pie(input[what], labels=input['where'], autopct='%1.1f%%')
+        plt.pie(input[what], labels=[kwargs['dicodisplayloc'][w] for w in input['where']], autopct='%1.1f%%')
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)

@@ -579,7 +579,7 @@ class visu_bokeh:
         def inner_bokeh_plot(self, **kwargs):
             input=kwargs['input']
             nb = kwargs['maxlettersdisplay']
-            input['where'] = [ (w[:nb] + '…') if len(w) > nb else w for w in input['where']]
+            input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)

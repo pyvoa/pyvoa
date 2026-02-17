@@ -99,7 +99,7 @@ class AllVisu:
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self.maxcountrydisplay  = 12
-        self.maxlettersdisplay = 10
+        self.maxlettersdisplay = 5
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
 
@@ -115,6 +115,7 @@ class AllVisu:
             what = kwargs.get('what')
             when = kwargs.get('when')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
+
             kwargs['logo'] = self.logo
             #input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = kwargs['whereordered']
@@ -129,6 +130,8 @@ class AllVisu:
             if func.__name__ == 'plot':
                 kwargs['title'] = self.database_name.upper() +', '+ str(which) + ' time evolution between ' + str(when)
             loc=list(input['where'].unique())
+            kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
+
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
 
@@ -198,6 +201,8 @@ class AllVisu:
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
 
+            loc = list(input['where'].unique())
+            kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
