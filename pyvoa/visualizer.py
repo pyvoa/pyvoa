@@ -102,6 +102,7 @@ class AllVisu:
         self.maxlettersdisplay = 20
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
+        self.logosmall = pathmetadb+'/logo-pyvoa_small.png'
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
@@ -115,8 +116,7 @@ class AllVisu:
             what = kwargs.get('what')
             when = kwargs.get('when')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
-
-            kwargs['logo'] = self.logo
+            kwargs['logo'] = self.logosmall
             #input = input.sort_values(by=['date']).reset_index(drop=True)
             locunique = kwargs['whereordered']
             input = input.loc[input['where'].isin(locunique)]
@@ -303,6 +303,7 @@ class AllVisu:
             elif typeofhist == 'value':
                 fig = visu_matplotlib().matplotlib_histo(**kwargs)
             elif typeofhist == 'pie':
+                kwargs['logo'] = self.logosmall
                 fig = visu_matplotlib().matplotlib_pie(**kwargs)
             else:
                 raise PyvoaError(typeofhist + ' not implemented in ' + vis)
@@ -312,6 +313,7 @@ class AllVisu:
             elif typeofhist == 'value':
                 fig = visu_bokeh().bokeh_histo(**kwargs)
             elif typeofhist == 'pie':
+                kwargs['logo'] = self.logosmall
                 fig = visu_bokeh().bokeh_pie(**kwargs)
         elif vis == 'seaborn':
             if typeofhist == 'location':
