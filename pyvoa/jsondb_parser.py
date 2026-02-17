@@ -364,7 +364,7 @@ class DataParser:
              #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
              #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
 
-          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce').dt.date
+          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format="mixed").dt.date
 
           if granularity == 'country' and 'where' not in list(pdata.name):
               pandas_temp['where'] = place
