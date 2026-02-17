@@ -38,6 +38,7 @@ from urllib.parse import urlparse
 import unidecode
 import datetime as dt
 import numpy as np
+import warnings
 from pyvoa.error import *
 import pickle
 # testing if pyvoa.ata is available
@@ -69,6 +70,12 @@ def set_verbose_mode(v):
     _verbose_mode=v
     if (v < 2) :
         pd.options.mode.chained_assignment = None  # default='warn'
+
+    if (v < 2) : 
+        warnings.simplefilter("ignore")
+    else:
+        warnings.simplefilter("default")
+
     return get_verbose_mode()
 
 def info(*args):
