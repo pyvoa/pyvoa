@@ -71,7 +71,7 @@ class visu_matplotlib:
             fig_w, fig_h = fig.get_size_inches() * fig.dpi
             xo = int(0.25*(fig_w-w))
             yo = int(0.3 * fig_h)
-            fig.figimage(im, xo=xo, yo=yo, alpha=.1)
+            fig.figimage(im, xo=0, yo=0, alpha=.1)
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
@@ -179,7 +179,7 @@ class visu_matplotlib:
         input['where']= [kwargs['dicodisplayloc'][w] for w in input['where']]
         input = input.set_index('where')
         return input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
-        title=title, ylabel='where', labeldistance=None,ax=ax)
+        title=title, ylabel='', labeldistance=None,ax=ax)
 
 
     @decomatplotlib
