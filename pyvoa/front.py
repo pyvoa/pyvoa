@@ -248,7 +248,7 @@ class front:
                 order position of the items in 'option'
             '''
 
-            if self.gpdbuilder == '':
+            if self.gpdbuilder == '' and kwargs['input'] is None and kwargs['which'] is None:
                 raise PyvoaError("Does setwhom has been defined ???")
 
             if func.__name__ == 'get':
@@ -265,8 +265,10 @@ class front:
                     raise PyvoaError("Argument ERROR")
             else:
                 raise PyvoaError("What function is this "+func.__name__)
-            if self.db == '':
+
+            if self.db == '' and kwargs['input'] is None:
                 PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+
             mustbealist = ['where','which','option']
 
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
@@ -323,7 +325,11 @@ class front:
                 #kwargs['input'] = input
                 kwargs['kwargsuser']['input'] = input
 
-            kwargs = self.gpdbuilder.get_stats(**kwargs)
+            if self.gpdbuilder != '':
+                kwargs = self.gpdbuilder.get_stats(**kwargs)
+
+            if self.db == '':
+                    self.allvisu = AllVisu('', kwargs['input'])
 
             found_bypop = None
             for w in kwargs['option']:
@@ -534,7 +540,6 @@ class front:
                 else:
                     #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                     kwargs['input'] = input
-
             return func(self,**kwargs)
         return inner
 
@@ -603,7 +608,7 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
-            self.outcome = fig    
+            self.outcome = fig
             return fig
 
     @input_wrapper
@@ -659,7 +664,8 @@ class front:
 
             which = kwargs.get('which')
             typeofplot = kwargs.get('typeofplot',self.listplot()[0])
-            kwargs.pop('output')
+            if kwargs.get('output'):
+                kwargs.pop('output')
 
             if typeofplot == 'versus' and len(which)>2:
                 PyvoaError(" versu can be used with 2 variables and only 2 !")
