@@ -3,7 +3,7 @@
     "geoinfo": {
     "granularity": "region",
     "iso3": "PRT",
-    "locationmode":"code"
+    "locationmode":"name"
   },
   "datasets": [
   	{	
