@@ -1,0 +1,21 @@
+{
+  "header": "Dipartimento della Protezione Civile database",
+    "geoinfo": {
+    "granularity": "region",
+    "iso3": "ITA",
+    "locationmode":"code"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222022/files/dpc_covid19-ita-regioni.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/pcm-dpc/COVID-19/master/dati-regioni/dpc-covid19-ita-regioni.csv",
+	 "separator":",",
+  	 "columns": [
+    		{"name":"where","alias":"denominazione_regione"},
+			{"alias":"data","name":"date"},
+		    {"alias":"totale_casi","name":"tot_cases","cumulative":true},
+            {"alias":"deceduti","name":"tot_deaths","cumulative":true}
+	 ]
+	}
+  ]
+}

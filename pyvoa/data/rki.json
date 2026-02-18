@@ -1,0 +1,36 @@
+{
+  "header": "Robert Koch Institut data base",
+    "geoinfo": {
+    "granularity": "region",
+    "iso3": "DEU",
+    "locationmode":"code"
+  },
+  "replace":{
+          "Turkey":"Türkiye"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222012/files/rki_deaths-rki-by-ags.csv?content",
+	 "namedata":"deaths", 
+	 "urlparent":"https://github.com/jgehrcke/covid-19-germany-gae/raw/master/deaths-rki-by-ags.csv",
+	 "separator":",",
+	 "columns": [
+		 {
+		    "name":"where",
+    		"alias":"time_iso8601"	
+		}
+		  ]
+  		}, 
+    {"urldata": "https://zenodo.org/records/11222012/files/cases-rki-by-ags.csv?content",
+	 "namedata":"cases", 
+	 "urlparent":"https://github.com/jgehrcke/covid-19-germany-gae/raw/master/cases-rki-by-ags.csv",
+	 "separator":",",
+	 "columns": [
+		 {
+		    "name":"where",
+    		"alias":"time_iso8601"	
+		}
+		  ]
+  		}
+	]
+}		
