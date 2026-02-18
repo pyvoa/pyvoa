@@ -244,7 +244,7 @@ class visu_bokeh:
                 #else:
                 #    fig.title = title + str(kwargs['kwargsuser']['when'])
                 dicfig[key]=fig
-            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:280px; height:110px; opacity: 0.1"></div>')
+            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:140px; height:55px; opacity: 0.1"></div>')
             #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
             kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
