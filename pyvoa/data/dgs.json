@@ -13,7 +13,7 @@
   	 "columns": [
     			{
 		   "name":"where",
-    		   "alias":"denominazione_regione"	
+    		   "alias":"concelho"	
 			},
 			{
 			"alias":"data",
