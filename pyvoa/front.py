@@ -105,6 +105,7 @@ class front:
         self.meta = MetaInfo()
         self.av = InputOption()
         self.lvisu = list(self.av.d_graphicsinput_args['vis'])
+        self.lvisu.sort()
         available_libs = self.av.test_add_graphics_libraries(self.lvisu)
         for lib, available in available_libs.items():
             if not available:
