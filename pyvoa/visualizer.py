@@ -86,7 +86,12 @@ class AllVisu:
         self.database_name = None
         verb("Init of AllVisu() with db=" + str(db_name))
         self.database_name = db_name
-        self.currentmetadata = MetaInfo().getcurrentmetadata(db_name)
+        if db_name != '':
+            self.currentmetadata = MetaInfo().getcurrentmetadata(db_name)
+            self.code = self.currentmetadata['geoinfo']['iso3']
+            self.granularity = self.currentmetadata['geoinfo']['granularity']
+            self.namecountry = self.currentmetadata['geoinfo']['iso3']
+
         self.setchartsfunctions = [method for method in dir(AllVisu) if callable(getattr(AllVisu, method)) and method.startswith("pyvoa_") and not method.startswith("__")]
         self.geopan = gpd.GeoDataFrame()
         self.pyvoa_geopandas = False
@@ -95,9 +100,6 @@ class AllVisu:
         self.dchartkargs = {}
         self.dvisukargs = {}
         self.uptitle, self.subtitle = ' ',' '
-        self.code = self.currentmetadata['geoinfo']['iso3']
-        self.granularity = self.currentmetadata['geoinfo']['granularity']
-        self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self.maxcountrydisplay  = 12
         self.maxlettersdisplay = 20
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
