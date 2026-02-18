@@ -778,6 +778,7 @@ class front:
         """
         allpd  = self.meta.getallmetadata()
         namedb = allpd.name.to_list()
+        namedb.sort()
 
         if detailed:
             dico = {}
