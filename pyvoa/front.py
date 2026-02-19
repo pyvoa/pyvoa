@@ -563,14 +563,16 @@ class front:
             """
             dateslider = kwargs.get('dateslider')
             typeofhist = kwargs.get('typeofhist')
-            #kwargs.pop('output')
+            if self.getvis() == 'bokeh' and 'geometry' in kwargs['input'].columns:
+                kwargs['input'] = kwargs['input'].drop(columns='geometry')
             if kwargs.get('pop'):
               kwargs.pop('pop')
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
-                if typeofhist == 'location' :
+                if self.getvis() != 'bokeh' and typeofhist == 'location' :
                     return func(self,self.allvisu.hist(**z)[0])
                 else:
+                    print(z)
                     return func(self,self.allvisu.hist(**z))
             else:
                 raise PyvoaError(" No visualization has been set up !")
