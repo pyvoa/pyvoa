@@ -568,7 +568,10 @@ class front:
               kwargs.pop('pop')
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
-                return func(self,self.allvisu.hist(**z))
+                if typeofhist == 'location' :
+                    return func(self,self.allvisu.hist(**z)[0])
+                else:
+                    return func(self,self.allvisu.hist(**z))
             else:
                 raise PyvoaError(" No visualization has been set up !")
         return inner
@@ -708,7 +711,6 @@ class front:
                 plt.show()
                 self.outcome = fig
             return fig
-
 
     def setnamefunction(self,name):
         """Sets the name of the function.
@@ -1119,7 +1121,6 @@ class front:
         """
         return self.vis
 
-
     def saveoutput(self,**kwargs):
         """Save output to a specified format.
 
@@ -1146,6 +1147,7 @@ class front:
             raise PyvoaError('Pandas to save is mandatory there is not default !')
         else:
             _db.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
+
     def merger(self,**kwargs):
         """Merger function that integrates provided data into the database.
 
@@ -1194,9 +1196,6 @@ class front:
                 save(self.outcome)
                 #
             else:
-                if self.getnamefunction() == 'hist':
-                    self.outcome[0].figure.savefig(name)   
-                else:
                     self.outcome.figure.savefig(name)
             print('Figure :', name, ' has been saved ')
         else:
