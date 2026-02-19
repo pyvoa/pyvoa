@@ -283,15 +283,13 @@ class visu_bokeh:
             input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
             input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
 
-            if 'geometry' in list(input_uniquecountries.columns):
+            if func.__name__ == 'bokeh_map':
                 if func.__name__ in lhist:
                     input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
                 input_uniquecountries['cases']=input_uniquecountries[which]
                 passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
                 convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
                 geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
-
-            if 'geometry' in list(input.columns):
                 input_dates = input.drop(columns='geometry').copy()
             else:
                 input_dates = input.copy()
@@ -487,30 +485,30 @@ class visu_bokeh:
                     ys += [y_min, y_max]
                 return min(xs), min(ys), max(xs), max(ys)
 
+            if func.__name__ == 'bokeh_map':
+                xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
+                pad_x = (xmax - xmin) * 0.05
+                pad_y = (ymax - ymin) * 0.05
+                bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
+                bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
+                ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
+                bokeh_figure_map.min_border = 0
 
-            xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
-            pad_x = (xmax - xmin) * 0.05
-            pad_y = (ymax - ymin) * 0.05
-            bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
-            bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
-            ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
-            bokeh_figure_map.min_border = 0
+                bokeh_figure_map.x_range.start = xmin - pad_x
+                bokeh_figure_map.x_range.end   = xmax + pad_x
+                bokeh_figure_map.y_range.start = ymin - pad_y
+                bokeh_figure_map.y_range.end   = ymax + pad_y
 
-            bokeh_figure_map.x_range.start = xmin - pad_x
-            bokeh_figure_map.x_range.end   = xmax + pad_x
-            bokeh_figure_map.y_range.start = ymin - pad_y
-            bokeh_figure_map.y_range.end   = ymax + pad_y
+                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
 
-            min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
-
-            bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
-                            fill_color = {'field': 'cases', 'transform': color_mapper},
-                            line_color = 'black', line_width = 0.25, fill_alpha = 1)
+                bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
+                                fill_color = {'field': 'cases', 'transform': color_mapper},
+                                line_color = 'black', line_width = 0.25, fill_alpha = 1)
+                kwargs['geocolumndatasrc'] = geocolumndatasrc
 
             if func.__name__ in lhist:
                 kwargs['yrange']=yrange
-            if 'geometry' in list(input_uniquecountries.columns):
-                kwargs['geocolumndatasrc'] = geocolumndatasrc
+
             kwargs['columndatasrc'] = columndatasrc
             kwargs['color_mapper']=color_mapper
             kwargs['input'] = input
