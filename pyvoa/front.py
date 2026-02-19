@@ -1194,7 +1194,10 @@ class front:
                 save(self.outcome)
                 #
             else:
-                self.outcome.figure.savefig(name)
+                if self.getnamefunction() == 'hist':
+                    self.outcome[0].figure.savefig(name)   
+                else:
+                    self.outcome.figure.savefig(name)
             print('Figure :', name, ' has been saved ')
         else:
             PyvoaError('savefig can\'t be used to store a panda DataFrame')
