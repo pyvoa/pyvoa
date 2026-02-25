@@ -1421,7 +1421,7 @@ class GeoCountry():
             disso = self._country_data[['name_subregion','geometry']].dissolve(by='name_subregion', aggfunc='sum').reset_index()
             # aggregate geometry with the same subregion name # some code subregion is lost somehow
             self._country_data = self._country_data.drop_duplicates(subset = ['name_subregion'])
-            self._country_data = pd.merge(self._country_data.drop(columns=['geometry']),disso, on='name_subregion')
+            self._country_data = gpd.GeoDataFrame(pd.merge(self._country_data.drop(columns=['geometry']),disso, on='name_subregion'))
 
         # --- 'ESP' case ---------------------------------------------------------------------------------------
         elif self._country == 'ESP':
