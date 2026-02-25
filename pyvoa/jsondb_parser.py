@@ -311,8 +311,8 @@ class DataParser:
               self.keyword_url[k]=url
           try:
               pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
-                keep_default_na = False, na_values = '' , header=0, dtype = cast, decimal = decimal,
-                 low_memory = False, nrows = debug, comment='#')
+                            keep_default_na = False, na_values = '' , header=0, dtype = cast, decimal = decimal,
+                            low_memory = False, nrows = debug, comment='#')
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
@@ -352,11 +352,14 @@ class DataParser:
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
               value_name = None
-              if "namedata" in list(datasets.keys()):
-                  value_name = datasets['namedata']
+          if "namedata" in list(datasets.keys()):
+              value_name = datasets['namedata']
+              if "var_name" in list(datasets.keys()):
+                   pandas_temp = pandas_temp.melt(id_vars='date',var_name='where',value_name=value_name)
               else:
-                  raise PyvoaError("Seems to have date in columns format in yours csv file, so namedata has to be defined in your json file")
-              pandas_temp = pandas_temp.melt(id_vars='where',var_name='date',value_name=value_name)
+                  pandas_temp = pandas_temp.melt(id_vars='where',var_name='date',value_name=value_name)
+          else:
+              raise PyvoaError("Seems to have date in columns format in yours csv file, so namedata has to be defined in your json file")
 
 
           if usecols and ('semaine' in usecols or 'week' in usecols):
