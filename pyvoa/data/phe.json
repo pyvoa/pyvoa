@@ -1,0 +1,60 @@
+{
+  "header": "Public Health England",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "GBR",
+    "locationmode":"code"
+    },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/10222748/files/phe_cumDeaths28DaysByDeathDate.csv?content",
+	 "urlparent":"https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=cumDeaths28DaysByDeathDate&format=csv",
+	 "separator":",",
+  	 "columns": [
+        {"name":"where","alias":"areaCode"},
+        {"name":"date"},
+		{"alias":"cumDeaths28DaysByDeathDate","name":"tot_deaths","cumulative":true}
+	 ]
+	},
+    {	
+	 "urldata": "https://zenodo.org/records/10222748/files/phe_cumCasesBySpecimenDate.csv?content",
+	 "urlparent":"https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=cumCasesBySpecimenDate&format=csv",
+	 "separator":",",
+  	 "columns": [
+        {"name":"where","alias":"areaCode"},
+        {"name":"date"},
+		{"alias":"cumCasesBySpecimenDate","name":"tot_cases","cumulative":true}
+	 ]
+	},
+    {	
+	 "urldata": "https://zenodo.org/records/10222748/files/phe_cumLFDTestsBySpecimenDate.csv?content",
+	 "urlparent":"https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=cumLFDTestsBySpecimenDate&format=csv",
+	 "separator":",",
+  	 "columns": [
+        {"name":"where","alias":"areaCode"},
+        {"name":"date"},
+		{"alias":"cumLFDTestsBySpecimenDate","name":"tot_tests","cumulative":true}
+	 ]
+	},
+    {	
+	 "urldata": "https://zenodo.org/records/10222748/files/phe_cumPeopleVaccinatedFirstDoseByVaccinationDate.csv?content",
+	 "urlparent":"https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=cumPeopleVaccinatedFirstDoseByVaccinationDate&format=csv",
+	 "separator":",",
+  	 "columns": [
+        {"name":"where","alias":"areaCode"},
+        {"name":"date"},
+		{"alias":"cumPeopleVaccinatedFirstDoseByVaccinationDate","name":"tot_vacc1","cumulative":true}
+	 ]
+	},
+    {	
+	 "urldata": "https://zenodo.org/records/10222748/files/phe_cumPeopleVaccinatedSecondDoseByVaccinationDate.csv?content",
+	 "urlparent":"https://api.coronavirus.data.gov.uk/v2/data?areaType=ltla&metric=cumPeopleVaccinatedSecondDoseByVaccinationDate&format=csv",
+	 "separator":",",
+  	 "columns": [
+        {"name":"where","alias":"areaCode"},
+        {"name":"date"},
+		{"alias":"cumPeopleVaccinatedSecondDoseByVaccinationDate","name":"tot_vacc2","cumulative":true}
+	 ]
+	}
+  ]
+} 

@@ -370,7 +370,7 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
         headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         if not 'zenodo.org' in url:
             verb('Instead of using original URL '+url)
-            url='https://zenodo.org/api/records/18335464/files/'+local_base_filename+'/content'
+            url='https://zenodo.org/api/records/18773027/files/'+local_base_filename+'/content'
             verb('using zenodo archived file '+url)
         urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
         fp=open(local_filename,'wb')
