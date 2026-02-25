@@ -3,7 +3,11 @@
     "geoinfo": {
     "granularity": "region",
     "iso3": "ITA",
-    "locationmode":"code"
+    "locationmode":"name"
+  },
+  "replace":{
+  	"P.A. Bolzano":"Trentino-Alto Adige",
+	"P.A. Trento":"Trentino-Alto Adige"	
   },
   "datasets": [
   	{	
@@ -11,7 +15,7 @@
 	 "urldata": "https://zenodo.org/records/11222022/files/dpc_covid19-ita-regioni.csv?content",
 	 "separator":",",
   	 "columns": [
-    		{"name":"where","alias":"codice_regione"},
+    		{"name":"where","alias":"denominazione_regione"},
 		{"alias":"data","name":"date"},
 	    	{"alias":"totale_casi","name":"tot_cases","cumulative":true},
             	{"alias":"deceduti","name":"tot_deaths","cumulative":true}
