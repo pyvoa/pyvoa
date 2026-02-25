@@ -1,0 +1,36 @@
+{
+  "header": "jpnmhlw database",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "JPN",
+    "locationmode":"name"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/11222015/files/jpnmhlw_deaths_cumulative_daily.csv?download=1",
+	 "namedata":"tot_deaths", 
+	 "var_name":"true",
+	 "separator":",",
+  	 "dropcolumns":["ALL"],
+	 "columns": [
+                 {
+                    "name":"date",
+                    "alias":"Date"
+                }
+                  ]
+  		},
+  	{	
+	 "urldata": "https://zenodo.org/records/11222015/files/jpnmhlw_confirmed_cases_cumulative_daily.csv?download=1",
+	 "namedata":"tot_cases", 
+	 "var_name":"true",
+	 "separator":",",
+  	 "dropcolumns":["ALL"],
+	 "columns": [
+                 {
+                    "name":"date",
+                    "alias":"Date"
+                }
+                  ]
+  		}
+	]
+}		
