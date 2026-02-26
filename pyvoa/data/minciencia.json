@@ -1,0 +1,20 @@
+{
+  "header": "Chile Ministerio de Ciencia, Tecnología, Conocimiento, e Innovación database",
+    "geoinfo": {
+    "granularity": "region",
+    "iso3": "CHL",
+    "locationmode":"name"
+  },
+  "datasets": [
+  	{	
+	 "urlparent":"https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto1/Covid-19_std.csv",
+	 "urldata": "https://zenodo.org/records/18773580/files/Covid-19_std.csv?content",
+	 "separator":",",
+  	 "columns": [
+    	{"name":"where","alias":"Codigo comuna"},
+		{"alias":"Fecha","name":"date"},
+	    {"alias":"Casos confirmados","name":"tot_cases"}
+	 ]
+	}
+  ]
+}
