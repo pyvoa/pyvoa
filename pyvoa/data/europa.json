@@ -6,7 +6,8 @@
   },
   "datasets": [
   	{	
-	 "urldata": "https://raw.githubusercontent.com/ec-jrc/COVID-19/master/data-by-region/jrc-covid-19-all-days-by-regions.csv",
+	 "urldata": "https://zenodo.org/records/11222020/files/europa_jrc-covid-19-all-days-by-regions.csv?download=1",
+	 "urlparent":"https://raw.githubusercontent.com/ec-jrc/COVID-19/master/data-by-region/jrc-covid-19-all-days-by-regions.csv",
 	 "separator":",",
 	 "drop":
 		{
