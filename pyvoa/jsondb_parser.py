@@ -310,6 +310,14 @@ class DataParser:
               self.keyword_definition[k]=v
               self.keyword_url[k]=url
           try:
+              thewhere=[k for k, v in rename_columns.items() if v == 'where']
+              if len(thewhere)>1:
+                  raise PyvoaError('Something seral where in your json !')
+              else:
+                  if cast:
+                      cast.update({thewhere[0]:'str'})
+                  else:
+                      cast={thewhere[0]:'str'}      
               pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
                             keep_default_na = False, na_values = '' , header=0, dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
