@@ -1,0 +1,31 @@
+{
+  "header": "CovidTracking.com database",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "USA",
+    "locationmode":"name"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/18788895/files/all-states-history.csv?content",
+	 "urlparent":"https://covidtracking.com/data/download/all-states-history.csv",
+	 "separator":",",
+  	 "columns": [
+    			{
+		   "name":"where",
+    		   "alias":"state"	
+			},
+		       {"alias":"death","name":"tot_cases","cumulative":true},
+               {"alias":"hospitalizedCumulative","name":"tot_hosp","cumulative":true},
+               {"alias":"hospitalizedCurrently","name":"cur_hosp"},
+               {"alias":"inIcuCumulative","name":"tot_icu","cumulative":true},
+               {"alias":"inIcuCurrently","name":"cur_icu"},
+               {"alias":"negative","name":"tot_neg_test"},
+               {"alias":"positive","name":"tot_pos_test"},
+               {"alias":"onVentilatorCumulative","name":"tot_onVentilator","cumulative":true},
+               {"alias":"onVentilatorCurrently","name":"cur_onVentilator"},
+               {"alias":"totalTestResults","name":"tot_test","cumulative":true}
+	 ]
+	}
+  ]
+}
