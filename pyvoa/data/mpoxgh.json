@@ -11,7 +11,8 @@
   },
   "datasets": [
   	{	
-	 "urldata": "https://raw.githubusercontent.com/owid/monkeypox/main/owid-monkeypox-data.csv",
+	 "urldata": "https://zenodo.org/records/11267175/files/owid-monkeypox-data.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/owid/monkeypox/main/owid-monkeypox-data.csv",
 	 "drop":
             {
             "iso_code": ["OWID_","XKX"]

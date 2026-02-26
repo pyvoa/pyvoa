@@ -11,7 +11,8 @@
   },
   "datasets": [
   	{	
-	 "urldata": "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv",
+	 "urldata": "https://zenodo.org/records/11267174/files/owid-covid-data.csv?content",
+	 "urlparent": "https://raw.githubusercontent.com/owid/covid-19-data/master/public/data/owid-covid-data.csv",
 	"drop":
 	    {   
 	    "iso_code": "OWID_"

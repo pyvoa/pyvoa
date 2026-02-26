@@ -7,15 +7,28 @@
   },
   "datasets": [
   	{	
-	 "urldata":"https://raw.githubusercontent.com/iMEdD-Lab/open-data/master/COVID-19/greece_deaths_v2.csv",
-	 "urlparent":"https://github.com/iMEdD-Lab/open-data/tree/master/COVID-19",
+	 "urldata":"https://zenodo.org/records/11222016/files/imed_greece_deaths_v2.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/iMEdD-Lab/open-data/master/COVID-19/greece_deaths_v2.csv",
 	 "namedata":"tot_deaths",
 	 "separator":",",
 	 "dropcolumns":["Γεωγραφικό Διαμέρισμα","Περιφέρεια","county","pop_11"],
 	 "columns": [
 		 {
 		    "name":"where",
-    		    "alias":"county_normalized"
+    		"alias":"county_normalized"
+		}
+	           ]
+         },
+		   	{	
+	 "urldata":"https://zenodo.org/records/11222016/files/imed_greece_cases_v2.csv?content",
+	 "urlparent":"https://raw.githubusercontent.com/iMEdD-Lab/open-data/master/COVID-19/greece_cases_v2.csv",
+	 "namedata":"tot_cases",
+	 "separator":",",
+	 "dropcolumns":["Γεωγραφικό Διαμέρισμα","Περιφέρεια","county","pop_11"],
+	 "columns": [
+		 {
+		    "name":"where",
+    		"alias":"county_normalized"
 		}
 	           ]
          }

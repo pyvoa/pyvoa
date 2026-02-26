@@ -7,7 +7,8 @@
   },
   "datasets": [
   	{	
-	 "urldata": "https://www.sentiweb.fr/datasets/all/inc-25-RDD.csv",
+	 "urldata": "https://zenodo.org/records/18790187/files/inc-25-RDD.csv?content",
+	 "urlparent": "https://www.sentiweb.fr/datasets/all/inc-25-RDD.csv",
 	 "urlmaster": "https://www.sentiweb.fr/france/fr/?page=table&maladie=25",
 	 "cast":{
                                 "week":"str"

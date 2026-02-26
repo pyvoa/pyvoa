@@ -10,8 +10,8 @@
   	 },
   "datasets": [
   	{	
-	 "urldata":"https://www.data.gov.cy/sites/default/files/CY%20Covid19%20Open%20Data%20-%20Extended%20-%20new_247.csv",
-	 "urlparent":"https://www.data.gov.cy/node/4617?language=en",
+	 "urldata":"https://zenodo.org/records/11222017/files/govcy.csv?content",
+	 "urlparent":"https://www.data.gov.cy/sites/default/files/CY%20Covid19%20Open%20Data%20-%20Extended%20-%20new_247.csv",
 	 "separator":",",
 	 "columns": [
 		  {
