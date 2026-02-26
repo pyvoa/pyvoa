@@ -10,9 +10,6 @@
 	 "urlparent":"https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto1/Covid-19_std.csv",
 	 "urldata": "https://zenodo.org/records/18773580/files/Covid-19_std.csv?content",
 	 "separator":",",
-	  "cast":{
-                                "Codigo region":"str"
-                 },
   	 "columns": [
     	{"name":"where","alias":"Codigo region"},
 	{"alias":"Fecha","name":"date"},
