@@ -20,9 +20,6 @@
 				{
 				"cl_age90": 0
 				},
-			"cast":{
-				"dep":"str"	
-			},
 			"decimal":",",
 			"columns" : [
 			{
@@ -50,9 +47,6 @@
 		{
 			"urldata": "https://www.data.gouv.fr/fr/datasets/r/5c4e1452-3850-4b59-b11c-3dd51d7fb8b5",
 			"separator":",",
-			  "cast":{
-                                "dep":"str"
-                        },
 			"columns" : [
 			{
 					"name":"where",
@@ -109,9 +103,6 @@
 			"urldata":"https://www.data.gouv.fr/fr/datasets/r/4acad602-d8b1-4516-bc71-7d5574d5f33e",
 			"urlparent":"https://www.data.gouv.fr/fr/datasets/indicateurs-de-suivi-de-lepidemie-de-covid-19/",
 			"separator":",",	
-			  "cast":{
-                                "dep":"str"
-                        },
 			"columns" : [
 			{	
 				"name":"date",
@@ -139,9 +130,6 @@
 		{	
 			"urldata":"https://www.data.gouv.fr/fr/datasets/r/83cbbdb9-23cb-455e-8231-69fc25d58111",
 			"urlparent":"https://www.data.gouv.fr/fr/datasets/donnees-relatives-aux-personnes-vaccinees-contre-la-covid-19-1",
-			  "cast":{
-                                "dep":"str"
-                        },
 			"columns" : [
 			{
 			"name":"where",
@@ -175,9 +163,6 @@
 			"drop" :{ 	 
 					"dep": "<NA>"
 			},			
-			  "cast":{
-                                "dep":"str"
-                        },
 			"columns" : [
 				{
 					"name":"where",
