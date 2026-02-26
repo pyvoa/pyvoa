@@ -1,0 +1,21 @@
+{
+  "header": "Who Europe from RiskLayer",
+    "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "EUR",
+    "locationmode":"code"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/18789238/files/output.csv?content",
+	 "urlparent":"https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-JLawOH35vPyOk39w0tjn64YQLlahiD2AaNfjd82pgQ37Jr1K8KMHOqJbxoi4k2FZVYBGbZ-nsxhi/pub?output=csv",
+	 "separator":",",
+  	 "columns": [
+    		{"alias":"UID","name":"where"},
+            {"alias":"DateRpt","name":"date"},
+            {"alias":"CumulativePositive","name":"tot_positive","cumulative":true},
+            {"alias":"IncidenceCumulative","name":"tot_incidence","cumulative":true}
+	 ]
+	}
+  ]
+}

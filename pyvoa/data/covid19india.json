@@ -1,0 +1,34 @@
+{
+  "header": "covid19india",
+    "geoinfo": {
+    "granularity": "region",
+    "iso3": "IND",
+    "locationmode":"name"
+  },
+ "replace":{
+      "Andaman and Nicobar Islands":"Andaman and Nicobar Islands",
+	  "Telangana":"Andhra Pradesh",
+      "Ladakh":"Jammu and Kashmir"
+  },
+  "datasets": [
+  	{	
+	 "urldata": "https://zenodo.org/records/18788975/files/states.csv?content",
+	 "urlparent":"https://api.covid19india.org/csv/latest/states.csv",
+	 "separator":",",
+  	 "columns": [
+    			{
+		    "name":"where",
+    	    "alias":"State"	
+			},
+			{
+			"alias":"Date",
+			"name":"date"
+             	       },
+		       {"alias":"Deceased","name":"tot_deaths","cumulative":true},
+               {"alias":"Confirmed","name":"tot_cases","cumulative":true},
+               {"alias":"Recovered","name":"tot_recovered","cumulative":true},
+               {"alias":"Tested","name":"tot_test","cumulative":true}   
+	 ]
+	}
+  ]
+}  
