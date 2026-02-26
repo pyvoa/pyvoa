@@ -3,7 +3,7 @@
     "geoinfo": {
     "granularity": "region",
     "iso3": "CHL",
-    "locationmode":"name"
+    "locationmode":"code"
   },
   "datasets": [
   	{	
