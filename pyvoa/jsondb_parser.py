@@ -348,7 +348,7 @@ class DataParser:
              pandas_temp = pandas_temp.replace(replace_field)
 
           pandas_temp = pandas_temp.rename(columns = rename_columns)
-
+          print(pandas_temp['where'].unique())
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
               value_name = None
@@ -358,9 +358,6 @@ class DataParser:
                    pandas_temp = pandas_temp.melt(id_vars='date',var_name='where',value_name=value_name)
               else:
                   pandas_temp = pandas_temp.melt(id_vars='where',var_name='date',value_name=value_name)
-          else:
-              raise PyvoaError("Seems to have date in columns format in yours csv file, so namedata has to be defined in your json file")
-
 
           if usecols and ('semaine' in usecols or 'week' in usecols):
                  pandas_temp['date'] = [ week_to_date(i) for i in pandas_temp['date']]
