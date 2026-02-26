@@ -348,7 +348,6 @@ class DataParser:
              pandas_temp = pandas_temp.replace(replace_field)
 
           pandas_temp = pandas_temp.rename(columns = rename_columns)
-          print(pandas_temp['where'].unique())
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
               value_name = None
