@@ -10,8 +10,8 @@
          },
   "datasets": [
   	{	
-	 "urldata": "https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv",
-	 "urlparent":"https://epistat.sciensano.be/covid/",
+	 "urldata":"https://zenodo.org/records/18790064/files/COVID19BE_CASES_AGESEX.csv?content",
+	 "urlparent": "https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv",
 	 "separator":",",
   	"columns": [
     		{
@@ -28,6 +28,39 @@
 			"cumulative":true
 		}
   		]
+	},
+	  	{	
+	 "urldata": "https://zenodo.org/records/18790064/files/sciensano_COVID19BE_HOSP.csv?",
+	 "urlparent":"https://epistat.sciensano.be/covid/",
+	 "separator":",",
+  	"columns": [
+    		{
+			"name":"date",
+                        "alias":"DATE" 
+                },
+		{ 
+			"name":"where",
+			"alias":"PROVINCE"
+		},
+		{
+                	"name":"tot_hosp",
+			"alias":"TOTAL_IN",
+			"cumulative":true
+		},
+{
+					"name":"tot_icu",
+					"alias":"TOTAL_IN_ICU",
+					"cumulative":true
+},
+{
+					"name":"tot_res",
+					"alias":"TOTAL_IN_RESP",
+					"cumulative":true},
+{					"name":"tot_ecmo",
+					"alias":"TOTAL_IN_ECMO",
+					"cumulative":true
+}
+  		]
 	}
-     ]		
+     ]	
 }
