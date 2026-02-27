@@ -1459,9 +1459,9 @@ class visu_bokeh:
         """
         geometry = geopandasrow['geometry']
         all = []
-        if geometry.type == 'Polygon':
+        if geometry.geom_type == 'Polygon':
             return list(geometry.exterior.coords)
-        if geometry.type == 'MultiPolygon':
+        if geometry.geom_type == 'MultiPolygon':
             for ea in geometry.geoms:
                 all.append(list(ea.exterior.coords))
         return all
