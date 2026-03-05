@@ -11,7 +11,7 @@
   },
   "datasets": [
   	{	
-	 "urldata": "https://zenodo.org/records/11267175/files/owid-monkeypox-data.csv?content",
+	 "urldata": "https://zenodo.org/records/11222009/files/mpoxgh_owid-monkeypox-data.csv?content",
 	 "urlparent":"https://raw.githubusercontent.com/owid/monkeypox/main/owid-monkeypox-data.csv",
 	 "drop":
             {
