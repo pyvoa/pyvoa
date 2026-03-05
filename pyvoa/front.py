@@ -572,7 +572,6 @@ class front:
                 if self.getvis() != 'bokeh' and typeofhist == 'location' :
                     return func(self,self.allvisu.hist(**z)[0])
                 else:
-                    print(z)
                     return func(self,self.allvisu.hist(**z))
             else:
                 raise PyvoaError(" No visualization has been set up !")
