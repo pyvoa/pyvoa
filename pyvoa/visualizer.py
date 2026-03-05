@@ -200,7 +200,6 @@ class AllVisu:
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
-
             loc = list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
             return func(self, **kwargs)
