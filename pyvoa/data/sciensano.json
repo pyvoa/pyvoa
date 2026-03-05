@@ -30,7 +30,7 @@
   		]
 	},
 	  	{	
-	 "urldata": "https://zenodo.org/records/18790064/files/sciensano_COVID19BE_HOSP.csv?",
+	 "urldata": "https://zenodo.org/records/18790064/files/sciensano_COVID19BE_HOSP.csv?content",
 	 "urlparent":"https://epistat.sciensano.be/covid/",
 	 "separator":",",
   	"columns": [
