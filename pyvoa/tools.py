@@ -367,7 +367,8 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     # if not : download the file in tmp area
     local_filename=local_tmp_filename
     try:
-        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+        headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
         if not 'zenodo.org' in url:
             verb('Instead of using original URL '+url)
             url='https://zenodo.org/api/records/18773027/files/'+local_base_filename+'/content'
