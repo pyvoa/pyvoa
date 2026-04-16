@@ -24,8 +24,8 @@
       			"alias": "geo_insee"
     		},
     		{
-      			"name": "inc",
-      			"alias": "inc",
+      			"name": "inc100",
+      			"alias": "inc100",
       			"description": "taux d'incidence hebdomadaire"
     		}
   		]
