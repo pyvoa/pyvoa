@@ -13,7 +13,7 @@
 	 "urldata":"https://zenodo.org/records/18790064/files/COVID19BE_CASES_AGESEX.csv?content",
 	 "urlparent": "https://epistat.sciensano.be/Data/COVID19BE_CASES_AGESEX.csv",
 	 "separator":",",
-  	"columns": [
+  	 "columns": [
     		{
 			"name":"date",
                         "alias":"DATE" 
@@ -32,6 +32,13 @@
 	  	{	
 	 "urldata": "https://zenodo.org/records/18790064/files/sciensano_COVID19BE_HOSP.csv?content",
 	 "urlparent":"https://epistat.sciensano.be/covid/",
+	 "na_values":"NA",
+	 "cast":{
+				"TOTAL_IN":"float64",
+				"TOTAL_IN_ICU":"float64",
+				"TOTAL_IN_RESP":"float64",
+				"TOTAL_IN_ECMO":"float64"
+                },
 	 "separator":",",
   	"columns": [
     		{
