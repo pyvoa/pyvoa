@@ -262,6 +262,7 @@ class DataParser:
       self.url = []
       self.keyword_definition = {}
       self.keyword_url = {}
+
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
           pdata = pd.DataFrame(datasets['columns'])
@@ -292,6 +293,9 @@ class DataParser:
           separator = ';'
           if 'separator' in list(datasets.keys()):
               separator = datasets['separator']
+          na_values = ''
+          if 'na_values' in list(datasets.keys()):
+              na_values = datasets['na_values']
           drop = {}
           if 'drop' in list(datasets.keys()):
               drop=datasets['drop']
@@ -319,13 +323,14 @@ class DataParser:
                           cast.update({thewhere[0]:'str'})
                       else:
                           cast={thewhere[0]:'str'}
-              pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
-                            keep_default_na = False, na_values = '' , header=0, dtype = cast, decimal = decimal,
+              #pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
+              pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
+                            keep_default_na = False, na_values = na_values , header=0, dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
-          coltocumul = pdata.loc[pdata.cumulative]['alias'].to_list()
+          coltocumul = pdata.loc[pdata['cumulative'], 'alias'].to_list()
           if coltocumul:
             where_conditions = pdata.loc[pdata['name'] == 'where', 'alias']
             if not where_conditions.empty:
@@ -369,8 +374,8 @@ class DataParser:
 
           if usecols and ('semaine' in usecols or 'week' in usecols):
                  pandas_temp['date'] = [ week_to_date(i) for i in pandas_temp['date']]
-             #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
-             #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
+                 #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
+                 #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
 
           pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format="mixed").dt.date
 
