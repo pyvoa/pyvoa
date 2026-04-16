@@ -358,7 +358,7 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
 
     if expiration_time >=0 and local_file_exists:
         if expiration_time==0 or time.time()-os.path.getmtime(local_filename)<expiration_time:
-            if os.path.getsize(local_filename) >= 100:
+            if os.path.getsize(local_filename) >= 1000:
                 verb('Using locally stored data for '+url+' stored as '+local_filename)
                 return local_filename
             else:
