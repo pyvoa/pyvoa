@@ -3,8 +3,18 @@
     "geoinfo": {
     "granularity": "subregion",
     "iso3": "ESP",
-    "locationmode":"code"
+    "locationmode":"name"
   },
+   "replace":{
+      "Alicante/Alacant":"Alicante",
+          "Araba/Álava":"Araba",
+      "Castellón/Castelló":"Castelló",
+      "Valencia/València":"València",
+      "Rioja, La":"La Rioja",
+      "Alicante/Alacant":"Alacant",
+      "Gipuzkoa":"Gipuzcoa"
+  },
+
   "datasets": [
   	{	
 	 "urldata": "https://zenodo.org/records/11222021/files/escovid19data_covid19-provincias-spain_consolidated.csv?content",
@@ -13,7 +23,7 @@
   	 "columns": [
     			{
 		   "name":"where",
-    		   "alias":"ine_code"	
+    		   "alias":"province"	
 			},
 			{
 			"name":"date"
