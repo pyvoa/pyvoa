@@ -1440,6 +1440,7 @@ class GeoCountry():
                 'provincia':'name_subregion',\
                 'codigo':'code_subregion'},inplace=True)
             self._country_data.drop(['texto'],axis=1,inplace=True)
+            self._country_data.loc[self._country_data['code_subregion']=='15','name_subregion']='La Coruña' # for naming homogeneity
 
         # --- 'GBR' case ---------------------------------------------------------------------------------------
         elif self._country == 'GBR':
