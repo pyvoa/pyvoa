@@ -3,7 +3,7 @@
     "geoinfo": {
     "granularity": "subregion",
     "iso3": "USA",
-    "locationmode":"name"
+    "locationmode":"code"
   },
   "datasets": [
   	{	
@@ -16,7 +16,7 @@
     		   "alias":"state"	
 			},
       {"name":"date"},
-		       {"alias":"death","name":"tot_deaths","cumulative":true},
+	       {"alias":"death","name":"tot_deaths","cumulative":true},
                {"alias":"hospitalizedCumulative","name":"tot_hosp","cumulative":true},
                {"alias":"hospitalizedCurrently","name":"cur_hosp"},
                {"alias":"inIcuCumulative","name":"tot_icu","cumulative":true},
