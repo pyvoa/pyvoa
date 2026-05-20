@@ -3,7 +3,7 @@
     "geoinfo": {
     "granularity": "subregion",
     "iso3": "MYS",
-    "locationmode":"name"
+    "locationmode":"code"
   },
 
   "datasets": [
