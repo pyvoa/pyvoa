@@ -1,7 +1,7 @@
 {
   "header": "Robert Koch Institut data base",
     "geoinfo": {
-    "granularity": "region",
+    "granularity": "subregion",
     "iso3": "DEU",
     "locationmode":"code"
   },
@@ -12,22 +12,26 @@
   	{
 	 "urldata": "https://zenodo.org/records/18682655/files/rki_deaths-rki-by-ags.csv?content",
 	 "namedata":"deaths", 
+	 "var_name":"true",
 	 "urlparent":"https://github.com/jgehrcke/covid-19-germany-gae/raw/master/deaths-rki-by-ags.csv",
 	 "separator":",",
+	 "dropcolumns":["sum_deaths"],
 	 "columns": [
 		 {
-		    "name":"where",
+		    "name":"date",
     		"alias":"time_iso8601"	
 		}
 		  ]
   		}, 
     {"urldata": "https://zenodo.org/records/18682655/files/cases-rki-by-ags.csv?content",
 	 "namedata":"cases", 
+	 "var_name":"true",
 	 "urlparent":"https://github.com/jgehrcke/covid-19-germany-gae/raw/master/cases-rki-by-ags.csv",
 	 "separator":",",
+	 "dropcolumns":["sum_cases"],
 	 "columns": [
 		 {
-		    "name":"where",
+		    "name":"date",
     		"alias":"time_iso8601"	
 		}
 		  ]
