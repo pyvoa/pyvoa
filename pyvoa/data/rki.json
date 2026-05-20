@@ -1,7 +1,7 @@
 {
   "header": "Robert Koch Institut data base",
     "geoinfo": {
-    "granularity": "region",
+    "granularity": "subregion",
     "iso3": "DEU",
     "locationmode":"code"
   },
