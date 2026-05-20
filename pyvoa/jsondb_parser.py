@@ -262,7 +262,6 @@ class DataParser:
       self.url = []
       self.keyword_definition = {}
       self.keyword_url = {}
-
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
           pdata = pd.DataFrame(datasets['columns'])
@@ -327,6 +326,7 @@ class DataParser:
               #pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
                             keep_default_na = False, na_values = na_values , header=0, dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
+
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
@@ -337,6 +337,7 @@ class DataParser:
                 wh = where_conditions.values[0]
                 pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
             else:
+                pandas_temp[coltocumul] = pd.to_numeric(pandas_temp[coltocumul],errors='coerce')
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
 
           if drop and not debug:
@@ -360,11 +361,11 @@ class DataParser:
                  if v =='np.nan':
                     replace_field[k]=np.nan
              pandas_temp = pandas_temp.replace(replace_field)
-
           pandas_temp = pandas_temp.rename(columns = rename_columns)
+
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
-              value_name = None
+          value_name = None
           if "namedata" in list(datasets.keys()):
               value_name = datasets['namedata']
               if "var_name" in list(datasets.keys()):
@@ -389,19 +390,16 @@ class DataParser:
           pandas_temp[notwhereanddate] = pandas_temp[notwhereanddate].apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", ".", regex=False), errors="coerce"))
           pandas_temp = pandas_temp[whereanddate+notwhereanddate]
           pandas_temp = pandas_temp.groupby(whereanddate).sum(min_count=1).reset_index()
-
           if pandas_db.empty:
               pandas_db = pandas_temp
           else:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
 
-
       pandas_db = fill_missing_dates(pandas_db)
 
       pandas_db = pandas_db.sort_values(['where','date'])
       self.available_keywords = list(pandas_db.columns)
-
       if 'date' in self.available_keywords:
           self.available_keywords.remove('date')
       if 'where' in self.available_keywords:
@@ -433,8 +431,8 @@ class DataParser:
               geopd = geopd.loc[geopd.code_subregion.isin(locationdb)]
           else:
               geopd = geopd.loc[geopd.name_subregion.isin(locationdb)]
-
           geopd['name_subregion'] = geopd['name_subregion'].str.upper()
+          geopd['code_subregion'] = geopd['code_subregion'].str.upper()
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
           geopd = geopd.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
       elif granularity == 'region':
@@ -453,6 +451,7 @@ class DataParser:
           pandas_db['where'] = pandas_db['where'].str.upper()
           namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
+
       else:
           PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:
