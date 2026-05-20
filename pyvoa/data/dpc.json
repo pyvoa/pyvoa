@@ -17,8 +17,8 @@
   	 "columns": [
     		{"name":"where","alias":"denominazione_regione"},
 		{"alias":"data","name":"date"},
-	    	{"alias":"totale_casi","name":"tot_cases","cumulative":true},
-            	{"alias":"deceduti","name":"tot_deaths","cumulative":true}
+	    	{"alias":"totale_casi","name":"tot_cases"},
+            	{"alias":"deceduti","name":"tot_deaths"}
 	 ]
 	}
   ]
