@@ -1341,9 +1341,17 @@ class GeoCountry():
             self._country_data.rename(columns={\
                 'STATE_NAME':'name_subregion',\
                 'STATE_ABBR':'code_subregion',\
-                'SUB_REGION':'code_region'},\
+                'SUB_REGION':'name_region'},\
                 inplace=True)
-            self._country_data['name_region'] = self._country_data['code_region']
+            def abbreviate(s):
+                words = s.split()
+                if len(words) == 1:
+                    return s[:3].upper()                          # e.g. "Pacific"           → "PAC"
+                elif len(words) == 2:
+                    return (words[0][0] + words[1][:2]).upper()   # e.g. "New England"       → "NEN"
+                else:
+                    return ''.join(w[0] for w in words).upper()   # e.g. "West North Central" → "WNC"
+            self._country_data['code_region'] = [abbreviate(s) for s in self._country_data['name_region']]
             self._country_data.drop(['DRAWSEQ','STATE_FIPS'],axis=1,inplace=True)
 
             # Adding informations from wikipedia
