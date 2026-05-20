@@ -16,16 +16,16 @@
     		   "alias":"state"	
 			},
       {"name":"date"},
-	       {"alias":"death","name":"tot_deaths","cumulative":true},
-               {"alias":"hospitalizedCumulative","name":"tot_hosp","cumulative":true},
+	       {"alias":"death","name":"tot_deaths"},
+               {"alias":"hospitalizedCumulative","name":"tot_hosp"},
                {"alias":"hospitalizedCurrently","name":"cur_hosp"},
-               {"alias":"inIcuCumulative","name":"tot_icu","cumulative":true},
+               {"alias":"inIcuCumulative","name":"tot_icu"},
                {"alias":"inIcuCurrently","name":"cur_icu"},
                {"alias":"negative","name":"tot_neg_test"},
                {"alias":"positive","name":"tot_pos_test"},
-               {"alias":"onVentilatorCumulative","name":"tot_onVentilator","cumulative":true},
+               {"alias":"onVentilatorCumulative","name":"tot_onVentilator"},
                {"alias":"onVentilatorCurrently","name":"cur_onVentilator"},
-               {"alias":"totalTestResults","name":"tot_test","cumulative":true}
+               {"alias":"totalTestResults","name":"tot_test"}
 	 ]
 	}
   ]
