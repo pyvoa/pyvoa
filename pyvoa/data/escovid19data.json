@@ -7,12 +7,13 @@
   },
    "replace":{
       "Alicante/Alacant":"Alicante",
-          "Araba/Álava":"Araba",
+      "Araba/Álava":"Araba",
       "Castellón/Castelló":"Castelló",
       "Valencia/València":"València",
       "Rioja, La":"La Rioja",
       "Alicante/Alacant":"Alacant",
-      "Gipuzkoa":"Gipuzcoa"
+      "Gipuzkoa":"Gipuzcoa",
+      "Coruña":"La Coruña"
   },
 
   "datasets": [

@@ -62,10 +62,11 @@
 {
 					"name":"tot_res",
 					"alias":"TOTAL_IN_RESP",
-					"cumulative":true},
+					"cumulative":true
+},
 {					"name":"tot_ecmo",
 					"alias":"TOTAL_IN_ECMO",
-					"cumulative":true
+					 "cumulative":true
 }
   		]
 	}
