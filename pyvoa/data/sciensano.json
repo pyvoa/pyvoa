@@ -51,22 +51,18 @@
 		},
 		{
                 	"name":"tot_hosp",
-			"alias":"TOTAL_IN",
-			"cumulative":true
+			"alias":"TOTAL_IN"
 		},
 {
 					"name":"tot_icu",
-					"alias":"TOTAL_IN_ICU",
-					"cumulative":true
+					"alias":"TOTAL_IN_ICU"
 },
 {
 					"name":"tot_res",
-					"alias":"TOTAL_IN_RESP",
-					"cumulative":true
+					"alias":"TOTAL_IN_RESP"
 },
 {					"name":"tot_ecmo",
-					"alias":"TOTAL_IN_ECMO",
-					 "cumulative":true
+					"alias":"TOTAL_IN_ECMO"
 }
   		]
 	}
