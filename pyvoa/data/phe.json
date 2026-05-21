@@ -13,7 +13,7 @@
   	 "columns": [
         {"name":"where","alias":"areaCode"},
         {"name":"date"},
-		{"alias":"cumDeaths28DaysByDeathDate","name":"tot_deaths","cumulative":true}
+		{"alias":"cumDeaths28DaysByDeathDate","name":"tot_deaths"}
 	 ]
 	},
     {	
@@ -23,7 +23,7 @@
   	 "columns": [
         {"name":"where","alias":"areaCode"},
         {"name":"date"},
-		{"alias":"cumCasesBySpecimenDate","name":"tot_cases","cumulative":true}
+		{"alias":"cumCasesBySpecimenDate","name":"tot_cases"}
 	 ]
 	},
     {	
@@ -33,7 +33,7 @@
   	 "columns": [
         {"name":"where","alias":"areaCode"},
         {"name":"date"},
-		{"alias":"cumLFDTestsBySpecimenDate","name":"tot_tests","cumulative":true}
+		{"alias":"cumLFDTestsBySpecimenDate","name":"tot_tests"}
 	 ]
 	},
     {	
@@ -43,7 +43,7 @@
   	 "columns": [
         {"name":"where","alias":"areaCode"},
         {"name":"date"},
-		{"alias":"cumPeopleVaccinatedFirstDoseByVaccinationDate","name":"tot_vacc1","cumulative":true}
+		{"alias":"cumPeopleVaccinatedFirstDoseByVaccinationDate","name":"tot_vacc1"}
 	 ]
 	},
     {	
@@ -53,7 +53,7 @@
   	 "columns": [
         {"name":"where","alias":"areaCode"},
         {"name":"date"},
-		{"alias":"cumPeopleVaccinatedSecondDoseByVaccinationDate","name":"tot_vacc2","cumulative":true}
+		{"alias":"cumPeopleVaccinatedSecondDoseByVaccinationDate","name":"tot_vacc2"}
 	 ]
 	}
   ]
