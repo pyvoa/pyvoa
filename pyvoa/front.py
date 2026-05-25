@@ -134,6 +134,7 @@ class front:
         self._setkwargsvisu = None
         self.batch = False
         self.outcome = None
+        self.maxlettersdisplay = 20
 
     def whattodo(self,):
         """Generates a DataFrame summarizing available methods and their options.
@@ -391,6 +392,8 @@ class front:
                             z.pop('typeofhist')
                             z.pop('typeofplot')
                             z.pop('bins')
+                    shortenwhere = {i:i[:self.maxlettersdisplay] + '...' if len(i)>20 else i for i in z['where']}
+                    z['input']['where'] = kwargs['input']['where'].replace(shortenwhere)
                 return func(self,**z)
             else:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
@@ -514,11 +517,10 @@ class front:
             where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)
-
             if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
                 mapoption = kwargs.get('typeofmap','not dense')
             else:
-                PyvoaWarning('typeofmap not compatible with this db, dummy argument')
+                #PyvoaWarning('typeofmap not compatible with this db, dummy argument')
                 mapoption = None
 
             if 'output' in kwargs:
@@ -548,6 +550,7 @@ class front:
             return func(self,**kwargs)
         return inner
 
+
     def decohist(func):
         @wraps(func)
         def inner(self,**kwargs):
@@ -573,7 +576,7 @@ class front:
               kwargs.pop('pop')
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
-                if self.getvis() != 'bokeh' and typeofhist == 'location' :
+                if self.getvis() not in ['bokeh','seaborn'] and typeofhist == 'location' :
                     return func(self,self.allvisu.hist(**z)[0])
                 else:
                     return func(self,self.allvisu.hist(**z))

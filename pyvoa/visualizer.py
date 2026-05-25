@@ -137,7 +137,6 @@ class AllVisu:
 
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
-
             return func(self, **kwargs)
         return inner_plot
 
