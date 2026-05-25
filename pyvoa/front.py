@@ -423,7 +423,7 @@ class front:
             """
             output = kwargs.get('output')
             pandy = kwargs.get('input')
-            which = next((x for x in self.listwhich() if x.startswith("tot_")), kwargs.get('which')[0]) 
+            which = next((x for x in self.listwhich() if x.startswith("tot_")), kwargs.get('which')[0])
 
             if 'geometry' not in list(pandy.columns):
                 output = 'pandas'
@@ -1015,8 +1015,9 @@ class front:
             if db in self.listwhom():
                return self.meta.getcurrentmetadata(db)
             else:
-                PyvoaError('Database is not in the pyvoa listing, please have a look ...')
-
+               raise PyvoaError('Database'+ db +' is not in the pyvoa listing, please have a look')
+        elif self.db:
+            return self.meta.getcurrentmetadata(self.db)
         else:
             raise PyvoaError('Database has not been defined')
 
