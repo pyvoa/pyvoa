@@ -423,7 +423,8 @@ class front:
             """
             output = kwargs.get('output')
             pandy = kwargs.get('input')
-            which = next((x for x in self.listwhich() if x.startswith("tot_")), kwargs.get('which')[0])
+            if self.db:
+                which = next((x for x in self.listwhich() if x.startswith("tot_")), kwargs.get('which')[0])
 
             if 'geometry' not in list(pandy.columns):
                 output = 'pandas'
