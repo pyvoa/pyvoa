@@ -26,6 +26,7 @@ from pyvoa.tools import (
     kwargs_valuestesting,
     debug,
     info,
+    fill_missing_dates,
     flat_list,
     all_or_none_lists,
     readpkl,
@@ -267,8 +268,13 @@ class front:
             else:
                 raise PyvoaError("What function is this "+func.__name__)
 
-            if self.db == '' and kwargs['input'] is None:
-                PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+            if self.db == '' :
+                if kwargs['input'] is None:
+                    PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+                else:
+                    kwargs['input'] = fill_missing_dates(kwargs['input'])
+                    if 'which' not in kwargs.keys():
+                        PyvoaError('For you own DB which must be stipulated !!')
 
             mustbealist = ['where','which','option']
 
@@ -302,10 +308,8 @@ class front:
                         kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
                 else:
                     kwargs['where'] = list(input['where'].unique())
-
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
-
             if 'sumall' in kwargs['option']:
                 kwargs['option'].remove('sumall')
                 kwargs['option'].append('sumall')
@@ -344,7 +348,6 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
-
             return func(self,**kwargs)
         return wrapper
 
@@ -439,21 +442,20 @@ class front:
                         return 'red'
                     else:
                         return black
-
                 if 'geometry' in list(pandy.columns):
                     pandy = pandy.drop(columns='geometry')
-                casted_data = pandy
+                casted_data = pandy.copy()
                 col=list(pandy.columns)
                 mem='{:,}'.format(pandy[col].memory_usage(deep=True).sum())
                 info('Memory usage of all columns: ' + mem + ' bytes')
             elif output == 'geopandas':
                 if 'geometry' in list(pandy.columns):
-                    casted_data = pandy
+                    casted_data = pandy.copy()
                 else:
                     casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
                     casted_data = gpd.GeoDataFrame(casted_data)
             elif output == 'dict':
-                casted_data = pandy.to_dict('split')
+                casted_data = pandy.copy().to_dict('split')
             elif output == 'list' or output == 'array':
                 my_list = []
                 for keys, values in pandy.items():
@@ -461,7 +463,7 @@ class front:
                     my_list.append(vc)
                 casted_data = my_list
                 if output == 'array':
-                    casted_data = np.array(pandy)
+                    casted_data = np.array(pandy.copy())
             else:
                 raise PyvoaError('Unknown output.')
 
@@ -475,7 +477,8 @@ class front:
             )
             kwargs['whereordered'] = where_ordered_bylastvalues
             casted_data = casted_data.sort_values(['where','date']).reset_index(drop=True)
-            kwargs['input'] = casted_data
+
+            kwargs['input'] = casted_data.copy()
             return func(self,**kwargs)
         return inner
 
