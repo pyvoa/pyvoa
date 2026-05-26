@@ -277,6 +277,7 @@ class GPDBuilder(object):
         if where_geometry_none.size>0:
             PyvoaWarning('Those localisation have None geometry, remove them ...:'+str(where_geometry_none))
         newpd = newpd.dropna(subset=['geometry'])
+
         return newpd
 
    def get_stats(self,**kwargs):
@@ -357,7 +358,6 @@ class GPDBuilder(object):
 
        for w in which:
            option = kwargs.get('option',defaultargs['option'][0])
-
            input[w] = (
            input.groupby('where')[w]
                  .apply(lambda s: s.bfill().ffill())
@@ -443,6 +443,7 @@ class GPDBuilder(object):
             new_order.remove('geometry')
        if 'code' not in input.columns:
            new_order.remove('code')
+
        kwargs['input'] = input[new_order].reset_index(drop=True)
        return kwargs
 
