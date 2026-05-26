@@ -295,6 +295,7 @@ class front:
                 default['input'] = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
+
             kwargs['what'] = kwargs.get('what',kwargs['what'][0])
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
@@ -309,14 +310,14 @@ class front:
                         kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
                 else:
                     kwargs['where'] = list(input['where'].unique())
+
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
             if 'sumall' in kwargs['option']:
                 kwargs['option'].remove('sumall')
                 kwargs['option'].append('sumall')
-
-            if 'sumall' in kwargs['option'] and len(kwargs['which'])>1:
-                raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
+                if len(kwargs['which'])>1:
+                    raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
             if not input.empty:
                 PyvoaWarning("In your DataFrame : the date must be in pd.to_datetime format !")
@@ -335,7 +336,7 @@ class front:
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
 
             if self.db == '':
-                    self.allvisu = AllVisu('', kwargs['input'])
+                self.allvisu = AllVisu('', kwargs['input'])
 
             found_bypop = None
             for w in kwargs['option']:
@@ -349,6 +350,7 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
+
             return func(self,**kwargs)
         return wrapper
 
@@ -429,8 +431,6 @@ class front:
             """
             output = kwargs.get('output')
             pandy = kwargs.get('input')
-            if self.db:
-                which = next((x for x in self.listwhich() if x.startswith("tot_")), kwargs.get('which')[0])
 
             if 'geometry' not in list(pandy.columns):
                 output = 'pandas'
@@ -471,6 +471,7 @@ class front:
                 raise PyvoaError('Unknown output.')
 
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
+
             last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
             where_ordered_bylastvalues = last_rows['where'].tolist()
             casted_data['where'] = pd.Categorical(

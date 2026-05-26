@@ -490,6 +490,8 @@ class DataParser:
       '''
            Return all the available keyswords for the database selected
       '''
+      firstvalue = next((x for x in self.available_keywords if x.startswith("tot_") or x.startswith("total_")),self.available_keywords[0])
+      self.available_keywords.insert(0, self.available_keywords.pop(self.available_keywords.index(firstvalue)))
       return self.available_keywords
 
   def get_url(self):
