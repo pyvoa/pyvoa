@@ -295,7 +295,7 @@ class visu_bokeh:
                 input_dates = input.copy()
 
             invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette=invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
+            color_mapper = LinearColorMapper(palette = Viridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
             color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
                         border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
