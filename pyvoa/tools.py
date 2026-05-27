@@ -53,7 +53,7 @@ _verbose_mode = 1 # default
 
 maintmpdir=os.path.join(Path.home(),".cache")
 tmpdir=os.path.join(maintmpdir,"pyvoa.data"+"_"+getuser())
-pklpath=tmpdir 
+pklpath=tmpdir
 
 # ----------------------------------------------------
 # --- Usefull functions for pyvoa.--------------------
@@ -71,7 +71,7 @@ def set_verbose_mode(v):
     if (v < 2) :
         pd.options.mode.chained_assignment = None  # default='warn'
 
-    if (v < 2) : 
+    if (v < 2) :
         warnings.simplefilter("ignore")
     else:
         warnings.simplefilter("default")
@@ -484,22 +484,35 @@ def return_nonan_dates_pandas(df = None, field = None):
 
 
 def readpkl(filepkl):
-  if filepkl is None:
+    """Load a pickled object from the pyvoa cache directory.
+
+    Args:
+        filepkl: filename to read (without path)
+
+    Returns:
+        Unpickled object
+
+    Raises:
+        PyvoaError: if file doesn't exist or can't be loaded
+    """
+    if filepkl is None:
         raise PyvoaError("readpkl requires 'filepkl'")
-  filepkl = os.path.join(pklpath,filepkl)
-  if not os.path.isfile(filepkl):
-     if not os.path.exists(pklpath):
-          os.makedirs(pklpath)
-     db_name=filepkl.replace(pklpath,'').replace('.pkl','')
-     PyvoaInfo("Data from "+db_name + " isn't allready stored")
-  else:
-     with open(filepkl, 'rb') as f:
-         #print("Info of "+ db_name + " stored ")
-         PyvoaInfo("last update: %s" % time.ctime(os.path.getmtime(filepkl)))
-         #datab = pickle.load(f)
-         datab = pd.read_pickle(f)
-         datab.get_parserdb().get_echoinfo()
-     return datab
+
+    filepath = os.path.join(pklpath, filepkl)
+    verb(f"Attempting to read: {filepath}")
+
+    if not os.path.isfile(filepath):
+        raise PyvoaError(f"Pickle file not found: {filepath}. "
+                        f"Data hasn't been cached yet.")
+    try:
+        with open(filepath, 'rb') as f:
+            PyvoaInfo(f"Loading cached data. Last update: {time.ctime(os.path.getmtime(filepath))}")
+            datab = pickle.load(f)
+            return datab
+    except Exception as e:
+        raise PyvoaError(f"Failed to load pickle file {filepath}: {str(e)}")
+
+
 
 def dumppkl(filepkl,whattodump):
    if filepkl is None or whattodump is None:
