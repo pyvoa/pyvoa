@@ -330,6 +330,7 @@ class DataParser:
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
+          '''
           coltocumul = pdata.loc[pdata['cumulative'], 'alias'].to_list()
           if coltocumul:
             where_conditions = pdata.loc[pdata['name'] == 'where', 'alias']
@@ -339,7 +340,7 @@ class DataParser:
             else:
                 pandas_temp[coltocumul] = pd.to_numeric(pandas_temp[coltocumul],errors='coerce')
                 pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
-
+          '''
           if drop and not debug:
               for key,val in drop.items():
                   if key in pandas_temp.columns:
@@ -397,6 +398,16 @@ class DataParser:
           self.url += [url]
 
       pandas_db = fill_missing_dates(pandas_db)
+
+      coltocumul = pdata.loc[pdata['cumulative'], 'name'].to_list()
+      if coltocumul:
+          where_conditions = pdata.loc[pdata['name'] == 'where', 'name']
+          if not where_conditions.empty:
+              wh = where_conditions.values[0]
+              pandas_db[coltocumul] = pandas_db.groupby(wh)[coltocumul].cumsum()
+          else:
+              pandas_db[coltocumul] = pd.to_numeric(pandas_db[coltocumul],errors='coerce')
+              pandas_db[coltocumul] = pandas_db[coltocumul].cumsum()
 
       pandas_db = pandas_db.sort_values(['where','date'])
       self.available_keywords = list(pandas_db.columns)
