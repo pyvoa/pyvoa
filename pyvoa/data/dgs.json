@@ -13,7 +13,7 @@
   	 "columns": [
     			{
 		   "name":"where",
-    		   "alias":"concelho"	
+    		   "alias":"distrito"	
 			},
 			{
 			"alias":"data",
