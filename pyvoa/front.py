@@ -30,7 +30,8 @@ from pyvoa.tools import (
     flat_list,
     all_or_none_lists,
     readpkl,
-    set_verbose_mode
+    set_verbose_mode,
+    dumppkl
 )
 
 import pyvoa.geopd_builder as coco
@@ -213,6 +214,7 @@ class front:
                 coge.GeoManager('name')
         self.db = base
 
+
     def help(self,):
         return h.display_full_help()
 
@@ -350,7 +352,6 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which']
-
             return func(self,**kwargs)
         return wrapper
 

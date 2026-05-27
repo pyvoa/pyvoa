@@ -330,17 +330,6 @@ class DataParser:
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
-          '''
-          coltocumul = pdata.loc[pdata['cumulative'], 'alias'].to_list()
-          if coltocumul:
-            where_conditions = pdata.loc[pdata['name'] == 'where', 'alias']
-            if not where_conditions.empty:
-                wh = where_conditions.values[0]
-                pandas_temp[coltocumul] = pandas_temp.groupby(wh)[coltocumul].cumsum()
-            else:
-                pandas_temp[coltocumul] = pd.to_numeric(pandas_temp[coltocumul],errors='coerce')
-                pandas_temp[coltocumul] = pandas_temp[coltocumul].cumsum()
-          '''
           if drop and not debug:
               for key,val in drop.items():
                   if key in pandas_temp.columns:

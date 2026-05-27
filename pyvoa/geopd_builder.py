@@ -67,6 +67,7 @@ class GPDBuilder(object):
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self._gi = coge.GeoInfo()
+
         try:
             if self.granularity == 'country':
                    self.geo = coge.GeoManager('name')
@@ -122,12 +123,10 @@ class GPDBuilder(object):
        db_name = kwargs.get('db_name')
        reload = kwargs.get('reload', True)
        vis = kwargs.get('vis', None)
-
        f = db_name+'.pkl'
        if reload:
-           datab = GPDBuilder(db_name)
-           dumppkl(f,datab)
-
+          datab = GPDBuilder(db_name)
+          dumppkl(f,datab)
        datab.setvisu(db_name,datab.getwheregeometrydescription())
        return datab, datab.getvisu()
 
