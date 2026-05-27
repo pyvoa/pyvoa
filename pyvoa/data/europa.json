@@ -24,13 +24,11 @@
              	       },
 		      {		
 			"name":"tot_deaths",
-			"alias":"CumulativeDeceased",
-			"cumulative":true
+			"alias":"CumulativeDeceased"
 		       },
 			{
                 	"name":"tot_positive",
-			"alias":"CumulativePositive",
-			"cumulative":true
+			"alias":"CumulativePositive"
 			},
                 	{
 			"name":"cur_hosp",
