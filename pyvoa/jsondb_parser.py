@@ -395,7 +395,7 @@ class DataParser:
               wh = where_conditions.values[0]
               pandas_db[coltocumul] = pandas_db.groupby(wh)[coltocumul].cumsum()
           else:
-              pandas_db[coltocumul] = pd.to_numeric(pandas_db[coltocumul],errors='coerce')
+              pandas_db[coltocumul] = pandas_db[coltocumul].apply(pd.to_numeric, errors='coerce')
               pandas_db[coltocumul] = pandas_db[coltocumul].cumsum()
 
       pandas_db = pandas_db.sort_values(['where','date'])

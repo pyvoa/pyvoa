@@ -19,13 +19,15 @@
   		  },
 		  {
 		  "name":"tot_deaths",
-		  "alias":"total deaths",
-		  "description":"total deaths attributed to Covid-19 disease (total deaths)"
+		  "alias":"daily deaths",
+		  "description":"total deaths attributed to Covid-19 disease (total deaths)",
+		  "cumulative":true
 		  },
 		  {
 		  "name":"tot_cases",
-		  "alias":"total cases",
-		  "description":"total number of confirmed cases (total cases)"
+		  "alias":"daily new cases",
+		  "description":"total number of confirmed cases (total cases)",
+		  "cumulative":true
 		  },
 		  {
 		  "name":"cur_hosp",
