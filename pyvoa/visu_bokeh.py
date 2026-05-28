@@ -231,7 +231,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear']      = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log']         = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_loglog']      = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=width, height=height, match_aspect=False)
+            dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=350, height=300, match_aspect=True)
             dicfig['bokeh_figure_linear_date'] = figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']    = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
             dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
@@ -492,8 +492,13 @@ class visu_bokeh:
                 pad_y = (ymax - ymin) * 0.05
                 bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
                 bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
+
+                # ✅ Use the ratio to adjust figure dimensions
                 ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
-                bokeh_figure_map.min_border = 0
+                if ratio < 1:  # Wider than tall
+                    bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
+                else:  # Taller than wide
+                    bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
 
                 bokeh_figure_map.x_range.start = xmin - pad_x
                 bokeh_figure_map.x_range.end   = xmax + pad_x
