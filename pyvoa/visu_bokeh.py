@@ -235,6 +235,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear_date'] = figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']    = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
             dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
+            dicfig['bokeh_figure_yearly_log']  = figure(x_axis_type='linear', y_axis_type='log',  width=width, height=height)
 
             logo_url = visu_bokeh.pyvoalogo(logo)
             for key, fig in dicfig.items():
@@ -986,7 +987,7 @@ class visu_bokeh:
         mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
         dbokeh_figure = {
             'linear': kwargs.get('bokeh_figure_yearly'),
-            'log': kwargs.get('bokeh_figure_yearly')
+            'log': kwargs.get('bokeh_figure_yearly_log')
         }
 
         input = input.loc[input['where'] == input['where'][0]].copy()
@@ -1001,7 +1002,7 @@ class visu_bokeh:
         input.loc[:,'dayofyear']= input['date'].apply(lambda x : x.dayofyear)
         allyears = list(input.allyears.unique())
 
-        for axis_type in  self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['ax_type']:
             fig = dbokeh_figure[axis_type]
             i = 0
             r_list=[]
