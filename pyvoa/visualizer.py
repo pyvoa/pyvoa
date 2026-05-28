@@ -128,7 +128,7 @@ class AllVisu:
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if func.__name__ == 'plot':
-                kwargs['title'] = self.database_name.upper() + ' database: '+ str(which) + ' time evolution between ' + str(when)
+                kwargs['title'] = self.database_name.upper() + ': database '+ str(which) + ' time evolution between ' + str(when)
             loc=list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
 
@@ -197,7 +197,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['title'] = self.database_name.upper() + ' database: ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
+            kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
