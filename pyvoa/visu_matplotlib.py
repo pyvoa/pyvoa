@@ -62,20 +62,34 @@ class visu_matplotlib:
         set_matplotlib_backend()
 
     def decomatplotlib(func):
-        def wrapper(self,**kwargs):
+        def wrapper(self, **kwargs):
             title = kwargs.get('title')
             im = mpimg.imread(kwargs['logo'])
             h, w = im.shape[:2]
-            fig, ax = plt.subplots(1, 1,figsize=(10, 5))
+
+            fig, ax = plt.subplots(1, 1, figsize=(10, 5))
             ax.set_title(title)
+
+            # Scale logo to ~15% of figure width
+            logo_width = int(0.40 * fig.get_figwidth() * fig.dpi)
+            logo_height = int(logo_width * h / w)  # Maintain aspect ratio
+
             fig_w, fig_h = fig.get_size_inches() * fig.dpi
-            xo = int(0.25*(fig_w-w))
-            yo = int(0.3 * fig_h)
-            fig.figimage(im, xo=0, yo=0, alpha=.1)
+            xo = int(fig_w - logo_width - 20)    # 20px margin from right
+            yo = int(fig_h - logo_height - 20)   # 20px margin from top
+
+            # Resize the image to match calculated dimensions
+            from PIL import Image
+            pil_im = Image.fromarray((im * 255).astype('uint8'))
+            im_resized = pil_im.resize((logo_width, logo_height))
+            im_resized = np.array(im_resized) / 255.0
+
+            fig.figimage(im_resized, xo=0, yo=0.5*yo, alpha=0.1)
+
             kwargs['fig'] = fig
             kwargs['ax'] = ax
             kwargs['plt'] = plt
-            return func(self,**kwargs)
+            return func(self, **kwargs)
         return wrapper
 
     @decomatplotlib
