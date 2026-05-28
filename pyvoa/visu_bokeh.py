@@ -1148,6 +1148,7 @@ class visu_bokeh:
         x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
         for axis_type in ["linear", "loglog"]:
             fig = dfigures[axis_type]
+            fig.yaxis.axis_label = 'frequency'
             if axis_type == 'loglog':
                 x_axis_type, y_axis_type = 'log', 'log'
                 axis_type_title = 'loglog'
