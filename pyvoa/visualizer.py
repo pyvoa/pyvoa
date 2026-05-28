@@ -222,8 +222,6 @@ class AllVisu:
             vis = kwargs.get('vis')
             input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
             kwargs['input'] = input
-            if kwargs['dateslider'] and vis != 'bokeh':
-                raise PyvoaError('dateslider available only visu Bokeh')
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -339,7 +337,7 @@ class AllVisu:
         input = kwargs.get('input')
         if vis != 'bokeh' and kwargs['dateslider']:
             kwargs.pop("dateslider")
-            PyvoaWarning("Only avalaible for vis='bokeh' dummy argument")
+            raise PyvoaError("Only avalaible for vis='bokeh' dummy argument")
         if 'geometry' not in list(input.columns):
             raise PyvoaError('No geometry in you pandas, map can not be called ...')
         if vis == 'matplotlib':

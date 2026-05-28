@@ -34,6 +34,7 @@ import copy
 import datetime as dt
 import matplotlib.dates as mdates
 from pyvoa.jsondb_parser import MetaInfo
+from pyvoa.kwarg_options import InputOption
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
@@ -43,6 +44,7 @@ class visu_matplotlib:
     '''
     def __init__(self,):
         import matplotlib
+        self.av = InputOption()
         def set_matplotlib_backend():
             try:
                 from IPython import get_ipython
@@ -210,23 +212,93 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_histo(self,**kwargs):
-        '''
-        matplotlib vertical histo
-        '''
-        input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
-        bins=len(input['where'])+1
-        input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
-        color_sumothers = "#000000"
-        color_others = "#1f77b4"
-        unique_items = sorted(input["where"].unique())
-        input = pd.pivot_table(input,index='date', columns='where', values=what)
-        ax = input.plot.hist(bins=bins, alpha=0.5,title = title,ax=ax)
-        handles, labels = ax.get_legend_handles_labels()
-        ax.legend(handles, input.columns, title="Where")
+        input_df = kwargs.get('input').copy()
+        bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
+        which = kwargs.get('which')
+
+        if isinstance(which, list):
+            which = which[0]
+
+        # bins
+        min_val = input_df[which].min()
+        max_val = input_df[which].max()
+
+        if not bins:
+            bins = 11
+
+        edges = np.linspace(min_val, max_val, bins + 1)
+
+        # assign bins
+        input_df["bin"] = pd.cut(input_df[which], bins=edges, include_lowest=True)
+
+        # pivot: bin x country
+        pivot = (
+            input_df
+            .groupby(["bin", "where"])
+            .size()
+            .unstack(fill_value=0)
+            .sort_index()
+        )
+
+        countries = pivot.columns
+        colors = plt.cm.tab20(np.linspace(0, 1, len(countries)))
+
+        x = np.arange(len(pivot))
+        bottom = np.zeros(len(pivot))
+
+        for i, country in enumerate(countries):
+            ax.bar(
+                x,
+                pivot[country].values,
+                bottom=bottom,
+                label=country,
+                color=colors[i],
+                alpha=0.85
+            )
+            bottom += pivot[country].values
+
+        # -------------------------
+        # AXE X en LOG (puissance de 10)
+        # -------------------------
+        def format_sci(x):
+            if x <= 0:
+                return ""
+
+            exp = int(np.floor(np.log10(x)))
+            mant = x / 10**exp
+
+            # arrondi propre
+            mant = np.round(mant, 1)
+
+            if mant == 1:
+                return rf"$10^{{{exp}}}$"
+            else:
+                return rf"${mant:g}\times10^{{{exp}}}$"
+
+        centers = np.array([(edges[i] + edges[i+1]) / 2 for i in range(len(edges)-1)])
+        mask = centers > 0
+        ax.set_xticks(x[mask])
+
+        ax.set_xticklabels([format_sci(c) for c in centers[mask]])
+
+        ax.set_xlabel(which)
+        ax.set_ylabel("frequency")
+
+        # -------------------------
+        # LÉGENDE À L'EXTÉRIEUR
+        # -------------------------
+        ax.legend(
+            title="Country",
+            bbox_to_anchor=(1.05, 1),
+            loc="upper left",
+            borderaxespad=0
+        )
+
+        #plt.tight_layout()
         return ax
 
     @decomatplotlib
