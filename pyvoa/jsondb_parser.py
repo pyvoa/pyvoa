@@ -262,25 +262,27 @@ class DataParser:
       self.url = []
       self.keyword_definition = {}
       self.keyword_url = {}
+      pdata = pd.DataFrame()
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
-          pdata = pd.DataFrame(datasets['columns'])
-          if 'alias' in list(pdata.columns):
+          pdatatemp = pd.DataFrame(datasets['columns'])
+
+          if 'alias' in list(pdatatemp.columns):
              # pdata.alias.fillna(pdata.name, inplace=True)
-              pdata["alias"] = pdata["alias"].fillna(pdata["name"])
+              pdatatemp["alias"] = pdatatemp["alias"].fillna(pdatatemp["name"])
           else:
-              pdata['alias'] = pdata['name']
-          if 'description' in list(pdata.columns):
-               pdata['description'] = pdata['description'].fillna(value='No description')
+              pdatatemp['alias'] = pdatatemp['name']
+          if 'description' in list(pdatatemp.columns):
+               pdatatemp['description'] = pdatatemp['description'].fillna(value='No description')
           else:
-              pdata['description'] = 'No description'
+              pdatatemp['description'] = 'No description'
 
-          if 'cumulative' in list(pdata.columns):
-             pdata['cumulative'] = pdata['cumulative'].fillna(value=False)
+          if 'cumulative' in list(pdatatemp.columns):
+             pdatatemp['cumulative'] = pdatatemp['cumulative'].fillna(value=False)
           else:
-            pdata['cumulative'] = False
+            pdatatemp['cumulative'] = False
 
-          usecols = pdata.alias.to_list()
+          usecols = pdatatemp.alias.to_list()
           selections = None
           if 'selections' in list(datasets.keys()):
               selections = datasets['selections']
@@ -305,10 +307,11 @@ class DataParser:
           if 'decimal' in list(datasets.keys()):
              decimal=datasets['decimal']
           rename_columns = None
-          if 'alias' in list(pdata.columns) and 'name' in list(pdata.columns):
-            rename_columns = pdata.set_index('alias')['name'].to_dict()
+          if 'alias' in list(pdatatemp.columns) and 'name' in list(pdatatemp.columns):
+            rename_columns = pdatatemp.set_index('alias')['name'].to_dict()
 
-          kd = pdata.loc[~pdata.name.isin(['where','date'])].set_index('name')['description'].to_dict()
+          kd = pdatatemp.loc[~pdatatemp.name.isin(['where','date'])].set_index('name')['description'].to_dict()
+
           for k,v in kd.items():
               self.keyword_definition[k]=v
               self.keyword_url[k]=url
@@ -326,7 +329,10 @@ class DataParser:
               #pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
                             keep_default_na = False, na_values = na_values , header=0, dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
-
+              if pdata.empty:
+                 pdata = pdatatemp.copy()
+              else:
+                 pdata=pd.concat([pdata,pdatatemp])
           except:
               raise PyvoaError('Something went wrong during the parsing')
 
@@ -389,6 +395,7 @@ class DataParser:
       pandas_db = fill_missing_dates(pandas_db)
 
       coltocumul = pdata.loc[pdata['cumulative'], 'name'].to_list()
+
       if coltocumul:
           where_conditions = pdata.loc[pdata['name'] == 'where', 'name']
           if not where_conditions.empty:
@@ -396,6 +403,7 @@ class DataParser:
               pandas_db[coltocumul] = pandas_db.groupby(wh)[coltocumul].cumsum()
           else:
               pandas_db[coltocumul] = pandas_db[coltocumul].apply(pd.to_numeric, errors='coerce')
+
               pandas_db[coltocumul] = pandas_db[coltocumul].cumsum()
 
       pandas_db = pandas_db.sort_values(['where','date'])
