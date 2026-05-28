@@ -387,6 +387,9 @@ class front:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:
                 if func.__name__ in ['hist','map']:
+                    if z['dateslider'] and self.vis != 'bokeh':
+                        raise PyvoaError('dateslider available only visu Bokeh')
+
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
 
