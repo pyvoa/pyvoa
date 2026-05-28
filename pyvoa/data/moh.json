@@ -16,11 +16,12 @@
 		   "name":"where",
     		   "alias":"state"	
 			},
+			{"name":"date"},
 			{
-			"name":"date"
-             	       },
-		       {"name":"cases_new"},
-		       {"name":"cases_active","cumulative":true}
+			       "name":"tot_cases",
+			       "alias":"cases_new",
+			       "cumulative":true
+		       }
 	 ]
 	},
 {
@@ -32,10 +33,12 @@
                    "name":"where",
                    "alias":"state"                
                         },
-                        {
-                        "name":"date"
-                       },
-                       {"name":"deaths_new"}
+                        {"name":"date"},
+			{
+			       "name":"tot_deaths",
+			       "alias":"deaths_new",
+			       "cumulative":true
+		       }
          ]
         },
 	{
@@ -47,9 +50,7 @@
                    "name":"where",
                    "alias":"state"
                         },
-                        {
-                        "name":"date"
-                       },
+			 {"name":"date"},
 		       {"name":"beds_icu_covid"}
 	 ]
         },
@@ -62,9 +63,7 @@
                    "name":"where",
                    "alias":"state"
                         },
-                        {
-                        "name":"date"
-                       },
+			 {"name":"date"},
                        {"name":"vax","alias":"daily_partial"}
 	 ]
 	}
