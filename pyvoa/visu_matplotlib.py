@@ -288,17 +288,12 @@ class visu_matplotlib:
         ax.set_xlabel(which)
         ax.set_ylabel("frequency")
 
-        # -------------------------
-        # LÉGENDE À L'EXTÉRIEUR
-        # -------------------------
         ax.legend(
             title="Country",
             bbox_to_anchor=(1.05, 1),
             loc="upper left",
             borderaxespad=0
         )
-
-        #plt.tight_layout()
         return ax
 
     @decomatplotlib
