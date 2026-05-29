@@ -250,7 +250,7 @@ class visu_bokeh:
                 input_dates = input.copy()
 
             invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette = Viridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
+            color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
             color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
                         border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
@@ -348,12 +348,12 @@ class visu_bokeh:
                             }
 
                             const labelMap = new Map();
-                            const total = sourcehisto.data[which].map(Number).reduce((a, b) => a + b, 0);
+                            const total = sourcehisto.data['top'].map(Number).reduce((a, b) => a + b, 0);
                             const angles = new Array(len);
                             console.log(sourcehisto.data['where']);
                             for (let j = 0; j < len; j++) {
                                 const w = String(sourcehisto.data['where'][j] || '');
-                                const where_val = w.length > 10 ? w.slice(0, 10) + '...' : w;
+                                const where_val = w.length > maxlettersdisplay ? w.slice(0, maxlettersdisplay) + '...' : w;
                                 //const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay)+'...';
                                 console.log(where_val);
                                 sourcehisto.data['top'][j]    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
@@ -364,10 +364,10 @@ class visu_bokeh:
                                 if (!Number.isFinite(pos)) continue;
                                 labelMap.set(pos, String(where_val));
 
-                                sourcehisto.data['angle'][j] =  (sourcehisto.data[which][j] / total) * 2 * Math.PI;
+                                sourcehisto.data['angle'][j] =  (sourcehisto.data['top'][j] / total) * 2 * Math.PI;
                                 sourcehisto.data['textdisplayed'][j] = sourcehisto.data['where'].map(w =>
                                 String(w).padStart(36, " "))[j];
-                                const value = sourcehisto.data[which][j];
+                                const value = sourcehisto.data['top'][j];
                                 const percent = (total === 0) ? 0 : (100 * value / total);
                                 sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
                             }
@@ -471,7 +471,7 @@ class visu_bokeh:
                 kwargs['yrange']=yrange
 
             kwargs['columndatasrc'] = columndatasrc
-            kwargs['color_mapper']=color_mapper
+            kwargs['color_mapper'] = color_mapper
             kwargs['input'] = input
             return func(self, **kwargs)
         return inner_decodateslider
