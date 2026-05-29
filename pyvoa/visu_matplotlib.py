@@ -303,7 +303,7 @@ class visu_matplotlib:
         import numpy as np
         import contextily as cx
         from matplotlib.ticker import ScalarFormatter
-
+        cmap = plt.cm.get_cmap("viridis").reversed()
         ax = kwargs.get('ax')
         ax.axis('off')
 
@@ -324,6 +324,7 @@ class visu_matplotlib:
             column=which,
             ax=ax,
             legend=True,
+            cmap=cmap,
             vmin=min_col,
             vmax=max_col,
             legend_kwds={
