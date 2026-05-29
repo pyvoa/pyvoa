@@ -333,6 +333,7 @@ class visu_matplotlib:
             maxx += padding_x
             miny -= padding_y
             maxy += padding_y
+            
         ax.set_xlim(minx, maxx)
         ax.set_ylim(miny, maxy)
         what = kwargs.get('what')
@@ -399,5 +400,5 @@ class visu_matplotlib:
 
         else:
             PyvoaError("Don't know what kind of tile it is...")
-       
+
         return ax
