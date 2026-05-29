@@ -301,13 +301,13 @@ class visu_bokeh:
                 slider_callback = CustomJS(
                         args=dict(
                             frames=frames,
-                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else None,
+                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else columndatasrc,
                             sourcehisto=columndatasrc,
                             which=which,
                             dates=unique_dates,
                             div=date_display,
                             maxcountrydisplay=maxcountrydisplay,
-                            maxlettersdisplay=maxlettersdisplay,
+                            maxlettersdisplay=10,#maxlettersdisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
                             ymax = ymax,
@@ -336,14 +336,13 @@ class visu_bokeh:
                             color_mapperjs.low=Math.min.apply(Math, values);
                             color_mapperjs.high=Math.max.apply(Math, values);
                             sourcemap.change.emit();
-                            console.log(sourcemap.data['cases'],Math.max.apply(Math, sourcemap.data['cases']));
                             // For HISTO
                             const len = sourcehisto.data[which].length;
                             const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
-                            const limited = sorted_rows.slice(0, maxcountrydisplay);
+                            const limited = sorted_rows.slice(0, len);//maxcountrydisplay);
                             const allColumns = Object.keys(sourcehisto.data);
 
-                             for (const col of allColumns) {
+                            for (const col of allColumns) {
                                 const limited_col = limited.map(r => r[col]);
                                 sourcehisto.data[col] = limited_col;
                             }
@@ -351,9 +350,12 @@ class visu_bokeh:
                             const labelMap = new Map();
                             const total = sourcehisto.data[which].map(Number).reduce((a, b) => a + b, 0);
                             const angles = new Array(len);
-
+                            console.log(sourcehisto.data['where']);
                             for (let j = 0; j < len; j++) {
-                                const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay);
+                                const w = String(sourcehisto.data['where'][j] || '');
+                                const where_val = w.length > 10 ? w.slice(0, 10) + '...' : w;
+                                //const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay)+'...';
+                                console.log(where_val);
                                 sourcehisto.data['top'][j]    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
                                 sourcehisto.data['bottom'][j] = ymax * (maxcountrydisplay - j) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay;
                                 sourcehisto.data['horihistotexty'] = sourcehisto.data['bottom'][j] + 0.5 * ymax / maxcountrydisplay;
@@ -368,8 +370,8 @@ class visu_bokeh:
                                 const value = sourcehisto.data[which][j];
                                 const percent = (total === 0) ? 0 : (100 * value / total);
                                 sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
-                                console.log(sourcehisto.data['textdisplayed2'][j]);
                             }
+
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
                             sourcehisto.change.emit();
