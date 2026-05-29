@@ -301,7 +301,7 @@ class visu_bokeh:
                 slider_callback = CustomJS(
                         args=dict(
                             frames=frames,
-                            sourcemap=geocolumndatasrc,
+                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else None,
                             sourcehisto=columndatasrc,
                             which=which,
                             dates=unique_dates,
@@ -368,11 +368,11 @@ class visu_bokeh:
                                 const value = sourcehisto.data[which][j];
                                 const percent = (total === 0) ? 0 : (100 * value / total);
                                 sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
+                                console.log(sourcehisto.data['textdisplayed2'][j]);
                             }
                             ylabellinear.major_label_overrides = labelMap;
                             ylabellog.major_label_overrides    = labelMap;
                             sourcehisto.change.emit();
-
                             div.text = '<b>' + dates[i] + '</b>';
                         """
                     )
@@ -1145,9 +1145,12 @@ class visu_bokeh:
     @deco_bokeh
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
+        input = kwargs.get('input')
+        columndatasrc = kwargs.get('columndatasrc')
+        which = kwargs.get('which')
+
         mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
-        columndatasrc = kwargs.get('columndatasrc')
         controls = kwargs.get('controls', None)
         maxletters = kwargs['maxlettersdisplay']
         title = kwargs['title']

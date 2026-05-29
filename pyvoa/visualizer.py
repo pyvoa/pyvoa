@@ -296,6 +296,10 @@ class AllVisu:
         '''
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
+        which = kwargs.get('which')
+        if isinstance(which, list):
+            which = which[0]
+            kwargs['which'] = which
         if vis == 'matplotlib':
             if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)
@@ -335,6 +339,11 @@ class AllVisu:
         '''
         vis = kwargs.get('vis')
         input = kwargs.get('input')
+        which = kwargs.get('which')
+        if isinstance(which, list):
+            which = which[0]
+            kwargs['which'] = which
+
         if vis != 'bokeh' and kwargs['dateslider']:
             kwargs.pop("dateslider")
             raise PyvoaError("Only avalaible for vis='bokeh' dummy argument")
