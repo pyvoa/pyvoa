@@ -222,7 +222,7 @@ class visu_matplotlib:
         input_df = kwargs.get('input').copy()
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which = kwargs.get('which')
-
+        print(which)
         # bins
         min_val = input_df[which].min()
         max_val = input_df[which].max()
