@@ -231,7 +231,6 @@ class visu_matplotlib:
             bins = 11
 
         edges = np.linspace(min_val, max_val, bins + 1)
-
         # assign bins
         input_df["bin"] = pd.cut(input_df[which], bins=edges, include_lowest=True)
 
@@ -285,16 +284,9 @@ class visu_matplotlib:
         ])
 
         x = np.arange(len(centers))
-
-        mask = centers > 0
-
-        ax.set_xticks(x[mask])
-
-        ax.set_xticklabels([format_sci(c) for c in centers[mask]])
-
+        ax.set_xticklabels([format_sci(c) for c in centers])
         ax.set_xlabel(which)
         ax.set_ylabel("frequency")
-
         ax.legend(
             title="Country",
             bbox_to_anchor=(1.05, 1),
