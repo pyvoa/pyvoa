@@ -41,6 +41,8 @@ import numpy as np
 import warnings
 from pyvoa.error import *
 import pickle
+import math
+
 # testing if pyvoa.ata is available
 import importlib
 _coacache_folder=''
@@ -523,6 +525,52 @@ def dumppkl(filepkl,whattodump):
    with open(filepkl, 'wb') as f:
         pickle.dump(whattodump,f)
 
+@staticmethod
+def min_max_range(a_min, a_max):
+    """ Return a cleverly rounded min and max giving raw min and raw max of data.
+    Usefull for hist range and colormap
+    """
+    min_p = 0
+    max_p = 0
+    if a_min != 0:
+        min_p = math.floor(math.log10(math.fabs(a_min)))  # power
+    if a_max != 0:
+        max_p = math.floor(math.log10(math.fabs(a_max)))
+
+    if a_min == 0:
+        if a_max == 0:
+            p = 0
+        else:
+            p = max_p
+    else:
+        if a_max == 0:
+            p = min_p
+        else:
+            p = max(min_p, max_p)
+
+    if a_min != 0:
+        min_r = math.floor(a_min / 10 ** (p - 1)) * 10 ** (p - 1)  # min range rounded
+    else:
+        min_r = 0
+
+    if a_max != 0:
+        max_r = math.ceil(a_max / 10 ** (p - 1)) * 10 ** (p - 1)
+    else:
+        max_r = 0
+
+    if min_r == max_r:
+        if min_r == 0:
+            min_r = -1
+            max_r = 1
+            k = 0
+        elif max_r > 0:
+            k = 0.1
+        else:
+            k = -0.1
+        max_r = (1 + k) * max_r
+        min_r = (1 - k) * min_r
+
+    return (min_r, max_r)
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
