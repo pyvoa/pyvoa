@@ -459,7 +459,7 @@ class DataParser:
           pandas_db['where'] = pandas_db['where'].str.upper()
           namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
-
+      
       else:
           PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:

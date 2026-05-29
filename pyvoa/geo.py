@@ -1487,9 +1487,9 @@ class GeoCountry():
             p=[]
 
             for index,row in self._country_data.iterrows():
-                if row.prov_name_n is not None:
+                if isinstance(row.prov_name_n,str) and row.prov_name_n is not None:
                     p0=row.prov_name_n
-                elif row.prov_name_f is not None:
+                elif isinstance(row.prov_name_f,str) and row.prov_name_f is not None:
                     p0=row.prov_name_f
                 else:
                     p0=row.region
