@@ -38,6 +38,9 @@ from pyvoa.kwarg_options import InputOption
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
+from pyvoa.tools import (
+    min_max_range,
+)
 class visu_matplotlib:
     '''
         MATPLOTLIB chart drawing methods ...
@@ -220,9 +223,6 @@ class visu_matplotlib:
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which = kwargs.get('which')
 
-        if isinstance(which, list):
-            which = which[0]
-
         # bins
         min_val = input_df[which].min()
         max_val = input_df[which].max()
@@ -301,30 +301,77 @@ class visu_matplotlib:
         '''
          matplotlib map display
         '''
+        import numpy as np
         import contextily as cx
+        from matplotlib.ticker import ScalarFormatter
+
         ax = kwargs.get('ax')
         ax.axis('off')
-        input = kwargs.get('input')
+
+        input = kwargs.get('input').copy()
+
         what = kwargs.get('what')
+        which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
-        input.plot(column = what, ax=ax,legend=True,
-                                legend_kwds={'label': what,
-                                'orientation': "horizontal","pad": 0.01, 'shrink': 0.5})
+
+        # color range
+        min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
+        # projection
+        input = input.to_crs(epsg=3857)
+
+        # plot
+        plot = input.plot(
+            column=which,
+            ax=ax,
+            legend=True,
+            vmin=min_col,
+            vmax=max_col,
+            legend_kwds={
+                'label': which,
+                'orientation': "horizontal",
+                'pad': 0.01,
+                'shrink': 0.5
+            }
+        )
+
+        cbar = plot.get_figure().axes[-1]
+        formatter = ScalarFormatter(useMathText=True)
+        formatter.set_scientific(True)
+        formatter.set_powerlimits((-2, 3))
+
+        cbar.xaxis.set_major_formatter(formatter)
+        cbar.tick_params(labelsize=8)
+
         ax.set_axis_off()
         ax.set_title(title)
-        input = input.to_crs(epsg=3857)
+
+        # basemap
         if tile == 'openstreet':
-            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.OpenStreetMap.Mapnik)
+            cx.add_basemap(
+                ax,
+                crs=input.crs.to_string(),
+                source=cx.providers.OpenStreetMap.Mapnik
+            )
+
         elif tile == 'esri':
-            PyvoaWarning("Problem occurs wiht esri and matplolib use default tile ....")
-            #cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Esri.WorldImagery)
+            PyvoaWarning(
+                "Problem occurs with esri and matplotlib, using default tile..."
+            )
+
         elif tile == 'stamen':
-            #cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.Stamen.TonerLite)
-            PyvoaWarning("Couldn't find stamen for matplolib use default tile ....")
+            PyvoaWarning(
+                "Couldn't find stamen for matplotlib, using default tile..."
+            )
+
         elif tile == 'positron':
-            cx.add_basemap(ax, crs=input.crs.to_string(), source=cx.providers.CartoDB.PositronNoLabels)
+            cx.add_basemap(
+                ax,
+                crs=input.crs.to_string(),
+                source=cx.providers.CartoDB.PositronNoLabels
+            )
+
         else:
-            PyvoaError("Don't know what kind of tile is it ...")
+            PyvoaError("Don't know what kind of tile it is...")
 
         return ax

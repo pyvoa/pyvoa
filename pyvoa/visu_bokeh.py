@@ -18,7 +18,8 @@ About :
 from pyvoa.tools import (
     extract_dates,
     verb,
-    fill_missing_dates
+    fill_missing_dates,
+    min_max_range,
 )
 from pyvoa.error import *
 import math
@@ -123,53 +124,6 @@ class visu_bokeh:
         self.figure_height = 400
         self.figure_width = 490
         self.listfigs = None
-
-    @staticmethod
-    def min_max_range(a_min, a_max):
-        """ Return a cleverly rounded min and max giving raw min and raw max of data.
-        Usefull for hist range and colormap
-        """
-        min_p = 0
-        max_p = 0
-        if a_min != 0:
-            min_p = math.floor(math.log10(math.fabs(a_min)))  # power
-        if a_max != 0:
-            max_p = math.floor(math.log10(math.fabs(a_max)))
-
-        if a_min == 0:
-            if a_max == 0:
-                p = 0
-            else:
-                p = max_p
-        else:
-            if a_max == 0:
-                p = min_p
-            else:
-                p = max(min_p, max_p)
-
-        if a_min != 0:
-            min_r = math.floor(a_min / 10 ** (p - 1)) * 10 ** (p - 1)  # min range rounded
-        else:
-            min_r = 0
-
-        if a_max != 0:
-            max_r = math.ceil(a_max / 10 ** (p - 1)) * 10 ** (p - 1)
-        else:
-            max_r = 0
-
-        if min_r == max_r:
-            if min_r == 0:
-                min_r = -1
-                max_r = 1
-                k = 0
-            elif max_r > 0:
-                k = 0.1
-            else:
-                k = -0.1
-            max_r = (1 + k) * max_r
-            min_r = (1 - k) * min_r
-
-        return (min_r, max_r)
 
     @staticmethod
     def rollerJS():
@@ -504,7 +458,7 @@ class visu_bokeh:
                 bokeh_figure_map.y_range.start = ymin - pad_y
                 bokeh_figure_map.y_range.end   = ymax + pad_y
 
-                min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
+                min_col, max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
 
                 bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
@@ -1428,7 +1382,7 @@ class visu_bokeh:
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
 
-        min_col, max_col = visu_bokeh().min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
+        min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
 
         invViridis256 = Viridis256[::-1]
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
