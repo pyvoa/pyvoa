@@ -206,6 +206,19 @@ class visu_bokeh:
             return func(self, **kwargs)
         return innerdeco_bokeh
 
+    @staticmethod
+    def geosource_bounds(geosource):
+        import json
+        from shapely.geometry import shape
+        data = json.loads(geosource.geojson)
+        xs, ys = [], []
+        for feature in data["features"]:
+            geom = shape(feature["geometry"])
+            x_min, y_min, x_max, y_max = geom.bounds
+            xs += [x_min, x_max]
+            ys += [y_min, y_max]
+        return min(xs), min(ys), max(xs), max(ys)
+
     def decodateslider(func):
         @wraps(func)
         def inner_decodateslider(self, **kwargs):
@@ -250,7 +263,7 @@ class visu_bokeh:
                 input_dates = input.copy()
 
             invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
+            color_mapper = LinearColorMapper(palette = Viridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
             color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
                         border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
@@ -430,30 +443,30 @@ class visu_bokeh:
                 input_dates = self.addcolumnspie(input_dates,which)
                 columndatasrc = ColumnDataSource(data = input_dates)
 
-            def geosource_bounds(geosource):
-                import json
-                from shapely.geometry import shape
-                data = json.loads(geosource.geojson)
-                xs, ys = [], []
-                for feature in data["features"]:
-                    geom = shape(feature["geometry"])
-                    x_min, y_min, x_max, y_max = geom.bounds
-                    xs += [x_min, x_max]
-                    ys += [y_min, y_max]
-                return min(xs), min(ys), max(xs), max(ys)
-
             if func.__name__ == 'bokeh_map':
-                xmin, ymin, xmax, ymax = geosource_bounds(geocolumndatasrc)
-                pad_x = (xmax - xmin) * 0.05
-                pad_y = (ymax - ymin) * 0.05
-                bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
-                bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
-
-                ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
-                if ratio < 1:  # Wider than tall
-                    bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
-                else:  # Taller than wide
-                    bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
+                xmin, ymin, xmax, ymax = visu_bokeh().geosource_bounds(geocolumndatasrc)
+                gdf = input.to_crs(epsg=3857)
+                pad_x,pad_y=0.,0.
+                if len(gdf) > 10:
+                    pad_x = (xmax - xmin) * 0.05
+                    pad_y = (ymax - ymin) * 0.05
+                    bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
+                    bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
+                    ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
+                    if ratio < 1:  # Wider than tall
+                        bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
+                    else:  # Taller than wide
+                        bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
+                else:
+                    zoom = 2
+                    dx = (xmax - xmin)
+                    dy = (ymax - ymin)
+                    padding_x = dx * zoom
+                    padding_y = dy * zoom
+                    xmin -= padding_x
+                    xmax += padding_x
+                    ymin -= padding_y
+                    ymax += padding_y
 
                 bokeh_figure_map.x_range.start = xmin - pad_x
                 bokeh_figure_map.x_range.end   = xmax + pad_x
