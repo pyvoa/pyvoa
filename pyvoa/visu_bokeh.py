@@ -493,7 +493,6 @@ class visu_bokeh:
                 bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
                 bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
 
-                # ✅ Use the ratio to adjust figure dimensions
                 ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
                 if ratio < 1:  # Wider than tall
                     bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
@@ -794,7 +793,7 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
 
         if len(input['where'].unique()) > 1 :
-            print('Can only display spiral for ONE location. I took the first one:', input['where'][0])
+            PyvoaError('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
         input["dayofyear"]=input.date.dt.dayofyear
         input['year']=input.date.dt.year
@@ -831,7 +830,14 @@ class visu_bokeh:
         ))
         bokeh_figure.line( x = 'x', y = 'y', source = pyvoa, legend_label = which[0] +', '+ input['where'][0],
                         line_width = 3, line_color = 'blue')
-        circle = bokeh_figure.circle('x', 'y', size=2, source=pyvoa)
+        circle = bokeh_figure.scatter(
+                x='x',
+                y='y',
+                size=2,
+                color='red',
+                marker='circle',
+                source=pyvoa
+            )
 
         cases_custom = visu_bokeh().rollerJS()
         hover_tool = HoverTool(tooltips=[('Cases', '@cases{0,0.0}'), ('date', '@date{%F}')],
