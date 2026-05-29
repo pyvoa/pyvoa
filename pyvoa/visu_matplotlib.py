@@ -222,7 +222,7 @@ class visu_matplotlib:
         input_df = kwargs.get('input').copy()
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which = kwargs.get('which')
-        print(which)
+
         # bins
         min_val = input_df[which].min()
         max_val = input_df[which].max()
@@ -279,8 +279,15 @@ class visu_matplotlib:
             else:
                 return rf"${mant:g}\times10^{{{exp}}}$"
 
-        centers = np.array([(edges[i] + edges[i+1]) / 2 for i in range(len(edges)-1)])
+        centers = np.array([
+            (edges[i] + edges[i+1]) / 2
+            for i in range(len(edges)-1)
+        ])
+
+        x = np.arange(len(centers))
+
         mask = centers > 0
+
         ax.set_xticks(x[mask])
 
         ax.set_xticklabels([format_sci(c) for c in centers[mask]])
