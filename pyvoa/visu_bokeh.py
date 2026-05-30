@@ -328,6 +328,8 @@ class visu_bokeh:
                             maxlettersdisplay=10,#maxlettersdisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
+                            ticker_linear=bokeh_figure_linear.yaxis[0].ticker,
+                            ticker_log=bokeh_figure_log.yaxis[0].ticker,
                             ymax = ymax,
                             color_mapperjs = color_mapper
                         ),
