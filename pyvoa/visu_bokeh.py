@@ -309,7 +309,12 @@ class visu_bokeh:
                 from bokeh.models import Slider, CustomJS, Div
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
+
                 from bokeh.models import CustomJS
+                from pathlib import Path
+                jsfile = Path(__file__).parent / "slider_callback.js"
+                with open(jsfile) as f:
+                    slider_code = f.read()
 
                 slider_callback = CustomJS(
                         args=dict(
@@ -323,74 +328,12 @@ class visu_bokeh:
                             maxlettersdisplay=10,#maxlettersdisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
+                            ticker_linear=bokeh_figure_linear.yaxis[0].ticker,
+                            ticker_log=bokeh_figure_log.yaxis[0].ticker,
                             ymax = ymax,
                             color_mapperjs = color_mapper
                         ),
-                        code="""
-                            const i = cb_obj.value;
-                            const frame = frames[i];
-                            const keys = Object.keys(frame);
-                            const rows = [];
-
-                            //FOR MAP
-                            for (let j = 0; j < frame[which].length; j++) {
-                                let r = {};
-                                for (const k of keys) {
-                                    r[k] = frame[k][j];
-                                }
-                                rows.push(r);
-                            }
-
-                            for (const k of keys) {
-                                sourcemap.data[k] = rows.map(r => r[k]);
-                                sourcemap.data['cases'] = sourcemap.data[which];
-                            }
-                            const values = sourcemap.data['cases'].filter(v => Number.isFinite(v));
-                            color_mapperjs.low=Math.min.apply(Math, values);
-                            color_mapperjs.high=Math.max.apply(Math, values);
-                            sourcemap.change.emit();
-                            // For HISTO
-                            const len = sourcehisto.data[which].length;
-                            const sorted_rows = rows.sort((a, b) => b[which] - a[which]);
-                            const limited = sorted_rows.slice(0, len);//maxcountrydisplay);
-                            const allColumns = Object.keys(sourcehisto.data);
-
-                            for (const col of allColumns) {
-                                const limited_col = limited.map(r => r[col]);
-                                sourcehisto.data[col] = limited_col;
-                            }
-
-                            const labelMap = new Map();
-                            const total = sourcehisto.data['top'].map(Number).reduce((a, b) => a + b, 0);
-                            const angles = new Array(len);
-                            console.log(sourcehisto.data['where']);
-                            for (let j = 0; j < len; j++) {
-                                const w = String(sourcehisto.data['where'][j] || '');
-                                const where_val = w.length > maxlettersdisplay ? w.slice(0, maxlettersdisplay) + '...' : w;
-                                //const where_val = sourcehisto.data['where'][j].slice(0, maxlettersdisplay)+'...';
-                                console.log(where_val);
-                                sourcehisto.data['top'][j]    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
-                                sourcehisto.data['bottom'][j] = ymax * (maxcountrydisplay - j) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay;
-                                sourcehisto.data['horihistotexty'] = sourcehisto.data['bottom'][j] + 0.5 * ymax / maxcountrydisplay;
-
-                                let pos = parseInt(ymax * (len - j) / len);
-                                if (!Number.isFinite(pos)) continue;
-                                labelMap.set(pos, String(where_val));
-
-                                sourcehisto.data['angle'][j] =  (sourcehisto.data['top'][j] / total) * 2 * Math.PI;
-                                sourcehisto.data['textdisplayed'][j] = sourcehisto.data['where'].map(w =>
-                                String(w).padStart(36, " "))[j];
-                                const value = sourcehisto.data['top'][j];
-                                const percent = (total === 0) ? 0 : (100 * value / total);
-                                sourcehisto.data['textdisplayed2'][j] = percent.toFixed(1) + "%";
-                            }
-
-                            ylabellinear.major_label_overrides = labelMap;
-                            ylabellog.major_label_overrides    = labelMap;
-                            sourcehisto.change.emit();
-                            div.text = '<b>' + dates[i] + '</b>';
-                        """
-                    )
+                        code=slider_code)
 
                 slider.js_on_change('value', slider_callback)
                 toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
