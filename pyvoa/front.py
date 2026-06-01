@@ -15,7 +15,8 @@ Date :    April 2020 - November 2025
 # --- Imports ----------------------------------------------------------
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
-warnings.filterwarnings("ignore", category=DeprecationWarning, module='jupyter_client')
+#warnings.filterwarnings("ignore", category=DeprecationWarning, module='jupyter_client')
+warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
 import pandas as pd
 from functools import wraps
