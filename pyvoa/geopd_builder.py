@@ -102,6 +102,9 @@ class GPDBuilder(object):
             raise PyvoaTypeError('What data base are you looking for ?')
         self.where_geodescription = where_kindgeo
 
+   def getinfodatewhich(self):
+       return self.currentdata.get_echoinfo()
+
    def getwheregeometrydescription(self):
         return self.where_geodescription
 

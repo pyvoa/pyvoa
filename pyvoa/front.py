@@ -16,7 +16,7 @@ Date :    April 2020 - November 2025
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning)
 #warnings.filterwarnings("ignore", category=DeprecationWarning, module='jupyter_client')
-warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
+#warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
 import pandas as pd
 from functools import wraps
@@ -213,6 +213,7 @@ class front:
                    self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=True,vis=visu)
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
+                print( self.gpdbuilder.getinfodatewhich())
                 coge.GeoManager('name')
         self.db = base
 
