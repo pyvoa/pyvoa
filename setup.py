@@ -24,6 +24,7 @@ setup(
         "lxml",
         "IPython",
         "contextily",
+        "html5lib",
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

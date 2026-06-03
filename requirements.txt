@@ -12,3 +12,4 @@ lxml
 wheel
 IPython
 contextily
+html5lib
