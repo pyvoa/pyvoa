@@ -219,219 +219,6 @@ class visu_bokeh:
             ys += [y_min, y_max]
         return min(xs), min(ys), max(xs), max(ys)
 
-    def decodateslider(func):
-        @wraps(func)
-        def inner_decodateslider(self, **kwargs):
-            input = kwargs['input']
-            which  = kwargs.get('which')
-            if isinstance(which,list):
-                which = which[0]
-                kwargs['which'] = which
-
-            bokeh_figure_linear = kwargs.get('bokeh_figure_linear')
-            bokeh_figure_log = kwargs.get('bokeh_figure_log')
-            bokeh_figure_map = kwargs.get('bokeh_figure_map')
-
-            dateslider = kwargs.get('dateslider')
-            if func.__name__ == 'bokeh_histo' and dateslider == True:
-                print('dateslider not implemented in this current version ...')
-                dateslider = False
-
-            maxcountrydisplay = kwargs['maxcountrydisplay']
-            maxlettersdisplay = kwargs['maxlettersdisplay']
-
-            lhist = ['bokeh_pie','bokeh_horizonhisto']
-
-            ymax = self.figure_height
-
-            if func.__name__ in lhist:
-                input = self.addcolumnshisto(input,which,maxcountrydisplay)
-                yrange = Range1d(min(input['bottom']), max(input['top']))
-
-            input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
-            input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
-
-            if func.__name__ == 'bokeh_map':
-                if func.__name__ in lhist:
-                    input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
-                input_uniquecountries['cases']=input_uniquecountries[which]
-                passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
-                convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
-                geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
-                input_dates = input.drop(columns='geometry').copy()
-            else:
-                input_dates = input.copy()
-
-            invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette = Viridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
-            color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
-                        border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
-            if dateslider:
-                input_dates = input_dates.sort_values(by=['date', 'where'])
-                input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
-                unique_dates = input_dates['date'].drop_duplicates().tolist()
-                unique_where = input_dates['where'].unique().tolist()
-                #unique_dates = [i.strftime("%d/%m/%Y") for i in unique_dates]
-                frames = []
-                cols = list(input_dates.columns)
-                frames = []
-                #unique_dates = unique_dates[::-1]
-
-                for d in unique_dates:
-                    df_d = input_dates[input_dates['date'] == d].copy()
-                    df_d['where'] = pd.Categorical(
-                        df_d['where'],
-                        categories=unique_where,
-                        ordered=True
-                    )
-                    df_d = df_d.sort_values('where')
-                    df_d = df_d[cols]
-                    if df_d.empty:
-                        frame = {c: [] for c in cols}
-                        frames.append(frame)
-                        continue
-
-                    frame = {}
-                    for c in list(df_d.columns):
-                        if c in df_d.columns:
-                            frame[c] = df_d[c].tolist()
-                        else:
-                            frame[c] = []
-                    frames.append(frame)
-
-                input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
-                if func.__name__ in lhist:
-                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplay)
-                    input_dates = self.addcolumnspie(input_dates,which)
-                    yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
-                columndatasrc = ColumnDataSource(data = input_dates)
-
-                from bokeh.models import Slider, CustomJS, Div
-                slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
-                date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
-
-                from bokeh.models import CustomJS
-                from pathlib import Path
-                jsfile = Path(__file__).parent / "slider_callback.js"
-                with open(jsfile) as f:
-                    slider_code = f.read()
-
-                slider_callback = CustomJS(
-                        args=dict(
-                            frames=frames,
-                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else columndatasrc,
-                            sourcehisto=columndatasrc,
-                            which=which,
-                            dates=unique_dates,
-                            div=date_display,
-                            maxcountrydisplay=maxcountrydisplay,
-                            maxlettersdisplay=10,#maxlettersdisplay,
-                            ylabellinear=bokeh_figure_linear.yaxis[0],
-                            ylabellog=bokeh_figure_log.yaxis[0],
-                            ticker_linear=bokeh_figure_linear.yaxis[0].ticker,
-                            ticker_log=bokeh_figure_log.yaxis[0].ticker,
-                            ymax = ymax,
-                            color_mapperjs = color_mapper
-                        ),
-                        code=slider_code)
-
-                slider.js_on_change('value', slider_callback)
-                toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
-                # CustomJS pour démarrer/arrêter l'animation
-
-                toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code="""
-                    if (cb_obj.active) {
-                        // play: démarrer interval si pas déjà présent
-                        if (!window._bokeh_play_interval) {
-                            window._bokeh_play_interval = setInterval(function() {
-                                let v = slider.value + 1;
-
-                                if (v > slider.end) {
-                                    // Stopper à la fin
-                                    clearInterval(window._bokeh_play_interval);
-                                    window._bokeh_play_interval = null;
-                                    cb_obj.active = false;
-                                    cb_obj.label = '► Play';
-                                    return;
-                                }
-                                slider.value = v; // déclenche slider_callback
-                            }, 100);
-                            cb_obj.label = '❚❚ Pause';
-                        }
-                    } else {
-                        // pause: clear interval
-                        if (window._bokeh_play_interval) {
-                            clearInterval(window._bokeh_play_interval);
-                            window._bokeh_play_interval = null;
-                        }
-                        cb_obj.label = '► Play';
-                    }
-                """)
-                toggl.js_on_change('active', toggle_callback)
-
-                from bokeh.models import Div
-                date_display = Div(text=f"<b>{unique_dates[-1]}</b>", width=300)
-                # Mettre à jour le Div depuis le slider (JS)
-                slider_date_div_cb = CustomJS(args=dict(div=date_display, dates=unique_dates),
-                code="""
-                  const i = cb_obj.value;      // index choisi
-                  div.text = "<b>" + dates[i] + "</b>";
-                  """)
-
-                slider.js_on_change('value', slider_date_div_cb)
-                controls = column(toggl, slider, date_display)
-                kwargs['controls'] = controls
-            else:
-                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
-                input_dates = self.addcolumnspie(input_dates,which)
-                columndatasrc = ColumnDataSource(data = input_dates)
-
-            if func.__name__ == 'bokeh_map':
-                xmin, ymin, xmax, ymax = visu_bokeh().geosource_bounds(geocolumndatasrc)
-                gdf = input.to_crs(epsg=3857)
-                pad_x,pad_y=0.,0.
-                if len(gdf) > 10:
-                    pad_x = (xmax - xmin) * 0.05
-                    pad_y = (ymax - ymin) * 0.05
-                    bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
-                    bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
-                    ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
-                    if ratio < 1:  # Wider than tall
-                        bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
-                    else:  # Taller than wide
-                        bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
-                else:
-                    zoom = 2
-                    dx = (xmax - xmin)
-                    dy = (ymax - ymin)
-                    padding_x = dx * zoom
-                    padding_y = dy * zoom
-                    xmin -= padding_x
-                    xmax += padding_x
-                    ymin -= padding_y
-                    ymax += padding_y
-
-                bokeh_figure_map.x_range.start = xmin - pad_x
-                bokeh_figure_map.x_range.end   = xmax + pad_x
-                bokeh_figure_map.y_range.start = ymin - pad_y
-                bokeh_figure_map.y_range.end   = ymax + pad_y
-
-                min_col, max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
-
-                bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
-                                fill_color = {'field': 'cases', 'transform': color_mapper},
-                                line_color = 'black', line_width = 0.25, fill_alpha = 1)
-                kwargs['geocolumndatasrc'] = geocolumndatasrc
-
-            if func.__name__ in lhist:
-                kwargs['yrange']=yrange
-
-            kwargs['columndatasrc'] = columndatasrc
-            kwargs['color_mapper'] = color_mapper
-            kwargs['input'] = input
-            return func(self, **kwargs)
-        return inner_decodateslider
-
     @staticmethod
     def bokeh_legend(bkfigure):
         from bokeh.models import CustomJS
@@ -456,38 +243,6 @@ class visu_bokeh:
             if not isinstance(fig,list):
                 fig = [fig]
             self.listfigs = fig
-
-    def bokeh_resume_data(self,**kwargs):
-        loc=list(input['where'].unique())
-        input['cases'] = input[which]
-        resumetype = kwargs.get('resumetype','spiral')
-        if resumetype == 'spiral':
-            dspiral={i:AllVisu.spiral(input.loc[ (input['where']==i) &
-                        (input.date >= self.when_beg) &
-                        (input.date <= self.when_end)].sort_values(by='date')) for i in loc}
-            input['resume']=input['where'].map(dspiral)
-        elif resumetype == 'spark':
-            spark={i:AllVisu.sparkline(input.loc[ (input['where']==i) &
-                        (input.date >= self.when_beg) &
-                        (input.date <= self.when_end)].sort_values(by='date')) for i in loc}
-            input['resume']=input['where'].map(spark)
-        else:
-            raise PyvoaError('bokeh_resume_data can use spiral or spark ... here what ?')
-        input = input.loc[input.date==input.date.max()].reset_index(drop=True)
-        def path_to_image_html(path):
-            return '<img pyvoa="'+ path + '" width="60" >'
-
-        input=input.apply(lambda x: x.round(2) if x.name in [which,'daily','weekly'] else x)
-        if isinstance(input['where'][0], list):
-            col=[i for i in list(input.columns) if i not in ['where','where','code']]
-            col.insert(0,'where')
-            input = input[col]
-            input=input.set_index('where')
-        else:
-           input = input.drop(columns='where')
-           input=input.set_index('where')
-
-        return input.to_html(escape=False,formatters=dict(resume=path_to_image_html))
 
     def bokeh_plot(func):
         @wraps(func)
@@ -989,6 +744,216 @@ class visu_bokeh:
         return tabs
 
     ''' VERTICAL HISTO '''
+    def decodateslider(func):
+        @wraps(func)
+        def inner_decodateslider(self, **kwargs):
+            input = kwargs['input']
+            which  = kwargs.get('which')
+            if isinstance(which,list):
+                which = which[0]
+                kwargs['which'] = which
+
+            bokeh_figure_linear = kwargs.get('bokeh_figure_linear')
+            bokeh_figure_log = kwargs.get('bokeh_figure_log')
+            bokeh_figure_map = kwargs.get('bokeh_figure_map')
+
+            dateslider = kwargs.get('dateslider')
+            if func.__name__ == 'bokeh_histo' and dateslider == True:
+                print('dateslider not implemented in this current version ...')
+                dateslider = False
+
+            maxcountrydisplay = kwargs['maxcountrydisplay']
+            maxlettersdisplay = kwargs['maxlettersdisplay']
+
+            lhist = ['bokeh_pie','bokeh_horizonhisto']
+
+            ymax = self.figure_height
+
+            if func.__name__ in lhist:
+                input = self.addcolumnshisto(input,which,maxcountrydisplay)
+                yrange = Range1d(min(input['bottom']), max(input['top']))
+
+            input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
+            input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
+
+            if func.__name__ == 'bokeh_map':
+                if func.__name__ in lhist:
+                    input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
+                input_uniquecountries['cases']=input_uniquecountries[which]
+                passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
+                convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
+                geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
+                input_dates = input.drop(columns='geometry').copy()
+            else:
+                input_dates = input.copy()
+
+            invViridis256 = Viridis256[::-1]
+            color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
+            color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
+                        border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
+            if dateslider:
+                input_dates = input_dates.sort_values(by=['date', 'where'])
+                input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
+                unique_dates = input_dates['date'].drop_duplicates().tolist()
+                unique_where = input_dates['where'].unique().tolist()
+                #unique_dates = [i.strftime("%d/%m/%Y") for i in unique_dates]
+                frames = []
+                cols = list(input_dates.columns)
+                frames = []
+                #unique_dates = unique_dates[::-1]
+
+                for d in unique_dates:
+                    df_d = input_dates[input_dates['date'] == d].copy()
+                    df_d['where'] = pd.Categorical(
+                        df_d['where'],
+                        categories=unique_where,
+                        ordered=True
+                    )
+                    df_d = df_d.sort_values('where')
+                    df_d = df_d[cols]
+                    if df_d.empty:
+                        frame = {c: [] for c in cols}
+                        frames.append(frame)
+                        continue
+
+                    frame = {}
+                    for c in list(df_d.columns):
+                        if c in df_d.columns:
+                            frame[c] = df_d[c].tolist()
+                        else:
+                            frame[c] = []
+                    frames.append(frame)
+
+                input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
+                if func.__name__ in lhist:
+                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplay)
+                    input_dates = self.addcolumnspie(input_dates,which)
+                    yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
+                columndatasrc = ColumnDataSource(data = input_dates)
+
+                from bokeh.models import Slider, CustomJS, Div
+                slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
+                date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
+
+                from bokeh.models import CustomJS
+                from pathlib import Path
+                jsfile = Path(__file__).parent / "slider_callback.js"
+                with open(jsfile) as f:
+                    slider_code = f.read()
+
+                slider_callback = CustomJS(
+                        args=dict(
+                            frames=frames,
+                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else columndatasrc,
+                            sourcehisto=columndatasrc,
+                            which=which,
+                            dates=unique_dates,
+                            div=date_display,
+                            maxcountrydisplay=maxcountrydisplay,
+                            maxlettersdisplay=10,#maxlettersdisplay,
+                            ylabellinear=bokeh_figure_linear.yaxis[0],
+                            ylabellog=bokeh_figure_log.yaxis[0],
+                            ymax = ymax,
+                            color_mapperjs = color_mapper
+                        ),
+                        code=slider_code)
+
+                slider.js_on_change('value', slider_callback)
+                toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
+                # CustomJS pour démarrer/arrêter l'animation
+
+                toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code="""
+                    if (cb_obj.active) {
+                        // play: démarrer interval si pas déjà présent
+                        if (!window._bokeh_play_interval) {
+                            window._bokeh_play_interval = setInterval(function() {
+                                let v = slider.value + 1;
+
+                                if (v > slider.end) {
+                                    // Stopper à la fin
+                                    clearInterval(window._bokeh_play_interval);
+                                    window._bokeh_play_interval = null;
+                                    cb_obj.active = false;
+                                    cb_obj.label = '► Play';
+                                    return;
+                                }
+                                slider.value = v; // déclenche slider_callback
+                            }, 100);
+                            cb_obj.label = '❚❚ Pause';
+                        }
+                    } else {
+                        // pause: clear interval
+                        if (window._bokeh_play_interval) {
+                            clearInterval(window._bokeh_play_interval);
+                            window._bokeh_play_interval = null;
+                        }
+                        cb_obj.label = '► Play';
+                    }
+                """)
+                toggl.js_on_change('active', toggle_callback)
+
+                from bokeh.models import Div
+                date_display = Div(text=f"<b>{unique_dates[-1]}</b>", width=300)
+                # Mettre à jour le Div depuis le slider (JS)
+                slider_date_div_cb = CustomJS(args=dict(div=date_display, dates=unique_dates),
+                code="""
+                  const i = cb_obj.value;      // index choisi
+                  div.text = "<b>" + dates[i] + "</b>";
+                  """)
+
+                slider.js_on_change('value', slider_date_div_cb)
+                controls = column(toggl, slider, date_display)
+                kwargs['controls'] = controls
+            else:
+                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
+                input_dates = self.addcolumnspie(input_dates,which)
+                columndatasrc = ColumnDataSource(data = input_dates)
+
+            if func.__name__ == 'bokeh_map':
+                xmin, ymin, xmax, ymax = visu_bokeh().geosource_bounds(geocolumndatasrc)
+                gdf = input.to_crs(epsg=3857)
+                pad_x,pad_y=0.,0.
+                if len(gdf) > 10:
+                    pad_x = (xmax - xmin) * 0.05
+                    pad_y = (ymax - ymin) * 0.05
+                    bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
+                    bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
+                    ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
+                    if ratio < 1:  # Wider than tall
+                        bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
+                    else:  # Taller than wide
+                        bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
+                else:
+                    zoom = 2
+                    dx = (xmax - xmin)
+                    dy = (ymax - ymin)
+                    padding_x = dx * zoom
+                    padding_y = dy * zoom
+                    xmin -= padding_x
+                    xmax += padding_x
+                    ymin -= padding_y
+                    ymax += padding_y
+
+                bokeh_figure_map.x_range.start = xmin - pad_x
+                bokeh_figure_map.x_range.end   = xmax + pad_x
+                bokeh_figure_map.y_range.start = ymin - pad_y
+                bokeh_figure_map.y_range.end   = ymax + pad_y
+
+                min_col, max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
+
+                bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
+                                fill_color = {'field': 'cases', 'transform': color_mapper},
+                                line_color = 'black', line_width = 0.25, fill_alpha = 1)
+                kwargs['geocolumndatasrc'] = geocolumndatasrc
+
+            if func.__name__ in lhist:
+                kwargs['yrange']=yrange
+
+            kwargs['columndatasrc'] = columndatasrc
+            kwargs['color_mapper'] = color_mapper
+            kwargs['input'] = input
+            return func(self, **kwargs)
+        return inner_decodateslider
 
     @deco_bokeh
     def bokeh_histo(self, **kwargs):
@@ -1126,6 +1091,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
+
             label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['where']]))
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 label_dict = {ytick_loc[0]:'sum all location'}
@@ -1345,7 +1311,6 @@ class visu_bokeh:
 
         min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
 
-        invViridis256 = Viridis256[::-1]
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
         color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
