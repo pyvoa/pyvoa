@@ -763,7 +763,6 @@ class visu_bokeh:
                 dateslider = False
 
             maxcountrydisplay = kwargs['maxcountrydisplay']
-            maxlettersdisplay = kwargs['maxlettersdisplay']
 
             lhist = ['bokeh_pie','bokeh_horizonhisto']
 
@@ -850,7 +849,6 @@ class visu_bokeh:
                             dates=unique_dates,
                             div=date_display,
                             maxcountrydisplay=maxcountrydisplay,
-                            maxlettersdisplay=10,#maxlettersdisplay,
                             ylabellinear=bokeh_figure_linear.yaxis[0],
                             ylabellog=bokeh_figure_log.yaxis[0],
                             ymax = ymax,
@@ -1075,7 +1073,6 @@ class visu_bokeh:
         mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
-        maxletters = kwargs['maxlettersdisplay']
         title = kwargs['title']
         dbokeh_figure = {
             'linear': kwargs.get('bokeh_figure_linear'),
@@ -1091,13 +1088,13 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-
-            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['where']]))
-            if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
-                label_dict = {ytick_loc[0]:'sum all location'}
+            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['shortenwhere']]))
+            print(input)
+            #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+            #    label_dict = {ytick_loc[0]:'sum all location'}
 
             fig.yaxis[0].major_label_overrides = label_dict
-            fig.yaxis[0].formatter = NumeralTickFormatter(format="0.0")
+
 
             factor = 20.0 if axis_type == 'log' else 1.2
             left = 0.01 if axis_type == 'log' else 'left'
@@ -1118,7 +1115,7 @@ class visu_bokeh:
                 line_width=1,
                 hover_line_width=2,
             )
-
+            '''
             labels = LabelSet(
                 x='horihistotextx',
                 y='horihistotexty',
@@ -1130,7 +1127,7 @@ class visu_bokeh:
                 text_color='black'
             )
             fig.add_layout(labels)
-
+            '''
             cases_custom = visu_bokeh().rollerJS()
             hover_tool = HoverTool(
                 tooltips=[

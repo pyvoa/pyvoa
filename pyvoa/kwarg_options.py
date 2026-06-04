@@ -73,7 +73,8 @@ class InputOption():
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
                         'guideline':[False,True],\
-                        'ax_type':['linear', 'log']
+                        'ax_type':['linear', 'log'],\
+                        'maxlettersdisplayed':10
                         }
 
         self.pdcharts = pd.DataFrame({
@@ -84,7 +85,7 @@ class InputOption():
             "'typeofmap'=[None,'not dense','dense']"]
             }, index=['plot', 'hist','map'])
 
-        self.windows = {' daily':1,' weekly':7}    
+        self.windows = {' daily':1,' weekly':7}
         self.listviskargskeys = list(self.d_graphicsinput_args.keys())
         self.dicokfront = {}
 

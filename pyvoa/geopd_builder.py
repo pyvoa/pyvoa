@@ -67,7 +67,6 @@ class GPDBuilder(object):
         self.granularity = self.currentmetadata['geoinfo']['granularity']
         self.namecountry = self.currentmetadata['geoinfo']['iso3']
         self._gi = coge.GeoInfo()
-
         try:
             if self.granularity == 'country':
                    self.geo = coge.GeoManager('name')
@@ -433,19 +432,19 @@ class GPDBuilder(object):
        if not isinstance(kwargs['which'],list):
            kwargs['which'] = [kwargs['which']]
 
-
-       #input = input.sort_values(by=["date",which[0]],ascending=[True,False]).reset_index(drop=True)
-       #input = input.sort_values(by=['where','date'])
-       #input = input.reset_index(drop=True)
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
+
+       uniqwhere=list(input['where'].unique())
+       maxletters=kwargs['maxlettersdisplayed']
+       dshortenwhere = {i:i[:maxletters] + '...' if len(i)>maxletters else i for i in uniqwhere}
+       input['shortenwhere']=input['where'].map(dshortenwhere)
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
-            new_order.remove('geometry')
+           new_order.remove('geometry')
        if 'code' not in input.columns:
-           new_order.remove('code')
-
+          new_order.remove('code')
        kwargs['input'] = input[new_order].reset_index(drop=True)
        return kwargs
 
