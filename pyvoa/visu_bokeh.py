@@ -1089,7 +1089,7 @@ class visu_bokeh:
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
             label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['shortenwhere']]))
-            print(input)
+    
             #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             #    label_dict = {ytick_loc[0]:'sum all location'}
 
