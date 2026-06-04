@@ -137,7 +137,6 @@ class front:
         self._setkwargsvisu = None
         self.batch = False
         self.outcome = None
-        self.maxlettersdisplay = 20
 
     def whattodo(self,):
         """Generates a DataFrame summarizing available methods and their options.
@@ -401,8 +400,8 @@ class front:
                             z.pop('typeofhist')
                             z.pop('typeofplot')
                             z.pop('bins')
-                    shortenwhere = {i:i[:self.maxlettersdisplay] + '...' if len(i)>20 else i for i in z['where']}
-                    z['input']['where'] = kwargs['input']['where'].replace(shortenwhere)
+                    #shortenwhere = {i:i[:self.maxlettersdisplay] + '...' if len(i)>self.maxlettersdisplay else i for i in z['where']}
+                    #z['input']['where'] = kwargs['input']['where'].replace(shortenwhere)
                 return func(self,**z)
             else:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
