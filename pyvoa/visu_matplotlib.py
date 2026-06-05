@@ -181,14 +181,16 @@ class visu_matplotlib:
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
-        ax.legend(bbox_to_anchor=(0.75, 1.2), loc='upper left')
-        ax.set_title(title)
+
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
         input['where']= [kwargs['dicodisplayloc'][w] for w in input['where']]
         input = input.set_index('where')
-        return input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
+        ax =  input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
+        ax.legend(bbox_to_anchor=(0.8, 0.9), loc='upper left')
+        ax.set_title(title)
+        return ax
 
 
     @decomatplotlib
@@ -333,7 +335,6 @@ class visu_matplotlib:
             maxx += padding_x
             miny -= padding_y
             maxy += padding_y
-            
         ax.set_xlim(minx, maxx)
         ax.set_ylim(miny, maxy)
         what = kwargs.get('what')
