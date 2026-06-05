@@ -63,7 +63,7 @@ for (let j = 0; j < maxcountrydisplay; j++) {
     sourcehisto.data["bottom"][j]         = bottom_pos;
     sourcehisto.data["horihistotexty"][j] = tick_pos;
     sourcehisto.data["angle"][j]          = total > 0 ? (value / total) * 2 * Math.PI : 0;
-    sourcehisto.data["textdisplayed"][j]  = String(w);//padStart(36, " ");
+    sourcehisto.data["textdisplayed"][j]  = String(w).padStart(36, " "); // this is for pie
     sourcehisto.data["textdisplayed2"][j] = total > 0
         ? (100 * value / total).toFixed(1) + "%"
         : "0.0%";
@@ -83,5 +83,5 @@ ylabellinear.major_label_overrides = labelMap;
 // Refresh
 // ====================================================
 sourcehisto.change.emit();
-
+console.log(sourcehisto.data["angle"]);
 div.text = "<b>" + dates[i] + "</b>";

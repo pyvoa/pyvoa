@@ -1089,7 +1089,7 @@ class visu_bokeh:
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
             label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['shortenwhere']]))
-    
+
             #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             #    label_dict = {ytick_loc[0]:'sum all location'}
 
@@ -1216,7 +1216,7 @@ class visu_bokeh:
             - dateslider = None if True
                     - orientation = horizontal
         '''
-        columndatasrc = kwargs.get('columndatasrc')  # doit être ColumnDataSource
+        columndatasrc = kwargs.get('columndatasrc')
         fig = kwargs.get('bokeh_figure_linear')
         controls = kwargs.get('controls', None)
         dateslider = kwargs.get('dateslider')
@@ -1251,7 +1251,7 @@ class visu_bokeh:
             text_font_size="10pt",
             source=columndatasrc
         )
-
+        '''
         labels2 = LabelSet(
             x=0, y=0,
             text='textdisplayed2',
@@ -1259,7 +1259,7 @@ class visu_bokeh:
             text_font_size="8pt",
             source=columndatasrc
         )
-
+        '''
         cases_custom = visu_bokeh().rollerJS()
         hover_tool = HoverTool(
             tooltips=[('where', '@where'), ('cases', '@right{0,0.0}')],
@@ -1269,7 +1269,7 @@ class visu_bokeh:
         fig.add_tools(hover_tool)
 
         fig.add_layout(labels)
-        fig.add_layout(labels2)
+        #fig.add_layout(labels2)
         fig = Row(fig,kwargs['watermark'])
         if dateslider:
             layout = column(controls, fig)
@@ -1300,7 +1300,8 @@ class visu_bokeh:
             w=bokeh_figure.width, w_units="screen",
             h=bokeh_figure.height, h_units="screen",
             anchor="center",
-            alpha=0.05
+            alpha=0.05,
+            level='overlay'
         )
 
         dateslider = kwargs.get('dateslider')
