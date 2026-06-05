@@ -36,7 +36,7 @@ import base64
 import copy
 import inspect
 import importlib
-
+from pathlib import Path
 import shapely.geometry as sg
 
 import datetime as dt
@@ -128,35 +128,10 @@ class visu_bokeh:
     @staticmethod
     def rollerJS():
         from bokeh.models import CustomJSHover
-        return CustomJSHover(code="""
-                var value;
-                 //   if(Math.abs(value)>100000 || Math.abs(value)<0.001)
-                 //       return value.toExponential(2);
-                 //   else
-                 //       return value.toFixed(2);
-                 if(value>10000 || value <0.01)
-                    value =  Number.parseFloat(value).toExponential(2);
-                 else
-                     value = Number.parseFloat(value).toFixed(2);
-                return value.toString();
-                /*  var s = value;
-                  var s0=s;
-                  var sp1=s.split(".");
-                  var p1=sp1[0].length
-                  if (sp1.length>1) {
-                    var sp2=s.split("e");
-                    var p2=sp2[0].length
-                    var p3=p2
-                    while(s[p2-1]=="0" && p2>p1) {
-                        p2=p2-1;
-                    }
-                    s=s0.substring(0,p2)+s0.substring(p3,s0.length);
-                  }
-                  if (s.split(".")[0].length==s.length-1) {
-                    s=s.substring(0,s.length-1);
-                  }
-                  return s;*/
-                """)
+        jsfile = Path(__file__).parent / "js/rollover_callback.js"
+        with open(jsfile) as f:
+            rollover_code = f.read()
+        return CustomJSHover(code=rollover_code)
 
     @staticmethod
     def pyvoalogo(logo):
@@ -835,8 +810,7 @@ class visu_bokeh:
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
                 from bokeh.models import CustomJS
-                from pathlib import Path
-                jsfile = Path(__file__).parent / "slider_callback.js"
+                jsfile = Path(__file__).parent / "js/slider_callback.js"
                 with open(jsfile) as f:
                     slider_code = f.read()
 
@@ -859,35 +833,10 @@ class visu_bokeh:
                 slider.js_on_change('value', slider_callback)
                 toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
                 # CustomJS pour démarrer/arrêter l'animation
-
-                toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code="""
-                    if (cb_obj.active) {
-                        // play: démarrer interval si pas déjà présent
-                        if (!window._bokeh_play_interval) {
-                            window._bokeh_play_interval = setInterval(function() {
-                                let v = slider.value + 1;
-
-                                if (v > slider.end) {
-                                    // Stopper à la fin
-                                    clearInterval(window._bokeh_play_interval);
-                                    window._bokeh_play_interval = null;
-                                    cb_obj.active = false;
-                                    cb_obj.label = '► Play';
-                                    return;
-                                }
-                                slider.value = v; // déclenche slider_callback
-                            }, 100);
-                            cb_obj.label = '❚❚ Pause';
-                        }
-                    } else {
-                        // pause: clear interval
-                        if (window._bokeh_play_interval) {
-                            clearInterval(window._bokeh_play_interval);
-                            window._bokeh_play_interval = null;
-                        }
-                        cb_obj.label = '► Play';
-                    }
-                """)
+                jsfile = Path(__file__).parent / "js/animation_callback.js"
+                with open(jsfile) as f:
+                    animation_code = f.read()
+                toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code=animation_code)
                 toggl.js_on_change('active', toggle_callback)
 
                 from bokeh.models import Div
