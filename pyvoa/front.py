@@ -212,7 +212,6 @@ class front:
                    self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=True,vis=visu)
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
-                print( self.gpdbuilder.getinfodatewhich())
                 coge.GeoManager('name')
         self.db = base
 

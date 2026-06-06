@@ -981,7 +981,10 @@ class visu_bokeh:
         panels = []
         bottom = 0
         x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
-        for axis_type in ["linear", "loglog"]:
+        axis_t = ["linear", "loglog"]
+        if interval[0] < 1. or interval[-1] < 1.:
+            axis_t = ["linear"]
+        for axis_type in axis_t:
             fig = dfigures[axis_type]
             fig.yaxis.axis_label = 'frequency'
             fig.xaxis.axis_label = which
