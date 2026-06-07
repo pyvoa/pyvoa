@@ -255,7 +255,6 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
-
             if self.gpdbuilderdata is None and kwargs['input'] is None and kwargs['which'] is None:
                 raise PyvoaError("Does setwhom has been defined ???")
 

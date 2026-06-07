@@ -1086,7 +1086,7 @@ class visu_bokeh:
                     ('where', '@where'),
                     ('cases', '@right')
                 ],
-                formatters={'where': 'printf', '@{' + 'right' + '}': cases_custom, '%': 'printf'},
+                formatters={'@right': cases_custom},
                 mode=mode,
                 point_policy="snap_to_data"
             )
