@@ -129,7 +129,9 @@ class front:
         self.lpop = self.av.lpop
 
         self.db = ''
-        self.gpdbuilder = ''
+        self.gpdbuilder = None
+        self.gpdbuilderdata = None
+        self.gpdbuildergeo = None
         self.vis = None
         self.allvisu = None
         self.charts = None
@@ -199,17 +201,18 @@ class front:
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
         visu = self.getvis()
+
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
             print('Available key-words, which ∈', self.listwhich())
             return
         else:
+            self.gpdbuilder  = coco.GPDBuilder(db_name=base)
             if reload:
-                self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=reload,vis=visu)
+                self.gpdbuilderdata,self.gpdbuildergeo,self.allvisu = self.gpdbuilder.factory(db_name=base,reload=reload,vis=visu)
             else:
-                self.gpdbuilder = readpkl(base + '.pkl')
-                if self.gpdbuilder is None:
-                   self.gpdbuilder, self.allvisu = coco.GPDBuilder.factory(db_name=base,reload=True,vis=visu)
+                self.gpdbuilderdata = readpkl('data'+base + '.pkl')
+                self.gpdbuildergeo = readpkl('geo'+base + '.pkl')
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
                 coge.GeoManager('name')
@@ -254,7 +257,7 @@ class front:
                 order position of the items in 'option'
             '''
 
-            if self.gpdbuilder == '' and kwargs['input'] is None and kwargs['which'] is None:
+            if self.gpdbuilderdata is None and kwargs['input'] is None and kwargs['which'] is None:
                 raise PyvoaError("Does setwhom has been defined ???")
 
             if func.__name__ == 'get':
@@ -309,8 +312,8 @@ class front:
 
             if kwargs['where'][0] == '':
                 if input.empty:
-                    if self.gpdbuilder:
-                        kwargs['where'] = list(self.gpdbuilder.get_fulldb()['where'].unique())
+                    if self.gpdbuilderdata is not None:
+                        kwargs['where'] = list(self.gpdbuilderdata['where'].unique())
                 else:
                     kwargs['where'] = list(input['where'].unique())
 
@@ -335,8 +338,11 @@ class front:
                 #kwargs['input'] = input
                 kwargs['kwargsuser']['input'] = input
 
-            if self.gpdbuilder != '':
+            if self.gpdbuilderdata is not None:
+                kwargs['input'] = self.gpdbuilderdata
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
+                kwargs['input'] = pd.merge(kwargs['input'],self.gpdbuildergeo,how='left')
+                kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
 
             if self.db == '':
                 self.allvisu = AllVisu('', kwargs['input'])

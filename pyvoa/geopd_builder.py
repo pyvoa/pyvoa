@@ -116,8 +116,7 @@ class GPDBuilder(object):
        '''
        return self.currentdata.get_available_keywords()
 
-   @staticmethod
-   def factory(**kwargs):
+   def factory(self,**kwargs):
        '''
         Return an instance to GPDBuilder and to Display methods
         This is recommended to avoid mismatch in labeled figures
@@ -126,11 +125,18 @@ class GPDBuilder(object):
        reload = kwargs.get('reload', True)
        vis = kwargs.get('vis', None)
        f = db_name+'.pkl'
+       data,geo=self.split_data_geo(self.get_fulldb())
        if reload:
-          datab = GPDBuilder(db_name)
-          dumppkl(f,datab)
-       datab.setvisu(db_name,datab.getwheregeometrydescription())
-       return datab, datab.getvisu()
+          dumppkl('data'+f,data)
+          dumppkl('geo'+f,geo)
+       self.setvisu(db_name,self.getwheregeometrydescription())
+       return data,geo, self.getvisu()
+
+   @staticmethod
+   def split_data_geo(mypyvoageopd):
+      geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
+      data=mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
+      return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
        ''' Set the Display '''
