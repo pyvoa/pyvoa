@@ -116,20 +116,18 @@ class GPDBuilder(object):
        '''
        return self.currentdata.get_available_keywords()
 
-   def factory(self,**kwargs):
+   def factory(self,reload=True):
        '''
         Return an instance to GPDBuilder and to Display methods
         This is recommended to avoid mismatch in labeled figures
        '''
-       reload = kwargs.get('reload', True)
-       vis = kwargs.get('vis', None)
        f = self.db+'.pkl'
        data,geo=self.split_data_geo(self.get_fulldb())
        if reload:
           dumppkl('data'+f,data)
           dumppkl('geo'+f,geo)
        self.setvisu(self.db,self.getwheregeometrydescription())
-       return data,geo, self.getvisu()
+       return data,geo,self.getvisu()
 
    @staticmethod
    def split_data_geo(mypyvoageopd):

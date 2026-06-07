@@ -208,9 +208,8 @@ class front:
             return
         else:
             self.gpdbuilder  = coco.GPDBuilder(db_name=base)
-            if reload:
-                self.gpdbuilderdata,self.gpdbuildergeo,self.allvisu = self.gpdbuilder.factory(reload=reload,vis=visu)
-            else:
+            self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
+            if not reload:
                 self.gpdbuilderdata = readpkl('data'+base + '.pkl')
                 self.gpdbuildergeo = readpkl('geo'+base + '.pkl')
                 pandy = self.gpdbuilder.getwheregeometrydescription()
