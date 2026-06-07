@@ -121,15 +121,14 @@ class GPDBuilder(object):
         Return an instance to GPDBuilder and to Display methods
         This is recommended to avoid mismatch in labeled figures
        '''
-       db_name = kwargs.get('db_name')
        reload = kwargs.get('reload', True)
        vis = kwargs.get('vis', None)
-       f = db_name+'.pkl'
+       f = self.db+'.pkl'
        data,geo=self.split_data_geo(self.get_fulldb())
        if reload:
           dumppkl('data'+f,data)
           dumppkl('geo'+f,geo)
-       self.setvisu(db_name,self.getwheregeometrydescription())
+       self.setvisu(self.db,self.getwheregeometrydescription())
        return data,geo, self.getvisu()
 
    @staticmethod

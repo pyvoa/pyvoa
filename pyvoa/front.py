@@ -209,7 +209,7 @@ class front:
         else:
             self.gpdbuilder  = coco.GPDBuilder(db_name=base)
             if reload:
-                self.gpdbuilderdata,self.gpdbuildergeo,self.allvisu = self.gpdbuilder.factory(db_name=base,reload=reload,vis=visu)
+                self.gpdbuilderdata,self.gpdbuildergeo,self.allvisu = self.gpdbuilder.factory(reload=reload,vis=visu)
             else:
                 self.gpdbuilderdata = readpkl('data'+base + '.pkl')
                 self.gpdbuildergeo = readpkl('geo'+base + '.pkl')
