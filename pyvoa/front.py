@@ -314,6 +314,10 @@ class front:
                         kwargs['where'] = list(self.gpdbuilderdata['where'].unique())
                 else:
                     kwargs['where'] = list(input['where'].unique())
+            else:
+                missing = [w for w in kwargs['where'] if w not in set(self.listwhere())]
+                if missing:
+                    PyvoaError('This location do not exit in the DB :' + str(missing))        
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -334,7 +338,6 @@ class front:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
                 #input = input.loc[input['where'].isin(kwargs['where'])]
                 #kwargs['input'] = input
-                kwargs['kwargsuser']['input'] = input
 
             if self.gpdbuilderdata is not None:
                 kwargs['input'] = self.gpdbuilderdata
