@@ -304,8 +304,7 @@ class GPDBuilder(object):
        input = kwargs.get('input')
        what  = kwargs.get('what')
        when  = kwargs.get('when')
-       where = kwargs.get('where')
-
+       where = kwargs.get('where')  
        if input.empty:
             kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
             input = self.currentdata.get_maingeopandas()
@@ -313,6 +312,7 @@ class GPDBuilder(object):
             input = input.loc[:,~input.columns.isin(anticolumns)]
        else:
            input = input.loc[input['where'].isin(where)]
+
 
        date_max_by_where = input.groupby('where')['date'].max()
        needs_reindex = date_max_by_where.nunique() > 1
@@ -350,6 +350,7 @@ class GPDBuilder(object):
             when_beg, when_end = input.date.min(), input.date.max()
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
+
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
        flatwhere = flat_list(where)
 
