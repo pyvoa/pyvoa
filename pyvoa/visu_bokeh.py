@@ -127,11 +127,10 @@ class visu_bokeh:
 
     @staticmethod
     def rollerJS():
+        from pathlib import Path
         from bokeh.models import CustomJSHover
         jsfile = Path(__file__).parent / "js/rollover_callback.js"
-        with open(jsfile) as f:
-            rollover_code = f.read()
-        return CustomJSHover(code=rollover_code)
+        return CustomJSHover(code=jsfile.read_text(encoding="utf-8"))
 
     @staticmethod
     def pyvoalogo(logo):
@@ -377,18 +376,22 @@ class visu_bokeh:
                     r_list.append(r)
                     maxi=max(maxi,np.nanmax(input[val]))
                     mini=max(mini,np.nanmin(input[val]))
-
+                    tooltips.append([('where', '@where'), ('date', '@date{%F}'), (r.name, '@$name{0,0.0}')])
+                    '''
                     if mini <0.01:
                         tooltips.append([('where', '@where'), ('date', '@date{%F}'), (r.name, '@$name')])
                     else:
                         tooltips.append([('where', '@where'), ('date', '@date{%F}'), (r.name, '@$name{0,0.0}')])
                     if isinstance(tooltips,tuple):
                         tooltips = tooltips[0]
+                    '''
                 i += 1
+            cases_custom = visu_bokeh().rollerJS()
+
             for i,r in enumerate(r_list):
                 label = r.name
                 tt = tooltips[i]
-                formatters = {'where': 'printf', '@date': 'datetime', '@name': 'printf'}
+                formatters = {'where': 'printf', '@date': 'datetime', '@name':  'numeral'}
                 hover=HoverTool(tooltips = tt, formatters = formatters, point_policy = "snap_to_data", mode = mode, renderers=[r])  # ,PanTool())
                 fig.add_tools(hover)
 
@@ -482,7 +485,7 @@ class visu_bokeh:
             )
 
         cases_custom = visu_bokeh().rollerJS()
-        hover_tool = HoverTool(tooltips=[('Cases', '@cases{0,0.0}'), ('date', '@date{%F}')],
+        hover_tool = HoverTool(tooltips=[('Cases', '@cases{0,0}'), ('date', '@date{%F}')],
                                formatters={'Cases': 'printf', '@{cases}': cases_custom, '@date': 'datetime'},
                                renderers=[circle],
                                point_policy="snap_to_data")
@@ -678,7 +681,7 @@ class visu_bokeh:
                     #maxi=max(maxi,np.nanmax(pyvoa.data['cases']))
 
             label = which
-            tooltips = [('where', '@rolloverdisplay'), ('date', '@date{%F}'), ('Cases', '@cases{0,0.0}')]
+            tooltips = [('where', '@rolloverdisplay'), ('date', '@date{%F}'), ('Cases', '@cases{0,0}')]
             formatters = {'where': 'printf', '@date': 'datetime', '@name': 'printf'}
             hover=HoverTool(tooltips = tooltips, formatters = formatters, point_policy = "snap_to_data", mode = mode)  # ,PanTool())
             fig.add_tools(hover)
@@ -1082,13 +1085,7 @@ class visu_bokeh:
             '''
             cases_custom = visu_bokeh().rollerJS()
             hover_tool = HoverTool(
-                tooltips=[
-                    ('where', '@where'),
-                    ('cases', '@right')
-                ],
-                formatters={'@right': cases_custom},
-                mode=mode,
-                point_policy="snap_to_data"
+                tooltips=[('where', '@where'), ('cases', '@right{0,0}')]
             )
             fig.add_tools(hover_tool)
             panel = TabPanel(child=Row(fig,kwargs['watermark']), title=axis_type)
@@ -1214,7 +1211,7 @@ class visu_bokeh:
         '''
         cases_custom = visu_bokeh().rollerJS()
         hover_tool = HoverTool(
-            tooltips=[('where', '@where'), ('cases', '@right{0,0.0}')],
+            tooltips=[('where', '@where'), ('cases', '@right{0,0}')],
             formatters={'where': 'printf', '@{cases}': cases_custom},
             mode=mode, point_policy="snap_to_data"
         )
@@ -1275,13 +1272,7 @@ class visu_bokeh:
         fill_color = {'field': which, 'transform': color_mapper},
         line_color = 'black', line_width = 0.25)
 
-        tooltips = f"""
-                    <b>location: @where<br>
-                    cases: @cases </b>
-                    """
-
-        bokeh_figure.add_tools(HoverTool(tooltips = tooltips,
-        formatters = {'where': 'printf', '@right': 'printf',})),
+        bokeh_figure.add_tools(HoverTool(tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
 
         #bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
