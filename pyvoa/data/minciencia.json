@@ -1,7 +1,7 @@
 {
   "header": "Chile Ministerio de Ciencia, Tecnología, Conocimiento, e Innovación database",
     "geoinfo": {
-    "granularity": "region",
+    "granularity": "subregion",
     "iso3": "CHL",
     "locationmode":"code"
   },
@@ -11,7 +11,7 @@
 	 "urldata": "https://zenodo.org/records/18773580/files/Covid-19_std.csv?content",
 	 "separator":",",
   	 "columns": [
-    	{"name":"where","alias":"Codigo region"},
+    	{"name":"where","alias":"Codigo comuna"},
 	{"alias":"Fecha","name":"date"},
         {"alias":"Casos confirmados","name":"tot_cases"}
 	 ]
