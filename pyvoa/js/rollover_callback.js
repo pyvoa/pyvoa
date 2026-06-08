@@ -12,13 +12,15 @@ About :
 -------
 */
 // rollover_callback.js
-const v = Number(value);
-if (!isFinite(v)) return "";
 
-const abs = Math.abs(v);
-if (abs !== 0 && (abs > 10_000 || abs < 0.01)) {
+let v = Number(value);
+
+if (Math.abs(v) > 10000 || (Math.abs(v) < 0.01 && v !== 0)) {
     return v.toExponential(2);
+} else {
+    return v.toLocaleString('fr-FR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
 }
 
-const [int, dec] = v.toFixed(2).split(".");
-return int.replace(/\B(?=(\d{3})+(?!\d))/g, "\u202f") + "." + dec;
