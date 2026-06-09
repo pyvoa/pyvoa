@@ -985,8 +985,7 @@ class visu_bokeh:
         bottom = 0
         x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
         axis_t = ["linear", "loglog"]
-        if interval[0] < 1. or interval[-1] < 1.:
-            axis_t = ["linear"]
+
         for axis_type in axis_t:
             fig = dfigures[axis_type]
             fig.yaxis.axis_label = 'frequency'
@@ -998,13 +997,6 @@ class visu_bokeh:
             fig.add_tools(hover_tool)
             fig.x_range = Range1d(interval[0], interval[-1])
             fig.y_range = Range1d(0, 1.05 * frame_histo['top'].max())
-            if x_axis_type == "log":
-                left = 0.8
-                if frame_histo['left'][0] <= 0:
-                    frame_histo.at[0, 'left'] = left
-                else:
-                    left  = frame_histo['left'][0]
-                fig.x_range = Range1d(left, 10 * interval[-1])
 
             if y_axis_type == "log":
                 bottom = 0.0001
