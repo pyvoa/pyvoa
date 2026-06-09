@@ -255,7 +255,9 @@ class front:
                 Transforms 'where', 'which', and 'option' into lists if they are not already.
                 order position of the items in 'option'
             '''
-            if self.gpdbuilderdata is None and kwargs['input'] is None and kwargs['which'] is None:
+            input = kwargs.get('input',pd.DataFrame())
+            which = kwargs.get('which',None)
+            if self.gpdbuilderdata is None and not input.empty and which is None:
                 raise PyvoaError("Does setwhom has been defined ???")
 
             if func.__name__ == 'get':
@@ -274,10 +276,11 @@ class front:
                 raise PyvoaError("What function is this "+func.__name__)
 
             if self.db == '' :
-                if kwargs['input'] is None:
+                if input is None:
                     PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
                 else:
-                    kwargs['input'] = fill_missing_dates(kwargs['input'])
+                    input = fill_missing_dates(input)
+                    kwargs['input']=input
                     if 'which' not in kwargs.keys():
                         PyvoaError('For you own DB which must be stipulated !!')
 
@@ -286,7 +289,7 @@ class front:
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
-            default['input'] = kwargs.get('input')
+            default['input'] = kwargs.get('input',pd.DataFrame())
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
             [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
             for k,v in default.items():
@@ -296,14 +299,13 @@ class front:
                     else:
                         default[k] = [kwargs[k]]
                 default['when'] = kwargs.get('when')
-                default['input'] = kwargs.get('input',pd.DataFrame())
 
             kwargs = {**default, **dicovisu}
 
             kwargs['what'] = kwargs.get('what',kwargs['what'][0])
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
-            input = kwargs.get('input',pd.DataFrame())
+            #input = kwargs.get('input',pd.DataFrame())
             kwargs['kwargsuser'] = kwargs.copy()
 
             where =  kwargs['where']
@@ -317,7 +319,7 @@ class front:
             else:
                 missing = [w for w in kwargs['where'] if w not in set(self.listwhere())]
                 if missing:
-                    PyvoaError('This location do not exit in the DB :' + str(missing))        
+                    PyvoaError('This location do not exit in the DB :' + str(missing))
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
