@@ -514,8 +514,6 @@ def readpkl(filepkl):
     except Exception as e:
         raise PyvoaError(f"Failed to load pickle file {filepath}: {str(e)}")
 
-
-
 def dumppkl(filepkl,whattodump):
    if filepkl is None or whattodump is None:
         raise PyvoaError("dumppkl requires both 'filepkl' and 'whattodump'")
@@ -524,6 +522,23 @@ def dumppkl(filepkl,whattodump):
    filepkl = os.path.join(pklpath,filepkl)
    with open(filepkl, 'wb') as f:
         pickle.dump(whattodump,f)
+
+
+@staticmethod
+def wgs84_to_web_mercator(tuple_xy):
+    """
+    Take a tuple (longitude,latitude) from a coordinate reference system crs=EPSG:4326
+     and converts it to a  longitude/latitude tuple from to Web Mercator format
+    """
+    k = 6378137
+    x = tuple_xy[0] * (k * np.pi / 180.0)
+    if tuple_xy[1] == -90:
+        lat = -89.99
+    else:
+        lat = tuple_xy[1]
+    y = np.log(np.tan((90 + lat) * np.pi / 360.0)) * k
+    return x, y
+
 
 @staticmethod
 def min_max_range(a_min, a_max):
