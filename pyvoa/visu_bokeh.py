@@ -20,6 +20,7 @@ from pyvoa.tools import (
     verb,
     fill_missing_dates,
     min_max_range,
+    wgs84_to_web_mercator
 )
 from pyvoa.error import *
 import math
@@ -1309,10 +1310,10 @@ class visu_bokeh:
                 for pt in visu_bokeh().get_polycoords(row):
                     if isinstance(pt, tuple):
                         # Un point = tuple (lon, lat)
-                        new_poly.append(visu_bokeh().wgs84_to_web_mercator(pt))
+                        new_poly.append(wgs84_to_web_mercator(pt))
                     elif isinstance(pt, list):
                         # Liste de points = ring de polygone
-                        shifted = [visu_bokeh().wgs84_to_web_mercator(p) for p in pt]
+                        shifted = [wgs84_to_web_mercator(p) for p in pt]
                         new_poly.append(sg.Polygon(shifted))
                     else:
                         raise TypeError("Unknown geometry element type")
@@ -1331,21 +1332,6 @@ class visu_bokeh:
         # Reconstruire un GeoDataFrame complet
         new_gdf = gpd.GeoDataFrame(rows, crs="epsg:3857")
         return new_gdf
-
-    @staticmethod
-    def wgs84_to_web_mercator(tuple_xy):
-        """
-        Take a tuple (longitude,latitude) from a coordinate reference system crs=EPSG:4326
-         and converts it to a  longitude/latitude tuple from to Web Mercator format
-        """
-        k = 6378137
-        x = tuple_xy[0] * (k * np.pi / 180.0)
-        if tuple_xy[1] == -90:
-            lat = -89.99
-        else:
-            lat = tuple_xy[1]
-        y = np.log(np.tan((90 + lat) * np.pi / 360.0)) * k
-        return x, y
 
     @staticmethod
     def convert_tile(tilename, which = 'bokeh'):
