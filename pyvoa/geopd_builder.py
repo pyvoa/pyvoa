@@ -104,7 +104,7 @@ class GPDBuilder(object):
    def getinfodatewhich(self):
        return self.currentdata.get_echoinfo()
 
-   def getwheregeometrydescription(self):
+   def getwheregeometrydescription(self,):
         return self.where_geodescription
 
    def gettypeofgeometry(self):
@@ -126,13 +126,13 @@ class GPDBuilder(object):
        if reload:
           dumppkl('data'+f,data)
           dumppkl('geo'+f,geo)
-       self.setvisu(self.db,self.getwheregeometrydescription())
+       self.setvisu(self.db,geo)
        return data,geo,self.getvisu()
 
    @staticmethod
    def split_data_geo(mypyvoageopd):
-      geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
       data=mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
+      geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
       return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
@@ -304,7 +304,7 @@ class GPDBuilder(object):
        input = kwargs.get('input')
        what  = kwargs.get('what')
        when  = kwargs.get('when')
-       where = kwargs.get('where')  
+       where = kwargs.get('where')
        if input.empty:
             kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
             input = self.currentdata.get_maingeopandas()
@@ -554,6 +554,7 @@ class GPDBuilder(object):
         original = new_cases.loc[smoothed.index]
 
         return smoothed
+
    def get_posteriors(self,sr, window=7, min_periods=1):
         from scipy import stats as sps
         # We create an array for every possible value of Rt
