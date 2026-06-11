@@ -346,6 +346,8 @@ class visu_matplotlib:
             cmap=cmap,
             vmin=min_col,
             vmax=max_col,
+            edgecolor='black', 
+            linewidth=0.5,
             legend_kwds={
                 'label': which,
                 'orientation': "horizontal",
