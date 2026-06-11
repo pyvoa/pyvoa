@@ -200,7 +200,7 @@ class AllVisu:
             if not kwargs['dateslider']:
                 kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
             else:
-                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which'])     
+                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which'])
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
@@ -346,7 +346,7 @@ class AllVisu:
         if isinstance(which, list):
             which = which[0]
             kwargs['which'] = which
-
+            
         if vis != 'bokeh' and kwargs['dateslider']:
             kwargs.pop("dateslider")
             raise PyvoaError("Only avalaible for vis='bokeh' dummy argument")

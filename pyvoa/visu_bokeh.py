@@ -20,7 +20,6 @@ from pyvoa.tools import (
     verb,
     fill_missing_dates,
     min_max_range,
-    wgs84_to_web_mercator
 )
 from pyvoa.error import *
 import math
@@ -185,13 +184,21 @@ class visu_bokeh:
     def geosource_bounds(geosource):
         import json
         from shapely.geometry import shape
+
         data = json.loads(geosource.geojson)
         xs, ys = [], []
         for feature in data["features"]:
-            geom = shape(feature["geometry"])
+            geom_json = feature.get("geometry")
+            if geom_json is None:
+                continue
+            geom = shape(geom_json)
+            if geom.is_empty:
+                continue
             x_min, y_min, x_max, y_max = geom.bounds
-            xs += [x_min, x_max]
-            ys += [y_min, y_max]
+            xs.extend([x_min, x_max])
+            ys.extend([y_min, y_max])
+        if not xs:
+            raise ValueError("No valid geometries found in GeoJSONDataSource")
         return min(xs), min(ys), max(xs), max(ys)
 
     @staticmethod
@@ -758,9 +765,7 @@ class visu_bokeh:
                 if func.__name__ in lhist:
                     input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
                 input_uniquecountries['cases']=input_uniquecountries[which]
-                passinput_uniquecountries = input_uniquecountries.to_crs(epsg=4326)
-                convertgeo = visu_bokeh().convertmercator(input_uniquecountries)
-                geocolumndatasrc = GeoJSONDataSource(geojson = convertgeo.to_json())
+                geocolumndatasrc = GeoJSONDataSource(geojson = input_uniquecountries.to_json())
                 input_dates = input.drop(columns='geometry').copy()
             else:
                 input_dates = input.copy()
@@ -1277,61 +1282,6 @@ class visu_bokeh:
     def bokeh_savefig(fig,name):
         from bokeh.io import export_png
         export_png(fig, filename = name)
-
-    @staticmethod
-    def get_polycoords(geopandasrow):
-        """
-        Take a row of a geopandas as an input (i.e : for index, row in geopdwd.iterrows():...)
-            and returns a tuple (if the geometry is a Polygon) or a list (if the geometry is a multipolygon)
-            of an exterior.coords
-        """
-        geometry = geopandasrow['geometry']
-        all = []
-        if geometry.geom_type == 'Polygon':
-            return list(geometry.exterior.coords)
-        if geometry.geom_type == 'MultiPolygon':
-            for ea in geometry.geoms:
-                all.append(list(ea.exterior.coords))
-        return all
-
-    @staticmethod
-    def convertmercator(gdf):
-        '''
-        trick found by dadoun to solve this problem
-        see https://discourse.bokeh.org/t/bokeh-tile-antimeridian-problem/6978
-        '''
-        rows = []
-
-        for idx, row in gdf.iterrows():
-            new_poly = []
-
-            # Convertir les polygones / multipolygones
-            if row["geometry"]:
-                for pt in visu_bokeh().get_polycoords(row):
-                    if isinstance(pt, tuple):
-                        # Un point = tuple (lon, lat)
-                        new_poly.append(wgs84_to_web_mercator(pt))
-                    elif isinstance(pt, list):
-                        # Liste de points = ring de polygone
-                        shifted = [wgs84_to_web_mercator(p) for p in pt]
-                        new_poly.append(sg.Polygon(shifted))
-                    else:
-                        raise TypeError("Unknown geometry element type")
-
-                # Construire la géométrie finale
-                if isinstance(new_poly[0], tuple):
-                    geom = sg.Polygon(new_poly)
-                else:
-                    geom = sg.MultiPolygon(new_poly)
-
-                # Copier toutes les colonnes d’origine
-                new_row = row.copy()
-                new_row["geometry"] = geom
-                rows.append(new_row)
-
-        # Reconstruire un GeoDataFrame complet
-        new_gdf = gpd.GeoDataFrame(rows, crs="epsg:3857")
-        return new_gdf
 
     @staticmethod
     def convert_tile(tilename, which = 'bokeh'):

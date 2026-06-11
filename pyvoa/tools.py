@@ -42,7 +42,8 @@ import warnings
 from pyvoa.error import *
 import pickle
 import math
-
+import shapely.geometry as sg
+import geopandas as gpd
 # testing if pyvoa.ata is available
 import importlib
 _coacache_folder=''
@@ -538,6 +539,59 @@ def wgs84_to_web_mercator(tuple_xy):
         lat = tuple_xy[1]
     y = np.log(np.tan((90 + lat) * np.pi / 360.0)) * k
     return x, y
+
+@staticmethod
+def convertmercator(gdf):
+    '''
+    trick found by dadoun to solve this problem
+    see https://discourse.bokeh.org/t/bokeh-tile-antimeridian-problem/6978
+    '''
+    rows = []
+    for idx, row in gdf.iterrows():
+        new_poly = []
+        # Convertir les polygones / multipolygones
+        if row["geometry"]:
+            for pt in get_polycoords(row):
+                if isinstance(pt, tuple):
+                    # Un point = tuple (lon, lat)
+                    new_poly.append(wgs84_to_web_mercator(pt))
+                elif isinstance(pt, list):
+                    # Liste de points = ring de polygone
+                    shifted = [wgs84_to_web_mercator(p) for p in pt]
+                    new_poly.append(sg.Polygon(shifted))
+                else:
+                    raise TypeError("Unknown geometry element type")
+
+            # Construire la géométrie finale
+            if isinstance(new_poly[0], tuple):
+                geom = sg.Polygon(new_poly)
+            else:
+                geom = sg.MultiPolygon(new_poly)
+
+            # Copier toutes les colonnes d’origine
+            new_row = row.copy()
+            new_row["geometry"] = geom
+            rows.append(new_row)
+
+    # Reconstruire un GeoDataFrame complet
+    new_gdf = gpd.GeoDataFrame(rows, crs="epsg:3857")
+    return new_gdf
+
+@staticmethod
+def get_polycoords(geopandasrow):
+    """
+    Take a row of a geopandas as an input (i.e : for index, row in geopdwd.iterrows():...)
+        and returns a tuple (if the geometry is a Polygon) or a list (if the geometry is a multipolygon)
+        of an exterior.coords
+    """
+    geometry = geopandasrow['geometry']
+    all = []
+    if geometry.geom_type == 'Polygon':
+        return list(geometry.exterior.coords)
+    if geometry.geom_type == 'MultiPolygon':
+        for ea in geometry.geoms:
+            all.append(list(ea.exterior.coords))
+    return all
 
 
 @staticmethod
