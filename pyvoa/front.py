@@ -33,7 +33,8 @@ from pyvoa.tools import (
     all_or_none_lists,
     readpkl,
     set_verbose_mode,
-    dumppkl
+    dumppkl,
+    convertmercator
 )
 
 import pyvoa.geopd_builder as coco
@@ -344,7 +345,9 @@ class front:
             if self.gpdbuilderdata is not None:
                 kwargs['input'] = self.gpdbuilderdata
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
-                kwargs['input'] = pd.merge(kwargs['input'],self.gpdbuildergeo,how='left')
+                transfo = convertmercator(self.gpdbuildergeo)
+                kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
+
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
 
             if self.db == '':
