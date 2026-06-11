@@ -313,6 +313,12 @@ class GPDBuilder(object):
        else:
            input = input.loc[input['where'].isin(where)]
 
+       if input.empty:
+            PyvoaError(f"No information is available for the provided locations: {where}")
+       else:
+           missing = [loc for loc in where if input.loc[input['where'] == loc].empty]
+           if len(missing)>0:
+                PyvoaWarning('No data available for these locations: '+ str(missing))
 
        date_max_by_where = input.groupby('where')['date'].max()
        needs_reindex = date_max_by_where.nunique() > 1
@@ -350,7 +356,6 @@ class GPDBuilder(object):
             when_beg, when_end = input.date.min(), input.date.max()
 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
-
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
        flatwhere = flat_list(where)
 

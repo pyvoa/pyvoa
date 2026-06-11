@@ -332,6 +332,11 @@ class visu_matplotlib:
         ax.set_ylim(float(miny), float(maxy))
         ax.set_aspect('equal')
 
+        #   fig = ax.get_figure()
+        #fig.set_figwidth(16)
+        #ratio = (maxy - miny) / (maxx - minx)
+        #fig.set_figheight(fig.get_figwidth() * ratio)
+        # color range
         min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
         # plot
         plot = input.plot(
