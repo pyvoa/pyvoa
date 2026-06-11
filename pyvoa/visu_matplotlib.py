@@ -19,7 +19,8 @@ from pyvoa.tools import (
     extract_dates,
     debug,
     verb,
-    fill_missing_dates
+    fill_missing_dates,
+    wgs84_to_web_mercator
 )
 from pyvoa.error import *
 import math
@@ -306,47 +307,32 @@ class visu_matplotlib:
         import contextily as cx
         from matplotlib.ticker import ScalarFormatter
 
-
         cmap = plt.cm.get_cmap("viridis").reversed()
         ax = kwargs.get('ax')
         ax.axis('off')
 
-        input = kwargs.get('input').copy()
-        gdf = input.to_crs(epsg=3857)
-
-        bounds = gdf.total_bounds  # (minx, miny, maxx, maxy)
-        minx, miny, maxx, maxy = bounds
-        if len(gdf) < 10:
-            dx = (maxx - minx)
-            dy = (maxy - miny)
-
-            padding_x = dx * 2.0   # zoom arrière
-            padding_y = dy * 2.0
-
-            minx -= padding_x
-            maxx += padding_x
-            miny -= padding_y
-            maxy += padding_y
-        else:
-            padding_x = (maxx - minx) * 0.2
-            padding_y = (maxy - miny) * 0.2
-
-            minx -= padding_x
-            maxx += padding_x
-            miny -= padding_y
-            maxy += padding_y
-        ax.set_xlim(minx, maxx)
-        ax.set_ylim(miny, maxy)
+        input = kwargs.get('input')
         what = kwargs.get('what')
         which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
 
-        # color range
-        min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
-        # projection
-        input = input.to_crs(epsg=3857)
+        minx, miny, maxx, maxy = input.total_bounds
+        dx = max(maxx - minx, 10_000)
+        dy = max(maxy - miny, 10_000)
 
+        factor = 0.5 if len(input) < 10 else 0.1
+
+        minx -= dx * factor
+        maxx += dx * factor
+        miny -= dy * factor
+        maxy += dy * factor
+
+        ax.set_xlim(float(minx), float(maxx))
+        ax.set_ylim(float(miny), float(maxy))
+        ax.set_aspect('equal')
+
+        min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
         # plot
         plot = input.plot(
             column=which,
@@ -378,8 +364,8 @@ class visu_matplotlib:
         if tile == 'openstreet':
             cx.add_basemap(
                 ax,
-                crs=input.crs.to_string(),
-                source=cx.providers.OpenStreetMap.Mapnik
+                crs='EPSG:3857',
+                source=cx.providers.OpenStreetMap.Mapnik,
             )
 
         elif tile == 'esri':
@@ -395,7 +381,7 @@ class visu_matplotlib:
         elif tile == 'positron':
             cx.add_basemap(
                 ax,
-                crs=input.crs.to_string(),
+                crs='EPSG:3857',
                 source=cx.providers.CartoDB.PositronNoLabels
             )
 
