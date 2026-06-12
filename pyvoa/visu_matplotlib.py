@@ -20,9 +20,12 @@ from pyvoa.tools import (
     debug,
     verb,
     fill_missing_dates,
-    wgs84_to_web_mercator
+    wgs84_to_web_mercator,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
-from pyvoa.error import *
+
 import math
 import pandas as pd
 import geopandas as gpd
@@ -346,7 +349,7 @@ class visu_matplotlib:
             cmap=cmap,
             vmin=min_col,
             vmax=max_col,
-            edgecolor='black', 
+            edgecolor='black',
             linewidth=0.5,
             legend_kwds={
                 'label': which,

@@ -32,13 +32,15 @@ from pyvoa.tools import (
     getnonnegfunc,
     return_nonan_dates_pandas,
     dumppkl,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
 import pyvoa.geo as coge
 
 import pyvoa.jsondb_parser as parser
 
 import geopandas as gpd
-from pyvoa.error import *
 import os, time
 import re
 import pyvoa.geo as coge

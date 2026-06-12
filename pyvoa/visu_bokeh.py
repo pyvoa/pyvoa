@@ -20,8 +20,11 @@ from pyvoa.tools import (
     verb,
     fill_missing_dates,
     min_max_range,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
-from pyvoa.error import *
+
 import math
 import pandas as pd
 import geopandas as gpd

@@ -34,12 +34,14 @@ from pyvoa.tools import (
     readpkl,
     set_verbose_mode,
     dumppkl,
-    convertmercator
+    convertmercator,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
 
 import pyvoa.geopd_builder as coco
 from pyvoa.jsondb_parser import MetaInfo
-from pyvoa.error import *
 import pyvoa.geo as coge
 
 import geopandas as gpd
