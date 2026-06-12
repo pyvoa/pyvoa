@@ -1262,8 +1262,15 @@ class visu_bokeh:
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
         color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
-
+        from bokeh.models import CustomJSTickFormatter
+        color_bar.formatter = CustomJSTickFormatter(code="""
+            return (tick/1e8).toFixed(1)
+        """)
         bokeh_figure.add_layout(color_bar, 'below')
+        bokeh_figure.add_layout(
+        Title(text="×10⁸", align="right"),
+        "below"
+            )
         bokeh_figure.xaxis.visible = False
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
