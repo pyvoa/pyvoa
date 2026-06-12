@@ -725,7 +725,7 @@ def PyvoaInfo(message):
 def PyvoaWarning(message):
     if get_verbose_mode() > 0:
         blinking_centered_text(
-            'PYVOA Info !',
+            'PYVOA Warning !',
             message,
             blinking=False,
             text_color='black',
@@ -734,17 +734,18 @@ def PyvoaWarning(message):
 
     Exception(message)
 
+import sys
 def PyvoaError(message):
 
     blinking_centered_text(
-        'PYVOA Info !',
+        'PYVOA Error !',
         message,
         blinking=True,
         text_color='white',
         bg_color='red'
     )
+    sys.exit(1)
 
-    raise Exception(message)
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
