@@ -39,7 +39,6 @@ import unidecode
 import datetime as dt
 import numpy as np
 import warnings
-from pyvoa.error import *
 import pickle
 import math
 import shapely.geometry as sg
