@@ -22,13 +22,15 @@ from pyvoa.tools import (
     kwargs_keystesting,
     extract_dates,
     verb,
-    fill_missing_dates
+    fill_missing_dates,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
 import geopandas as gpd
 import pandas as pd
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwarg_options import InputOption
-from pyvoa.error import *
 
 try:
     import bokeh
@@ -346,7 +348,7 @@ class AllVisu:
         if isinstance(which, list):
             which = which[0]
             kwargs['which'] = which
-            
+
         if vis != 'bokeh' and kwargs['dateslider']:
             kwargs.pop("dateslider")
             raise PyvoaError("Only avalaible for vis='bokeh' dummy argument")

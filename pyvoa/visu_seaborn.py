@@ -233,7 +233,6 @@ class visu_seaborn:
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
         sns.set_theme(style="whitegrid")
-        plt.pie(input[what], labels=[kwargs['dicodisplayloc'][w] for w in input['where']], autopct='%1.1f%%')
         plt.xlabel(what)
         plt.ylabel('')
         plt.xticks(rotation=45)

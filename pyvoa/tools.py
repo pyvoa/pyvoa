@@ -593,7 +593,6 @@ def get_polycoords(geopandasrow):
             all.append(list(ea.exterior.coords))
     return all
 
-
 @staticmethod
 def min_max_range(a_min, a_max):
     """ Return a cleverly rounded min and max giving raw min and raw max of data.
@@ -640,6 +639,113 @@ def min_max_range(a_min, a_max):
         min_r = (1 - k) * min_r
 
     return (min_r, max_r)
+
+
+def blinking_centered_text(typemsg, message, blinking=False, text_color="white", bg_color="red"):
+
+    # Détecter l'environnement
+    try:
+        import google.colab
+        in_colab = True
+    except ImportError:
+        in_colab = False
+
+    try:
+        env_name = get_ipython().__class__.__name__
+        is_jupyter = env_name == 'ZMQInteractiveShell'
+    except NameError:
+        is_jupyter = False
+
+    # --- Jupyter / Colab : affichage HTML ---
+    if is_jupyter or in_colab:
+        from IPython.display import display, HTML
+
+        color_map = {
+            'yellow':  '#B8860B',
+            'red':     '#C0392B',
+            'green':   '#27AE60',
+            'blue':    '#2980B9',
+            'white':   '#FFFFFF',
+            'black':   '#000000',
+            'cyan':    '#17A589',
+            'magenta': '#8E44AD',
+            'default': '#FFFFFF',
+        }
+
+        bg_color_html   = color_map.get(bg_color.lower(),   bg_color)
+        text_color_html = color_map.get(text_color.lower(), text_color)
+        anim = "animation: blink 1s step-start infinite;" if blinking else ""
+
+        style = f"""
+        <style>
+            @keyframes blink {{ 50% {{ opacity: 0; }} }}
+        </style>
+        <div style="text-align:center; background-color:{bg_color_html};
+                    color:{text_color_html}; padding:10px; border-radius:5px;
+                    font-weight:bold; {anim}">
+            <div>{typemsg}</div>
+            <div>{message}</div>
+        </div>
+        """
+        display(HTML(style))
+
+    # --- Terminal : affichage ANSI ---
+    else:
+        color_codes = {
+            'black':   '30', 'red':     '31', 'green': '32', 'yellow': '33',
+            'blue':    '34', 'magenta': '35', 'cyan':  '36', 'white':  '37',
+            'default': '39',
+        }
+        bg_codes   = {name: str(int(code) + 10) for name, code in color_codes.items()}
+        text_code  = color_codes.get(text_color.lower(), '37')
+        bg_code    = bg_codes.get(bg_color.lower(), '41')
+
+        ansi_start = f"\033[5;{text_code};{bg_code}m" if blinking else f"\033[{text_code};{bg_code}m"
+        ansi_reset = "\033[0m"
+
+        try:
+            _, columns = shutil.get_terminal_size()
+        except:
+            columns = 80
+
+        sys.stdout.write(f'{ansi_start}{typemsg.center(columns)}{ansi_reset}\n')
+        sys.stdout.write(f'{ansi_start}{message.center(columns)}{ansi_reset}\n')
+
+def PyvoaInfo(message):
+    if pt.get_verbose_mode() > 1:
+        blinking_centered_text(
+            'PYVOA Info !',
+            message,
+            blinking=False,
+            text_color='black',
+            bg_color='blue'
+        )
+
+    Exception(message)
+
+def PyvoaWarning(message):
+    if pt.get_verbose_mode() > 0:
+        blinking_centered_text(
+            'PYVOA Info !',
+            message,
+            blinking=False,
+            text_color='black',
+            bg_color='yellow'
+        )
+
+    Exception(message)
+
+def PyvoaError(message):
+
+    blinking_centered_text(
+        'PYVOA Info !',
+        message,
+        blinking=True,
+        text_color='white',
+        bg_color='red'
+    )
+
+    raise Exception(message)
 
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""

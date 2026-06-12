@@ -22,7 +22,6 @@ import datetime
 import collections
 import random
 import numpy as np
-from pyvoa.error import *
 from pyvoa.tools import (
     info,
     verb,
@@ -31,7 +30,10 @@ from pyvoa.tools import (
     get_local_from_url,
     week_to_date,
     fill_missing_dates,
-    flat_list
+    flat_list,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
 import pyvoa.geo as coge
 import sys
@@ -227,7 +229,7 @@ class DataParser:
             self.mainpandas = self.get_parsing()
             self.get_echoinfo()
         except:
-            raise PyvoaDbError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
+            raise PyvoaError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
                 "You may contact contact@pyvoa.org . Thanks.")
 
   def get_echoinfo(self):
@@ -469,7 +471,7 @@ class DataParser:
       pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
-      pandas_db=pandas_db.dropna(subset=['geometry']) 
+      pandas_db=pandas_db.dropna(subset=['geometry'])
       return pandas_db
 
   def get_db(self,):

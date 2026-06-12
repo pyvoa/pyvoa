@@ -17,7 +17,7 @@ An interface module to easily plot pyvoa_data with bokeh
 
 """
 from pyvoa.tools import kwargs_keystesting
-from pyvoa.error import *
+#from pyvoa.error import *
 import math
 import pandas as pd
 import numpy as np
