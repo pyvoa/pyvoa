@@ -19,9 +19,11 @@ An interface module to easily plot pyvoa_data with bokeh
 from pyvoa.tools import (
     extract_dates,
     verb,
-    fill_missing_dates
+    fill_missing_dates,
+    PyvoaInfo,
+    PyvoaError,
+    PyvoaWarning
 )
-from pyvoa.error import *
 import math
 import pandas as pd
 import geopandas as gpd
