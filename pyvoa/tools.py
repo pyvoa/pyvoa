@@ -711,7 +711,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
         sys.stdout.write(f'{ansi_start}{message.center(columns)}{ansi_reset}\n')
 
 def PyvoaInfo(message):
-    if pt.get_verbose_mode() > 1:
+    if get_verbose_mode() > 1:
         blinking_centered_text(
             'PYVOA Info !',
             message,
@@ -723,7 +723,7 @@ def PyvoaInfo(message):
     Exception(message)
 
 def PyvoaWarning(message):
-    if pt.get_verbose_mode() > 0:
+    if get_verbose_mode() > 0:
         blinking_centered_text(
             'PYVOA Info !',
             message,
