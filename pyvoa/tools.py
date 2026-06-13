@@ -673,7 +673,8 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
 
         bg_color_html   = color_map.get(bg_color.lower(),   bg_color)
         text_color_html = color_map.get(text_color.lower(), text_color)
-        anim = "animation: blink 1s step-start infinite;" if blinking else ""
+        blink_period = 2 #seconds
+        anim = f"animation: blink {blink_period}s step-start infinite;" if blinking else ""
 
         style = f"""
         <style>
@@ -736,7 +737,6 @@ def PyvoaWarning(message):
 
 import sys
 def PyvoaError(message):
-
     blinking_centered_text(
         'PYVOA Error !',
         message,
