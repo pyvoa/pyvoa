@@ -282,7 +282,7 @@ class visu_bokeh:
             'log': kwargs.get('bokeh_figure_log')
         }
         dicof={'title':kwargs.get('title')}
-        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_label'] = which[0]
             dicof['y_axis_label'] = which[1]
@@ -359,7 +359,7 @@ class visu_bokeh:
 
         legend = kwargs.get('legend', None)
 
-        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
@@ -586,7 +586,7 @@ class visu_bokeh:
         #                       mode = mode, point_policy="snap_to_data")  # ,PanTool())
 
         panels = []
-        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             fig.yaxis[0].formatter = PrintfTickFormatter(format = "%4.2e")
             fig.xaxis.formatter = DatetimeTickFormatter(
@@ -669,7 +669,7 @@ class visu_bokeh:
         input.loc[:,'dayofyear']= input['date'].apply(lambda x : x.dayofyear)
         allyears = list(input.allyears.unique())
 
-        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             i = 0
             r_list=[]
@@ -1038,7 +1038,7 @@ class visu_bokeh:
         new_panels = []
         from bokeh.models import LogScale, LinearScale
 
-        for axis_type in self.av.d_graphicsinput_args['ax_type']:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             fig.y_range = kwargs['yrange']
 
