@@ -135,27 +135,39 @@ def kwargs_test(given_args, expected_args, error_string):
 
     return True
 
-def kwargs_valuestesting(given_values, expected_values, error_string):
-    ''' test if the values in the list given_values are in the expected_values '''
-    if not isinstance(expected_values,list):
-        raise PyvoaError("kwargs_fulltest error, the given args are not a list type.")
+def kwargs_values_testing(given_values, expected_values, error_string):
+    """Check if values are in allowed list."""
 
-    if expected_values is not None and given_values is not None:
-        if isinstance(given_values,list):
-            if isinstance(given_values[0],list):
-                for a in given_values:
-                    bad_values = [i for i in a if i not in expected_values ]
-                    if len(bad_values) != 0 :
-                        raise PyvoaError(error_string+' unrecognized values '+str(bad_values))
-            else:
-                bad_values = [a for a in given_values if a not in expected_values ]
-                if len(bad_values) != 0 :
-                    raise PyvoaError(error_string+' unrecognized values '+str(bad_values))
-        else:
-            if given_values not in expected_values:
-                raise PyvoaError(error_string+' unrecognized values '+str(given_values))
+    if expected_values is None or given_values is None:
+        return
+
+    if not isinstance(expected_values, (list, set, tuple)):
+        return
+
+    allowed = set(expected_values)
+
+    def check_one_list(vals):
+        bad = [v for v in vals if v not in allowed]
+        if bad:
+            raise PyvoaError(
+                f"{error_string} unrecognized values {bad}"
+            )
+
+    # cas list of list
+    if isinstance(given_values, list) and given_values and isinstance(given_values[0], list):
+        for sub in given_values:
+            check_one_list(sub)
+
+    # cas list simple
+    elif isinstance(given_values, list):
+        check_one_list(given_values)
+
+    # cas scalaire
     else:
-        pass
+        if given_values not in allowed:
+            raise PyvoaError(
+                f"{error_string} unrecognized value {given_values}"
+            )
 
 def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string):
     """Test that the list of kwargs is compatible with expected args. If not

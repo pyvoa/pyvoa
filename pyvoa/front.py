@@ -288,13 +288,20 @@ class front:
                         PyvoaError('For you own DB which must be stipulated !!')
 
             mustbealist = ['where','which','option']
-
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
             default['input'] = kwargs.get('input',pd.DataFrame())
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
-            [kwargs_valuestesting(dicovisu[i],self.av.d_graphicsinput_args[i],'value of '+ i +' not correct') for i in ['typeofhist','typeofplot']]
+            
+            for i in self.av.d_graphicsinput_args:
+                print(self.av.d_graphicsinput_args[i])
+                kwargs_valuestesting(
+                    dicovisu[i],
+                    self.av.d_graphicsinput_args[i],
+                    f"value of {i} not correct"
+                )
+
             for k,v in default.items():
                 if k in kwargs.keys() and k not in ['when','input']:
                     if isinstance(kwargs[k],list):
