@@ -356,10 +356,17 @@ class visu_bokeh:
             'log': kwargs.get('bokeh_figure_log_date')
         }
         dicof={'title':kwargs.get('title')}
-
         legend = kwargs.get('legend', None)
 
-        for axis_type in self.av.d_graphicsinput_args['scale']:
+        ay_type = kwargs.get('scale', None)
+        scale_options = self.av.d_graphicsinput_args['scale']
+
+        if ay_type is None:
+            ay_type = [i for i in self.av.d_graphicsinput_args['scale'] if i]
+        if not isinstance(ay_type,list):
+            ay_type = [ay_type]
+
+        for axis_type in ay_type:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
