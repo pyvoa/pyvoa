@@ -24,7 +24,7 @@ pd.options.mode.chained_assignment = None  # default='warn'
 import datetime as dt
 
 from pyvoa.tools import (
-    kwargs_valuestesting,
+    kwargs_values_testing,
     extract_dates,
     debug,
     verb,
@@ -295,9 +295,9 @@ class GPDBuilder(object):
        '''
        defaultargs = InputOption().d_batchinput_args
        option = kwargs.get('option',defaultargs['option'][0])
-       kwargs_valuestesting(option,defaultargs['option'],'option error ... ')
+       kwargs_values_testing(option,defaultargs['option'],'option error ... ')
        output = kwargs['output']
-       kwargs_valuestesting(output,defaultargs['output'],'output error ...')
+       kwargs_values_testing(output,defaultargs['output'],'output error ...')
        which = kwargs.get('which',[self.currentdata.get_available_keywords()[0]])
        if which == ['']:
           which = [self.currentdata.get_available_keywords()[0]]
@@ -308,7 +308,7 @@ class GPDBuilder(object):
        when  = kwargs.get('when')
        where = kwargs.get('where')
        if input.empty:
-            kwargs_valuestesting(which,self.currentdata.get_available_keywords(),'which error ...')
+            kwargs_values_testing(which,self.currentdata.get_available_keywords(),'which error ...')
             input = self.currentdata.get_maingeopandas()
             anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
             input = input.loc[:,~input.columns.isin(anticolumns)]
