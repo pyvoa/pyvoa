@@ -25,7 +25,7 @@ import numpy as np
 import datetime as dt
 from pyvoa.tools import (
     kwargs_keystesting,
-    kwargs_valuestesting,
+    kwargs_values_testing,
     debug,
     info,
     fill_missing_dates,
@@ -293,10 +293,9 @@ class front:
             default['output'] = default['output'][0]
             default['input'] = kwargs.get('input',pd.DataFrame())
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
-            
+
             for i in self.av.d_graphicsinput_args:
-                print(self.av.d_graphicsinput_args[i])
-                kwargs_valuestesting(
+                kwargs_values_testing(
                     dicovisu[i],
                     self.av.d_graphicsinput_args[i],
                     f"value of {i} not correct"
