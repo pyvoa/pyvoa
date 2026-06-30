@@ -49,59 +49,62 @@ class GPDBuilder(object):
    """
    GPDBuilder class
    """
-   def __init__(self, db_name):
+   def __init__(self, db_name = None):
         """
             Main pycoa.class:
             - call the get_parser
             - call the geo
             - call the display
         """
-        verb("Init of geopd_builder.GPDBuilder()")
-        self.db = db_name
-        self.currentmetadata = parser.MetaInfo().getcurrentmetadata(db_name)
-        self.currentdata = parser.DataParser(db_name)
+        if db_name is not None:
+            verb("Init of geopd_builder.GPDBuilder()")
+            self.db = db_name
+            self.currentmetadata = parser.MetaInfo().getcurrentmetadata(db_name)
+            self.currentdata = parser.DataParser(db_name)
 
-        self.slocation = self.currentdata.get_locations()
-        #self.geo = self.currentdata.get_geo()
-        self.db_world = self.currentdata.get_world_boolean()
-        self.codisp  = None
-        self.code = self.currentmetadata['geoinfo']['iso3']
-        self.granularity = self.currentmetadata['geoinfo']['granularity']
-        self.namecountry = self.currentmetadata['geoinfo']['iso3']
-        self._gi = coge.GeoInfo()
-        try:
-            if self.granularity == 'country':
-                   self.geo = coge.GeoManager('name')
-                   geopan = gpd.GeoDataFrame()#crs="EPSG:4326")
-                   info = coge.GeoInfo()
-                   alllocationsgeo = self.geo.get_GeoRegion().get_countries_from_region('world')
-                   geopan['where'] = [self.geo.to_standard(c)[0] for c in alllocationsgeo]
-                   geopan = info.add_field(field=['geometry'],input=geopan ,geofield='where')
-                   geopan = gpd.GeoDataFrame(geopan, geometry=geopan.geometry, crs="EPSG:4326")
-                   geopan = geopan[geopan['where'] != 'Antarctica']
-                   where_kindgeo = geopan.dropna().reset_index(drop=True)
-            else:
-                   self.geo = coge.GeoCountry(self.code)
-                   if self.granularity == 'region':
-                        where_kindgeo = self.geo.get_region_list()[['code_region', 'name_region', 'geometry']]
-                        where_kindgeo = where_kindgeo.rename(columns={'name_region': 'where'})
-                        if self.code == 'PRT':
-                             tmp = where_kindgeo.rename(columns={'name_region': 'where'})
-                             tmp = tmp.loc[tmp.code_region=='PT.99']
-                             self.boundary_metropole =tmp['geometry'].total_bounds
-                        if self.code == 'FRA':
-                             tmp = where_kindgeo.rename(columns={'name_region': 'where'})
-                             tmp = tmp.loc[tmp.code_region=='999']
-                             self.boundary_metropole =tmp['geometry'].total_bounds
-                   elif self.granularity == 'subregion':
-                        list_dep_metro = None
-                        where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
-                        where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
-                   else:
-                       raise PyvoaTypeError('What is the granularity of your  database ?')
-        except:
-            raise PyvoaTypeError('What data base are you looking for ?')
-        self.where_geodescription = where_kindgeo
+            self.slocation = self.currentdata.get_locations()
+            #self.geo = self.currentdata.get_geo()
+            self.db_world = self.currentdata.get_world_boolean()
+            self.codisp  = None
+            self.code = self.currentmetadata['geoinfo']['iso3']
+            self.granularity = self.currentmetadata['geoinfo']['granularity']
+            self.namecountry = self.currentmetadata['geoinfo']['iso3']
+            self._gi = coge.GeoInfo()
+            try:
+                if self.granularity == 'country':
+                       self.geo = coge.GeoManager('name')
+                       geopan = gpd.GeoDataFrame()#crs="EPSG:4326")
+                       info = coge.GeoInfo()
+                       alllocationsgeo = self.geo.get_GeoRegion().get_countries_from_region('world')
+                       geopan['where'] = [self.geo.to_standard(c)[0] for c in alllocationsgeo]
+                       geopan = info.add_field(field=['geometry'],input=geopan ,geofield='where')
+                       geopan = gpd.GeoDataFrame(geopan, geometry=geopan.geometry, crs="EPSG:4326")
+                       geopan = geopan[geopan['where'] != 'Antarctica']
+                       where_kindgeo = geopan.dropna().reset_index(drop=True)
+                else:
+                       self.geo = coge.GeoCountry(self.code)
+                       if self.granularity == 'region':
+                            where_kindgeo = self.geo.get_region_list()[['code_region', 'name_region', 'geometry']]
+                            where_kindgeo = where_kindgeo.rename(columns={'name_region': 'where'})
+                            if self.code == 'PRT':
+                                 tmp = where_kindgeo.rename(columns={'name_region': 'where'})
+                                 tmp = tmp.loc[tmp.code_region=='PT.99']
+                                 self.boundary_metropole =tmp['geometry'].total_bounds
+                            if self.code == 'FRA':
+                                 tmp = where_kindgeo.rename(columns={'name_region': 'where'})
+                                 tmp = tmp.loc[tmp.code_region=='999']
+                                 self.boundary_metropole =tmp['geometry'].total_bounds
+                       elif self.granularity == 'subregion':
+                            list_dep_metro = None
+                            where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
+                            where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
+                       else:
+                           raise PyvoaTypeError('What is the granularity of your  database ?')
+            except:
+                raise PyvoaTypeError('What data base are you looking for ?')
+            self.where_geodescription = where_kindgeo
+        else:
+            self.currentdata = None
 
    def getinfodatewhich(self):
        return self.currentdata.get_echoinfo()
@@ -298,9 +301,13 @@ class GPDBuilder(object):
        kwargs_values_testing(option,defaultargs['option'],'option error ... ')
        output = kwargs['output']
        kwargs_values_testing(output,defaultargs['output'],'output error ...')
-       which = kwargs.get('which',[self.currentdata.get_available_keywords()[0]])
+       if self.currentdata is not None:
+           available_kewords=self.currentdata.get_available_keywords()[0]
+       else:
+            available_kewords=kwargs['which']
+       which = kwargs.get('which',[available_kewords])
        if which == ['']:
-          which = [self.currentdata.get_available_keywords()[0]]
+          which = [available_kewords]
           kwargs['which'] = which
 
        input = kwargs.get('input')
@@ -308,9 +315,9 @@ class GPDBuilder(object):
        when  = kwargs.get('when')
        where = kwargs.get('where')
        if input.empty:
-            kwargs_values_testing(which,self.currentdata.get_available_keywords(),'which error ...')
+            kwargs_values_testing(which,available_kewords,'which error ...')
             input = self.currentdata.get_maingeopandas()
-            anticolumns = [x for x in self.currentdata.get_available_keywords() if x not in which]
+            anticolumns = [x for x in available_kewords if x not in which]
             input = input.loc[:,~input.columns.isin(anticolumns)]
        else:
            input = input.loc[input['where'].isin(where)]

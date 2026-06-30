@@ -204,11 +204,11 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
     """Filling the input pandas dataframe p with missing dates
     """
     if not isinstance(p, pd.DataFrame):
-        raise PyvoaTypeError("Expecting input p as a pandas dataframe.")
+        raise PyvoaError("Expecting input p as a pandas dataframe.")
     if not date_field in p.columns:
-        raise PyvoaKeyError("The date_field is not a proper column of input pandas dataframe.")
+        raise PyvoaError("The date_field is not a proper column of input pandas dataframe.")
     if not loc_field in p.columns:
-        raise PyvoaKeyError("The loc_field is not a proper column of input pandas dataframe.")
+        raise PyvoaError("The loc_field is not a proper column of input pandas dataframe.")
     # datatoilettage :)
     p = p.loc[~p[loc_field].isin([''])]
 
