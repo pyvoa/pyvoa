@@ -260,7 +260,7 @@ class front:
             '''
             input = kwargs.get('input',pd.DataFrame())
             which = kwargs.get('which',None)
-            if self.gpdbuilderdata is None and not input.empty and which is None:
+            if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
 
             if func.__name__ == 'get':
@@ -342,7 +342,8 @@ class front:
                 PyvoaWarning("In your DataFrame : the date must be in pd.to_datetime format !")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-
+                if which is None:
+                    PyvoaError('When input is given, which is also needed !')    
                 when = kwargs.get('when')
 
                 #if not when:
@@ -357,6 +358,9 @@ class front:
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
 
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
+            else:
+                if not input.empty:
+                    kwargs = coco.GPDBuilder().get_stats(**kwargs)
 
             if self.db == '':
                 self.allvisu = AllVisu('', kwargs['input'])
