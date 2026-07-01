@@ -72,7 +72,8 @@ class InputOption():
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
                         'guideline':[False,True],\
-                        'scale':[None,'linear','log'],\
+                         #does None need here 'scale':[None,'linear','log']
+                        'scale':['linear','log'],\
                         'maxlettersdisplayed':10
                         }
 
