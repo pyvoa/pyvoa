@@ -88,7 +88,7 @@ class AllVisu:
         self.database_name = None
         verb("Init of AllVisu() with db=" + str(db_name))
         self.database_name = db_name
-        if db_name != '':
+        if db_name != 'in-house data':
             self.currentmetadata = MetaInfo().getcurrentmetadata(db_name)
             self.code = self.currentmetadata['geoinfo']['iso3']
             self.granularity = self.currentmetadata['geoinfo']['granularity']

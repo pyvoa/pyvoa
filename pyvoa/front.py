@@ -343,7 +343,7 @@ class front:
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
                 if which is None:
-                    PyvoaError('When input is given, which is also needed !')    
+                    PyvoaError('When input is given, which is also needed !')
                 when = kwargs.get('when')
 
                 #if not when:
@@ -361,9 +361,8 @@ class front:
             else:
                 if not input.empty:
                     kwargs = coco.GPDBuilder().get_stats(**kwargs)
-
-            if self.db == '':
-                self.allvisu = AllVisu('', kwargs['input'])
+                    self.db = 'in-house data'
+                    self.allvisu = AllVisu(self.db, kwargs['input'])
 
             found_bypop = None
             for w in kwargs['option']:
