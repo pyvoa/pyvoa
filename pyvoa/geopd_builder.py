@@ -104,6 +104,7 @@ class GPDBuilder(object):
                 raise PyvoaTypeError('What data base are you looking for ?')
             self.where_geodescription = where_kindgeo
         else:
+            self.db = 'in-house data'
             self.currentdata = None
 
    def getinfodatewhich(self):
