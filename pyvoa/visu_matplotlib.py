@@ -345,6 +345,8 @@ class visu_matplotlib:
         #fig.set_figheight(fig.get_figwidth() * ratio)
         # color range
         min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
+        input = input.set_crs("EPSG:2154", allow_override=True)
+
         # plot
         plot = input.plot(
             column=which,
