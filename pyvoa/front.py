@@ -259,7 +259,7 @@ class front:
                 order position of the items in 'option'
             '''
             input = kwargs.get('input',pd.DataFrame())
-            which = kwargs.get('which',None)
+
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
 
@@ -278,14 +278,15 @@ class front:
             else:
                 raise PyvoaError("What function is this "+func.__name__)
 
-            if self.db == '' :
+            if self.db == '' or self.db == 'in-house data':
                 if input is None:
                     PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
                 else:
                     input = fill_missing_dates(input)
                     kwargs['input']=input
-                    if 'which' not in kwargs.keys():
-                        PyvoaError('For you own DB which must be stipulated !!')
+                kwargs['which'] =  [w for w in input.columns if w not in ['date', 'where']][0]
+            else:
+                kwargs['which'] = kwargs.get('which',self.gpdbuilder.get_available_keywords()[0])
 
             mustbealist = ['where','which','option']
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
@@ -342,8 +343,6 @@ class front:
                 PyvoaWarning("In your DataFrame : the date must be in pd.to_datetime format !")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                if which is None:
-                    PyvoaError('When input is given, which is also needed !')
                 when = kwargs.get('when')
 
                 #if not when:
@@ -360,6 +359,8 @@ class front:
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
             else:
                 if not input.empty:
+                    if not all(col in input.columns for col in ['date', 'where']):
+                        PyvoaError("['date', 'where'] must be in your pandas")
                     kwargs = coco.GPDBuilder().get_stats(**kwargs)
                     self.db = 'in-house data'
                     self.allvisu = AllVisu(self.db, kwargs['input'])
