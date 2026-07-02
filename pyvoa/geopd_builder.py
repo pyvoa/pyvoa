@@ -302,23 +302,17 @@ class GPDBuilder(object):
        kwargs_values_testing(option,defaultargs['option'],'option error ... ')
        output = kwargs['output']
        kwargs_values_testing(output,defaultargs['output'],'output error ...')
-       if self.currentdata is not None:
-           available_kewords=self.currentdata.get_available_keywords()[0]
-       else:
-            available_kewords=kwargs['which']
-       which = kwargs.get('which',[available_kewords])
-       if which == ['']:
-          which = [available_kewords]
-          kwargs['which'] = which
 
+       which = kwargs.get('which')
        input = kwargs.get('input')
+
        what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
        if input.empty:
-            kwargs_values_testing(which,available_kewords,'which error ...')
+            kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
-            anticolumns = [x for x in available_kewords if x not in which]
+            anticolumns = [x for x in available_keywords if x not in which]
             input = input.loc[:,~input.columns.isin(anticolumns)]
        else:
            input = input.loc[input['where'].isin(where)]
@@ -364,7 +358,6 @@ class GPDBuilder(object):
            when_beg_data,when_end_data = when_beg, when_end
        else:
             when_beg, when_end = input.date.min(), input.date.max()
-
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
        flatwhere = flat_list(where)
