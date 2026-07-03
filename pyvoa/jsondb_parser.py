@@ -212,19 +212,19 @@ class DataParser:
         self.metadata = MetaInfo().getcurrentmetadata(namedb)
         granularity = self.metadata['geoinfo']['granularity']
         code = self.metadata['geoinfo']['iso3']
+        if granularity == 'country': # world wide dba
+            self.granu_country = True
+            self.geo = coge.GeoManager('name')
+            self.geo_all = 'world'
+        else: # local db
+            self.geo = coge.GeoCountry(code)
+            if granularity == 'region':
+                self.geo_all = self.geo.get_region_list()
+            elif granularity == 'subregion':
+                self.geo_all = self.geo.get_subregion_list()
+            else:
+                PyvoaError('Granularity problem: neither country, region or subregion')
         try:
-            if granularity == 'country': # world wide dba
-                self.granu_country = True
-                self.geo = coge.GeoManager('name')
-                self.geo_all = 'world'
-            else: # local db
-                self.geo = coge.GeoCountry(code)
-                if granularity == 'region':
-                    self.geo_all = self.geo.get_region_list()
-                elif granularity == 'subregion':
-                    self.geo_all = self.geo.get_subregion_list()
-                else:
-                    PyvoaError('Granularity problem: neither country, region or subregion')
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
             self.get_echoinfo()
