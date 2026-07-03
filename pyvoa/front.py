@@ -200,7 +200,7 @@ class front:
         if reload not in [0,1]:
             raise PyvoaError('reload must be a boolean ... ')
         if base not in self.listwhom():
-            raise PyvoaDbError(base + ' is not a supported GPDBuilder. '
+            raise PyvoaError(base + ' is not a supported GPDBuilder. '
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
         visu = self.getvis()
