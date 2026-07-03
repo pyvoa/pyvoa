@@ -227,11 +227,11 @@ class DataParser:
         try:
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
-            self.get_echoinfo()
         except:
             raise PyvoaError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
                 "You may contact contact@pyvoa.org . Thanks.")
-
+        self.get_echoinfo()
+                
   def get_echoinfo(self):
       info('Few information concernant the selected database : ', self.db)
       info('Available key-words, which ∈', sorted(self.get_available_keywords()))
