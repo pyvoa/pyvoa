@@ -327,7 +327,8 @@ class front:
                 else:
                     kwargs['where'] = list(input['where'].unique())
             else:
-                missing = [w for w in kwargs['where'] if w.upper() not in self.listwhere()]
+                upwhere = [i.upper() for i in self.listwhere()]
+                missing = [w for w in kwargs['where'] if w.upper() not in upwhere]
                 if missing:
                     PyvoaError('This location do not exit in the DB :' + str(missing))
 
