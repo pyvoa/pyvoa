@@ -341,7 +341,7 @@ class front:
                     raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
             if not input.empty:
-                PyvoaWarning("In your DataFrame : the date must be in pd.to_datetime format !")
+                PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
                 when = kwargs.get('when')
