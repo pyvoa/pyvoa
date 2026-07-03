@@ -26,7 +26,7 @@ GeoCountry manages information for a single country.
 """
 
 import inspect  # for debug purpose
-
+import sys
 import warnings
 
 import pycountry as pc
