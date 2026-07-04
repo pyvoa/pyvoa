@@ -325,15 +325,23 @@ class GPDBuilder(object):
                 PyvoaWarning('No data available for these locations: '+ str(missing))
 
        date_max_by_where = input.groupby('where')['date'].max()
-       needs_reindex = date_max_by_where.nunique() > 1
-       if needs_reindex:
-            PyvoaWarning("Your data is irregular, date will be reindexed ! ")
-            all_dates = input['date'].unique()
+       if date_max_by_where.nunique() > 1:
+            PyvoaWarning(
+                "Some 'where' values have different end dates; "
+                "the data will be reindexed."
+            )
+
+            all_dates = np.sort(input['date'].unique())
+
             input = (
-                input.set_index('date')
-                        .groupby('where')
-                        .apply(lambda g: g.reindex(all_dates).ffill().bfill())
-                    .reset_index('date').reset_index(drop=True)
+                input.set_index(['where', 'date'])
+                  .groupby(level=0)
+                  .apply(lambda g: g.droplevel(0)
+                                    .reindex(all_dates)
+                                    .ffill()
+                                    .bfill())
+                  .reset_index()
+                  .rename(columns={'index': 'date'})
             )
 
        if not pd.api.types.is_datetime64_any_dtype(input['date']):

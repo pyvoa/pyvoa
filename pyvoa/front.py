@@ -319,7 +319,6 @@ class front:
             kwargs['kwargsuser'] = kwargs.copy()
 
             where =  kwargs['where']
-
             if kwargs['where'][0] == '':
                 if input.empty:
                     if self.gpdbuilderdata is not None:
@@ -327,11 +326,11 @@ class front:
                 else:
                     kwargs['where'] = list(input['where'].unique())
             else:
-                upwhere = [i.upper() for i in self.listwhere()]
+                wh = list(input['where'].unique()) if not input.empty else self.listwhere()
+                upwhere = [i.upper() for i in wh]
                 missing = [w for w in kwargs['where'] if w.upper() not in upwhere]
                 if missing:
                     PyvoaError('This location do not exit in the DB :' + str(missing))
-
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
             if 'sumall' in kwargs['option']:
@@ -340,31 +339,26 @@ class front:
                 if len(kwargs['which'])>1:
                     raise PyvoaError('sumall option incompatible with multiple variables... please keep only one variable!')
 
-            if not input.empty:
-                PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")
-                if not all(i in input.columns for i in ['where', 'date']):
-                    raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                when = kwargs.get('when')
-
                 #if not when:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
                 #input = input.loc[input['where'].isin(kwargs['where'])]
                 #kwargs['input'] = input
-
-            if self.gpdbuilderdata is not None:
+            if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
                 transfo = convertmercator(self.gpdbuildergeo)
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
-
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
             else:
-                if not input.empty:
-                    if not all(col in input.columns for col in ['date', 'where']):
-                        PyvoaError("['date', 'where'] must be in your pandas")
-                    kwargs = coco.GPDBuilder().get_stats(**kwargs)
-                    self.db = 'in-house data'
-                    self.allvisu = AllVisu(self.db, kwargs['input'])
+                PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")
+                if not all(col in input.columns for col in ['date', 'where']):
+                    PyvoaError("['date', 'where'] must be in your pandas")
+                if not all(i in input.columns for i in ['where', 'date']):
+                    raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
+                #when = kwargs.get('when')
+                kwargs = coco.GPDBuilder().get_stats(**kwargs)
+                self.db = 'in-house data'
+                self.allvisu = AllVisu(self.db, kwargs['input'])
 
             found_bypop = None
             for w in kwargs['option']:
