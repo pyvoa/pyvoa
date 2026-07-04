@@ -968,6 +968,9 @@ class front:
             If clustered is True, it returns a list of regions based on the ISO3 code.
             If clustered is False, it returns a list of countries based on the granularity and the current database settings.
         """
+        if self.db is None or self.db=='in-house data':
+            PyvoaError("listwhere not available use your on where ... ")
+            
         granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = self.meta.getcurrentmetadata(self.db)['geoinfo']['iso3']
         def clust():
