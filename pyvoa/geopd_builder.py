@@ -309,18 +309,19 @@ class GPDBuilder(object):
        what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
+
        if input.empty:
             kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
             anticolumns = [x for x in available_keywords if x not in which]
             input = input.loc[:,~input.columns.isin(anticolumns)]
        else:
-           input = input.loc[input['where'].isin(where)]
+           input = input.loc[input['where'].str.upper().isin([w.upper() for w in where])]
 
        if input.empty:
             PyvoaError(f"No information is available for the provided locations: {where}")
        else:
-           missing = [loc for loc in where if input.loc[input['where'] == loc].empty]
+           missing = [loc for loc in where if input.loc[input['where'].str.upper() == loc.upper()].empty]
            if len(missing)>0:
                 PyvoaWarning('No data available for these locations: '+ str(missing))
 
