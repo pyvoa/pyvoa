@@ -230,13 +230,6 @@ class DataParser:
         except:
             raise PyvoaError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
                 "You may contact contact@pyvoa.org . Thanks.")
-        self.get_echoinfo()
-
-  def get_echoinfo(self):
-      info('Few information concernant the selected database : ', self.db)
-      info('Available key-words, which ∈', sorted(self.get_available_keywords()))
-      info('Example of where : ', random.choices(self.get_locations(), k=min(5,len(self.get_locations()))),' ...')
-      info('Last date data ', pd.to_datetime(max(self.get_dates())).strftime("%m/%d/%Y"))
 
   def get_parsing(self,):
       '''

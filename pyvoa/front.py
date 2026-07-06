@@ -21,6 +21,7 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 import pandas as pd
 from functools import wraps
 import numpy as np
+import random
 
 import datetime as dt
 from pyvoa.tools import (
@@ -219,7 +220,15 @@ class front:
                 self.allvisu = AllVisu(base, pandy)
                 coge.GeoManager('name')
         self.db = base
+        self.get_echoinfo()
 
+
+    def get_echoinfo(self):
+      info('Few information concernant the selected database : ', self.db)
+      info('Available key-words, which ∈', sorted(self.listwhich()))
+      info('Example of where : ', random.choices(self.listwhere(), k=min(5,len(self.listwhere()))),' ...')
+      info('Last date data ', self.gpdbuilderdata['date'].max())
+      info('First date data ', self.gpdbuilderdata['date'].min())
 
     def help(self,):
         return h.display_full_help()
@@ -970,7 +979,6 @@ class front:
         """
         if self.db is None or self.db=='in-house data':
             PyvoaError("listwhere not available use your on where ... ")
-            
         granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = self.meta.getcurrentmetadata(self.db)['geoinfo']['iso3']
         def clust():
