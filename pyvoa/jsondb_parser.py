@@ -20,7 +20,6 @@ from os.path import isfile, join
 import json
 import datetime
 import collections
-import random
 import numpy as np
 from pyvoa.tools import (
     info,

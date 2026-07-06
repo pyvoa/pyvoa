@@ -222,7 +222,6 @@ class front:
         self.db = base
         self.get_echoinfo()
 
-
     def get_echoinfo(self):
       info('Few information concernant the selected database : ', self.db)
       info('Available key-words, which ∈', sorted(self.listwhich()))
