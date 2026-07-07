@@ -24,10 +24,10 @@
 			"alias":"Date",
 			"name":"date"
              	       },
-		       {"alias":"Deceased","name":"tot_deaths","cumulative":true},
-               {"alias":"Confirmed","name":"tot_cases","cumulative":true},
-               {"alias":"Recovered","name":"tot_recovered","cumulative":true},
-               {"alias":"Tested","name":"tot_test","cumulative":true}   
+		       {"alias":"Deceased","name":"tot_deaths"},
+               {"alias":"Confirmed","name":"tot_cases"},
+               {"alias":"Recovered","name":"tot_recovered"},
+               {"alias":"Tested","name":"tot_test"}   
 	 ]
 	}
   ]
