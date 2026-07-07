@@ -59,8 +59,7 @@
 			},
 		    {
 				"name":"tot_dchosp",
-				"alias":"dchosp",
-				"cumulative":true
+				"alias":"dchosp"
 		    },
 		    {	   
 				"name":"cur_hosp",
@@ -68,8 +67,7 @@
 		    },
 		    {
 				"name":"tot_rad",
-				"alias":"rad",
-				"cumulative":true
+				"alias":"rad"
 		    },
 		    {
 			 	"name":"cur_rea",
@@ -144,23 +142,19 @@
 			},
 			{
 				"name":"tot_vacc1",
-				"alias":"n_cum_dose1",
-				"cumulative":true
+				"alias":"n_cum_dose1"
 			},
 			{
         		"name":"tot_vacc_complet",
-				"alias":"n_cum_complet",
-				"cumulative":true
+				"alias":"n_cum_complet"
 			},
 			{
 				"name":"tot_vacc_rappel",
-				"alias":"n_cum_rappel",
-				"cumulative":true
+				"alias":"n_cum_rappel"
 			},
 			{
 				"name":"tot_vacc2_rappel",
-				"alias":"n_cum_2_rappel",
-				"cumulative":true
+				"alias":"n_cum_2_rappel"
 			}
 			]
 		},
