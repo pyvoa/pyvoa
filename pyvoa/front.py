@@ -205,7 +205,7 @@ class front:
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
         visu = self.getvis()
-
+        
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
             print('Available key-words, which ∈', self.listwhich())
@@ -336,7 +336,14 @@ class front:
             else:
                 wh = list(input['where'].unique()) if not input.empty else self.listwhere()
                 upwhere = [i.upper() for i in wh]
-                missing = [w for w in kwargs['where'] if w.upper() not in upwhere]
+                flat_where = []
+                for w in kwargs['where']:
+                    if isinstance(w, list):
+                        flat_where.extend(w)
+                    else:
+                        flat_where.append(w)
+                missing = [w for w in flat_where if w.upper() not in upwhere]
+
                 if missing:
                     PyvoaError('This location do not exit in the DB :' + str(missing))
             if not all_or_none_lists(kwargs['where']):
@@ -353,9 +360,11 @@ class front:
                 #kwargs['input'] = input
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
-                kwargs = self.gpdbuilder.get_stats(**kwargs)
                 transfo = convertmercator(self.gpdbuildergeo)
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
+                kwargs = self.gpdbuilder.get_stats(**kwargs)
+                #if 'sumall' in kwargs['option']:
+                #    print(kwargs['input'])
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
             else:
                 PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")
