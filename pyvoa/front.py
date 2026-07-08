@@ -205,7 +205,7 @@ class front:
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
         visu = self.getvis()
-        
+
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
             print('Available key-words, which ∈', self.listwhich())
