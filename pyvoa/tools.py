@@ -455,6 +455,7 @@ def getnonnegfunc(mypd,which):
             yy = pa.values
             ind = list(pa.index)
             where_nan = np.isnan(yy)
+            yy = pa.to_numpy(copy=True)
             yy[where_nan] = 0.
             indices=np.where(yy < 0)[0]
             for kk in np.where(yy < 0)[0]:
