@@ -677,6 +677,7 @@ class visu_bokeh:
         allyears = list(input.allyears.unique())
 
         for axis_type in self.av.d_graphicsinput_args['scale']:
+
             fig = dbokeh_figure[axis_type]
             i = 0
             r_list=[]

@@ -388,8 +388,9 @@ class GPDBuilder(object):
                  )
 
            kwargs['input'] = input
-           #if kwargs['kwargsuser']['input'].empty:
-           input = self.whereclustered(**kwargs)
+          
+           if kwargs['kwargsuser']['input'].empty:
+               input = self.whereclustered(**kwargs)
            has_normalize = any(o.startswith("normalize:") for o in option)
            has_sumall = "sumall" in option
 

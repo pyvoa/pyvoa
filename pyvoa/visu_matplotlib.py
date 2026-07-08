@@ -334,7 +334,6 @@ class visu_matplotlib:
         maxx += dx * factor
         miny -= dy * factor
         maxy += dy * factor
-
         ax.set_xlim(float(minx), float(maxx))
         ax.set_ylim(float(miny), float(maxy))
         ax.set_aspect('equal')
