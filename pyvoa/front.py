@@ -346,6 +346,7 @@ class front:
 
                 if missing:
                     PyvoaError('This location do not exit in the DB :' + str(missing))
+
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
             if 'sumall' in kwargs['option']:

@@ -260,6 +260,10 @@ class GPDBuilder(object):
                     population = temp.loc[temp.date==temp.date.max()]['population']
                     populationsum = np.nansum(population)
 
+                # Canada, Chile, Greece, Norway seem to have geometry problems
+                # They can be drawn individually but not when 'sumall' is present
+                # buffer(0) fixe the problem.
+                temp["geometry"] = temp["geometry"].buffer(0)
                 geometryjoined = temp.loc[temp.date == temp.date.max()]["geometry"].unary_union
                 temp = temp.groupby(['date'])[which].sum().reset_index()
 
@@ -278,10 +282,9 @@ class GPDBuilder(object):
                 where = self.geo.to_standard(where,output='list',interpret_region=True)
             else:
                 where = self.subregions_deployed(where,self.granularity)
-
             newpd = input.loc[input['where'].str.upper().isin([x.upper() for x in where])]
+            newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
 
-        newpd = gpd.GeoDataFrame(newpd, geometry=newpd.geometry, crs='EPSG:4326').reset_index(drop=True)
         where_geometry_none = newpd[newpd['geometry'].isna()]['where'].unique()
         if where_geometry_none.size>0:
             PyvoaWarning('Those localisation have None geometry, remove them ...:'+str(where_geometry_none))
@@ -388,7 +391,7 @@ class GPDBuilder(object):
                  )
 
            kwargs['input'] = input
-          
+
            if kwargs['kwargsuser']['input'].empty:
                input = self.whereclustered(**kwargs)
            has_normalize = any(o.startswith("normalize:") for o in option)
