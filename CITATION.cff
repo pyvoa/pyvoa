@@ -1,0 +1,106 @@
+# CITATION.cff — Citation File Format 1.2.0
+# Specification: https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
+# Validate with: pip install cffconvert && cffconvert --validate
+# Keep consistent with AUTHORS, LICENSE, pyproject.toml and the Zenodo deposit.
+
+cff-version: 1.2.0
+message: "If you use pyvoa in your work, please cite it using the metadata below."
+title: "pyvoa: Python Virus Open Analysis"
+abstract: >-
+  pyvoa is an open-source Python library providing unified access to
+  epidemiological databases (COVID-19 and other viral datasets), a standardised
+  data format, transparent joins with geolocation databases, and built-in tools
+  for time-series and cartographic visualisation. It is designed to be usable by
+  non-specialists - high-school and university students, science journalists,
+  researchers unfamiliar with data extraction - while remaining scriptable for
+  advanced Python users.
+type: software
+version: "0.4.2"
+date-released: "2026-01-01"   # TODO: date of the matching tagged release
+license: MIT
+repository-code: "https://github.com/pyvoa/pyvoa"
+url: "https://pyvoa.org"
+contact:
+  - name: "The pyvoa team"
+    email: "contact@pyvoa.org"
+
+authors:
+  # Alphabetical by family name, identical to AUTHORS.
+  - family-names: "Beau"
+    given-names: "Tristan"
+    orcid: "https://orcid.org/0000-0002-2022-2140"
+    email: "tristan.beau@u-pariscite.fr"
+    affiliation: "Université Paris Cité, UFR de physique, and LPNHE (CNRS/IN2P3, Sorbonne Université, UMR 7585), Paris, France"
+    country: FR
+  - family-names: "Browaeys"
+    given-names: "Julien"
+    orcid: "https://orcid.org/0000-0003-4405-9875"
+    email: "julien.browaeys@u-pariscite.fr"
+    affiliation: "Université Paris Cité, UFR de physique, and MSC - Matière et Systèmes Complexes (CNRS, UMR 7057), Paris, France"
+    country: FR
+  - family-names: "Dadoun"
+    given-names: "Olivier"
+    orcid: "https://orcid.org/0000-0002-2169-9725"
+    email: "olivier.dadoun@lpnhe.in2p3.fr"
+    affiliation: "LPNHE (CNRS/IN2P3, Sorbonne Université, Université Paris Cité, UMR 7585), Paris, France"
+    country: FR
+
+keywords:
+  - "epidemiology"
+  - "COVID-19"
+  - "open data"
+  - "data visualisation"
+  - "geolocation"
+  - "Python"
+  - "reproducible research"
+  - "science education"
+
+identifiers:
+  # Zenodo mints two DOIs: a concept DOI (all versions) and one DOI per version.
+  # Put the concept DOI here: this is the one to cite by default.
+  - type: doi
+    value: "10.5281/zenodo.0000000"   # TODO: concept DOI, https://zenodo.org/communities/pyvoa
+    description: "Concept DOI - all versions of pyvoa"
+  - type: url
+    value: "https://pypi.org/project/pyvoa/"
+    description: "Package distributed on PyPI"
+
+# --- Uncomment and complete once the software paper is accepted -------------
+# When `preferred-citation` is present, GitHub and cffconvert offer this
+# reference instead of the software itself (see schema-guide.md).
+#
+# preferred-citation:
+#   type: article
+#   title: "pyvoa: a Python package for open analysis of viral epidemiological data"
+#   authors:
+#     - family-names: "Beau"
+#       given-names: "Tristan"
+#       orcid: "https://orcid.org/0000-0002-2022-2140"
+#     - family-names: "Browaeys"
+#       given-names: "Julien"
+#       orcid: "https://orcid.org/0000-0003-4405-9875"
+#     - family-names: "Dadoun"
+#       given-names: "Olivier"
+#       orcid: "https://orcid.org/0000-0002-2169-9725"
+#   journal: "Journal of Open Source Software"
+#   year: 2026
+#   volume: 0
+#   issue: 0
+#   start: 0000
+#   doi: "10.21105/joss.00000"
+
+references:
+  - type: software
+    title: "pycoa: Python COVID Analysis"
+    abstract: "Predecessor of pyvoa (2020-2023)."
+    repository-code: "https://github.com/coa-project/pycoa"
+    authors:
+      - family-names: "Beau"
+        given-names: "Tristan"
+        orcid: "https://orcid.org/0000-0002-2022-2140"
+      - family-names: "Browaeys"
+        given-names: "Julien"
+        orcid: "https://orcid.org/0000-0003-4405-9875"
+      - family-names: "Dadoun"
+        given-names: "Olivier"
+        orcid: "https://orcid.org/0000-0002-2169-9725"
