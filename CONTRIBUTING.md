@@ -45,7 +45,7 @@ python -m pip install -e .            # editable install of the package
 python -m pip install -r requirements.txt
 ```
 
-pyvoa requires Python >= 3.8 and is designed to run inside a
+pyvoa requires Python >= 3.10 and is designed to run inside a
 [Jupyter](https://jupyter.org/) environment, locally or on a remote server
 (Google Colab, Binder). Please check that your change also works in a notebook,
 using the examples in `examples/`.
