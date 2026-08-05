@@ -119,6 +119,7 @@ class AllVisu:
             which = kwargs.get('which')
             what = kwargs.get('what')
             when = kwargs.get('when')
+            title = kwargs.get('title')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logosmall
             locunique = kwargs['whereordered']
@@ -129,8 +130,9 @@ class AllVisu:
             kwargs['legend'] = None
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            if func.__name__ == 'plot':
+            if func.__name__ == 'plot' and title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ': database '+ str(which) + ' time evolution between ' + str(when)
+
             loc=list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
 
