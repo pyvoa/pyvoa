@@ -22,4 +22,4 @@ About : Gives the version information, also used in the setup.py and __init__.py
 
 __version__ = '0.4.2'
 __author__ = 'Tristan Beau, Julien Browaeys, Olivier Dadoun'
-__email__ = 'support@pyvoa.org'
+__email__ = 'contact@pyvoa.org'

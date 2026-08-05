@@ -1,3 +1,57 @@
 [build-system]
 requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyvoa"
+dynamic = ["version"]
+description = "Python virus open analysis. See more on pyvoa.org"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [
+    { name = "pyvoa.org", email = "contact@pyvoa.org" },
+]
+maintainers = [
+    { name = "pyvoa.org", email = "contact@pyvoa.org" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pandas",
+    "geopandas",
+    "shapely",
+    "bs4",
+    "numpy",
+    "pycountry",
+    "pycountry_convert",
+    "requests",
+    "unidecode",
+    "lxml",
+    "IPython",
+    "contextily",
+    "html5lib",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.urls]
+Homepage = "https://pyvoa.org"
+Repository = "https://github.com/pyvoa/pyvoa"
+
+[tool.setuptools.dynamic]
+version = { attr = "pyvoa.__version__.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["pyvoa*"]
+
+[tool.setuptools.package-data]
+pyvoa = ["data/*.json", "data/*.png"]
