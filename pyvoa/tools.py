@@ -718,7 +718,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
         ansi_reset = "\033[0m"
 
         try:
-            _, columns = shutil.get_terminal_size()
+            columns, _ = shutil.get_terminal_size()
         except:
             columns = 80
 
