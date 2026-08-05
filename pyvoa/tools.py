@@ -29,6 +29,7 @@ import numpy
 import datetime
 import time
 import os.path
+import shutil
 import requests
 from tempfile import gettempdir
 from pathlib import Path
