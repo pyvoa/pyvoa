@@ -364,12 +364,13 @@ class GPDBuilder(object):
            if when_end > when_end_data:
                 when_end = when_end_data
                 PyvoaWarning("No available data after "+str(when_end_data) + ' - ' + str(when_end) + ' is considered')
-           if when_beg != when_end:
-               input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
-           kwargs['input'] = input
-           when_beg_data,when_end_data = when_beg, when_end
        else:
             when_beg, when_end = input.date.min(), input.date.max()
+       if when_beg != when_end:
+           input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
+           kwargs['input'] = input
+           when_beg_data,when_end_data = when_beg, when_end
+ 
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
        flatwhere = flat_list(where)
@@ -424,7 +425,8 @@ class GPDBuilder(object):
                         else:
                             temppd = temppd.groupby(prefix+suffix).sum(numeric_only=True).reset_index()
                     else:
-                        temppd = temppd.groupby(['where','code','date']).sum(numeric_only=True).reset_index()
+                        temppd = temppd.groupby('date').agg(
+                            where=('where', lambda x: ','.join(x)), **{w: (w, 'sum')}).reset_index()
                elif o.startswith('normalize:'):
                      temppd = self.normbypop(temppd , w ,o)
                      kwargs['input'] = temppd
