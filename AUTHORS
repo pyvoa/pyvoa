@@ -1,9 +1,21 @@
 # AUTHORS — pyvoa (Python Virus Open Analysis)
 # https://pyvoa.org — https://github.com/pyvoa/pyvoa
 #
-# Contact : contact@pyvoa.org
+# This file lists the authors of the pyvoa software, i.e. the people who have
+# made a substantial and sustained intellectual contribution to its design,
+# implementation or scientific direction.
+#
+# It is distinct from:
+#   - LICENSE          : copyright holders (MIT License)
+#   - CITATION.cff     : machine-readable citation metadata
+#   - CONTRIBUTORS.md  : all contributions, including occasional ones
+#
+# Order: alphabetical by family name. It implies no hierarchy.
+# Roles: CRediT taxonomy (ANSI/NISO Z39.104-2022), https://credit.niso.org/
+# Additions or changes: by pull request, see CONTRIBUTING.md
+# Contact: contact@pyvoa.org
 
-## Authors and mainteners
+## Authors and maintainers
 
 Tristan Beau <tristan.beau@u-pariscite.fr>
     Université Paris Cité, UFR de physique, Paris, France
@@ -15,7 +27,7 @@ Julien Browaeys <julien.browaeys@u-pariscite.fr>
     Université Paris Cité, UFR de physique, Paris, France
     MSC — Matière et Systèmes Complexes, CNRS, UMR 7057, Paris, France
     ORCID: 0000-0003-4405-9875
-    CRediT: Conceptualization, Software, Validation, Writing
+    CRediT: Conceptualization, Software, Validation
 
 Olivier Dadoun <olivier.dadoun@lpnhe.in2p3.fr>
     LPNHE, CNRS/IN2P3, Sorbonne Université, Université Paris Cité, UMR 7585,
@@ -23,9 +35,16 @@ Olivier Dadoun <olivier.dadoun@lpnhe.in2p3.fr>
     ORCID: 0000-0002-2169-9725
     CRediT: Conceptualization, Software, Data curation, Visualization
 
-## Institutionnal support
+## History
 
-Université Paris Cité - u-pariscite.fr
-Institut Ad Memoriam - https://institut-ad-memoriam.u-pariscite.fr/
-LPNHE (CNRS/IN2P3 - Université Paris Cité - Sorbonne Université) UMR 7585 - lpnhe.in2p3.fr
-MSC (CNRS - Université Paris Cité) UMR 7057
+pyvoa is the successor of pycoa (Python COVID Analysis, 2020–2023), developed by
+the same authors and started during the Covid Hackathon (2020). Earlier
+contributions are recorded in the git history of
+https://github.com/coa-project/pycoa
+
+## Institutional support
+
+Université Paris Cité — https://u-pariscite.fr
+LPNHE (CNRS/IN2P3 — Sorbonne Université — Université Paris Cité), UMR 7585 — https://lpnhe.in2p3.fr
+MSC — Matière et Systèmes Complexes (CNRS — Université Paris Cité), UMR 7057 — https://msc.u-paris.fr
+Institut Covid-19 Ad Memoriam — https://institut-ad-memoriam.u-pariscite.fr/
