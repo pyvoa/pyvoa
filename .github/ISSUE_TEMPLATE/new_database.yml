@@ -1,0 +1,116 @@
+# The fields mirror the five criteria of CONTRIBUTING.md section 6. Filling
+# this in *before* writing code is the point: most of the cost of a new source
+# is in the licence and geography questions, not in the parser.
+name: New database
+description: Propose a new epidemiological data source for pyvoa.
+title: "[database] "
+labels: ["new database", "data"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        pyvoa's value lies in exposing heterogeneous sources through a single
+        standardised interface, so a new source is a welcome contribution.
+
+        Please open this issue **before** writing a parser, so that the design
+        can be discussed. In most cases a new database needs only a JSON
+        description in `pyvoa/data/` and no Python change at all.
+
+  - type: input
+    id: provider
+    attributes:
+      label: Provider and dataset
+      description: Who publishes it, and what does it cover?
+      placeholder: "Santé publique France — daily hospital admissions"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: Stable data URL
+      description: >-
+        The direct URL pyvoa would download. It must be publicly accessible
+        without authentication, and stable over time — not a link that is
+        regenerated per session or per export.
+    validations:
+      required: true
+
+  - type: input
+    id: licence
+    attributes:
+      label: Licence
+      description: >-
+        The licence of the *data*, with a link to where it is stated. The
+        source must be openly licensed; a dataset with no licence statement
+        cannot be added.
+      placeholder: "Licence Ouverte / Open Licence 2.0 — https://…"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: granularity
+    attributes:
+      label: Geographical granularity
+      multiple: true
+      options:
+        - country
+        - region
+        - subregion
+        - other / mixed
+    validations:
+      required: true
+
+  - type: textarea
+    id: geography
+    attributes:
+      label: How are places identified?
+      description: >-
+        pyvoa resolves locations through ISO 3166 codes wherever possible. Does
+        the source carry ISO codes, or only names? Are there names that will not
+        resolve (overseas territories, disputed areas, historical regions,
+        merged administrative units)?
+    validations:
+      required: true
+
+  - type: input
+    id: frequency
+    attributes:
+      label: Update frequency
+      placeholder: "daily on weekdays / weekly on Wednesdays / no longer updated since 2023-06"
+    validations:
+      required: true
+
+  - type: textarea
+    id: caveats
+    attributes:
+      label: Known caveats
+      description: >-
+        Reporting delays, weekend gaps, retrospective corrections, changes of
+        definition mid-series, missing values encoded as zero. These matter more
+        than the parser: users draw conclusions from these series.
+    validations:
+      required: true
+
+  - type: textarea
+    id: sample
+    attributes:
+      label: Sample of the raw data
+      description: >-
+        A few lines of the actual payload — header plus two or three rows. This
+        becomes the offline test fixture under `tests/data/`.
+      render: text
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: intent
+    attributes:
+      label: Contribution
+      options:
+        - label: I intend to open a pull request implementing this myself.
+          required: false
+        - label: >-
+            I agree to follow this project's
+            [Code of Conduct](https://github.com/pyvoa/pyvoa/blob/main/CODE_OF_CONDUCT.md).
+          required: true

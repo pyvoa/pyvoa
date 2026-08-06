@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Project : PyvoA
 Date :    april 2020 - december 2025
@@ -24,31 +23,33 @@ default value is 1 (print information to stdout). The 2 value grants a debug lev
 printing.
 """
 
-import pandas as pd
-import numpy
 import datetime
-import time
-import os.path
-import shutil
-import requests
-from tempfile import gettempdir
-from pathlib import Path
-from getpass import getuser
-from zlib import crc32
-from urllib.parse import urlparse
-import unidecode
 import datetime as dt
-import numpy as np
-import warnings
-import pickle
-import math
-import shapely.geometry as sg
-import geopandas as gpd
+
 # testing if pyvoa.ata is available
 import importlib
+import math
+import os.path
+import pickle
+import shutil
+import sys
+import time
+import warnings
+from getpass import getuser
+from pathlib import Path
+from urllib.parse import urlparse
+from zlib import crc32
+
+import geopandas as gpd
+import numpy as np
+import pandas as pd
+import requests
+import shapely.geometry as sg
+import unidecode
+
 _coacache_folder=''
 _coacache_module_info = importlib.util.find_spec("coacache")
-if _coacache_module_info != None:
+if _coacache_module_info is not None:
     _coacache_folder = _coacache_module_info.submodule_search_locations[0]
 
 # Verbosity of pyvoa
@@ -97,12 +98,12 @@ def verb(*args):
 
 def kwargs_keystesting(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
 
-    if type(given_args)!=dict:
+    if not isinstance(given_args,dict):
         raise PyvoaError("kwargs_keystesting error, the given args are not a dict type.")
-    if type(expected_args)!=list:
+    if not isinstance(expected_args,list):
         raise PyvoaError("kwargs_keystesting error, the expected args are not a list type")
 
     bad_kwargs=[a for a in list(given_args.keys()) if a not in expected_args ]
@@ -112,27 +113,23 @@ def kwargs_keystesting(given_args, expected_args, error_string):
     return True
 
 def debug(value,message=''):
-    if message:
-        message = message
-    else:
-        message = ''
     print("\n------------------------\n")
     print(" ---- " , message ,  " ->>>>>>>>       ",value)
     print("\n------------------------\n")
 
 def kwargs_test(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
 
-    if type(given_args)!=dict:
-        raise PyvoaKeyError("kwargs_test error, the given args are not a dict type.")
-    if type(expected_args)!=list:
-        raise PyvoaKeyError("kwargs_test error, the expected args are not a list type")
+    if not isinstance(given_args,dict):
+        raise PyvoaError("kwargs_test error, the given args are not a dict type.")
+    if not isinstance(expected_args,list):
+        raise PyvoaError("kwargs_test error, the expected args are not a list type")
 
     bad_kwargs=[a for a in list(given_args.keys()) if a not in expected_args ]
     if len(bad_kwargs) != 0 :
-        raise PyvoaKeyError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
+        raise PyvoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
 
     return True
 
@@ -172,7 +169,7 @@ def kwargs_values_testing(given_values, expected_values, error_string):
 
 def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
     if not isinstance(given_kargs,dict) or not isinstance(expected_kargs,dict):
         raise PyvoaError("kwargs_fulltest error, the given args are not a dict type.")
@@ -206,34 +203,34 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
     """
     if not isinstance(p, pd.DataFrame):
         raise PyvoaError("Expecting input p as a pandas dataframe.")
-    if not date_field in p.columns:
+    if date_field not in p.columns:
         raise PyvoaError("The date_field is not a proper column of input pandas dataframe.")
-    if not loc_field in p.columns:
+    if loc_field not in p.columns:
         raise PyvoaError("The loc_field is not a proper column of input pandas dataframe.")
     # datatoilettage :)
     p = p.loc[~p[loc_field].isin([''])]
 
-    if d2==None:
+    if d2 is None:
         d2=p[date_field].max()
-    if d1==None:
+    if d1 is None:
         d1=p[date_field].min()
 
     if not all(isinstance(d, datetime.date) for d in [d1,d2]):
-        raise PyvoaTypeError("Waiting for dates as datetime.date.")
+        raise PyvoaError("Waiting for dates as datetime.date.")
     if d1 > d2:
-        raise PyvoaKeyError("Dates should be ordered as d1<d2.")
+        raise PyvoaError("Dates should be ordered as d1<d2.")
 
     idx = pd.date_range(d1, d2, freq = "D")
     idx = idx.date
     all_loc=list(p[loc_field].unique())
 
     pfill=pd.DataFrame()
-    for l in all_loc:
-        pp=p.loc[p[loc_field]==l]
+    for loc in all_loc:
+        pp=p.loc[p[loc_field]==loc]
         pp2=pp.set_index([date_field])
         pp2.index = pd.DatetimeIndex(pp2.index)
         pp3 = pp2.reindex(idx,fill_value=pd.NA)#numpy.nan)#
-        pp3[loc_field] = pp3[loc_field].fillna(l)  #pp3['location'].fillna(method='bfill')
+        pp3[loc_field] = pp3[loc_field].fillna(loc)  #pp3['location'].fillna(method='bfill')
         #pp3['isowhere'] = pp3['isowhere'].fillna(method='bfill')
         #pp3['isowhere'] = pp3['isowhere'].fillna(method='ffill')
         pfill=pd.concat([pfill, pp3])
@@ -245,8 +242,8 @@ def check_valid_date(date):
     with 2 digits for day, 2 digits for month and 4 digits for year.
     """
     raise_error=False
-    if type(date) != type(str()):
-        raise PyvoaTypeError('Expecting date given as string.')
+    if not isinstance(date,str):
+        raise PyvoaError('Expecting date given as string.')
 
     d=date.split('/')
     if len(d)!=3:
@@ -263,13 +260,13 @@ def check_valid_date(date):
                 raise_error=True
 
     if raise_error:
-        raise PyvoaTypeError("Not a valid date should be : day/month/year, with 2 digits " \
+        raise PyvoaError("Not a valid date should be : day/month/year, with 2 digits " \
             "for month or day, 4 digits for year.")
 
     try:
         return datetime.date(int(year),int(month),int(day))
     except ValueError:
-        raise PyvoaTypeError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
+        raise PyvoaError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
             "the month (btw 1 and 12) and the year value.")
 
 def extract_dates(when):
@@ -285,7 +282,7 @@ def extract_dates(when):
     w0=datetime.date(1,1,1) # minimal year is 1
     w1=datetime.date.today()
     if when and when != ['']:  # when input is not None, assume min and max date
-        if type(when) != type(str()):
+        if not isinstance(when,str):
             raise PyvoaError("Date expected as string.")
         w=when.split(':')
 
@@ -371,37 +368,35 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
             local_file_exists=True
             local_filename=local_tmp_filename
 
-    if expiration_time >=0 and local_file_exists:
-        if expiration_time==0 or time.time()-os.path.getmtime(local_filename)<expiration_time:
-            if os.path.getsize(local_filename) >= 1000:
-                verb('Using locally stored data for '+url+' stored as '+local_filename)
-                return local_filename
-            else:
-                verb('Should use '+local_filename+', but it appears as empty. That\'s why we do not use it.')
+    if expiration_time >=0 and local_file_exists and \
+            (expiration_time==0 or time.time()-os.path.getmtime(local_filename)<expiration_time):
+        if os.path.getsize(local_filename) >= 1000:
+            verb('Using locally stored data for '+url+' stored as '+local_filename)
+            return local_filename
+        else:
+            verb('Should use '+local_filename+', but it appears as empty. That\'s why we do not use it.')
 
     # if not : download the file in tmp area
     local_filename=local_tmp_filename
     try:
         #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
-        if not 'zenodo.org' in url:
+        if 'zenodo.org' not in url:
             verb('Instead of using original URL '+url)
             url='https://zenodo.org/api/records/18784098/files/'+local_base_filename+'/content'
             verb('using zenodo archived file '+url)
         urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
-        fp=open(local_filename,'wb')
-        fp.write(urlfile.content)
-        fp.close()
+        with open(local_filename,'wb') as fp:
+            fp.write(urlfile.content)
         verb('Download content of '+url+' . Locally stored as cached data in '+local_filename)
     except requests.exceptions.RequestException :
         if local_file_exists and expiration_time >=0 :
             info('Cannot access to '+url+' . Will use locally stored cached version.')
-            pass
         else:
-            raise PyvoaConnectionError('Cannot access to the url '+\
+            raise PyvoaError('Cannot access to the url '+\
                 url+' . Please check your internet connection or url path.')
     except Exception as e2:
-        raise PyvoaNotManagedError(type(e2).__name__+" : "+str(e2))
+        raise PyvoaError(type(e2).__name__+" : "+str(e2))
 
     return local_filename
 
@@ -420,8 +415,7 @@ def flat_list(matrix):
      flatten_matrix = []
      for sublist in matrix:
          if isinstance(sublist,list):
-             for val in sublist:
-                 flatten_matrix.append(val)
+             flatten_matrix.extend(sublist)
          else:
              flatten_matrix.append(sublist)
      return flatten_matrix
@@ -430,9 +424,7 @@ def all_or_none_lists(my_list):
     # Vérifie s'il existe au moins une liste dans les éléments
     has_list = any(isinstance(x, list) for x in my_list)
     # Si oui, vérifie que tous les éléments sont des listes
-    if has_list and not all(isinstance(x, list) for x in my_list):
-        return False
-    return True
+    return not (has_list and not all(isinstance(x, list) for x in my_list))
 
 def getnonnegfunc(mypd,which):
     '''
@@ -448,7 +440,7 @@ def getnonnegfunc(mypd,which):
             whichvalues = lpd[which]
             try:
                 y0 = whichvalues.values[0] # integrated offset at t=0
-            except:
+            except IndexError:
                 y0 = 0
             if np.isnan(y0):
                 y0 = 0
@@ -458,7 +450,7 @@ def getnonnegfunc(mypd,which):
             where_nan = np.isnan(yy)
             yy = pa.to_numpy(copy=True)
             yy[where_nan] = 0.
-            indices=np.where(yy < 0)[0]
+            np.where(yy < 0)[0]
             for kk in np.where(yy < 0)[0]:
                 k = int(kk)
                 val_to_repart = -yy[k]
@@ -468,7 +460,7 @@ def getnonnegfunc(mypd,which):
                     yy[k] = yy[k-1]
                 val_to_repart = val_to_repart + yy[k]
                 s = np.nansum(yy[0:k])
-                if not any([i !=0 for i in yy[0:k]]) == True and s == 0:
+                if not any(i != 0 for i in yy[0:k]) and s == 0:
                     yy[0:k] = 0.
                 elif s == 0:
                     yy[0:k] = np.nan*np.ones(k)
@@ -495,7 +487,7 @@ def return_nonan_dates_pandas(df = None, field = None):
    while (boolval):
        boolval = df.loc[df.date == (watchdate + dt.timedelta(days=j))][field].dropna().empty
        j += 1
-   df = df.loc[df.date >= watchdate - dt.timedelta(days=j - 1)]
+   df = df.loc[df.date >= watchdate + dt.timedelta(days=j - 1)]
    return df
 
 
@@ -526,7 +518,7 @@ def readpkl(filepkl):
             datab = pickle.load(f)
             return datab
     except Exception as e:
-        raise PyvoaError(f"Failed to load pickle file {filepath}: {str(e)}")
+        raise PyvoaError(f"Failed to load pickle file {filepath}: {e!s}")
 
 def dumppkl(filepkl,whattodump):
    if filepkl is None or whattodump is None:
@@ -658,7 +650,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
 
     # Détecter l'environnement
     try:
-        import google.colab
+        import google.colab  # noqa: F401  -- imported only to detect the Colab runtime
         in_colab = True
     except ImportError:
         in_colab = False
@@ -671,7 +663,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
 
     # --- Jupyter / Colab : affichage HTML ---
     if is_jupyter or in_colab:
-        from IPython.display import display, HTML
+        from IPython.display import HTML, display
 
         color_map = {
             'yellow':  '#B8860B',
@@ -719,7 +711,7 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
 
         try:
             columns, _ = shutil.get_terminal_size()
-        except:
+        except Exception:
             columns = 80
 
         sys.stdout.write(f'{ansi_start}{typemsg.center(columns)}{ansi_reset}\n')
@@ -735,8 +727,6 @@ def PyvoaInfo(message):
             bg_color='blue'
         )
 
-    Exception(message)
-
 def PyvoaWarning(message):
     if get_verbose_mode() > 0:
         blinking_centered_text(
@@ -747,18 +737,26 @@ def PyvoaWarning(message):
             bg_color='yellow'
         )
 
-    Exception(message)
+class PyvoaError(Exception):
+    """The single exception type raised by pyvoa.
 
-import sys
-def PyvoaError(message):
-    blinking_centered_text(
-        'PYVOA Error !',
-        message,
-        blinking=True,
-        text_color='white',
-        bg_color='red'
-    )
-    sys.exit(1)
+    Displaying the message is done at construction time, so that the usual
+    coloured banner is shown to the end user even when the traceback itself
+    is hidden (notebooks, front end helpers). Being a genuine exception, it
+    can also be caught and inspected, which the previous implementation
+    (a function calling sys.exit) did not allow.
+    """
+
+    def __init__(self, *args):
+        message = ' '.join(str(a) for a in args)
+        super().__init__(message)
+        blinking_centered_text(
+            'PYVOA Error !',
+            message,
+            blinking=True,
+            text_color='white',
+            bg_color='red'
+        )
 
 
 class dotdict(dict):

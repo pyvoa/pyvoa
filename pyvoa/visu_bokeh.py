@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Project : PyvoA
@@ -15,74 +14,50 @@ About :
 
 
 """
-from pyvoa.tools import (
-    extract_dates,
-    verb,
-    fill_missing_dates,
-    min_max_range,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-
-import math
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-
-from collections import defaultdict
+import base64
+import bisect
 import itertools
 import json
-import io
-from io import BytesIO
-import base64
-import copy
-import inspect
-import importlib
-from pathlib import Path
-import shapely.geometry as sg
-
-import datetime as dt
-import bisect
 from functools import wraps
-import datetime as dt
-from pyvoa.jsondb_parser import MetaInfo
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from bokeh import events
+from bokeh.io import export_png, output_notebook
+from bokeh.layouts import column, row
 from bokeh.models import (
-ColumnDataSource,
-TableColumn,
-DataTable,
-ColorBar,
-LogTicker,
-HoverTool,
-CrosshairTool,
-BasicTicker,
-GeoJSONDataSource,
-LinearColorMapper,
-LogColorMapper,
-Label,
-PrintfTickFormatter,
-BasicTickFormatter,
-NumeralTickFormatter,
-Slider,
-CustomJS,
-CustomJSHover,
-Select,
-Range1d,
-DatetimeTickFormatter,
-Legend,
-LegendItem,
-Text,
-Div,
-Row
-)
-from bokeh.models import (
-    Toggle
+    BasicTicker,
+    BasicTickFormatter,
+    ColorBar,
+    ColumnDataSource,
+    CrosshairTool,
+    CustomJS,
+    CustomJSHover,
+    DatetimeTickFormatter,
+    Div,
+    GeoJSONDataSource,
+    HoverTool,
+    LabelSet,
+    Legend,
+    LegendItem,
+    LinearColorMapper,
+    PrintfTickFormatter,
+    Range1d,
+    Row,
+    Select,
+    Title,
+    Toggle,
+    WMTSTileSource,
 )
 from bokeh.models.layouts import TabPanel, Tabs
-from bokeh.models import Panel
+from bokeh.palettes import Category10, Category20, Viridis256
 from bokeh.plotting import figure
-from bokeh.io import output_notebook
+from bokeh.transform import cumsum
+
 from pyvoa.kwarg_options import InputOption
+from pyvoa.tools import PyvoaError, min_max_range, verb
+
 
 def safe_output_notebook():
     try:
@@ -90,34 +65,13 @@ def safe_output_notebook():
         ipy = get_ipython()
         if ipy is not None and 'IPKernelApp' in ipy.config:
             output_notebook()
-    except Exception:
-        pass
+    except Exception as e:
+        verb('Not running inside a notebook, bokeh output_notebook() skipped: '+str(e))
 safe_output_notebook()
 
 #output_notebook(hide_banner=True)
-from bokeh.layouts import (
-row,
-column,
-gridplot
-)
-from bokeh.palettes import (
-Category10,
-Category20,
-Viridis256
-)
-from bokeh.models import Title
 
-from bokeh.io import export_png
-from bokeh import events
-from bokeh.models.widgets import DateSlider
-from bokeh.models import (
-LabelSet,
-WMTSTileSource
-)
-from bokeh.transform import (
-transform,
-cumsum
-)
+
 
 class visu_bokeh:
     def __init__(self,):
@@ -131,7 +85,6 @@ class visu_bokeh:
     @staticmethod
     def rollerJS():
         from pathlib import Path
-        from bokeh.models import CustomJSHover
         jsfile = Path(__file__).parent / "js/rollover_callback.js"
         return CustomJSHover(code=jsfile.read_text(encoding="utf-8"))
 
@@ -152,7 +105,7 @@ class visu_bokeh:
             input['colors'] = input['where'].map(color_map)
             kwargs['input'] = input
             logo = kwargs['logo']
-            which = kwargs['which']
+            kwargs['which']
             title = kwargs['title']
             width  = kwargs.get('width', self.figure_width)
             height = kwargs.get('height',self.figure_height)
@@ -185,7 +138,6 @@ class visu_bokeh:
 
     @staticmethod
     def geosource_bounds(geosource):
-        import json
         from shapely.geometry import shape
 
         data = json.loads(geosource.geojson)
@@ -207,8 +159,7 @@ class visu_bokeh:
     @staticmethod
     def bokeh_legend(bkfigure):
         from bokeh.models import CustomJS
-        from bokeh import events
-        toggle_legend_js = CustomJS(args=dict(leg=bkfigure.legend[0]),
+        toggle_legend_js = CustomJS(args={'leg': bkfigure.legend[0]},
         code="""
         if(leg.visible)
         {
@@ -233,7 +184,7 @@ class visu_bokeh:
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
             input=kwargs['input']
-            nb = kwargs['maxlettersdisplay']
+            kwargs['maxlettersdisplay']
             input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
@@ -269,9 +220,9 @@ class visu_bokeh:
         '''
         input = kwargs.get('input')
         which = kwargs.get('which')
-        copyright = kwargs.get('copyright')
+        # copyright = kwargs.get('copyright')
         mode = kwargs.get('mode')
-        bokeh_figure = kwargs.get('bokeh_figure')
+        # bokeh_figure = kwargs.get('bokeh_figure')
         panels = []
         cases_custom = visu_bokeh().rollerJS()
         if self.get_listfigures():
@@ -347,10 +298,10 @@ class visu_bokeh:
         which = kwargs.get('which')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
-        title = kwargs.get('title',None)
+        # title = kwargs.get('title',None)
         panels = []
         listfigs = []
-        cases_custom = visu_bokeh().rollerJS()
+        visu_bokeh().rollerJS()
         dbokeh_figure = {
             'linear': kwargs.get('bokeh_figure_linear_date'),
             'log': kwargs.get('bokeh_figure_log_date')
@@ -359,7 +310,7 @@ class visu_bokeh:
         legend = kwargs.get('legend', None)
 
         ay_type = kwargs.get('scale', None)
-        scale_options = self.av.d_graphicsinput_args['scale']
+        self.av.d_graphicsinput_args['scale']
 
         if ay_type is None:
             ay_type = [i for i in self.av.d_graphicsinput_args['scale'] if i]
@@ -370,7 +321,7 @@ class visu_bokeh:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
-            i = 0
+            # i = 0
             r_list=[]
             maxi=-1000
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
@@ -403,8 +354,8 @@ class visu_bokeh:
                     if isinstance(tooltips,tuple):
                         tooltips = tooltips[0]
                     '''
-                i += 1
-            cases_custom = visu_bokeh().rollerJS()
+                # i += 1
+            visu_bokeh().rollerJS()
 
             for i,r in enumerate(r_list):
                 label = r.name
@@ -417,9 +368,8 @@ class visu_bokeh:
                     cross= CrosshairTool()
                     fig.add_tools(cross)
 
-            if axis_type == 'linear':
-                if maxi  < 1e4 :
-                    fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
+            if axis_type == 'linear' and maxi < 1e4 :
+                fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
             fig.legend.title=", ".join(which)
             fig.legend.ncols = len(which)
             fig.legend.visible = True
@@ -443,11 +393,8 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_spiral_plot(self, **kwargs):
-        panels = []
-        listfigs = []
         input = kwargs.get('input')
         which = kwargs.get('which')
-        borne = 300
         dicof={'title':kwargs.get('title')}
         dicof['match_aspect']=True
 
@@ -456,7 +403,7 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
 
         if len(input['where'].unique()) > 1 :
-            PyvoaError('Can only display spiral for ONE location. I took the first one:', input['where'][0])
+            raise PyvoaError('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
         input["dayofyear"]=input.date.dt.dayofyear
         input['year']=input.date.dt.year
@@ -472,7 +419,8 @@ class visu_bokeh:
         input["r_cas_inf"] = input.apply(lambda x : x["r_baseline"] - 0.5*x[which]*size_factor,axis=1)
 
         radius = 200
-        def polar(theta,r,norm=radius/input["r_baseline"].max()):
+        polar_norm = radius/input["r_baseline"].max()
+        def polar(theta,r,norm=polar_norm):
             x = norm*r*np.cos(theta)
             y = norm*r*np.sin(theta)
             return x,y
@@ -485,12 +433,12 @@ class visu_bokeh:
         [ ycol.append([i,j]) for i,j in zip(y_cas_inf,y_cas_sup)]
         bokeh_figure.patches(xcol,ycol,color='blue',fill_alpha = 0.5)
 
-        pyvoa = ColumnDataSource(data=dict(
-        x=x_base,
-        y=y_base,
-        date=input['date'],
-        cases=input['cases']
-        ))
+        pyvoa = ColumnDataSource(data={
+        'x': x_base,
+        'y': y_base,
+        'date': input['date'],
+        'cases': input['cases']
+        })
         bokeh_figure.line( x = 'x', y = 'y', source = pyvoa, legend_label = which[0] +', '+ input['where'][0],
                         line_width = 3, line_color = 'blue')
         circle = bokeh_figure.scatter(
@@ -558,7 +506,7 @@ class visu_bokeh:
         input = kwargs.get('input')
         which= kwargs.get('which')
         guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
-        mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
+        # mode = kwargs.get('mode',self.av.d_graphicsinput_args['mode'][0])
         if isinstance(which,list):
             which=which[0]
 
@@ -569,10 +517,9 @@ class visu_bokeh:
 
         uniqloc = list(input['where'].unique())
         uniqloc.sort()
-        if 'where' in input.columns:
-            if len(uniqloc) < 2:
-                raise PyvoaTypeError('What do you want me to do ? You have selected, only one country.'
-                                   'There is no sens to use this method. See help.')
+        if 'where' in input.columns and len(uniqloc) < 2:
+            raise PyvoaError('What do you want me to do ? You have selected, only one country.'
+                               'There is no sens to use this method. See help.')
         input = input[['date', 'where', which]]
         input = input.sort_values(by='where', ascending = True).reset_index(drop=True)
 
@@ -587,7 +534,7 @@ class visu_bokeh:
         filter_data2 = mypivot[[uniqloc[1]]].rename(columns={uniqloc[1]: 'cases'})
         pyvoa2 = ColumnDataSource(filter_data2)
 
-        cases_custom = visu_bokeh().rollerJS()
+        visu_bokeh().rollerJS()
         #hover_tool = HoverTool(tooltips=[(which, '@which{0,0.0}'), ('date', '@date{%F}')],
         #                       formatters={which: 'printf', '@{which}': cases_custom, '@date': 'datetime'},
         #                       mode = mode, point_policy="snap_to_data")  # ,PanTool())
@@ -603,11 +550,11 @@ class visu_bokeh:
             if guideline:
                 cross= CrosshairTool()
                 fig.add_tools(cross)
-            def add_line(pyvoa, options, init, color):
+            def add_line(pyvoa, options, init, color, fig=fig):
                 s = Select(options = options, value = init)
                 r = fig.line(x = 'date', y = 'cases', source = pyvoa, line_width = 3, line_color = color)
                 li = LegendItem(label = init, renderers = [r])
-                s.js_on_change('value', CustomJS(args=dict(s0=source, s1=pyvoa, li=li),
+                s.js_on_change('value', CustomJS(args={'s0': source, 's1': pyvoa, 'li': li},
                                                  code="""
                                             var c = cb_obj.value;
                                             var y = s0.data[c];
@@ -626,7 +573,6 @@ class visu_bokeh:
             panels.append(panel)
 
         tabs = Tabs(tabs = panels)
-        label = fig.title
         return tabs
 
     ''' YEARLY PLOT '''
@@ -668,7 +614,7 @@ class visu_bokeh:
 
         panels = []
         listfigs = []
-        cases_custom = visu_bokeh().rollerJS()
+        visu_bokeh().rollerJS()
         #drop bissextile fine tuning in needed in the future
         input = input.loc[~(input['date'].dt.month.eq(2) & input['date'].dt.day.eq(29))].reset_index(drop=True)
         input.loc[:,'allyears']=input['date'].apply(lambda x : x.year)
@@ -679,11 +625,7 @@ class visu_bokeh:
         for axis_type in self.av.d_graphicsinput_args['scale']:
 
             fig = dbokeh_figure[axis_type]
-            i = 0
-            r_list=[]
-            maxi=-1000
             input['cases']=input[which]
-            line_style = ['solid', 'dashed', 'dotted', 'dotdash']
             colors = itertools.cycle(self.lcolors)
             for loc in list(input['where'].unique()):
                 for year in allyears:
@@ -699,7 +641,6 @@ class visu_bokeh:
                     )
                     #maxi=max(maxi,np.nanmax(pyvoa.data['cases']))
 
-            label = which
             tooltips = [('where', '@rolloverdisplay'), ('date', '@date{%F}'), ('Cases', '@cases{0,0}')]
             formatters = {'where': 'printf', '@date': 'datetime', '@name': 'printf'}
             hover=HoverTool(tooltips = tooltips, formatters = formatters, point_policy = "snap_to_data", mode = mode)  # ,PanTool())
@@ -719,7 +660,7 @@ class visu_bokeh:
             fig.legend.location = "top_left"
             fig.legend.click_policy="hide"
 
-            minyear=input.date.min().year
+            # minyear = input.date.min().year
 
             months = pd.date_range("2023-01-01", "2023-12-01", freq="MS")
             month_doys = months.dayofyear
@@ -755,7 +696,7 @@ class visu_bokeh:
             bokeh_figure_map = kwargs.get('bokeh_figure_map')
 
             dateslider = kwargs.get('dateslider')
-            if func.__name__ == 'bokeh_histo' and dateslider == True:
+            if func.__name__ == 'bokeh_histo' and dateslider:
                 print('dateslider not implemented in this current version ...')
                 dateslider = False
 
@@ -783,7 +724,7 @@ class visu_bokeh:
 
             invViridis256 = Viridis256[::-1]
             color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
-            color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
+            ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
                         border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
             if dateslider:
                 input_dates = input_dates.sort_values(by=['date', 'where'])
@@ -825,29 +766,28 @@ class visu_bokeh:
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
                 columndatasrc = ColumnDataSource(data = input_dates)
 
-                from bokeh.models import Slider, CustomJS, Div
+                from bokeh.models import CustomJS, Div, Slider
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
-                from bokeh.models import CustomJS
                 jsfile = Path(__file__).parent / "js/slider_callback.js"
                 with open(jsfile) as f:
                     slider_code = f.read()
 
                 slider_callback = CustomJS(
-                        args=dict(
-                            frames=frames,
-                            sourcemap=geocolumndatasrc if func.__name__ == 'bokeh_map' else columndatasrc,
-                            sourcehisto=columndatasrc,
-                            which=which,
-                            dates=unique_dates,
-                            div=date_display,
-                            maxcountrydisplay=maxcountrydisplay,
-                            ylabellinear=bokeh_figure_linear.yaxis[0],
-                            ylabellog=bokeh_figure_log.yaxis[0],
-                            ymax = ymax,
-                            color_mapperjs = color_mapper
-                        ),
+                        args={
+                            'frames': frames,
+                            'sourcemap': geocolumndatasrc if func.__name__ == 'bokeh_map' else columndatasrc,
+                            'sourcehisto': columndatasrc,
+                            'which': which,
+                            'dates': unique_dates,
+                            'div': date_display,
+                            'maxcountrydisplay': maxcountrydisplay,
+                            'ylabellinear': bokeh_figure_linear.yaxis[0],
+                            'ylabellog': bokeh_figure_log.yaxis[0],
+                            'ymax': ymax,
+                            'color_mapperjs': color_mapper
+                        },
                         code=slider_code)
 
                 slider.js_on_change('value', slider_callback)
@@ -856,13 +796,13 @@ class visu_bokeh:
                 jsfile = Path(__file__).parent / "js/animation_callback.js"
                 with open(jsfile) as f:
                     animation_code = f.read()
-                toggle_callback = CustomJS(args=dict(slider=slider, frames=frames), code=animation_code)
+                toggle_callback = CustomJS(args={'slider': slider, 'frames': frames}, code=animation_code)
                 toggl.js_on_change('active', toggle_callback)
 
                 from bokeh.models import Div
                 date_display = Div(text=f"<b>{unique_dates[-1]}</b>", width=300)
                 # Mettre à jour le Div depuis le slider (JS)
-                slider_date_div_cb = CustomJS(args=dict(div=date_display, dates=unique_dates),
+                slider_date_div_cb = CustomJS(args={'div': date_display, 'dates': unique_dates},
                 code="""
                   const i = cb_obj.value;      // index choisi
                   div.text = "<b>" + dates[i] + "</b>";
@@ -906,7 +846,7 @@ class visu_bokeh:
                 bokeh_figure_map.y_range.start = ymin - pad_y
                 bokeh_figure_map.y_range.end   = ymax + pad_y
 
-                min_col, max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
+                _min_col, _max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
 
                 bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
@@ -946,7 +886,7 @@ class visu_bokeh:
 
         input = kwargs.get('input')
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
-        uniqloc = list(input['where'].unique())
+        list(input['where'].unique())
         which  = kwargs.get('which')
         if isinstance(which,list):
             which = which[0]
@@ -1000,7 +940,7 @@ class visu_bokeh:
         hover_tool = HoverTool(tooltips = tooltips)
         panels = []
         bottom = 0
-        x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
+        _x_axis_type, y_axis_type, axis_type_title = 3 * ['linear']
         axis_t = ["linear", "loglog"]
 
         for axis_type in axis_t:
@@ -1008,7 +948,7 @@ class visu_bokeh:
             fig.yaxis.axis_label = 'frequency'
             fig.xaxis.axis_label = which
             if axis_type == 'loglog':
-                x_axis_type, y_axis_type = 'log', 'log'
+                _x_axis_type, y_axis_type = 'log', 'log'
                 axis_type_title = 'loglog'
 
             fig.add_tools(hover_tool)
@@ -1030,11 +970,11 @@ class visu_bokeh:
     @deco_bokeh
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
-        input = kwargs.get('input')
+        # input = kwargs.get('input')
         columndatasrc = kwargs.get('columndatasrc')
-        which = kwargs.get('which')
+        # which = kwargs.get('which')
 
-        mode = kwargs.get('mode')
+        # mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
         title = kwargs['title']
@@ -1044,7 +984,6 @@ class visu_bokeh:
         }
 
         new_panels = []
-        from bokeh.models import LogScale, LinearScale
 
         for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
@@ -1060,7 +999,6 @@ class visu_bokeh:
             fig.yaxis[0].major_label_overrides = label_dict
 
 
-            factor = 20.0 if axis_type == 'log' else 1.2
             left = 0.01 if axis_type == 'log' else 'left'
             epslion = 0.01 if axis_type == 'log' and min(columndatasrc.data['left']) == 0 else 0.0
             minn = min(columndatasrc.data['left']) + epslion
@@ -1092,7 +1030,7 @@ class visu_bokeh:
             )
             fig.add_layout(labels)
             '''
-            cases_custom = visu_bokeh().rollerJS()
+            visu_bokeh().rollerJS()
             hover_tool = HoverTool(
                 tooltips=[('where', '@where'), ('cases', '@right{0,0}')]
             )
@@ -1116,13 +1054,13 @@ class visu_bokeh:
             if fv == 0:
                 return '0'
             if abs(fv) >= 1.e4 or (abs(fv) > 0 and abs(fv) < 0.01):
-                return '{:.3g}'.format(fv)
+                return f'{fv:.3g}'
             return str(round(fv, 2))
 
         mypd['horihistotext'] = mypd['right'].apply(_fmt)
         mypd['horihistotext'] = [str(i) for i in mypd['horihistotext']]
-        mypd['left'] = mypd['left'].apply(lambda x: 0 if x > 0 else x)
-        mypd['right'] = mypd['right'].apply(lambda x: 0 if x < 0 else x)
+        mypd['left'] = mypd['left'].apply(lambda x: min(x, 0))
+        mypd['right'] = mypd['right'].apply(lambda x: max(x, 0))
         mypd['horihistotextx'] = mypd['right']
         indices = [i % maxcountrydisplay for i in range(len(mypd))]
         mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
@@ -1265,7 +1203,7 @@ class visu_bokeh:
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
 
-        min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
+        _min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
 
         color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
@@ -1298,7 +1236,6 @@ class visu_bokeh:
 
     @staticmethod
     def bokeh_savefig(fig,name):
-        from bokeh.io import export_png
         export_png(fig, filename = name)
 
     @staticmethod

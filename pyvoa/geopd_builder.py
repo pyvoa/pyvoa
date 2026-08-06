@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Project : PyvoA
 Date :    april 2020 - december 2025
@@ -17,35 +16,31 @@ The parser class gives a simplier access through an already filled dict of data
 
 """
 
-import pandas
-import numpy as np
-import pandas as pd
-pd.options.mode.chained_assignment = None  # default='warn'
 import datetime as dt
-
-from pyvoa.tools import (
-    kwargs_values_testing,
-    extract_dates,
-    debug,
-    verb,
-    flat_list,
-    getnonnegfunc,
-    return_nonan_dates_pandas,
-    dumppkl,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-import pyvoa.geo as coge
-
-import pyvoa.jsondb_parser as parser
+import re
 
 import geopandas as gpd
-import os, time
-import re
+import numpy as np
+import pandas as pd
+
 import pyvoa.geo as coge
+import pyvoa.jsondb_parser as parser
 from pyvoa.kwarg_options import InputOption
-class GPDBuilder(object):
+from pyvoa.tools import (
+   PyvoaError,
+   PyvoaWarning,
+   dumppkl,
+   extract_dates,
+   flat_list,
+   getnonnegfunc,
+   kwargs_values_testing,
+   verb,
+)
+
+pd.options.mode.chained_assignment = None  # default='warn'
+
+
+class GPDBuilder:
    """
    GPDBuilder class
    """
@@ -95,13 +90,12 @@ class GPDBuilder(object):
                                  tmp = tmp.loc[tmp.code_region=='999']
                                  self.boundary_metropole =tmp['geometry'].total_bounds
                        elif self.granularity == 'subregion':
-                            list_dep_metro = None
                             where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
                             where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
                        else:
-                           raise PyvoaTypeError('What is the granularity of your  database ?')
-            except:
-                raise PyvoaTypeError('What data base are you looking for ?')
+                           raise PyvoaError('What is the granularity of your  database ?')
+            except Exception as e:
+                raise PyvoaError('What data base are you looking for ?') from e
             self.where_geodescription = where_kindgeo
         else:
             self.db = 'in-house data'
@@ -178,7 +172,7 @@ class GPDBuilder(object):
                 elif self.geo.is_subregion(i):
                    tmp = i
                 else:
-                    raise PyvoaTypeError(i + ': not subregion nor region ... what is it ?')
+                    raise PyvoaError(i + ': not subregion nor region ... what is it ?')
             elif typeloc == 'region':
                 tmp = self.geo.get_region_list()
                 if i.isdigit():
@@ -189,11 +183,11 @@ class GPDBuilder(object):
                         tmp = tmp[:-1]
                 else:
                     if self.geo.is_subregion(i):
-                        raise PyvoaTypeError(i+ ' is a subregion ... not compatible with a region DB granularity?')
+                        raise PyvoaError(i+ ' is a subregion ... not compatible with a region DB granularity?')
                     else:
-                        raise PyvoaTypeError(i + ': not subregion nor region ... what is it ?')
+                        raise PyvoaError(i + ': not subregion nor region ... what is it ?')
             else:
-                raise PyvoaTypeError('Not subregion nor region requested, don\'t know what to do ?')
+                raise PyvoaError('Not subregion nor region requested, don\'t know what to do ?')
             if exploded:
                 exploded.append(tmp)
             else:
@@ -308,10 +302,11 @@ class GPDBuilder(object):
        which = kwargs.get('which')
        input = kwargs.get('input')
 
-       what  = kwargs.get('what')
+       # what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
        if input.empty:
+            available_keywords = self.get_available_keywords()
             kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
             anticolumns = [x for x in available_keywords if x not in which]
@@ -321,7 +316,7 @@ class GPDBuilder(object):
            input = input.loc[input['where'].str.upper().isin([w.upper() for w in flat_list(where)])]
 
        if input.empty:
-            PyvoaError(f"No information is available for the provided locations: {where}")
+            raise PyvoaError(f"No information is available for the provided locations: {where}")
        else:
            missing = [loc for loc in flat_list(where) if input.loc[input['where'].str.upper() == loc.upper()].empty]
            if len(missing)>0:
@@ -373,11 +368,11 @@ class GPDBuilder(object):
  
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
-       flatwhere = flat_list(where)
+       flat_list(where)
 
        bypopvalue = None
        datesunique = list(input.date.unique())
-       ndates = len(datesunique)
+       len(datesunique)
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']
@@ -411,7 +406,7 @@ class GPDBuilder(object):
            for o in option:
                temppd = input
                if o == 'nonneg':
-                   if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
+                   if w.startswith(('cur_idx_', 'cur_tx_')):
                         print('The default option nonneg cannot be used with instantaneous data, such as : ' + w)
                    temppd = getnonnegfunc(temppd, w)
                elif o == 'smooth7':
@@ -420,7 +415,7 @@ class GPDBuilder(object):
                     temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if 'geometry' in list(temppd.columns):
-                        if w.startswith('cur_idx_') or w.startswith('cur_tx_'):
+                        if w.startswith(('cur_idx_', 'cur_tx_')):
                             temppd = temppd.groupby(prefix+suffix).mean().reset_index()
                         else:
                             temppd = temppd.groupby(prefix+suffix).sum(numeric_only=True).reset_index()
@@ -484,39 +479,31 @@ class GPDBuilder(object):
     if pandy.empty:
         raise PyvoaError('normbypop problem, your pandas seems to be empty ....')
     value = re.sub(r'normalize:', '', bypop)
-    clust = list(pandy['where'].unique())
+    # clust = list(pandy['where'].unique())  # unused since its only reader was dead code
 
     pop_field='population'
 
     uniquepandy = pandy.groupby('where').first().reset_index()
-    if self.db_world == True:
+    if self.db_world:
         try:
             uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population',overload=True)
-        except:
-            PyvoaError(self.db + ' has no information for what concern: '+pop_field)
+        except Exception as e:
+            raise PyvoaError(self.db + ' has no information for what concern: '+pop_field) from e
     else:
-        if not isinstance(self._gi,coge.GeoCountry):
+        if not isinstance(self._gi,coge.GeoCountry) or self._gi.get_country() != self.geo.get_country():
             self._gi = None
-        else:
-            if self._gi.get_country() != self.geo.get_country():
-                self._gi=None
 
-        if self._gi == None :
+        if self._gi is None :
             self._gi = self.geo
         pop_field='population_subregion'
-        if self.granularity == 'region':
-            regsubreg={i:self.geo.get_subregions_from_region(name=i) for i in clust}
+            # regsubreg={i:self.geo.get_subregions_from_region(name=i) for i in clust}
+        if self.granularity in ('region', 'subregion'):
             try:
                 uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
-            except:
-                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
-        elif self.granularity == 'subregion':
-            try:
-                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
-            except:
-                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
+            except Exception as e:
+                raise PyvoaError(self.db + ' has no information for what concern: '+pop_field) from e
         else:
-            raise PyvoaKeyError('This is not region nor subregion what is it ?!')
+            raise PyvoaError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
     if pop_field not in pandy.columns:
         pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
@@ -524,7 +511,7 @@ class GPDBuilder(object):
         val2norm=[val2norm]
 
     for i in val2norm:
-        var = i+' '+bypop
+        i+' '+bypop
         pandy.loc[:,i+' '+bypop]=pandy[i]/pandy[pop_field]*dpop[value]
     return pandy
 
@@ -542,12 +529,12 @@ class GPDBuilder(object):
        if 'saveformat' in kwargs:
             saveformat = kwargs['saveformat']
        if saveformat not in possibleformat:
-           raise PyvoaKeyError('Output option '+saveformat+' is not recognized.')
+           raise PyvoaError('Output option '+saveformat+' is not recognized.')
        if 'savename' in kwargs and kwargs['savename'] != '':
           savename = kwargs['savename']
 
-       if not 'pandas' in kwargs:
-          raise PyvoaKeyError('Absolute needed variable : the pandas desired ')
+       if 'pandas' not in kwargs:
+          raise PyvoaError('Absolute needed variable : the pandas desired ')
        else:
           pandyori = kwargs['pandas']
        pandy = pandyori
@@ -574,7 +561,7 @@ class GPDBuilder(object):
             last_zero = zeros.max()
             idx_start = smoothed.index.get_loc(last_zero) + 1
         smoothed = smoothed.iloc[idx_start:]
-        original = new_cases.loc[smoothed.index]
+        new_cases.loc[smoothed.index]
 
         return smoothed
 

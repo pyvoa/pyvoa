@@ -1,0 +1,116 @@
+# The required fields mirror, one for one, the four items that CONTRIBUTING.md
+# section 2 asks for in a bug report.
+name: Bug report
+description: Something in pyvoa behaves differently from what you expected.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this.
+
+        pyvoa reads from about two dozen third-party providers, and those
+        providers change their files without notice. Before filling this in,
+        two checks take a minute and often identify the cause — see
+        [SUPPORT.md](https://github.com/pyvoa/pyvoa/blob/main/SUPPORT.md):
+
+        1. does another database work (`setwhom('owid')` vs `setwhom('jhu')`)?
+        2. does the problem survive clearing `~/.cache/pyvoa.data_<username>/`?
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened
+      description: A short description of the problem, in one or two sentences.
+    validations:
+      required: true
+
+  - type: textarea
+    id: versions
+    attributes:
+      label: Versions
+      description: >-
+        pyvoa, Python and operating system. Run
+        `python -c "import pyvoa, sys, platform; print(pyvoa.__version__,
+        sys.version, platform.platform())"` and paste the output.
+      placeholder: |
+        pyvoa 0.5.0
+        Python 3.12.3
+        Linux-6.8.0-generic-x86_64
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproducer
+    attributes:
+      label: Minimal reproducible example
+      description: >-
+        The shortest snippet that triggers the problem. Please include the
+        database you selected (`setwhom`) and, if a plot is involved, the
+        visualisation backend (`setvis`).
+      placeholder: |
+        import pyvoa.front as pf
+        pf.setwhom('owid', reload=False)
+        pf.setvis('matplotlib')
+        pf.plot(where='France', which='total_cases')
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: What you thought would happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result, with the full traceback
+      description: >-
+        Paste the complete output. Setting the verbosity to debug first
+        (`from pyvoa.tools import set_verbose_mode; set_verbose_mode(2)`)
+        usually makes the cause visible. In a notebook, include the whole cell
+        output rather than the last line only.
+      render: text
+    validations:
+      required: true
+
+  - type: input
+    id: run-date
+    attributes:
+      label: Date you ran this
+      description: >-
+        Upstream data changes from day to day, so a report that is
+        reproducible today may not be next week. Format YYYY-MM-DD.
+      placeholder: "2026-08-06"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: >-
+        Notebook or console? Local, Google Colab or Binder? Did this work in an
+        earlier version of pyvoa? Optional.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: >-
+            I searched the existing issues and discussions, and this is not
+            already reported.
+          required: true
+        - label: >-
+            I agree to follow this project's
+            [Code of Conduct](https://github.com/pyvoa/pyvoa/blob/main/CODE_OF_CONDUCT.md).
+          required: true

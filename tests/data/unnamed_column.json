@@ -1,0 +1,14 @@
+{
+  "header": "A column is missing its mandatory name key",
+  "geoinfo": {
+    "granularity": "country",
+    "iso3": "FRA",
+    "locationmode": "code"
+  },
+  "datasets": [
+    {
+      "urldata": "https://example.org/frozen/tiny.csv",
+      "columns": [{"name": "date"}, {"alias": "cases"}]
+    }
+  ]
+}

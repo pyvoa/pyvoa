@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Project : PyvoA
@@ -16,40 +15,15 @@ About :
 An interface module to easily plot pyvoa_data with bokeh
 
 """
-from pyvoa.tools import (
-    extract_dates,
-    verb,
-    fill_missing_dates,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-import math
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-
-from collections import defaultdict
-import itertools
-import json
-import io
-from io import BytesIO
-import base64
-import copy
-import locale
-import inspect
-import importlib
-
-import shapely.geometry as sg
-
-import datetime as dt
-import bisect
 from functools import wraps
 
-from pyvoa.jsondb_parser import MetaInfo
+import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import seaborn as sns
-import matplotlib.image as mpimg
+
+from pyvoa.tools import PyvoaWarning
+
+
 class visu_seaborn:
     ######SEABORN#########
     ######################
@@ -80,8 +54,8 @@ class visu_seaborn:
         @wraps(func)
         def inner_plot(self, **kwargs):
             im = mpimg.imread(kwargs['logo'])
-            h, w = im.shape[:2]
-            fig, ax = plt.subplots(1, 1,figsize=(10, 5))
+            _h, w = im.shape[:2]
+            fig, _ax = plt.subplots(1, 1,figsize=(10, 5))
             fig_w, fig_h = fig.get_size_inches() * fig.dpi
             xo = int(0.25*(fig_w-w))
             yo = int(0.3 * fig_h)
@@ -121,10 +95,10 @@ class visu_seaborn:
         Create a seaborn line plot with date on x-axis and which on y-axis.
         """
         input = kwargs['input']
-        loca = list(input['where'].unique())
+        list(input['where'].unique())
         what = kwargs['what']
         plt = kwargs.get('plt')
-        legend = kwargs.get('legend',None)
+        # legend = kwargs.get('legend',None)
         sns = kwargs.get('sns')
         st={k:i for k,i in  enumerate(['-','--',':'])}
         df = input.copy()
@@ -209,10 +183,10 @@ class visu_seaborn:
         """
         input = kwargs['input']
         what = kwargs['what']
-        title = kwargs.get('title')
+        # title = kwargs.get('title')
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')
-        legend = kwargs.get('legend',None)
+        # legend = kwargs.get('legend',None)
         sns.set_theme(style="whitegrid")
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
@@ -230,7 +204,7 @@ class visu_seaborn:
         """
         Create a seaborn pairplot
         """
-        input = kwargs['input']
+        # input = kwargs['input']
         what = kwargs['what']
         plt = kwargs.get('plt')
         sns = kwargs.get('sns')

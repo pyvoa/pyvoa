@@ -14,21 +14,18 @@ About :
 An interface module to easily plot pyvoa_data with bokeh
 
 """
-import folium
-import branca.colormap
-from branca.colormap import LinearColormap
-from branca.element import (
-    Element,
-    Figure
-)
 import json
+
+import folium
 import numpy as np
+from branca.colormap import LinearColormap
+from branca.element import Element, Figure
+
 
 class visu_folium:
     def __init__(self,):
         self.folium_width = 800
         self.folium_height = 400
-        pass
 
     def folium_map(self, **kwargs):
         title=kwargs.get('title')
@@ -36,7 +33,7 @@ class visu_folium:
         input=input.drop(columns=['date'])
         what = kwargs.get('what')
         #tile = AllVisu.convert_tile(kwargs.get('tile',self.dicovisuargs['tile']), 'folium')
-        plabel = kwargs.get('label')
+        # plabel = kwargs.get('label')
         #mapa = folium.Map(tiles=tile, attr='<a href=\"http://pyvoa.org\"> ©pyvoa </a>' + msg)
         mapa = folium.Map(attr='<a href=\"http://pyvoa.org\"> ©pyvoa </a>')
         fig = Figure(width=self.folium_width, height=self.folium_height)
@@ -50,7 +47,7 @@ class visu_folium:
         )
         colormap.caption =  title
         colormap.add_to(mapa)
-        map_id = colormap.get_name()
+        colormap.get_name()
 
         custom_label_colorbar_js = """
         var div = document.getElementById('legend');
@@ -67,7 +64,7 @@ class visu_folium:
         html.script.get_root().render()
         html.script._children[e.get_name()] = e
         input[what + 'scientific_format'] = \
-            (['{:.5g}'.format(i) for i in input[what]])
+            ([f'{i:.5g}' for i in input[what]])
         # (['{:.3g}'.format(i) if i>100000 else i for i in geopdwd_filter[input_field]])
 
         map_dict = input.set_index('where')[what].to_dict()
@@ -82,7 +79,7 @@ class visu_folium:
                 return colormap(value)
 
         #displayed = 'rolloverdisplay'
-        json_data = json.dumps(json.loads(input.to_json()))
+        json.dumps(json.loads(input.to_json()))
 
         folium.GeoJson(
             input,
