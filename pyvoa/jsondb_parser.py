@@ -222,7 +222,7 @@ class DataParser:
             elif granularity == 'subregion':
                 self.geo_all = self.geo.get_subregion_list()
             else:
-                PyvoaError('Granularity problem: neither country, region or subregion')
+                raise PyvoaError('Granularity problem: neither country, region or subregion')
         try:
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
@@ -443,7 +443,7 @@ class DataParser:
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
       else:
-          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')
+          raise PyvoaError('Not a region nors ubregion ... sorry but what is it ?')
 
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
@@ -455,7 +455,7 @@ class DataParser:
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
 
       else:
-          PyvoaError("what locationmode in your json file is supposed to be ?")
+          raise PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
 

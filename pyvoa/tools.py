@@ -30,6 +30,7 @@ import datetime
 import time
 import os.path
 import shutil
+import sys
 import requests
 from tempfile import gettempdir
 from pathlib import Path
@@ -97,7 +98,7 @@ def verb(*args):
 
 def kwargs_keystesting(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
 
     if type(given_args)!=dict:
@@ -122,17 +123,17 @@ def debug(value,message=''):
 
 def kwargs_test(given_args, expected_args, error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
 
     if type(given_args)!=dict:
-        raise PyvoaKeyError("kwargs_test error, the given args are not a dict type.")
+        raise PyvoaError("kwargs_test error, the given args are not a dict type.")
     if type(expected_args)!=list:
-        raise PyvoaKeyError("kwargs_test error, the expected args are not a list type")
+        raise PyvoaError("kwargs_test error, the expected args are not a list type")
 
     bad_kwargs=[a for a in list(given_args.keys()) if a not in expected_args ]
     if len(bad_kwargs) != 0 :
-        raise PyvoaKeyError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
+        raise PyvoaError(error_string+' Unrecognized args are '+str(bad_kwargs)+'.')
 
     return True
 
@@ -172,7 +173,7 @@ def kwargs_values_testing(given_values, expected_values, error_string):
 
 def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string):
     """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaKeyError with error_string.
+    it raises a PyvoaError with error_string.
     """
     if not isinstance(given_kargs,dict) or not isinstance(expected_kargs,dict):
         raise PyvoaError("kwargs_fulltest error, the given args are not a dict type.")
@@ -219,9 +220,9 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
         d1=p[date_field].min()
 
     if not all(isinstance(d, datetime.date) for d in [d1,d2]):
-        raise PyvoaTypeError("Waiting for dates as datetime.date.")
+        raise PyvoaError("Waiting for dates as datetime.date.")
     if d1 > d2:
-        raise PyvoaKeyError("Dates should be ordered as d1<d2.")
+        raise PyvoaError("Dates should be ordered as d1<d2.")
 
     idx = pd.date_range(d1, d2, freq = "D")
     idx = idx.date
@@ -246,7 +247,7 @@ def check_valid_date(date):
     """
     raise_error=False
     if type(date) != type(str()):
-        raise PyvoaTypeError('Expecting date given as string.')
+        raise PyvoaError('Expecting date given as string.')
 
     d=date.split('/')
     if len(d)!=3:
@@ -263,13 +264,13 @@ def check_valid_date(date):
                 raise_error=True
 
     if raise_error:
-        raise PyvoaTypeError("Not a valid date should be : day/month/year, with 2 digits " \
+        raise PyvoaError("Not a valid date should be : day/month/year, with 2 digits " \
             "for month or day, 4 digits for year.")
 
     try:
         return datetime.date(int(year),int(month),int(day))
     except ValueError:
-        raise PyvoaTypeError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
+        raise PyvoaError("Check consistancy of the given date. e.g. the day (btw 1 and 31), " \
             "the month (btw 1 and 12) and the year value.")
 
 def extract_dates(when):
@@ -398,10 +399,10 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
             info('Cannot access to '+url+' . Will use locally stored cached version.')
             pass
         else:
-            raise PyvoaConnectionError('Cannot access to the url '+\
+            raise PyvoaError('Cannot access to the url '+\
                 url+' . Please check your internet connection or url path.')
     except Exception as e2:
-        raise PyvoaNotManagedError(type(e2).__name__+" : "+str(e2))
+        raise PyvoaError(type(e2).__name__+" : "+str(e2))
 
     return local_filename
 
@@ -735,8 +736,6 @@ def PyvoaInfo(message):
             bg_color='blue'
         )
 
-    Exception(message)
-
 def PyvoaWarning(message):
     if get_verbose_mode() > 0:
         blinking_centered_text(
@@ -747,18 +746,26 @@ def PyvoaWarning(message):
             bg_color='yellow'
         )
 
-    Exception(message)
+class PyvoaError(Exception):
+    """The single exception type raised by pyvoa.
 
-import sys
-def PyvoaError(message):
-    blinking_centered_text(
-        'PYVOA Error !',
-        message,
-        blinking=True,
-        text_color='white',
-        bg_color='red'
-    )
-    sys.exit(1)
+    Displaying the message is done at construction time, so that the usual
+    coloured banner is shown to the end user even when the traceback itself
+    is hidden (notebooks, front end helpers). Being a genuine exception, it
+    can also be caught and inspected, which the previous implementation
+    (a function calling sys.exit) did not allow.
+    """
+
+    def __init__(self, *args):
+        message = ' '.join(str(a) for a in args)
+        super().__init__(message)
+        blinking_centered_text(
+            'PYVOA Error !',
+            message,
+            blinking=True,
+            text_color='white',
+            bg_color='red'
+        )
 
 
 class dotdict(dict):

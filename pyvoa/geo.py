@@ -194,8 +194,8 @@ class GeoManager():
             standard (str): The standard to be set for the GeoManager.
 
         Raises:
-            PyvoaTypeError: If the standard argument is not a string.
-            PyvoaKeyError: If the standard is not in the list of managed standards.
+            PyvoaError: If the standard argument is not a string.
+            PyvoaError: If the standard is not in the list of managed standards.
 
         Returns:
             str: The current standard after setting it.
@@ -216,17 +216,17 @@ class GeoManager():
             standard (str): The standard type to be set for the GeoManager.
 
         Raises:
-            PyvoaTypeError: If the `standard` argument is not a string.
-            PyvoaKeyError: If the `standard` is not managed or recognized.
+            PyvoaError: If the `standard` argument is not a string.
+            PyvoaError: If the `standard` is not managed or recognized.
 
         Returns:
             str: The current standard after setting it.
         """
         if not isinstance(standard,str):
-            raise PyvoaTypeError('GeoManager error, the standard argument'
+            raise PyvoaError('GeoManager error, the standard argument'
                 ' must be a string')
         if standard not in self.get_list_standard():
-            raise PyvoaKeyError('GeoManager.set_standard error, "'+\
+            raise PyvoaError('GeoManager.set_standard error, "'+\
                                     standard+' not managed. Please see '\
                                     'get_list_standard() function')
         self._standard=standard
@@ -243,11 +243,11 @@ class GeoManager():
                 - interpret_region (bool): If True, interprets region names and expands them to their corresponding countries. Defaults to False.
 
         Raises:
-            PyvoaKeyError: If an incorrect output type or incompatible arguments are provided.
-            PyvoaDbError: If an unknown database is specified.
-            PyvoaTypeError: If the input types are incorrect.
-            PyvoaLookupError: If no country matches the provided key.
-            PyvoaNotManagedError: If an unexpected error occurs during processing.
+            PyvoaError: If an incorrect output type or incompatible arguments are provided.
+            PyvoaError: If an unknown database is specified.
+            PyvoaError: If the input types are incorrect.
+            PyvoaError: If no country matches the provided key.
+            PyvoaError: If an unexpected error occurs during processing.
 
         Returns:
             list or dict or pandas.DataFrame: The standardized location names in the specified output format.
@@ -276,27 +276,27 @@ class GeoManager():
 
         output=kwargs.get('output',self.get_list_output()[0])
         if output not in self.get_list_output():
-            raise PyvoaKeyError('Incorrect output type. See get_list_output()'
+            raise PyvoaError('Incorrect output type. See get_list_output()'
                 ' or help.')
 
         db=kwargs.get('db',self.get_list_db()[0])
         if db not in self.get_list_db():
-            raise PyvoaDbError('Unknown database "'+db+'" for translation to '
+            raise PyvoaError('Unknown database "'+db+'" for translation to '
                 'standardized location names. See get_list_db() or help.')
 
         interpret_region=kwargs.get('interpret_region',False)
         if not isinstance(interpret_region,bool):
-            raise PyvoaTypeError('The interpret_region argument is a boolean, '
+            raise PyvoaError('The interpret_region argument is a boolean, '
                 'not a '+str(type(interpret_region)))
 
         if interpret_region==True and output!='list':
-            raise PyvoaKeyError('The interpret_region True argument is incompatible '
+            raise PyvoaError('The interpret_region True argument is incompatible '
                 'with non list output option.')
 
         if isinstance(w,str):
             w=[w]
         elif not isinstance(w,list):
-            raise PyvoaTypeError('Waiting for str, list of str or pandas'
+            raise PyvoaError('Waiting for str, list of str or pandas'
                 'as input of get_standard function member of GeoManager')
         wini=w.copy()
         w=[v.title() for v in w] # capitalize first letter of each name
@@ -313,7 +313,7 @@ class GeoManager():
             if type(c)==int:
                 c=str(c)
             elif type(c)!=str:
-                raise PyvoaTypeError('Locations should be given as '
+                raise PyvoaError('Locations should be given as '
                     'strings or integers only')
             if (c in self._gr.get_region_list()) and interpret_region == True:
                 w=self._gr.get_countries_from_region(c)+w
@@ -336,11 +336,11 @@ class GeoManager():
                                 ', using first one.\n')
                             n0=nf[0]
                         except LookupError:
-                            raise PyvoaLookupError('No country match the key "'+c+'". Error.')
+                            raise PyvoaError('No country match the key "'+c+'". Error.')
                         except Exception as e1:
-                            raise PyvoaNotManagedError('Not managed error '+type(e1))
+                            raise PyvoaError('Not managed error '+type(e1))
                     except Exception as e2:
-                        raise PyvoaNotManagedError('Not managed error'+type(e1))
+                        raise PyvoaError('Not managed error'+type(e1))
 
                     if n0 != 'owid_*':
                         if self._standard=='iso2':
@@ -352,7 +352,7 @@ class GeoManager():
                         elif self._standard=='num':
                             n1=n0.numeric
                         else:
-                            raise PyvoaKeyError('Current standard is '+self._standard+\
+                            raise PyvoaError('Current standard is '+self._standard+\
                                 ' which is not managed. Error.')
 
                 n.append(n1)
@@ -490,9 +490,9 @@ class GeoInfo():
                 pd.DataFrame: The modified DataFrame with the added fields.
 
             Raises:
-                PyvoaKeyError: If the provided field is not supported or if the geofield is invalid.
-                PyvoaTypeError: If the input DataFrame or overload option is of incorrect type.
-                PyvoaDbError: If the source database structure has changed.
+                PyvoaError: If the provided field is not supported or if the geofield is invalid.
+                PyvoaError: If the input DataFrame or overload option is of incorrect type.
+                PyvoaError: If the source database structure has changed.
     """
     """GeoInfo class definition. No inheritance from any other class.
 
@@ -581,7 +581,7 @@ class GeoInfo():
             str: The source information for the specified field, or the entire list of fields if no field is specified.
 
         Raises:
-            PyvoaKeyError: If the specified field is not a supported field of GeoInfo.
+            PyvoaError: If the specified field is not a supported field of GeoInfo.
 
         Examples:
             source_info = get_source('example_field')
@@ -593,7 +593,7 @@ class GeoInfo():
         if field==None:
             return self._list_field
         elif field not in self.get_list_field():
-            raise PyvoaKeyError('The field "'+str(field)+'" is not '
+            raise PyvoaError('The field "'+str(field)+'" is not '
                 'a supported field of GeoInfo(). Please see help or '
                 'the get_list_field() output.')
         return field+' : '+self._list_field[field]
@@ -612,9 +612,9 @@ class GeoInfo():
                 - overload (bool): If True, allows overwriting existing fields in the DataFrame. Defaults to False.
 
         Raises:
-            PyvoaTypeError: If the input DataFrame is not valid or if overload is not a boolean.
-            PyvoaKeyError: If no field is provided, if any specified fields are invalid, or if the geofield is not a valid column in the DataFrame.
-            PyvoaDbError: If the worldometers database field names have changed and cannot be matched.
+            PyvoaError: If the input DataFrame is not valid or if overload is not a boolean.
+            PyvoaError: If no field is provided, if any specified fields are invalid, or if the geofield is not a valid column in the DataFrame.
+            PyvoaError: If the worldometers database field names have changed and cannot be matched.
 
         Returns:
             pd.DataFrame: The modified DataFrame with the specified fields added.
@@ -643,34 +643,34 @@ class GeoInfo():
 
         p=kwargs.get('input',None) # the panda
         if not isinstance(p,pd.DataFrame):
-            raise PyvoaTypeError('You should provide a valid input pandas'
+            raise PyvoaError('You should provide a valid input pandas'
                 ' DataFrame as input. See help.')
         p=p.copy()
 
         overload=kwargs.get('overload',False)
         if not isinstance(overload,bool):
-            raise PyvoaTypeError('The overload option should be a boolean.')
+            raise PyvoaError('The overload option should be a boolean.')
 
         fl=kwargs.get('field',None) # field list
         if fl == None:
-            raise PyvoaKeyError('No field given. See help.')
+            raise PyvoaError('No field given. See help.')
         if not isinstance(fl,list):
             fl=[fl]
         if not all(f in self.get_list_field() for f in fl):
-            raise PyvoaKeyError('All fields are not valid or supported '
+            raise PyvoaError('All fields are not valid or supported '
                 'ones. Please see help of get_list_field()')
 
         if not overload and not all(f not in p.columns.tolist() for f in fl):
-            raise PyvoaKeyError('Some fields already exist in you panda '
+            raise PyvoaError('Some fields already exist in you panda '
                 'dataframe columns. You may set overload to True.')
 
         geofield=kwargs.get('geofield','where')
 
         if not isinstance(geofield,str):
-            raise PyvoaTypeError('The geofield should be given as a '
+            raise PyvoaError('The geofield should be given as a '
                 'string.')
         if geofield not in p.columns.tolist():
-            raise PyvoaKeyError('The geofield "'+geofield+'" given is '
+            raise PyvoaError('The geofield "'+geofield+'" given is '
                 'not a valid column name of the input pandas dataframe.')
 
         self._gm.set_standard('iso2')
@@ -713,7 +713,7 @@ class GeoInfo():
 
                     # test that field order hasn't changed in the db
                     if not all (col.startswith(field_descr[i][1]) for i,col in enumerate(self._data_population.columns) ):
-                        raise PyvoaDbError('The worldometers database changed its field names. '
+                        raise PyvoaError('The worldometers database changed its field names. '
                             'The GeoInfo should be updated. Please contact developers.')
 
                     # change field name
@@ -999,7 +999,7 @@ class GeoRegion():
             region (str): The region to be checked.
 
         Raises:
-            PyvoaKeyError: If the provided region is not of type str.
+            PyvoaError: If the provided region is not of type str.
 
         Returns:
             bool: True if the region is valid, False otherwise.
@@ -1007,7 +1007,7 @@ class GeoRegion():
         """ it returns either False or the correctly named region name
         """
         if type(region) != str:
-            raise PyvoaKeyError("The given region is not a str type.")
+            raise PyvoaError("The given region is not a str type.")
 
         region=region.title()  # if not properly capitalized
 
@@ -1019,7 +1019,7 @@ class GeoRegion():
     def get_countries_from_region(self,region):
         """Retrieve a list of country codes from a specified region.
 
-        This method checks if the provided region is valid and returns a sorted list of country codes (ISO 3166-1 alpha-3) associated with that region. If the region is not recognized, a PyvoaKeyError is raised.
+        This method checks if the provided region is valid and returns a sorted list of country codes (ISO 3166-1 alpha-3) associated with that region. If the region is not recognized, a PyvoaError is raised.
 
         Args:
             region (str): The name of the region for which to retrieve country codes.
@@ -1028,7 +1028,7 @@ class GeoRegion():
                           'Amu', 'Ceeac', 'Eac', 'Censad', 'Comesa', and 'Brics'.
 
         Raises:
-            PyvoaKeyError: If the provided region is unknown.
+            PyvoaError: If the provided region is unknown.
 
         Returns:
             list: A sorted list of country codes corresponding to the specified region.
@@ -1041,7 +1041,7 @@ class GeoRegion():
         """
         r = self.is_region(region)
         if not r:
-            raise PyvoaKeyError('The given region "'+str(region)+'" is unknown.')
+            raise PyvoaError('The given region "'+str(region)+'" is unknown.')
         region=r
 
         clist=[]
@@ -1223,7 +1223,7 @@ class GeoCountry():
                 and 'JPN' for Japan.
 
         Raises:
-            PyvoaKeyError: If the provided country code is not supported.
+            PyvoaError: If the provided country code is not supported.
 
         Attributes:
             _country_data (GeoDataFrame): A GeoDataFrame containing geographical
@@ -1251,7 +1251,7 @@ class GeoCountry():
             return None
 
         if not country in self.get_list_countries():
-            raise PyvoaKeyError("Country "+str(country)+" not supported. Please see get_list_countries() and help. ")
+            raise PyvoaError("Country "+str(country)+" not supported. Please see get_list_countries() and help. ")
 
         self._country_data_region=None
         self._country_data_subregion=None
@@ -1938,22 +1938,22 @@ class GeoCountry():
 
         This method checks whether the object has been properly initialized.
         If the object is initialized, it returns True. Otherwise, it raises
-        a PyvoaDbError indicating that the country is not set.
+        a PyvoaError indicating that the country is not set.
 
         Raises:
-            PyvoaDbError: If the object is not initialized with a non-empty
+            PyvoaError: If the object is not initialized with a non-empty
             country string.
 
         Returns:
             bool: True if the object is initialized, otherwise an exception is raised.
         """
 
-        """Test if the country is initialized. If not, raise a PyvoaDbError.
+        """Test if the country is initialized. If not, raise a PyvoaError.
         """
         if self.is_init():
             return True
         else:
-            raise PyvoaDbError("The country is not set. Use a constructor with non empty country string.")
+            raise PyvoaError("The country is not set. Use a constructor with non empty country string.")
 
     def get_region_list(self):
         """Retrieves a list of regions along with their geometries.
@@ -2046,9 +2046,9 @@ class GeoCountry():
                 - output (str): Specifies the output format. Should be either 'code' or 'name'. Defaults to 'code'.
 
         Raises:
-            PyvoaKeyError: If both name and code are provided, or if neither is provided.
-            PyvoaTypeError: If the provided name or code is not a string.
-            PyvoaWhereError: If the specified region does not exist for the country.
+            PyvoaError: If both name and code are provided, or if neither is provided.
+            PyvoaError: If the provided name or code is not a string.
+            PyvoaError: If the specified region does not exist for the country.
 
         Returns:
             str: The subregion corresponding to the specified region, in the format specified by the output argument.
@@ -2063,23 +2063,23 @@ class GeoCountry():
         name=kwargs.get("name",None)
         out=kwargs.get("output",'code')
         if not (code == None) ^ (name == None):
-            raise PyvoaKeyError("Should give either code or name of region, not both.")
+            raise PyvoaError("Should give either code or name of region, not both.")
         if not out in ['code','name']:
-            raise PyvoaKeyError("Should set output either as 'code' or 'name' for subregions.")
+            raise PyvoaError("Should set output either as 'code' or 'name' for subregions.")
 
         if name != None:
             if not isinstance(name,str):
-                raise PyvoaTypeError("Name should be given as string.")
+                raise PyvoaError("Name should be given as string.")
             name = name.title()
             if not name in self.get_region_list()['name_region'].str.title().to_list():
-                raise PyvoaWhereError ("The region "+name+" does not exist for country "+self.get_country()+". See get_region_list().")
+                raise PyvoaError ("The region "+name+" does not exist for country "+self.get_country()+". See get_region_list().")
             cut=(self.get_data(True)['name_region'].str.title()==name)
 
         if code != None:
             if not isinstance(code,str):
-                raise PyvoaTypeError("Name should be given as string.")
+                raise PyvoaError("Name should be given as string.")
             if not code in self.get_region_list()['code_region'].to_list():
-                raise PyvoaWhereError("The region "+code+" does not exist for country "+self.get_country()+". See get_region_list().")
+                raise PyvoaError("The region "+code+" does not exist for country "+self.get_country()+". See get_region_list().")
             cut=(self.get_data(True)['code_region']==code)
 
         return self.get_data(True)[cut][out+'_subregion'].iloc[0]#to_list()
@@ -2092,7 +2092,7 @@ class GeoCountry():
             output (str, optional): The format of the output. Defaults to 'code'.
 
         Raises:
-            PyvoaTypeError: If the provided argument is not a list.
+            PyvoaError: If the provided argument is not a list.
 
         Returns:
             list: A list of subregions corresponding to the provided region names.
@@ -2102,7 +2102,7 @@ class GeoCountry():
         The output argument ('code' as default) is given to the get_subregions_from_region function.
         """
         if not isinstance(l,list):
-            raise PyvoaTypeError("Should provide list as argument")
+            raise PyvoaError("Should provide list as argument")
         s=[]
         for r in l:
             s=s+self.get_subregions_from_region(name=r,output=output)
@@ -2121,8 +2121,8 @@ class GeoCountry():
                 or 'name' for region names. Defaults to 'code'.
 
         Raises:
-            PyvoaKeyError: If the output option is not 'code' or 'name'.
-            PyvoaWhereError: If the specified subregion code does not exist for the current country.
+            PyvoaError: If the output option is not 'code' or 'name'.
+            PyvoaError: If the specified subregion code does not exist for the current country.
 
         Returns:
             list: A list of unique regions associated with the specified subregion code,
@@ -2132,10 +2132,10 @@ class GeoCountry():
         Output default is 'code' of subregions. Can be changer with output='name'.
         """
         if not output in ['code','name']:
-            raise PyvoaKeyError('The output option should be "code" or "name" only')
+            raise PyvoaError('The output option should be "code" or "name" only')
 
         if not code in self.get_subregion_list()['code_subregion'].to_list():
-            raise PyvoaWhereError("The subregion "+code+" does not exist for country "+self.get_country()+". See get_subregion_list().")
+            raise PyvoaError("The subregion "+code+" does not exist for country "+self.get_country()+". See get_subregion_list().")
 
         l=[]
         for k,v in self.get_data(True).iterrows():
@@ -2156,7 +2156,7 @@ class GeoCountry():
             output (str, optional): The format for the output from `get_regions_from_subregion`. Defaults to 'code'.
 
         Raises:
-            PyvoaTypeError: If the provided argument is not a list.
+            PyvoaError: If the provided argument is not a list.
 
         Returns:
             list: A list of unique regions corresponding to the provided subregion codes.
@@ -2167,7 +2167,7 @@ class GeoCountry():
         The output argument ('code' as default) is given to the get_regions_from_subregion function.
         """
         if not isinstance(l,list):
-            raise PyvoaTypeError("Should provide list as argument")
+            raise PyvoaError("Should provide list as argument")
         s=[]
         for sr in l:
             s=s+self.get_regions_from_subregion(sr,output=output)
@@ -2185,8 +2185,8 @@ class GeoCountry():
                 - 'output' (str): The desired output format, either 'code' or 'name'. Defaults to 'code'.
 
         Raises:
-            PyvoaKeyError: If both 'name' and 'code' are provided, or if neither is provided.
-            PyvoaKeyError: If 'output' is not set to either 'code' or 'name'.
+            PyvoaError: If both 'name' and 'code' are provided, or if neither is provided.
+            PyvoaError: If 'output' is not set to either 'code' or 'name'.
 
         Returns:
             list: A list of regions associated with the specified macroregion, including the input region.
@@ -2203,8 +2203,8 @@ class GeoCountry():
                 - 'output' (str): The desired output format, either 'code' or 'name'. Defaults to 'code'.
 
         Raises:
-            PyvoaKeyError: If both 'name' and 'code' are provided, or if neither is provided.
-            PyvoaKeyError: If 'output' is not set to either 'code' or 'name'.
+            PyvoaError: If both 'name' and 'code' are provided, or if neither is provided.
+            PyvoaError: If 'output' is not set to either 'code' or 'name'.
 
         Returns:
             list: A list of regions associated with the specified macroregion, including the input region.
@@ -2216,9 +2216,9 @@ class GeoCountry():
         out=kwargs.get("output",'code')
 
         if not (code == None) ^ (name == None):
-            raise PyvoaKeyError("Should give either code or name of region, not both.")
+            raise PyvoaError("Should give either code or name of region, not both.")
         if not out in ['code','name']:
-            raise PyvoaKeyError("Should set output either as 'code' or 'name' for subregions.")
+            raise PyvoaError("Should set output either as 'code' or 'name' for subregions.")
 
         dict_input={k:v for k,v in kwargs.items() if k in ['code','name']}
         r_out=self.get_regions_from_list_of_subregion_codes(self.get_subregions_from_region(**dict_input),output=out)
@@ -2383,8 +2383,8 @@ class GeoCountry():
                 - overload (bool): If True, allows overwriting existing columns in the input DataFrame. Defaults to False.
 
         Raises:
-            PyvoaTypeError: If the input DataFrame, input_key, geofield, or overload parameters are of incorrect type.
-            PyvoaKeyError: If the input_key or geofield is not a valid column name in the respective DataFrames, or if the field(s) to be added are not available.
+            PyvoaError: If the input DataFrame, input_key, geofield, or overload parameters are of incorrect type.
+            PyvoaError: If the input_key or geofield is not a valid column name in the respective DataFrames, or if the field(s) to be added are not available.
 
         Returns:
             pd.DataFrame: A new DataFrame that results from merging the input DataFrame with the additional data based on the specified keys.
@@ -2411,24 +2411,24 @@ class GeoCountry():
         # Testing input
         data=kwargs.get('input',None) # the panda
         if not isinstance(data,pd.DataFrame):
-            raise PyvoaTypeError('You should provide a valid input pandas'
+            raise PyvoaError('You should provide a valid input pandas'
                 ' DataFrame as input. See help.')
         data=data.copy()
 
         # Testing input_key
         input_key=kwargs.get('input_key','where')
         if not isinstance(input_key,str):
-            raise PyvoaTypeError('The input_key should be given as a string.')
+            raise PyvoaError('The input_key should be given as a string.')
         if input_key not in data.columns.tolist():
-            raise PyvoaKeyError('The input_key "'+input_key+'" given is '
+            raise PyvoaError('The input_key "'+input_key+'" given is '
                 'not a valid column name of the input pandas dataframe.')
 
         # Testing geofield
         geofield=kwargs.get('geofield','code_subregion')
         if not isinstance(geofield,str):
-            raise PyvoaTypeError('The geofield should be given as a string.')
+            raise PyvoaError('The geofield should be given as a string.')
         if geofield not in self._country_data.columns.tolist():
-            raise PyvoaKeyError('The geofield "'+geofield+'" given is '
+            raise PyvoaError('The geofield "'+geofield+'" given is '
                 'not a valid column name of the available data. '
                 'See get_list_properties() for valid fields.')
 
@@ -2440,28 +2440,28 @@ class GeoCountry():
                 region_merging=False
 
         if not isinstance(region_merging,bool):
-            raise PyvoaKeyError('The region_mergin key should be boolean. See help.')
+            raise PyvoaError('The region_mergin key should be boolean. See help.')
 
         # Testing fields
         prop=kwargs.get('field',None) # field list
         if prop == None:
-            raise PyvoaKeyError('No field given. See help.')
+            raise PyvoaError('No field given. See help.')
         if not isinstance(prop,list):
             prop=[prop] # make the prop input a list if needed
 
         if not all(isinstance(p, str) for p in prop):
-            raise PyvoaTypeError("Each property should be a string whereas "+str(prop)+" is not a list of string.")
+            raise PyvoaError("Each property should be a string whereas "+str(prop)+" is not a list of string.")
 
         if not all(p in self.get_list_properties() for p in prop):
-            raise PyvoaKeyError("The property "+prop+" is not available for country "+self.get_country()+".")
+            raise PyvoaError("The property "+prop+" is not available for country "+self.get_country()+".")
 
         # Testing overload
         overload=kwargs.get('overload',False)
         if not isinstance(overload,bool):
-            raise PyvoaTypeError('The overload option should be a boolean.')
+            raise PyvoaError('The overload option should be a boolean.')
 
         if not overload and not all(p not in data.columns.tolist() for p in prop):
-            raise PyvoaKeyError('Some fields already exist in you panda '
+            raise PyvoaError('Some fields already exist in you panda '
                 'dataframe columns. You may set overload to True.')
 
         if overload:
