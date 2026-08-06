@@ -18,6 +18,9 @@ pytest
 # Run the tests that genuinely hit upstream servers
 pytest -m network
 
+# Lint (must be clean: this is what the CI lint job runs)
+ruff check .
+
 # Manual smoke test: exercises setwhom() for one or more databases
 python test.py
 
@@ -34,40 +37,35 @@ Two gotchas when adding tests:
 
 `test.py` is an untracked local scratch script, not a committed part of the repo — treat it as a convenience harness, not a source of truth. It loops over `pf.listwhom()` and calls `pf.setwhom(w)` for each; check the `continue` filter at the top of the loop before relying on it, since it's routinely edited in place to target whichever database(s) are currently being debugged (a recurring set: covidtracking, escovid19data, jhu-usa, moh, rki, sciensano).
 
-`HANDOFF.md` at the repo root tracks the JOSS-readiness plan. Tasks 1–3 (the `shutil` import, PEP 621 packaging, the test suite) are done, as is the `__pycache__`/`.gitignore` bullet of task 4. The rest of task 4 (the CI workflow, ruff, README badges) and tasks 5–6 (community files, README) are not yet implemented.
+`HANDOFF.md` at the repo root tracks the JOSS-readiness plan and its current task status.
+
+## Lint
+
+`ruff check .` must be clean — it is enforced by CI, and the tree is currently at zero findings. The configuration lives in `[tool.ruff]` in `pyproject.toml`: ruff's own default rule set plus `E4`/`E7`/`E9`, with `*.ipynb` excluded (the example notebooks are documentation, not library code). The ruff version is **pinned** in the `dev` extra and in the workflow, because ruff widens its default selection between releases and an unpinned gate would start failing on its own.
+
+Four exceptions are deliberate, and the reasoning is recorded next to them in `pyproject.toml` — do not "fix" the underlying code to satisfy these rules:
+
+- **BLE001** — `except Exception:` followed by `raise PyvoaError(...)` is the intended pattern, since `PyvoaError` is the library's single documented exception type.
+- **DTZ001 / DTZ007 / DTZ011** — epidemiological series are indexed by calendar dates, which have no timezone. Making them tz-aware would shift dates near midnight.
+- **E402, `pyvoa/front.py` only** — the module sets a `FutureWarning` filter before importing pandas/geopandas so those imports stay quiet for notebook users, and it exposes the singleton's methods at module level after instantiating it.
+
+`# noqa: F401` on the optional-backend probes in `visualizer.py` and on `import google.colab` in `tools.py` is also intentional: importing *is* the availability test there.
+
+Dead assignments are commented out rather than deleted, so the original intent stays readable.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs three jobs on push to `main` and on every pull request:
+
+- `lint` — pinned ruff, installed alone so the job does not build geopandas.
+- `test` — python 3.10/3.11/3.12 (matching the classifiers), the offline suite, coverage written to the GitHub Actions job summary and uploaded as a `coverage.xml` artefact. There is no third-party coverage service, hence a CI badge in `README.md` but no coverage badge.
+- `network` — the `@pytest.mark.network` tests, restricted to the weekly cron and manual dispatch, so an upstream outage can never block a pull request.
 
 ## Architecture
 
-### Data flow
-
-```
-front.setwhom(db_name)
-    → GPDBuilder (geopd_builder.py)       # initializes database
-        → MetaInfo + DataParser (jsondb_parser.py)  # reads pyvoa/data/<db>.json
-        → downloads + caches data in ~/.cache/pyvoa.data_<username>/
-        → GeoManager (geo.py)             # normalizes location names
-front.get(...)                            # returns pandas/geopandas DataFrame
-front.plot() / .map() / .histogram()
-    → AllVisu (visualizer.py)             # dispatches to backend
-        → visu_matplotlib / visu_bokeh / visu_seaborn / visu_folium
-```
-
-### Key modules
-
-| Module | Role |
-|--------|------|
-| `front.py` | Main public API (`front` class) — entry point for all user operations |
-| `geopd_builder.py` | `GPDBuilder`: database initialization, download, caching |
-| `jsondb_parser.py` | `MetaInfo` + `DataParser`: reads the 23 JSON database configs in `pyvoa/data/` |
-| `geo.py` | `GeoManager` (country-name normalization), `GeoInfo`, `GeoRegion`, `GeoCountry` |
-| `visualizer.py` | `AllVisu`: visualization coordinator, dispatches to pluggable backends |
-| `visu_*.py` | Visualization backends (matplotlib, bokeh, seaborn, folium) |
-| `tools.py` | Shared utilities: caching (CRC32), kwargs validation, date parsing, and colored-terminal error/warning/info display (`PyvoaError`, `PyvoaWarning`, `PyvoaInfo`) |
-| `kwarg_options.py` | `InputOption`: schema-based kwarg validation |
-
 ### Database configuration
 
-Each supported database is described by a JSON file in `pyvoa/data/` (23 as of this writing). These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
+Each supported database is described by a JSON file in `pyvoa/data/`. These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
 
 ### Caching
 
@@ -82,6 +80,10 @@ All location names are normalized through `tostdstring()` (a module-level functi
 `PyvoaError` (in `tools.py`) is the single exception type of the library — there is no hierarchy, and the older `PyvoaTypeError` / `PyvoaKeyError` / `PyvoaDbError` / `PyvoaWhereError` / `PyvoaLookupError` / `PyvoaConnectionError` / `PyvoaNotManagedError` names no longer exist. It is a real `Exception` subclass and must always be **raised**, never called as a bare statement (a bare call constructs the object, prints the banner and then does nothing). It renders its coloured banner at construction time, so the message still reaches the end user when the traceback is hidden, as in a notebook.
 
 `PyvoaWarning` and `PyvoaInfo` are *not* exceptions: they are display functions gated on the verbosity (`> 0` and `> 1` respectively).
+
+### Known dead API
+
+`front.merger()` calls `self.gpdbuilder.merger(...)`, but no `merger` method exists on `GPDBuilder` or anywhere else in the package — the method has never been callable. It either needs an implementation or removal; do not assume it works.
 
 ### Verbosity
 
