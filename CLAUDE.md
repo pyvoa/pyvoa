@@ -34,7 +34,9 @@ Two gotchas when adding tests:
 
 `test.py` is an untracked local scratch script, not a committed part of the repo — treat it as a convenience harness, not a source of truth. It loops over `pf.listwhom()` and calls `pf.setwhom(w)` for each; check the `continue` filter at the top of the loop before relying on it, since it's routinely edited in place to target whichever database(s) are currently being debugged (a recurring set: covidtracking, escovid19data, jhu-usa, moh, rki, sciensano).
 
-`HANDOFF.md` at the repo root tracks the JOSS-readiness plan. Tasks 1–3 (the `shutil` import, PEP 621 packaging, the test suite) are done; Tasks 4–6 (CI, community files, README) are not yet implemented.
+One test is a strict `xfail` recording a known bug rather than asserting it as correct: `return_nonan_dates_pandas` never drops leading all-NaN dates (sign error in the leading-edge loop — it computes `watchdate - timedelta(j-1)` where the trailing loop needs `+`). Fix the code and the xfail flips to a pass; do not delete the test.
+
+`HANDOFF.md` at the repo root tracks the JOSS-readiness plan. Tasks 1–3 (the `shutil` import, PEP 621 packaging, the test suite) are done, as is the `__pycache__`/`.gitignore` bullet of task 4. The rest of task 4 (the CI workflow, ruff, README badges) and tasks 5–6 (community files, README) are not yet implemented.
 
 ## Architecture
 
@@ -58,7 +60,7 @@ front.plot() / .map() / .histogram()
 |--------|------|
 | `front.py` | Main public API (`front` class) — entry point for all user operations |
 | `geopd_builder.py` | `GPDBuilder`: database initialization, download, caching |
-| `jsondb_parser.py` | `MetaInfo` + `DataParser`: reads 24 JSON database configs in `pyvoa/data/` |
+| `jsondb_parser.py` | `MetaInfo` + `DataParser`: reads the 23 JSON database configs in `pyvoa/data/` |
 | `geo.py` | `GeoManager` (country-name normalization), `GeoInfo`, `GeoRegion`, `GeoCountry` |
 | `visualizer.py` | `AllVisu`: visualization coordinator, dispatches to pluggable backends |
 | `visu_*.py` | Visualization backends (matplotlib, bokeh, seaborn, folium) |
@@ -75,7 +77,7 @@ Downloaded files are cached under `~/.cache/pyvoa.data_<username>/`. Files small
 
 ### Geographic normalization
 
-All location names are normalized through `GeoManager.tostdstring()` (ANSI/unidecode). Country names, ISO3 codes, regions, and subregions are all supported. Mappings use `pycountry` and `pycountry_convert`.
+All location names are normalized through `tostdstring()` (a module-level function in `tools.py`, not a `GeoManager` method), which strips accents via `unidecode`, collapses whitespace and hyphens, and upper-cases. Country names, ISO3 codes, regions, and subregions are all supported. Mappings use `pycountry` and `pycountry_convert`.
 
 ### Error handling
 
@@ -93,4 +95,4 @@ Backends are optional imports that fail gracefully. `AllVisu` discovers availabl
 
 ## Version
 
-Single source of truth: `pyvoa/__version__.py`. Referenced in `setup.py` and the `front` class welcome message.
+Single source of truth: `pyvoa/__version__.py`. `pyproject.toml` reads it through `[tool.setuptools.dynamic]`, `pyvoa/__init__.py` re-exports it (so `import pyvoa; pyvoa.__version__` works without pulling in the heavy dependencies), and the `front` class welcome message prints it. There is no `setup.py` any more — packaging is PEP 621.
