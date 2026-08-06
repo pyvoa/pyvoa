@@ -496,7 +496,7 @@ def return_nonan_dates_pandas(df = None, field = None):
    while (boolval):
        boolval = df.loc[df.date == (watchdate + dt.timedelta(days=j))][field].dropna().empty
        j += 1
-   df = df.loc[df.date >= watchdate - dt.timedelta(days=j - 1)]
+   df = df.loc[df.date >= watchdate + dt.timedelta(days=j - 1)]
    return df
 
 
