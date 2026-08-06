@@ -34,8 +34,6 @@ Two gotchas when adding tests:
 
 `test.py` is an untracked local scratch script, not a committed part of the repo — treat it as a convenience harness, not a source of truth. It loops over `pf.listwhom()` and calls `pf.setwhom(w)` for each; check the `continue` filter at the top of the loop before relying on it, since it's routinely edited in place to target whichever database(s) are currently being debugged (a recurring set: covidtracking, escovid19data, jhu-usa, moh, rki, sciensano).
 
-One test is a strict `xfail` recording a known bug rather than asserting it as correct: `return_nonan_dates_pandas` never drops leading all-NaN dates (sign error in the leading-edge loop — it computes `watchdate - timedelta(j-1)` where the trailing loop needs `+`). Fix the code and the xfail flips to a pass; do not delete the test.
-
 `HANDOFF.md` at the repo root tracks the JOSS-readiness plan. Tasks 1–3 (the `shutil` import, PEP 621 packaging, the test suite) are done, as is the `__pycache__`/`.gitignore` bullet of task 4. The rest of task 4 (the CI workflow, ruff, README badges) and tasks 5–6 (community files, README) are not yet implemented.
 
 ## Architecture

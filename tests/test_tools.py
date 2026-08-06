@@ -276,12 +276,6 @@ def test_return_nonan_dates_pandas_drops_trailing_empty_dates():
     assert trimmed["date"].max() == pd.Timestamp("2020-01-02")
 
 
-@pytest.mark.xfail(
-    reason="sign error in the leading-edge loop of return_nonan_dates_pandas: it "
-           "computes 'watchdate - timedelta(j-1)' where the trailing loop needs "
-           "'+', so leading all-NaN dates are never dropped",
-    strict=True,
-)
 def test_return_nonan_dates_pandas_drops_leading_empty_dates():
     given = pd.DataFrame(
         {
@@ -291,6 +285,59 @@ def test_return_nonan_dates_pandas_drops_leading_empty_dates():
     )
     trimmed = tools.return_nonan_dates_pandas(given, "v")
     assert trimmed["date"].min() == pd.Timestamp("2020-01-02")
+
+
+def test_return_nonan_dates_pandas_drops_several_leading_empty_dates():
+    given = pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                ["2020-01-01", "2020-01-02", "2020-01-03", "2020-01-04"]
+            ),
+            "v": [np.nan, np.nan, np.nan, 1.0],
+        }
+    )
+    trimmed = tools.return_nonan_dates_pandas(given, "v")
+    assert list(trimmed["date"]) == [pd.Timestamp("2020-01-04")]
+
+
+def test_return_nonan_dates_pandas_trims_both_ends():
+    given = pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                ["2020-01-01", "2020-01-02", "2020-01-03", "2020-01-04"]
+            ),
+            "v": [np.nan, 1.0, 2.0, np.nan],
+        }
+    )
+    trimmed = tools.return_nonan_dates_pandas(given, "v")
+    assert list(trimmed["date"]) == [
+        pd.Timestamp("2020-01-02"),
+        pd.Timestamp("2020-01-03"),
+    ]
+
+
+def test_return_nonan_dates_pandas_keeps_a_clean_frame_intact():
+    """Nothing to trim must mean nothing trimmed."""
+    given = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-03"]),
+            "v": [1.0, 2.0, 3.0],
+        }
+    )
+    trimmed = tools.return_nonan_dates_pandas(given, "v")
+    assert len(trimmed) == 3
+
+
+def test_return_nonan_dates_pandas_keeps_interior_gaps():
+    """Only the edges are trimmed, a hole in the middle is data."""
+    given = pd.DataFrame(
+        {
+            "date": pd.to_datetime(["2020-01-01", "2020-01-02", "2020-01-03"]),
+            "v": [1.0, np.nan, 3.0],
+        }
+    )
+    trimmed = tools.return_nonan_dates_pandas(given, "v")
+    assert len(trimmed) == 3
 
 
 # --------------------------------------------------------------------------
