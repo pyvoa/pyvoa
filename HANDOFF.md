@@ -11,6 +11,10 @@ scratch, review and integrate): `AUTHORS`, `CITATION.cff`, `CONTRIBUTING.md`,
 
 Work on a branch, one commit per task, and open a single pull request.
 
+**Status, 2026-08-07: tasks 1-5 are done and released as v0.5.0** (see
+"Release v0.5.0" below). `joss-readiness` was merged into `main` directly
+rather than through a pull request. Task 6 and the JOSS paper remain.
+
 ## Task 1 — Fix the missing `shutil` import (blocking, 1 line)
 
 `pyvoa/error.py` calls `shutil.get_terminal_size()` but never imports `shutil`.
@@ -74,22 +78,97 @@ Reproduce: `python -c "import pyvoa.tools as t; t.check_valid_date('2020-05-01')
 Copy this checklist into the PR description. Nothing below can be done from a
 clone; each item is a setting or an external account.
 
-- [ ] **Enable GitHub Discussions** (Settings → General → Features). Until then,
+- [X] **Enable GitHub Discussions** (Settings → General → Features). Until then,
       the Discussions links in `README.md`, `SUPPORT.md`, `CONTRIBUTING.md` §1
       and `.github/ISSUE_TEMPLATE/config.yml` all 404.
-- [ ] **Create the issue labels** used by the forms, or they are silently
+- [X] **Create the issue labels** used by the forms, or they are silently
       dropped: `bug`, `enhancement`, `new database`, `data`.
-- [ ] **Confirm O. Dadoun's ORCID** — `0000-0002-2169-9725` in `AUTHORS` and
+- [X] **Confirm O. Dadoun's ORCID** — `0000-0002-2169-9725` in `AUTHORS` and
       `CITATION.cff`, unverified.
-- [ ] **Confirm the mail domain** — `@u-pariscite.fr` for T. Beau and
+- [X] **Confirm the mail domain** — `@u-pariscite.fr` for T. Beau and
       J. Browaeys; the institution also uses `@u-paris.fr`.
 - [ ] **Mint the Zenodo concept DOI**, then replace the
-      `10.5281/zenodo.0000000` placeholder in `CITATION.cff` and set
-      `date-released` (currently the `2026-01-01` placeholder) to the date of
-      the matching tagged release.
-- [ ] **Check the rendered forms** once merged, at
+      `10.5281/zenodo.0000000` placeholder in `CITATION.cff`. `date-released`
+      is no longer a placeholder: it was set to `2026-08-06` with the v0.5.0
+      release, and `version` to `0.5.0`. The concept DOI is the last remaining
+      placeholder in that file.
+- [ ] **Check the rendered forms**, now possible since `main` carries them:
       `https://github.com/pyvoa/pyvoa/issues/new/choose` — issue-form schema
       errors only surface on GitHub, not locally.
+
+## Release v0.5.0 — done, 2026-08-07
+
+Cut from the merged `joss-readiness` work. The analysis API did not change;
+0.5.0 is the version that packages tasks 1-5.
+
+- [X] **Version bumped to 0.5.0** in `pyvoa/__version__.py`. `pyvoa/help.py`
+      used to carry a second, independently hardcoded `__version__` and
+      `__author__` — it imports them now, so `pyvoa/__version__.py` is really
+      the single source of truth. Also bumped: `CITATION.cff` (`version`,
+      `date-released`) and the version placeholder in `bug_report.yml`.
+- [X] **`CHANGELOG.md`** has a 0.5.0 section, written from the branch's
+      fourteen commits and matching the file's existing style.
+- [X] **Merged to `main`** as a `--no-ff` merge (`efd1a47`), so the branch
+      stays visible in the history, and pushed.
+- [X] **Tagged `v0.5.0`** (annotated, on the merge commit) and pushed.
+- [X] **GitHub release** published at
+      `https://github.com/pyvoa/pyvoa/releases/tag/v0.5.0`, notes taken from
+      the changelog section, with `pyvoa-0.5.0-py3-none-any.whl` and
+      `pyvoa-0.5.0.tar.gz` attached. Created through the REST API: `gh` is not
+      installed on the release machine.
+- [ ] **PyPI upload** — still pending, the only unfinished release step. The
+      artifacts are built and `twine check`-clean in `dist/`; the machine has
+      no `~/.pypirc`, no `TWINE_*` variables and an empty keyring, so the
+      upload needs a token typed interactively:
+
+      python -m twine upload dist/pyvoa-0.5.0-py3-none-any.whl dist/pyvoa-0.5.0.tar.gz
+
+      List the two files explicitly: `dist/` still holds the 0.4.2 artifacts,
+      and a wildcard would try to re-upload them and fail the batch.
+
+Verified before tagging: 176 tests pass, `ruff check pyvoa/ tests/` clean, both
+artifacts pass `twine check`, the wheel carries all 23 database JSON files and
+the 3 PNGs, and it installs into a fresh venv reporting 0.5.0. The only ruff
+findings in the tree are in `test.py`, which is untracked and invisible to CI.
+
+## Todo the zenodo concept DOI
+  Two ways round it
+
+  A. Keep Zenodo, drop GitHub entirely — manual upload. The GitHub integration does exactly one thing: on each release it downloads
+  https://github.com/pyvoa/pyvoa/archive/refs/tags/v0.5.0.tar.gz and creates a deposit from it. You can upload that same tarball yourself. The resulting record, DOIs included,
+  is indistinguishable. This is what I'd do — it's a handful of clicks once every release, and pyvoa releases a few times a year, not weekly.
+
+  B. Link GitHub afterwards, without signing up through it. Worth knowing in case you assumed otherwise: you can create a Zenodo account with ORCID (you have one, and so do
+  Julien and Olivier) or plain email, and then attach GitHub under Settings → Linked accounts → Connect. Signing up with GitHub and linking GitHub are separate things. Only take
+  this route if you want the automation.
+
+  Route A, step by step
+
+  Create the Zenodo account with ORCID or email if you don't have one. Then:
+
+  1. Get the artifact. Done already: the v0.5.0 release page carries both
+  dist/pyvoa-0.5.0.tar.gz (the sdist, the thing PyPI serves — prefer this one) and GitHub's own
+  auto-generated source tarball. Either is fine; they are also still in dist/ locally.
+
+  2. Zenodo → New upload, drop the tarball in.
+  3. Fill the metadata, straight out of CITATION.cff so the two agree — JOSS editors do check this:
+
+  - Resource type: Software
+  - Title: pyvoa: Python Virus Open Analysis
+  - Creators: Beau, Browaeys, Dadoun — each with their ORCID and affiliation (CITATION.cff:29-46)
+  - Description: the abstract block, CITATION.cff:9-16
+  - License: MIT
+  - Version: 0.5.0
+  - Keywords: the eight from CITATION.cff:48-56
+  - Related works: "is supplement to" → https://github.com/pyvoa/pyvoa (this is what the integration sets)
+
+  4. Publish. The record page then shows both DOIs; the concept one sits under "Cite all versions" and is the lower number. That's the one for CITATION.cff:62, along with the
+  real release date on line 19, which is already correct.
+  5. For 0.5.1 and later: open the record → New version → upload the new tarball → publish. The concept DOI carries over unchanged, which is the whole point of it.
+
+  One caveat on the "Reserve DOI" button in the upload form: it reserves the version DOI so you can bake it into the files before publishing. It does not give you the concept
+  DOI early — that only exists after the first publish. So the order stays: publish, then patch CITATION.cff.
+
 
 Deferred deliberately, not forgotten:
 
