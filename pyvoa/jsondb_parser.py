@@ -140,7 +140,10 @@ class MetaInfo:
       '''
       if namedb:
           line = self.pdjson.loc[self.pdjson.name == namedb]
-          if line.validejson.values == 'GOOD':
+          if line.empty:
+              raise PyvoaError('Unknown database "' + str(namedb) + '". Available '
+                  'databases are : ' + ', '.join(sorted(self.pdjson.name)) + '.')
+          if line.validejson.values[0] == 'GOOD':
               try:
                   return line.parsingjson.values[0]
               except:

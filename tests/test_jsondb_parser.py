@@ -126,15 +126,19 @@ def test_getcurrentmetadata_rejects_an_empty_name(empty):
         MetaInfo().getcurrentmetadata(empty)
 
 
-@pytest.mark.xfail(
-    reason="getcurrentmetadata indexes an empty selection for an unknown "
-           "database, so numpy raises 'truth value of an empty array is "
-           "ambiguous' instead of a PyvoaError naming the unknown database",
-    strict=True,
-)
 def test_getcurrentmetadata_rejects_an_unknown_database():
-    with pytest.raises(PyvoaError):
+    with pytest.raises(PyvoaError) as excinfo:
         MetaInfo().getcurrentmetadata("no-such-database")
+    assert "no-such-database" in str(excinfo.value)
+
+
+def test_getcurrentmetadata_suggests_the_available_databases():
+    """A typo in a database name must list what the user could have meant."""
+    with pytest.raises(PyvoaError) as excinfo:
+        MetaInfo().getcurrentmetadata("owidd")
+    message = str(excinfo.value)
+    assert "owid" in message
+    assert "jhu" in message
 
 
 def test_getcurrentmetadatawhich_lists_the_variables():
