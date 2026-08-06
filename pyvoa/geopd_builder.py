@@ -99,9 +99,9 @@ class GPDBuilder(object):
                             where_kindgeo = self.geo.get_subregion_list()[['code_subregion', 'name_subregion', 'geometry']]
                             where_kindgeo = where_kindgeo.rename(columns={'name_subregion': 'where'})
                        else:
-                           raise PyvoaTypeError('What is the granularity of your  database ?')
+                           raise PyvoaError('What is the granularity of your  database ?')
             except:
-                raise PyvoaTypeError('What data base are you looking for ?')
+                raise PyvoaError('What data base are you looking for ?')
             self.where_geodescription = where_kindgeo
         else:
             self.db = 'in-house data'
@@ -178,7 +178,7 @@ class GPDBuilder(object):
                 elif self.geo.is_subregion(i):
                    tmp = i
                 else:
-                    raise PyvoaTypeError(i + ': not subregion nor region ... what is it ?')
+                    raise PyvoaError(i + ': not subregion nor region ... what is it ?')
             elif typeloc == 'region':
                 tmp = self.geo.get_region_list()
                 if i.isdigit():
@@ -189,11 +189,11 @@ class GPDBuilder(object):
                         tmp = tmp[:-1]
                 else:
                     if self.geo.is_subregion(i):
-                        raise PyvoaTypeError(i+ ' is a subregion ... not compatible with a region DB granularity?')
+                        raise PyvoaError(i+ ' is a subregion ... not compatible with a region DB granularity?')
                     else:
-                        raise PyvoaTypeError(i + ': not subregion nor region ... what is it ?')
+                        raise PyvoaError(i + ': not subregion nor region ... what is it ?')
             else:
-                raise PyvoaTypeError('Not subregion nor region requested, don\'t know what to do ?')
+                raise PyvoaError('Not subregion nor region requested, don\'t know what to do ?')
             if exploded:
                 exploded.append(tmp)
             else:
@@ -321,7 +321,7 @@ class GPDBuilder(object):
            input = input.loc[input['where'].str.upper().isin([w.upper() for w in flat_list(where)])]
 
        if input.empty:
-            PyvoaError(f"No information is available for the provided locations: {where}")
+            raise PyvoaError(f"No information is available for the provided locations: {where}")
        else:
            missing = [loc for loc in flat_list(where) if input.loc[input['where'].str.upper() == loc.upper()].empty]
            if len(missing)>0:
@@ -493,7 +493,7 @@ class GPDBuilder(object):
         try:
             uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population',overload=True)
         except:
-            PyvoaError(self.db + ' has no information for what concern: '+pop_field)
+            raise PyvoaError(self.db + ' has no information for what concern: '+pop_field)
     else:
         if not isinstance(self._gi,coge.GeoCountry):
             self._gi = None
@@ -509,14 +509,14 @@ class GPDBuilder(object):
             try:
                 uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
             except:
-                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
+                raise PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         elif self.granularity == 'subregion':
             try:
                 uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
             except:
-                PyvoaError(self.db + ' has no information for what concern: '+pop_field)
+                raise PyvoaError(self.db + ' has no information for what concern: '+pop_field)
         else:
-            raise PyvoaKeyError('This is not region nor subregion what is it ?!')
+            raise PyvoaError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
     if pop_field not in pandy.columns:
         pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
@@ -542,12 +542,12 @@ class GPDBuilder(object):
        if 'saveformat' in kwargs:
             saveformat = kwargs['saveformat']
        if saveformat not in possibleformat:
-           raise PyvoaKeyError('Output option '+saveformat+' is not recognized.')
+           raise PyvoaError('Output option '+saveformat+' is not recognized.')
        if 'savename' in kwargs and kwargs['savename'] != '':
           savename = kwargs['savename']
 
        if not 'pandas' in kwargs:
-          raise PyvoaKeyError('Absolute needed variable : the pandas desired ')
+          raise PyvoaError('Absolute needed variable : the pandas desired ')
        else:
           pandyori = kwargs['pandas']
        pandy = pandyori
