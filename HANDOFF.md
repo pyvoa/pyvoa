@@ -116,7 +116,7 @@ Cut from the merged `joss-readiness` work. The analysis API did not change;
       the changelog section, with `pyvoa-0.5.0-py3-none-any.whl` and
       `pyvoa-0.5.0.tar.gz` attached. Created through the REST API: `gh` is not
       installed on the release machine.
-- [ ] **PyPI upload** — still pending, the only unfinished release step. The
+- [X] **PyPI upload** — still pending, the only unfinished release step. The
       artifacts are built and `twine check`-clean in `dist/`; the machine has
       no `~/.pypirc`, no `TWINE_*` variables and an empty keyring, so the
       upload needs a token typed interactively:
@@ -130,45 +130,6 @@ Verified before tagging: 176 tests pass, `ruff check pyvoa/ tests/` clean, both
 artifacts pass `twine check`, the wheel carries all 23 database JSON files and
 the 3 PNGs, and it installs into a fresh venv reporting 0.5.0. The only ruff
 findings in the tree are in `test.py`, which is untracked and invisible to CI.
-
-## Todo the zenodo concept DOI
-  Two ways round it
-
-  A. Keep Zenodo, drop GitHub entirely — manual upload. The GitHub integration does exactly one thing: on each release it downloads
-  https://github.com/pyvoa/pyvoa/archive/refs/tags/v0.5.0.tar.gz and creates a deposit from it. You can upload that same tarball yourself. The resulting record, DOIs included,
-  is indistinguishable. This is what I'd do — it's a handful of clicks once every release, and pyvoa releases a few times a year, not weekly.
-
-  B. Link GitHub afterwards, without signing up through it. Worth knowing in case you assumed otherwise: you can create a Zenodo account with ORCID (you have one, and so do
-  Julien and Olivier) or plain email, and then attach GitHub under Settings → Linked accounts → Connect. Signing up with GitHub and linking GitHub are separate things. Only take
-  this route if you want the automation.
-
-  Route A, step by step
-
-  Create the Zenodo account with ORCID or email if you don't have one. Then:
-
-  1. Get the artifact. Done already: the v0.5.0 release page carries both
-  dist/pyvoa-0.5.0.tar.gz (the sdist, the thing PyPI serves — prefer this one) and GitHub's own
-  auto-generated source tarball. Either is fine; they are also still in dist/ locally.
-
-  2. Zenodo → New upload, drop the tarball in.
-  3. Fill the metadata, straight out of CITATION.cff so the two agree — JOSS editors do check this:
-
-  - Resource type: Software
-  - Title: pyvoa: Python Virus Open Analysis
-  - Creators: Beau, Browaeys, Dadoun — each with their ORCID and affiliation (CITATION.cff:29-46)
-  - Description: the abstract block, CITATION.cff:9-16
-  - License: MIT
-  - Version: 0.5.0
-  - Keywords: the eight from CITATION.cff:48-56
-  - Related works: "is supplement to" → https://github.com/pyvoa/pyvoa (this is what the integration sets)
-
-  4. Publish. The record page then shows both DOIs; the concept one sits under "Cite all versions" and is the lower number. That's the one for CITATION.cff:62, along with the
-  real release date on line 19, which is already correct.
-  5. For 0.5.1 and later: open the record → New version → upload the new tarball → publish. The concept DOI carries over unchanged, which is the whole point of it.
-
-  One caveat on the "Reserve DOI" button in the upload form: it reserves the version DOI so you can bake it into the files before publishing. It does not give you the concept
-  DOI early — that only exists after the first publish. So the order stays: publish, then patch CITATION.cff.
-
 
 Deferred deliberately, not forgotten:
 

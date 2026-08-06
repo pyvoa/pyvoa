@@ -56,10 +56,8 @@ keywords:
   - "science education"
 
 identifiers:
-  # Zenodo mints two DOIs: a concept DOI (all versions) and one DOI per version.
-  # Put the concept DOI here: this is the one to cite by default.
   - type: doi
-    value: "10.5281/zenodo.0000000"   # TODO: concept DOI, https://zenodo.org/communities/pyvoa
+    value: "10.5281/zenodo.21829901"  
     description: "Concept DOI - all versions of pyvoa"
   - type: url
     value: "https://pypi.org/project/pyvoa/"
