@@ -14,44 +14,39 @@ Date :    April 2020 - November 2025
 
 # --- Imports ----------------------------------------------------------
 import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 #warnings.filterwarnings("ignore", category=DeprecationWarning, module='jupyter_client')
 #warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
-import pandas as pd
-from functools import wraps
-import numpy as np
+import ast
 import random
-
-import datetime as dt
-from pyvoa.tools import (
-    kwargs_keystesting,
-    kwargs_values_testing,
-    debug,
-    info,
-    fill_missing_dates,
-    flat_list,
-    all_or_none_lists,
-    readpkl,
-    set_verbose_mode,
-    dumppkl,
-    convertmercator,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-
-import pyvoa.geopd_builder as coco
-from pyvoa.jsondb_parser import MetaInfo
-import pyvoa.geo as coge
+from functools import wraps
+from importlib import import_module
 
 import geopandas as gpd
-from pyvoa.kwarg_options import InputOption
-from pyvoa.visualizer import AllVisu
-import pyvoa.help as h
+import numpy as np
+import pandas as pd
 
-from importlib import import_module
-import ast
+import pyvoa.geo as coge
+import pyvoa.geopd_builder as coco
+import pyvoa.help as h
+from pyvoa.jsondb_parser import MetaInfo
+from pyvoa.kwarg_options import InputOption
+from pyvoa.tools import (
+    PyvoaError,
+    PyvoaInfo,
+    PyvoaWarning,
+    all_or_none_lists,
+    convertmercator,
+    fill_missing_dates,
+    info,
+    kwargs_keystesting,
+    kwargs_values_testing,
+    readpkl,
+)
+from pyvoa.visualizer import AllVisu
+
 
 def getversion():
     try:
@@ -204,7 +199,7 @@ class front:
             raise PyvoaError(base + ' is not a supported GPDBuilder. '
                                     'See pyvoa.fron.listwhom() for the full list.')
         # Check if the current base is already set to the requested base
-        visu = self.getvis()
+        # visu = self.getvis()
 
         if self.db == base:
             info(f"The GPDBuilder '{base}' is already set as the current database")
@@ -292,11 +287,10 @@ class front:
                 else:
                     input = fill_missing_dates(input)
                     kwargs['input']=input
-                kwargs['which'] =  [w for w in input.columns if w not in ['date', 'where']][0]
+                kwargs['which'] =  next(w for w in input.columns if w not in ['date', 'where'])
             else:
                 kwargs['which'] = kwargs.get('which',self.gpdbuilder.get_available_keywords()[0])
 
-            mustbealist = ['where','which','option']
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
@@ -310,8 +304,8 @@ class front:
                     f"value of {i} not correct"
                 )
 
-            for k,v in default.items():
-                if k in kwargs.keys() and k not in ['when','input']:
+            for k in default:
+                if k in kwargs and k not in ['when','input']:
                     if isinstance(kwargs[k],list):
                         default[k] = kwargs[k]
                     else:
@@ -326,7 +320,7 @@ class front:
             #input = kwargs.get('input',pd.DataFrame())
             kwargs['kwargsuser'] = kwargs.copy()
 
-            where =  kwargs['where']
+            # where =  kwargs['where']
             if kwargs['where'][0] == '':
                 if input.empty:
                     if self.gpdbuilderdata is not None:
@@ -421,7 +415,7 @@ class front:
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis
-            if not 'get' in func.__name__:
+            if 'get' not in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:
                 if func.__name__ in ['hist','map']:
@@ -486,12 +480,12 @@ class front:
                     elif val.columns=='where':
                         return 'red'
                     else:
-                        return black
+                        return 'black'
                 if 'geometry' in list(pandy.columns):
                     pandy = pandy.drop(columns='geometry')
                 casted_data = pandy.copy()
                 col=list(pandy.columns)
-                mem='{:,}'.format(pandy[col].memory_usage(deep=True).sum())
+                mem=f'{pandy[col].memory_usage(deep=True).sum():,}'
                 info('Memory usage of all columns: ' + mem + ' bytes')
             elif output == 'geopandas':
                 if 'geometry' in list(pandy.columns):
@@ -503,7 +497,7 @@ class front:
                 casted_data = pandy.copy().to_dict('split')
             elif output == 'list' or output == 'array':
                 my_list = []
-                for keys, values in pandy.items():
+                for values in pandy.values():
                     vc = [i for i in values]
                     my_list.append(vc)
                 casted_data = my_list
@@ -554,10 +548,10 @@ class front:
                 Any exceptions raised by the `func` or during the processing of geometry settings.
             """
             input = kwargs.get('input')
-            originalinput = input.copy()
+            # originalinput = input.copy()
             if 'geometry' not in list(input.columns):
                 raise PyvoaError('No geometry inside your pandas, map can not be asked')
-            where = kwargs.get('where')
+            # where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)
             if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
@@ -570,7 +564,7 @@ class front:
                 kwargs.pop('output')
             if 'pop' in kwargs:
                 kwargs.pop('pop')
-            dateslider = kwargs.get('dateslider', None)
+            # dateslider = kwargs.get('dateslider', None)
 
             if mapoption:
                 if 'folium' in mapoption:
@@ -611,7 +605,7 @@ class front:
             Returns:
                 The result of the visualization function applied to the generated histogram outcome.
             """
-            dateslider = kwargs.get('dateslider')
+            # dateslider = kwargs.get('dateslider')
             typeofhist = kwargs.get('typeofhist')
             if self.getvis() == 'bokeh' and 'geometry' in kwargs['input'].columns:
                 kwargs['input'] = kwargs['input'].drop(columns='geometry')
@@ -689,9 +683,8 @@ class front:
             from bokeh.io import (
             show,
             )
-            if not self.batch:
-                if fig:
-                    show(fig)
+            if not self.batch and fig:
+                show(fig)
         else:
             import matplotlib.pyplot as plt
             if not self.batch:
@@ -715,7 +708,7 @@ class front:
             Raises:
                 PyvoaError: If no visualization has been set up.
             """
-            input=kwargs['input']
+            # input=kwargs['input']
 
             which = kwargs.get('which')
             typeofplot = kwargs.get('typeofplot',self.listplot()[0])
@@ -845,8 +838,8 @@ class front:
                     iso3ls.append(iso3)
                     gr = mypd.parsingjson.values[0]['geoinfo']['granularity']
                     grls.append(gr)
-                    for datasets in mypd.parsingjson.values[0]['datasets']:
-                        pdata = pd.DataFrame(datasets['columns'])
+                    # for datasets in mypd.parsingjson.values[0]['datasets']:
+                    #     pdata = pd.DataFrame(datasets['columns'])
                     varls.append(self.listwhich(i))
 
             dico.update({'dbname': namels})
@@ -868,7 +861,7 @@ class front:
         return self.lwhat
 
     def listchart(self,):
-        if self.vis == None:
+        if self.vis is None:
             raise PyvoaError('Vis has not be set !')
         return self.av.pdcharts[self.vis]
 
@@ -880,7 +873,7 @@ class front:
         Returns:
             list: The list histogram.
         """
-        if self.vis == None:
+        if self.vis is None:
             raise PyvoaError('Vis has not be set !')
         self.lhist = self.av.pdcharts[self.vis]['hist']
         self.lhist = ast.literal_eval(self.lhist.split("=", 1)[1])
@@ -896,7 +889,7 @@ class front:
         Returns:
             list: A list containing the types of plots.
         """
-        if self.vis == None:
+        if self.vis is None:
             raise PyvoaError('Vis has not be set !')
         self.lplot = self.av.pdcharts[self.vis]['plot']
         self.lplot = ast.literal_eval(self.lplot.split("=", 1)[1])
@@ -1007,7 +1000,7 @@ class front:
         if clustered:
             return clust()
         else:
-            if self.gpdbuilder.db_world == True:
+            if self.gpdbuilder.db_world:
                 if granularity == 'country' and code not in ['WLD','EUR'] :
                     r =  self.gpdbuilder.to_standard(code)
                 else:
@@ -1048,8 +1041,8 @@ class front:
         """
         if db:
             if detailed:
-                l=self.listwhom(True)
-                print(l[l.index == db])
+                whomlist=self.listwhom(True)
+                print(whomlist[whomlist.index == db])
                 return None
         else:
             if self.db=='':
@@ -1058,8 +1051,8 @@ class front:
                 else:
                     return None
             if detailed:
-                l=self.listwhom(True)
-                print(l[l.index==self.db])
+                whomlist=self.listwhom(True)
+                print(whomlist[whomlist.index==self.db])
             return self.db
 
     def getdbmetadata(self,db=None):
@@ -1106,7 +1099,7 @@ class front:
             pandas.DataFrame: The full database retrieved from the `gpdbuilder`.
         """
         col = list(self.gpdbuilder.get_fulldb().columns)
-        mem='{:,}'.format(self.gpdbuilder.get_fulldb()[col].memory_usage(deep=True).sum())
+        mem=f'{self.gpdbuilder.get_fulldb()[col].memory_usage(deep=True).sum():,}'
         info('Memory usage of all columns: ' + mem + ' bytes')
         df = self.gpdbuilder.get_fulldb()
         return df
@@ -1160,7 +1153,7 @@ class front:
         else:
             self.vis = vis
             PyvoaInfo(f"The visualization has been set correctly to: {vis}")
-        self.setkwargsvisu(**{'vis':vis})
+        self.setkwargsvisu(vis=vis)
 
     def setbatch(self,):
         self.batch = True
@@ -1192,7 +1185,6 @@ class front:
         Returns:
             None
         """
-        global _db
         kwargs_keystesting(kwargs, ['pandas','saveformat','savename'], 'Bad args used in the pyvoa.saveoutput function.')
         pandy = kwargs.get('pandas', pd.DataFrame())
         saveformat = kwargs.get('saveformat', 'excel')
@@ -1200,7 +1192,7 @@ class front:
         if pandy.empty:
             raise PyvoaError('Pandas to save is mandatory there is not default !')
         else:
-            _db.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
+            self.gpdbuilder.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
 
     def merger(self,**kwargs):
         """Merger function that integrates provided data into the database.
@@ -1219,10 +1211,9 @@ class front:
         Returns:
             The result of the database merger operation.
         """
-        global _db
         kwargs_keystesting(kwargs,['coapandas'], 'Bad args used in the pyvoa.merger function.')
         listpandy = kwargs.get('coapandas',[])
-        return _db.merger(coapandas = listpandy)
+        return self.gpdbuilder.merger(coapandas = listpandy)
 
     def savefig(self,name):
         """Saves the current figure to a file.
@@ -1245,10 +1236,9 @@ class front:
                     raise PyvoaError('selenium is needed ... pip install selenium')
                 export_png(self.outcome, filename=name)
                 '''
-                from bokeh.plotting import figure, output_file, save
+                from bokeh.plotting import output_file, save
                 output_file(name+'.html')
                 save(self.outcome)
-                #
             else:
                     self.outcome.figure.savefig(name)
             print('Figure :', name, ' has been saved ')
@@ -1262,12 +1252,14 @@ class front:
 
 __pyvoafront_instance__ = front()
 
-from pyvoa.__version__ import __version__,__author__,__email__
+from pyvoa.__version__ import __author__, __email__, __version__
+
 __pyvoafront_instance__.__version__ = __version__
 __pyvoafront_instance__.__author__ = __author__
 __pyvoafront_instance__.__email__ = __email__
 
 import sys
+
 module = sys.modules[__name__]
 
 for attr_name in dir(__pyvoafront_instance__):

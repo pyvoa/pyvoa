@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Project : PyvoA
@@ -15,36 +14,20 @@ About :
 
 
 """
-from pyvoa.tools import (
-    extract_dates,
-    debug,
-    verb,
-    fill_missing_dates,
-    wgs84_to_web_mercator,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-
-import math
-import pandas as pd
-import geopandas as gpd
-import numpy as np
-
-import json
-import io
-import copy
-
-import datetime as dt
 import matplotlib.dates as mdates
-from pyvoa.jsondb_parser import MetaInfo
-from pyvoa.kwarg_options import InputOption
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
+from pyvoa.kwarg_options import InputOption
 from pyvoa.tools import (
+    PyvoaError,
+    PyvoaWarning,
     min_max_range,
 )
+
+
 class visu_matplotlib:
     '''
         MATPLOTLIB chart drawing methods ...
@@ -84,7 +67,7 @@ class visu_matplotlib:
             logo_height = int(logo_width * h / w)  # Maintain aspect ratio
 
             fig_w, fig_h = fig.get_size_inches() * fig.dpi
-            xo = int(fig_w - logo_width - 20)    # 20px margin from right
+            int(fig_w - logo_width - 20)    # 20px margin from right
             yo = int(fig_h - logo_height - 20)   # 20px margin from top
 
             # Resize the image to match calculated dimensions
@@ -159,8 +142,8 @@ class visu_matplotlib:
         '''
         input = kwargs.get('input')
         what = kwargs.get('what')
-        title = kwargs.get('title')
-        plt = kwargs['plt']
+        # title = kwargs.get('title')
+        kwargs['plt']
         ax = kwargs['ax']
         #drop bissextile fine tuning in needed in the future
         input = input.loc[~(input['date'].dt.month.eq(2) & input['date'].dt.day.eq(29))].reset_index(drop=True)
@@ -170,7 +153,7 @@ class visu_matplotlib:
 
         input.loc[:,'dayofyear']= input['date'].apply(lambda x : x.dayofyear)
 
-        loc = input['where'][0]
+        input['where'][0]
         d = input.allyears.unique()
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
@@ -187,7 +170,7 @@ class visu_matplotlib:
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
-        plt = kwargs.get('plt')
+        # plt = kwargs.get('plt')
         ax = kwargs.get('ax')
 
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
@@ -212,7 +195,7 @@ class visu_matplotlib:
         plt = kwargs.get('plt')
         cmap = plt.get_cmap('Paired')
         ax = kwargs.get('ax')
-        fig = kwargs.get('fig')
+        # fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
 
         input_sorted = input.sort_values(by=what,ascending=True)
@@ -225,8 +208,8 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_histo(self,**kwargs):
-        what = kwargs.get('what')
-        title = kwargs.get('title')
+        # title = kwargs.get('title')
+        # what = kwargs.get('what')
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         input_df = kwargs.get('input').copy()
@@ -310,8 +293,8 @@ class visu_matplotlib:
         '''
          matplotlib map display
         '''
-        import numpy as np
         import contextily as cx
+        import numpy as np
         from matplotlib.ticker import ScalarFormatter
 
         cmap = plt.cm.get_cmap("viridis").reversed()
@@ -319,7 +302,7 @@ class visu_matplotlib:
         ax.axis('off')
 
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        # what = kwargs.get('what')
         which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')

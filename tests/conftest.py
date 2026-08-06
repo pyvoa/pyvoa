@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Shared fixtures for the pyvoa test suite.
 
 Two invariants are enforced here for every test that is *not* marked
@@ -15,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-import pyvoa.tools as tools
+from pyvoa import tools
 
 DATA = Path(__file__).parent / "data"
 

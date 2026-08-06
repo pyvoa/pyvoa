@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for pyvoa.tools.
 
 Every public function of the module is exercised here. None of these tests
@@ -16,9 +15,8 @@ import pandas as pd
 import pytest
 import shapely.geometry as sg
 
-import pyvoa.tools as tools
+from pyvoa import tools
 from pyvoa.tools import PyvoaError
-
 
 # --------------------------------------------------------------------------
 # verbosity
@@ -664,6 +662,7 @@ def test_error_display_works_without_a_tty():
         [sys.executable, "-c", script],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert completed.returncode == 0, completed.stderr
     assert "UnboundLocalError" not in completed.stderr

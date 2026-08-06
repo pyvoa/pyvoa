@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Tests that genuinely reach upstream servers.
 
 Every test here is marked ``network`` and is therefore deselected by the
@@ -21,7 +20,7 @@ import datetime
 import pandas as pd
 import pytest
 
-import pyvoa.geo as geo
+from pyvoa import geo
 from pyvoa.jsondb_parser import DataParser
 from pyvoa.tools import exists_from_url, get_local_from_url
 
@@ -37,7 +36,7 @@ def test_exists_from_url_finds_a_live_url():
 
 
 def test_get_local_from_url_returns_a_readable_file(tmp_path, monkeypatch):
-    import pyvoa.tools as tools
+    from pyvoa import tools
 
     monkeypatch.setattr(tools, "tmpdir", str(tmp_path))
     path = get_local_from_url(

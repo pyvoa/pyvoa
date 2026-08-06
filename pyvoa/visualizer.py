@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 """
 Project : PyvoA
@@ -16,42 +15,38 @@ About :
 An interface module to easily plot pyvoa_data with bokeh
 
 """
-from functools import wraps
 import datetime as dt
-from pyvoa.tools import (
-    kwargs_keystesting,
-    extract_dates,
-    verb,
-    fill_missing_dates,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
+from functools import wraps
+
 import geopandas as gpd
 import pandas as pd
+
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwarg_options import InputOption
+from pyvoa.tools import PyvoaError, PyvoaInfo, PyvoaWarning, verb
 
+# The four imports below only probe whether an optional backend is installed;
+# the backends themselves are imported lazily, hence the noqa on each of them.
 try:
-    import bokeh
+    import bokeh  # noqa: F401
     BOKEH_AVAILABLE = True
 except ImportError:
     BOKEH_AVAILABLE = False
 
 try:
-    import matplotlib
+    import matplotlib  # noqa: F401
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
 
 try:
-    import seaborn
+    import seaborn  # noqa: F401
     SEABORN_AVAILABLE = True
 except ImportError:
     SEABORN_AVAILABLE = False
 
 try:
-    import folium
+    import folium  # noqa: F401
     FOLIUM_AVAILABLE = True
 except ImportError:
     FOLIUM_AVAILABLE = False
@@ -69,7 +64,9 @@ if FOLIUM_AVAILABLE:
     from pyvoa.visu_folium import visu_folium
 
 import importlib.resources as pkg_resources
+
 import pyvoa
+
 
 class AllVisu:
     """
@@ -117,7 +114,7 @@ class AllVisu:
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
             which = kwargs.get('which')
-            what = kwargs.get('what')
+            # what = kwargs.get('what')
             when = kwargs.get('when')
             title = kwargs.get('title')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
@@ -154,7 +151,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             which = which[0]
-            what = kwargs.get('what')
+            # what = kwargs.get('what')
             when = kwargs.get('when')
             typeofhist = kwargs.get('typeofhist')
 
@@ -171,9 +168,9 @@ class AllVisu:
                     others = input.iloc[self.maxcountrydisplay:]
                     rest = {col: ['SumOthers'] for col in top.columns}
                     if 'normalize' in which:
-                        windows_which = [ which.replace(' ',i+' ') for i in windows.keys() ]
+                        windows_which = [ which.replace(' ',i+' ') for i in windows ]
                     else:
-                        windows_which = [ which + i for i in windows.keys() ]
+                        windows_which = [ which + i for i in windows ]
                     for i in [which]+windows_which:
                         total = others[i].apply(
                             lambda x: x[0] if isinstance(x, list) else x
@@ -225,8 +222,8 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            locunique = input['where'].unique()
-            vis = kwargs.get('vis')
+            # vis = kwargs.get('vis')
+            input['where'].unique()
             input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
             kwargs['input'] = input
             if kwargs['what'] in ['daily','weekly']:
@@ -249,9 +246,8 @@ class AllVisu:
         if (typeofplot == 'yearly' or typeofplot == 'spiral') and \
            (len(kwargs['input']['where'].unique())>1 or len(kwargs['which'])>1):
             raise PyvoaError('Yearly or spiral plots can display only one country and/or one value.')
-        if typeofplot == 'versus':
-            if len(kwargs.get('which')) != 2:
-                raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
+        if typeofplot == 'versus' and len(kwargs.get('which')) != 2:
+            raise PyvoaError("Can't make versus plot in this condition len("+str(kwargs.get('which'))+")!=2")
         if vis == 'matplotlib':
             if typeofplot == 'date':
                 fig = visu_matplotlib().matplotlib_date_plot(**kwargs)
