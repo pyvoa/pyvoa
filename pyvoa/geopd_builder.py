@@ -26,13 +26,10 @@ import datetime as dt
 from pyvoa.tools import (
     kwargs_values_testing,
     extract_dates,
-    debug,
     verb,
     flat_list,
     getnonnegfunc,
-    return_nonan_dates_pandas,
     dumppkl,
-    PyvoaInfo,
     PyvoaError,
     PyvoaWarning
 )
