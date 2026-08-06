@@ -69,6 +69,36 @@ Reproduce: `python -c "import pyvoa.tools as t; t.check_valid_date('2020-05-01')
   `@u-pariscite.fr` mail domain, mint the Zenodo concept DOI and paste it into
   `CITATION.cff`.
 
+### Status: done — human-only steps to paste into the pull request
+
+Copy this checklist into the PR description. Nothing below can be done from a
+clone; each item is a setting or an external account.
+
+- [ ] **Enable GitHub Discussions** (Settings → General → Features). Until then,
+      the Discussions links in `README.md`, `SUPPORT.md`, `CONTRIBUTING.md` §1
+      and `.github/ISSUE_TEMPLATE/config.yml` all 404.
+- [ ] **Create the issue labels** used by the forms, or they are silently
+      dropped: `bug`, `enhancement`, `new database`, `data`.
+- [ ] **Confirm O. Dadoun's ORCID** — `0000-0002-2169-9725` in `AUTHORS` and
+      `CITATION.cff`, unverified.
+- [ ] **Confirm the mail domain** — `@u-pariscite.fr` for T. Beau and
+      J. Browaeys; the institution also uses `@u-paris.fr`.
+- [ ] **Mint the Zenodo concept DOI**, then replace the
+      `10.5281/zenodo.0000000` placeholder in `CITATION.cff` and set
+      `date-released` (currently the `2026-01-01` placeholder) to the date of
+      the matching tagged release.
+- [ ] **Check the rendered forms** once merged, at
+      `https://github.com/pyvoa/pyvoa/issues/new/choose` — issue-form schema
+      errors only surface on GitHub, not locally.
+
+Deferred deliberately, not forgotten:
+
+- `ruff format` is **not** run: the tree is not format-clean (22 files) and CI
+  does not check it. `CONTRIBUTING.md` §4 no longer claims otherwise, and §5
+  now tells contributors to match the surrounding style. Adopting a formatter
+  is a separate decision with a large, purely cosmetic diff.
+- No `PULL_REQUEST_TEMPLATE.md`: the checklist stays in `CONTRIBUTING.md` §4.
+
 ## Task 6 — README and documentation
 
 - The `README.md` install section still points at the pycoa wiki

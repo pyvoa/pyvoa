@@ -15,16 +15,19 @@ submit changes. By participating in this project you agree to abide by our
 | Need | Where to go |
 |---|---|
 | A question about how to use pyvoa | [GitHub Discussions](https://github.com/pyvoa/pyvoa/discussions) or <contact@pyvoa.org> |
-| A bug or unexpected behaviour | [Open an issue](https://github.com/pyvoa/pyvoa/issues/new) |
+| A bug or unexpected behaviour | [Open an issue](https://github.com/pyvoa/pyvoa/issues/new/choose) |
 | A new feature or a new database | Open an issue **before** writing code, so that the design can be discussed |
 | A security or confidentiality concern | <contact@pyvoa.org> (please do not open a public issue) |
 
-Please search the [existing issues](https://github.com/pyvoa/pyvoa/issues)
-before opening a new one.
+[SUPPORT.md](SUPPORT.md) describes these channels in more detail, and lists two
+checks worth running before reporting a bug. Please search the
+[existing issues](https://github.com/pyvoa/pyvoa/issues) before opening a new
+one.
 
 ## 2. Reporting a bug
 
-A useful report contains:
+The [bug report form](https://github.com/pyvoa/pyvoa/issues/new/choose) asks for
+each of the items below. A useful report contains:
 
 1. the pyvoa version, the Python version and the operating system;
 2. a **minimal reproducible example** — the shortest snippet that triggers the
@@ -41,9 +44,11 @@ git clone https://github.com/pyvoa/pyvoa.git
 cd pyvoa
 python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 python -m pip install --upgrade pip
-python -m pip install -e .            # editable install of the package
-python -m pip install -r requirements.txt
+python -m pip install -e ".[dev]"     # editable install, with the test tools
 ```
+
+The `dev` extra pulls in pytest and the pinned ruff used by CI, so the checks
+below run exactly as they do on a pull request.
 
 pyvoa requires Python >= 3.10 and is designed to run inside a
 [Jupyter](https://jupyter.org/) environment, locally or on a remote server
@@ -60,10 +65,16 @@ using the examples in `examples/`.
 4. **Run the checks locally** before pushing:
 
    ```bash
-   pytest                 # test suite
-   ruff check .           # linting
-   ruff format --check .  # formatting
+   pytest                 # test suite (offline; this is what CI runs)
+   ruff check .           # linting; must report no findings
    ```
+
+   The default selection is **offline by design**: `tests/conftest.py` makes any
+   socket creation fail unless a test is marked `@pytest.mark.network`, so a
+   test can never quietly start depending on an upstream server. Those marked
+   tests are deselected by default; run them with `pytest -m network` if your
+   change touches downloading or parsing, keeping in mind that they fail when a
+   provider is down rather than when your code is wrong.
 
 5. **Write a clear commit message.** We follow
    [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), e.g.
@@ -79,6 +90,7 @@ never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
 ### Pull request checklist
 
 - [ ] Tests added or updated, and the suite passes.
+- [ ] New tests run offline, using a fixture rather than a live download.
 - [ ] Public functions carry a docstring ([PEP 257](https://peps.python.org/pep-0257/)).
 - [ ] User-facing documentation and notebook examples updated if relevant.
 - [ ] `CHANGELOG.md` updated.
@@ -86,8 +98,12 @@ never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## 5. Coding conventions
 
-- Follow [PEP 8](https://peps.python.org/pep-0008/); formatting and linting are
-  enforced with [ruff](https://docs.astral.sh/ruff/).
+- Follow [PEP 8](https://peps.python.org/pep-0008/); linting is enforced in CI
+  with [ruff](https://docs.astral.sh/ruff/), whose configuration and its
+  deliberate exceptions are documented in `[tool.ruff]` in `pyproject.toml`.
+  Formatting is *not* enforced: the existing code predates any formatter, so
+  please match the style of the file you are editing rather than reformatting
+  it, and keep formatting changes out of functional pull requests.
 - Use explicit, English identifiers; keep the public API stable and documented.
 - Type hints are encouraged on new or refactored code
   ([PEP 484](https://peps.python.org/pep-0484/)).
@@ -132,9 +148,13 @@ committing, unless the output is the point of the example.
 
 ## 9. Releases (maintainers)
 
-1. Update `CHANGELOG.md` and the version number in `pyproject.toml`.
+1. Update `CHANGELOG.md` and the version number in `pyvoa/__version__.py` — the
+   single source of truth, from which `pyproject.toml` reads it dynamically.
 2. Tag the release: `git tag -a v0.4.3 -m "v0.4.3" && git push --tags`.
 3. Publish on PyPI; check that the GitHub-Zenodo hook has minted a version DOI
    and that the Zenodo metadata (title, author list, ORCID) matches
    `CITATION.cff`.
-4. Update `version`, `date-released` and the DOI in `CITATION.cff`.
+4. Update `version`, `date-released` and the DOI in `CITATION.cff`, then check it
+   with `pipx run cffconvert --validate`. Run it through `pipx` (or `uvx`):
+   cffconvert requires `jsonschema<4` and will downgrade it in a shared
+   environment.

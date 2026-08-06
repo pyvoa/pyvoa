@@ -1,0 +1,66 @@
+name: Feature request
+description: Suggest a new capability or an improvement to an existing one.
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a new **data source**, please use the *New database* form instead.
+        If you are unsure whether something is a bug or a missing feature, ask
+        in [Discussions](https://github.com/pyvoa/pyvoa/discussions) first — no
+        need to decide before opening a conversation.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: >-
+        Describe the analysis or the teaching situation you are stuck on,
+        rather than the solution you have in mind. It often turns out that
+        pyvoa can already do it, or that a different design fits better.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like pyvoa to do?
+      description: If you can, sketch the call you would like to be able to write.
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do instead today?
+      description: >-
+        A workaround with pandas, another library, a manual download. This helps
+        gauge how much the feature would actually save.
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Would this need a new dependency?
+      description: >-
+        pyvoa is meant to install cleanly in constrained environments such as
+        school computers and free notebook services, so every new dependency has
+        to be justified (see CONTRIBUTING.md section 5). Optional if you do not
+        know.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: intent
+    attributes:
+      label: Contribution
+      options:
+        - label: I intend to open a pull request implementing this myself.
+          required: false
+        - label: >-
+            I agree to follow this project's
+            [Code of Conduct](https://github.com/pyvoa/pyvoa/blob/main/CODE_OF_CONDUCT.md).
+          required: true
