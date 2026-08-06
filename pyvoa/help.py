@@ -1,8 +1,9 @@
 import argparse
 
-# Basic metadata
-__version__ = '0.4.2'
-__author__ = 'Tristan Beau, Julien Browaeys, Olivier Dadoun'
+# Basic metadata. The version and the author list live in pyvoa/__version__.py,
+# the single source of truth that pyproject.toml also reads.
+from pyvoa.__version__ import __author__, __version__
+
 __github__ = 'https://github.com/pyvoa/pyvoa'
 __web__ = 'http://pyvoa.org/'
 

@@ -1,3 +1,31 @@
+# version 0.5.0
+Publication-readiness release: no change to the analysis API, but the package,
+its error handling and its development process are now those expected of a
+citable piece of research software.
+
+- `PyvoaError` is a real `Exception` subclass and is raised everywhere, instead
+  of being called as a bare statement. It is the single exception type of the
+  library; the former `PyvoaTypeError`, `PyvoaKeyError`, `PyvoaDbError`,
+  `PyvoaWhereError`, `PyvoaLookupError`, `PyvoaConnectionError` and
+  `PyvoaNotManagedError` names are gone.
+- fix: a missing `import shutil` made every error raise `UnboundLocalError`
+  instead of `PyvoaError` when running outside a terminal (script, cron, CI).
+- fix: an unknown database name passed to `setwhom()` is reported as a
+  `PyvoaError` rather than a `KeyError` from the JSON parser.
+- fix: `return_nonan_dates_pandas` trims the leading all-NaN dates.
+- packaging moved to PEP 621: `setup.py` is deleted, `pyproject.toml` reads the
+  version from `pyvoa/__version__.py`, and `import pyvoa` exposes
+  `pyvoa.__version__` without pulling in the heavy dependencies.
+- minimum Python is now 3.10; 3.10, 3.11 and 3.12 are tested.
+- a pytest suite that never touches the network by default: any test needing an
+  upstream server is marked `@pytest.mark.network` and deselected.
+- continuous integration on GitHub Actions: lint, the test matrix, and a weekly
+  job for the network tests.
+- `ruff check .` is clean and enforced by CI.
+- community files for citation and contribution: `AUTHORS`, `CITATION.cff`,
+  `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` and the issue forms.
+- `__pycache__` is no longer tracked.
+
 # versions 0.4.1, 0.4.2
 - cosmetic changes
 
