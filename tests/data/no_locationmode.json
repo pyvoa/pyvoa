@@ -1,0 +1,13 @@
+{
+  "header": "geoinfo is present but incomplete: locationmode is missing",
+  "geoinfo": {
+    "granularity": "country",
+    "iso3": "FRA"
+  },
+  "datasets": [
+    {
+      "urldata": "https://example.org/frozen/tiny.csv",
+      "columns": [{"name": "date"}]
+    }
+  ]
+}

@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "pytest-cov"]
 
 [project.urls]
 Homepage = "https://pyvoa.org"
@@ -55,3 +55,10 @@ include = ["pyvoa*"]
 
 [tool.setuptools.package-data]
 pyvoa = ["data/*.json", "data/*.png"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-m 'not network'"
+markers = [
+    "network: test needs internet access; deselected by default, run with -m network",
+]
