@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Project : PyvoA
 Date :    april 2020 - december 2025
@@ -11,35 +10,19 @@ Module : pyvoa.jsondb_parser
 -----
 This is the PyCoA rapport module it gives all available information concerning a database key words
 """
-import pandas as pd
-from functools import reduce
-from bs4 import BeautifulSoup
+import importlib.resources as pkg_resources
+import json
 import os.path
 from os import listdir
 from os.path import isfile, join
-import json
-import datetime
-import collections
+
 import numpy as np
-from pyvoa.tools import (
-    info,
-    verb,
-    kwargs_test,
-    exists_from_url,
-    get_local_from_url,
-    week_to_date,
-    fill_missing_dates,
-    flat_list,
-    PyvoaInfo,
-    PyvoaError,
-    PyvoaWarning
-)
-import pyvoa.geo as coge
-import sys
-import pycountry
-import importlib.resources as pkg_resources
-from pathlib import Path
+import pandas as pd
+
 import pyvoa
+import pyvoa.geo as coge
+from pyvoa.tools import PyvoaError, fill_missing_dates, get_local_from_url, week_to_date
+
 
 class MetaInfo:
   def __init__(self):
@@ -86,14 +69,14 @@ class MetaInfo:
     if check_file:
         sig, msg = 1, ''
         try:
-            with open(file, 'r') as file:
-                data = json.load(file)
+            with open(file, 'r') as fp:
+                data = json.load(fp)
                 sig, msg = MetaInfo.checkmetadatastructure(data)
                 if sig == 0:
                     data = 'Database json description incompatible: '+ msg
         except ValueError as e:
             sig = 0
-            data = 'Invalid json file ' + filename +': %s' % e
+            data = 'Invalid json file ' + filename + f': {e}'
     else:
         sig = 0
         data = 'This file :' + filename +  ' do not exist'
@@ -117,7 +100,6 @@ class MetaInfo:
       #      raise PyvoaError('Where the json database description folder is supposed to be ?')
       pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
       onlyfiles = [f for f in listdir(pathmetadb) if isfile(join(pathmetadb, f)) and f.endswith('.json')]
-      jsongeoinfo = {}
       col = ['name','validejson','parsingjson']
       df = pd.DataFrame(columns = col)
       valide = ''
@@ -127,7 +109,7 @@ class MetaInfo:
          try:
              meta = metadata[1]
              valide = 'GOOD'
-         except:
+         except IndexError:
              meta = metadata[0]
              valide = 'BAD'
          tmp=pd.DataFrame([[name,valide,meta]],columns=col)
@@ -140,11 +122,14 @@ class MetaInfo:
       '''
       if namedb:
           line = self.pdjson.loc[self.pdjson.name == namedb]
-          if line.validejson.values == 'GOOD':
+          if line.empty:
+              raise PyvoaError('Unknown database "' + str(namedb) + '". Available '
+                  'databases are : ' + ', '.join(sorted(self.pdjson.name)) + '.')
+          if line.validejson.values[0] == 'GOOD':
               try:
                   return line.parsingjson.values[0]
-              except:
-                  raise PyvoaError('Database json description incompatible, please check')
+              except Exception as e:
+                  raise PyvoaError('Database json description incompatible, please check') from e
           else:
             error =  " Database json parsing error:\n" + line.parsingjson.values[0]
             raise PyvoaError(error)
@@ -181,9 +166,7 @@ class MetaInfo:
           sig = 1
           msg = 'pyvoa.json meta structure is validated'
           for i in lm:
-              try:
-                 dico[i]
-              except:
+              if i not in dico:
                  sig = 0
                  msg = 'Missing in your json file : '+i
           return [sig,msg]
@@ -222,13 +205,13 @@ class DataParser:
             elif granularity == 'subregion':
                 self.geo_all = self.geo.get_subregion_list()
             else:
-                PyvoaError('Granularity problem: neither country, region or subregion')
+                raise PyvoaError('Granularity problem: neither country, region or subregion')
         try:
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
-        except:
+        except Exception as e:
             raise PyvoaError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
-                "You may contact contact@pyvoa.org . Thanks.")
+                "You may contact contact@pyvoa.org . Thanks.") from e
 
   def get_parsing(self,):
       '''
@@ -327,8 +310,8 @@ class DataParser:
                  pdata = pdatatemp.copy()
               else:
                  pdata=pd.concat([pdata,pdatatemp])
-          except:
-              raise PyvoaError('Something went wrong during the parsing')
+          except Exception as e:
+              raise PyvoaError('Something went wrong during the parsing') from e
 
           if drop and not debug:
               for key,val in drop.items():
@@ -443,7 +426,7 @@ class DataParser:
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
       else:
-          raise PyvoaTypeError('Not a region nors ubregion ... sorry but what is it ?')
+          raise PyvoaError('Not a region nors ubregion ... sorry but what is it ?')
 
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
@@ -455,7 +438,7 @@ class DataParser:
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
 
       else:
-          PyvoaError("what locationmode in your json file is supposed to be ?")
+          raise PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
 
@@ -492,7 +475,7 @@ class DataParser:
       '''
            Return all the available keyswords for the database selected
       '''
-      firstvalue = next((x for x in self.available_keywords if x.startswith("tot_") or x.startswith("total_")),self.available_keywords[0])
+      firstvalue = next((x for x in self.available_keywords if x.startswith(("tot_", "total_"))),self.available_keywords[0])
       self.available_keywords.insert(0, self.available_keywords.pop(self.available_keywords.index(firstvalue)))
       return self.available_keywords
 
