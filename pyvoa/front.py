@@ -192,7 +192,7 @@ class front:
 
         Raises:
             PyvoaError: If the `reload` parameter is not a boolean (0 or 1).
-            PyvoaDbError: If the specified `base` is not in the list of supported GPDBuilders.
+            PyvoaError: If the specified `base` is not in the list of supported GPDBuilders.
 
         Returns:
             None: This method does not return a value.
@@ -288,7 +288,7 @@ class front:
 
             if self.db == '' or self.db == 'in-house data':
                 if input is None:
-                    PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
+                    raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
                 else:
                     input = fill_missing_dates(input)
                     kwargs['input']=input
@@ -345,7 +345,7 @@ class front:
                 missing = [w for w in flat_where if w.upper() not in upwhere]
 
                 if missing:
-                    PyvoaError('This location do not exit in the DB :' + str(missing))
+                    raise PyvoaError('This location do not exit in the DB :' + str(missing))
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -370,7 +370,7 @@ class front:
             else:
                 PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")
                 if not all(col in input.columns for col in ['date', 'where']):
-                    PyvoaError("['date', 'where'] must be in your pandas")
+                    raise PyvoaError("['date', 'where'] must be in your pandas")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
                 #when = kwargs.get('when')
@@ -723,14 +723,14 @@ class front:
                 kwargs.pop('output')
 
             if typeofplot == 'versus' and len(which)>2:
-                PyvoaError(" versu can be used with 2 variables and only 2 !")
+                raise PyvoaError(" versu can be used with 2 variables and only 2 !")
             if kwargs.get('pop'):
                 kwargs.pop('pop')
             if self.getvis():
                 z = {**self.getkwargsvisu(),**kwargs}
                 return func(self,self.allvisu.plot(**z))
             else:
-                PyvoaError(" No visualization has been set up !")
+                raise PyvoaError(" No visualization has been set up !")
         return inner
 
     @input_wrapper
@@ -987,7 +987,7 @@ class front:
             If clustered is False, it returns a list of countries based on the granularity and the current database settings.
         """
         if self.db is None or self.db=='in-house data':
-            PyvoaError("listwhere not available use your on where ... ")
+            raise PyvoaError("listwhere not available use your on where ... ")
         granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = self.meta.getcurrentmetadata(self.db)['geoinfo']['iso3']
         def clust():
@@ -1253,7 +1253,7 @@ class front:
                     self.outcome.figure.savefig(name)
             print('Figure :', name, ' has been saved ')
         else:
-            PyvoaError('savefig can\'t be used to store a panda DataFrame')
+            raise PyvoaError('savefig can\'t be used to store a panda DataFrame')
 
 # this trick allow you to do
 # import pyvoa.front as pv

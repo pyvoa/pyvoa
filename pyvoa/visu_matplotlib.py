@@ -401,6 +401,6 @@ class visu_matplotlib:
             )
 
         else:
-            PyvoaError("Don't know what kind of tile it is...")
+            raise PyvoaError("Don't know what kind of tile it is...")
 
         return ax

@@ -456,7 +456,7 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
 
         if len(input['where'].unique()) > 1 :
-            PyvoaError('Can only display spiral for ONE location. I took the first one:', input['where'][0])
+            raise PyvoaError('Can only display spiral for ONE location. I took the first one:', input['where'][0])
             input = input.loc[input['where'] == input['where'][0]].copy()
         input["dayofyear"]=input.date.dt.dayofyear
         input['year']=input.date.dt.year
@@ -571,7 +571,7 @@ class visu_bokeh:
         uniqloc.sort()
         if 'where' in input.columns:
             if len(uniqloc) < 2:
-                raise PyvoaTypeError('What do you want me to do ? You have selected, only one country.'
+                raise PyvoaError('What do you want me to do ? You have selected, only one country.'
                                    'There is no sens to use this method. See help.')
         input = input[['date', 'where', which]]
         input = input.sort_values(by='where', ascending = True).reset_index(drop=True)
