@@ -1,0 +1,23 @@
+# Issue-form configuration.
+# Blank issues are disabled so that bug reports arrive with the four items
+# required by CONTRIBUTING.md section 2; everything that is not a bug or a data
+# source is routed below.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Question about using pyvoa
+    url: https://github.com/pyvoa/pyvoa/discussions
+    about: >-
+      How do I plot this, which database has that field, why is my series
+      empty? Ask in Discussions - beginner questions are welcome.
+
+  - name: Where to get help
+    url: https://github.com/pyvoa/pyvoa/blob/main/SUPPORT.md
+    about: >-
+      Support channels, and the two checks worth running before reporting a
+      bug (try another database, clear the cache).
+
+  - name: Security or privacy concern
+    url: mailto:contact@pyvoa.org
+    about: >-
+      Please write to contact@pyvoa.org rather than opening a public issue.
