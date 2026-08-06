@@ -15,8 +15,8 @@ abstract: >-
   researchers unfamiliar with data extraction - while remaining scriptable for
   advanced Python users.
 type: software
-version: "0.4.2"
-date-released: "2026-01-01"   # TODO: date of the matching tagged release
+version: "0.5.0"
+date-released: "2026-08-06"
 license: MIT
 repository-code: "https://github.com/pyvoa/pyvoa"
 url: "https://pyvoa.org"
