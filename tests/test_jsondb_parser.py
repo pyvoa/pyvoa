@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Unit tests for pyvoa.jsondb_parser.
 
 These tests run entirely offline. The most valuable one is
@@ -10,11 +9,12 @@ them stops matching the expected structure.
 import datetime
 import json
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 import shapely.geometry as sg
 
-import pyvoa.jsondb_parser as jsondb_parser
+from pyvoa import jsondb_parser
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.tools import PyvoaError
 
@@ -186,7 +186,7 @@ def test_getcurrentmetadatawhich_on_a_shipped_database():
 class _FakeGeoManager:
     """Stands in for coge.GeoManager, whose __init__ downloads region data."""
 
-    _NAMES = {"FRA": "France"}
+    _NAMES: ClassVar[dict] = {"FRA": "France"}
 
     def __init__(self, standard="name"):
         self.standard = standard

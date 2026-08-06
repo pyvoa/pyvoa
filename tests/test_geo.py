@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Offline unit tests for pyvoa.geo.
 
 Only the part of the module that does not need a download is covered here.
@@ -15,9 +14,8 @@ import geopandas as gpd
 import pytest
 import shapely.geometry as sg
 
-import pyvoa.geo as geo
+from pyvoa import geo
 from pyvoa.tools import PyvoaError
-
 
 # --------------------------------------------------------------------------
 # GeoManager : standards, without building a GeoRegion
@@ -172,7 +170,8 @@ def test_pack_polygons_lays_out_the_requested_number_of_columns():
 def test_pack_polygons_honours_the_gap():
     without = geo.pack_polygons_grid_by_area(_frame([1, 1, 1, 1]), n_cols=2)
     with_gap = geo.pack_polygons_grid_by_area(_frame([1, 1, 1, 1]), n_cols=2, gap=5)
-    span = lambda p: max(g.bounds[2] for g in p.geometry)
+    def span(p):
+        return max(g.bounds[2] for g in p.geometry)
     assert span(with_gap) > span(without) + 4
 
 

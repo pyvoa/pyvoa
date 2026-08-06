@@ -1,6 +1,8 @@
+import matplotlib
+
 import pyvoa.front as pv
 import pyvoa.tools as pt
-import matplotlib
+
 matplotlib.use('Agg')
 
 pt.set_verbose_mode(2)

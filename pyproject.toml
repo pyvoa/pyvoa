@@ -41,7 +41,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov"]
+dev = ["pytest", "pytest-cov", "ruff==0.16.1"]
 
 [project.urls]
 Homepage = "https://pyvoa.org"
@@ -55,6 +55,40 @@ include = ["pyvoa*"]
 
 [tool.setuptools.package-data]
 pyvoa = ["data/*.json", "data/*.png"]
+
+[tool.ruff]
+target-version = "py310"
+# The example notebooks are documentation, not library code: they are meant to
+# read like a user's session and are not held to the package's lint standard.
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+# ruff's default rule set, plus the pycodestyle error rules it leaves out
+# (E4 imports, E7 statements, E9 runtime). The ruff version is pinned in the
+# dev extra so that the gate is reproducible: a new ruff may widen its default
+# selection, and the CI lint job must not start failing on its own.
+extend-select = ["E4", "E7", "E9"]
+
+# Every other finding reported by this selection has been fixed. The three rules
+# below are switched off deliberately, because applying them would change
+# behaviour rather than clean it up:
+ignore = [
+    # pyvoa funnels third-party failures into PyvoaError, its single documented
+    # exception type, so `except Exception` followed by `raise PyvoaError(...)`
+    # is the intended pattern and not a blind catch.
+    "BLE001",
+    # Epidemiological series are indexed by calendar dates, which have no
+    # timezone: the reporting day of a case count is a date, not an instant.
+    # Making these datetimes tz-aware would shift dates near midnight.
+    "DTZ001", "DTZ007", "DTZ011",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# front.py sets a FutureWarning filter before importing pandas/geopandas so that
+# warnings raised *during* those imports stay hidden from notebook users, and it
+# exposes the singleton's methods at module level after instantiating it. Both
+# require statements between the imports.
+"pyvoa/front.py" = ["E402"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
