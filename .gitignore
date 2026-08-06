@@ -9,3 +9,8 @@ pyvoa/.ipynb_checkpoints/
 pyvoa.egg-info/
 build/
 dist/
+__pycache__/
+*.pyc
+.coverage
+.ipynb_checkpoints/
+*.swp
