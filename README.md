@@ -14,7 +14,123 @@ This environment is designed to be accessible to non-specialists: high-school st
 
 Pyvoa provides access to multiple databases and delivers data in a standardized format. It also ensures seamless integration with geolocation databases (handling country or region names, enabling joins across datasets with differing descriptions, and generating maps). This geolocation information can furthermore be reused for applications beyond viral data analysis.
 
-[You may consider the full version installation for visualize charts displays ](https://pypi.org/project/pyvoa-full/)
+## Installation
+
+pyvoa requires Python ≥ 3.10 and is published on PyPI:
+
+```bash
+pip install pyvoa          # the library: data access, standardisation, geolocation
+pip install pyvoa-full     # the same, plus the matplotlib and bokeh plotting backends
+```
+
+Install `pyvoa-full` if you want charts and maps: `pyvoa` on its own gives you
+the data as pandas or geopandas objects, and the plotting backends are optional
+imports that pyvoa detects at runtime.
+
+To work from a clone instead, see [CONTRIBUTING.md §3](CONTRIBUTING.md#3-development-setup).
+
+## A first example
+
+```python
+import pyvoa.front as pf
+
+pf.setwhom('owid')          # select a database — Our World in Data, worldwide, by country
+pf.listwhich()              # which variables does it expose?
+
+# the data, as a pandas DataFrame: one row per date and per place
+df = pf.get(where=['France', 'Italy', 'Spain'],
+            which='total_deaths',
+            what='daily',
+            output='pandas')
+
+# the same selection, as a chart (needs pyvoa-full)
+pf.setvis('matplotlib')     # or 'bokeh'
+pf.plot(where=['France', 'Italy', 'Spain'], which='total_deaths', what='daily')
+pf.map(which='total_deaths')   # every place the database covers, on a map
+```
+
+`where` takes a place name or a list of them, matched through the geolocation
+layer, so case and accents do not matter (`'france'` finds `France`).
+`pf.listwhere()` gives the places the selected database actually carries —
+countries for `owid`, *départements* for `spf`, and so on; asking for one it
+does not have raises a `PyvoaError` naming it.
+
+`what` is the pre-treatment applied to the series — `current` (the raw
+cumulative or instantaneous value), `daily` or `weekly`. `output` selects the
+return type: `pandas`, `geopandas`, `list`, `dict` or `array`.
+
+Downloads are cached under `~/.cache/pyvoa.data_<username>/`, so the second run
+of a script is fast; `pf.setwhom('owid', reload=False)` goes further and reuses
+the local copy saved by a previous call rather than fetching anything.
+
+The introspection functions are the fastest way to explore the API — every one
+of them returns a plain Python list:
+
+```python
+pf.listwhom()      # the databases
+pf.listwhich()     # the variables of the selected database
+pf.listwhat()      # ['current', 'daily', 'weekly']
+pf.listwhere()     # the places the selected database covers
+pf.listoption()    # e.g. 'sumall', 'nonneg', 'smooth7', 'normalize:pop100'
+pf.listvis()       # ['bokeh', 'matplotlib']
+pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
+```
+
+## Supported databases
+
+23 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+`pf.setwhom(key)` selects one. Each is described by a JSON file in
+[`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
+file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
+The payloads are read from Zenodo mirrors of the upstream files, so a series
+stays reproducible after its original provider stops publishing.
+
+| Key | Coverage | Granularity | Source |
+|---|---|---|---|
+| `covid19india` | India | region | covid19india.org |
+| `covidtracking` | United States | subregion (states) | The COVID Tracking Project |
+| `dgs` | Portugal | region | Direção-Geral da Saúde |
+| `dpc` | Italy | region | Dipartimento della Protezione Civile |
+| `escovid19data` | Spain | subregion (provinces) | escovid19data |
+| `europa` | worldwide | country | European Commission, Joint Research Centre |
+| `govcy` | Cyprus | country | Government of Cyprus |
+| `imed` | Greece | subregion | iMEDD |
+| `jhu` | worldwide | country | Johns Hopkins University CSSE |
+| `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE |
+| `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare |
+| `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación |
+| `moh` | Malaysia | subregion (states) | Ministry of Health |
+| `mpoxgh` | worldwide | country | Global.health, via Our World in Data |
+| `owid` | worldwide | country | Our World in Data |
+| `phe` | United Kingdom | subregion | Public Health England / UKHSA |
+| `risklayer` | Europe | subregion | Risklayer, for WHO Europe |
+| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut |
+| `sciensano` | Belgium | region | Sciensano |
+| `sentinellesIRA` | France | region | Réseau Sentinelles — acute respiratory infections |
+| `spf` | France | subregion (*départements*) | Santé publique France |
+| `spfnational` | France | country | Santé publique France |
+| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater |
+
+Most of these are COVID-19 series; `mpoxgh` covers mpox and `sentinellesIRA`
+acute respiratory infections. Upstream providers stopped updating several of
+these datasets after the pandemic, so the last available date varies from one
+database to the next — `setwhom()` prints it.
+
+## Documentation and examples
+
+- [`examples/notebooks/`](examples/notebooks/) — Jupyter notebooks, starting
+  with `PyvoaForBeginners.ipynb`; `GeoByExamples.ipynb` covers the geolocation
+  layer on its own.
+- [`examples/pyfiles/`](examples/pyfiles/) — `owid.py` and `using_geo.py`, the
+  same workflows as plain scripts.
+- <https://pyvoa.org> — project website.
+- `pf.whattodo()` returns a DataFrame listing every keyword accepted by `get`,
+  `plot`, `hist` and `map`, with its allowed values — the quickest reference
+  from inside a session.
+
+pyvoa is designed to run comfortably in a notebook, locally or on a hosted
+service such as Google Colab or Binder, but nothing requires Jupyter: it works
+just as well from a script or a console.
 
 ## Community and support
 
@@ -34,4 +150,3 @@ the *Cite this repository* button. Authorship is documented in
 ## Licence
 
 [MIT](LICENSE).
-

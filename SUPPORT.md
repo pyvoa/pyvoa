@@ -57,8 +57,11 @@ The issue form asks for these, and they are what makes a report actionable
 
 ## Documentation
 
-- [README.md](README.md) — installation and a first example.
-- [`examples/`](examples/) — Jupyter notebooks covering the common workflows.
+- [README.md](README.md) — installation, a first example, and the table of
+  supported databases.
+- [`examples/`](examples/) — Jupyter notebooks covering the common workflows,
+  starting with `notebooks/PyvoaForBeginners.ipynb`, plus the same workflows as
+  plain scripts under `pyfiles/`.
 - <https://pyvoa.org> — project website.
 
 ## Contributing
