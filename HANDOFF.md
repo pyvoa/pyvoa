@@ -50,14 +50,7 @@ the Zenodo UI, or leave it and let v0.5.1 be the first consistent deposit.
 Editing metadata does not mint a new DOI; adding the wheel to an existing
 record does require a new version.
 
-## 2. `requirements.txt` duplicates `pyproject.toml`
-
-It is tracked, and it restates the runtime dependencies plus `setuptools` and
-`wheel`. Since packaging moved to PEP 621 there is no consumer of it in the
-repository, and a second dependency list will drift from the real one. Delete
-it, or reduce it to a one-line pointer at `pip install -e ".[dev]"`.
-
-## 3. Confirm the issue forms render on GitHub
+## 2. Confirm the issue forms render on GitHub
 
 All four files under `.github/ISSUE_TEMPLATE/` parse as YAML locally, and every
 label they request (`bug`, `enhancement`, `new database`, `data`) exists on the
@@ -71,7 +64,7 @@ as the version placeholder, so it goes stale at every release — and the releas
 checklist in `CONTRIBUTING.md` §9 does not mention it. Add it to §9 as a fifth
 step, or the placeholder will drift again.
 
-## 4. The JOSS paper
+## 3. The JOSS paper
 
 `paper.md` and `paper.bib` are drafted outside this repository and are not in
 the tree. They are the remaining deliverable for the submission itself.
@@ -87,6 +80,12 @@ the tree. They are the remaining deliverable for the submission itself.
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
 - **`CHANGELOG.md` does not follow Keep a Changelog.** It predates the project;
   `CONTRIBUTING.md` §4.7 documents its actual convention. Do not restructure it.
+- **`requirements.txt` is kept, not deleted.** It no longer duplicates
+  `pyproject.toml` — since `7e04993` it is a comment block plus a single `.`,
+  which installs the project and lets pip resolve dependencies from the
+  packaging metadata. It has to stay at the repository root because
+  mybinder.org builds its environment from it, and `CONTRIBUTING.md` §3 names
+  Binder as a supported environment.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases** rather
   than 23. That is intentional — the exact count lives in `README.md`'s table,
   which is the one place that has to stay in step with `pyvoa/data/`.
