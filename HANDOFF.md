@@ -13,35 +13,20 @@ issue labels, repository description, homepage and topics are all set on
 GitHub. `CITATION.cff` has no placeholders left. `git log` and `CHANGELOG.md`
 carry the detail; this file now tracks only what is still open.
 
+The documentation pass of 2026-08-07 is committed. So is the fix for the red
+CI: the four `GeoInfo` tests built a real `GeoInfo(0)`, whose `gm=0` makes
+`GeoInfo.__init__` construct a `GeoManager()` (`pyvoa/geo.py:542`) and download
+about ten upstream pages, so they tripped `conftest.py`'s socket guard on a
+runner and passed locally only on a warm `~/.cache/pyvoa.data_<user>`. They now
+share a `bare_info` fixture built with `GeoInfo.__new__`, mirroring
+`bare_manager` next to it; both methods under test read only the class-level
+`_list_field`. `HOME=$(mktemp -d) pytest` is green (176 passed, 17 deselected).
+
 Everything below was re-verified against GitHub, PyPI and Zenodo on 2026-08-07.
 
 ---
 
-## 1. CI is red on `main` — fix this first
-
-Three runs of `ci.yml` exist and all three failed (latest: run 31167114418 on
-`7e04993`). `ruff` is green; `pytest` fails on 3.10, 3.11 and 3.12 alike. The
-red badge sits at the top of `README.md`, which is the first thing a JOSS
-reviewer sees.
-
-The cause is the trap that `tests/test_geo.py`'s own module docstring warns
-about. Five call sites build `geo.GeoInfo(0)`:
-
-    tests/test_geo.py:73, 79, 80, 84, 90
-
-`gm=0` makes `GeoInfo.__init__` construct a `GeoManager()` (`pyvoa/geo.py:542`),
-which downloads about ten upstream pages, so the tests trip `conftest.py`'s
-socket guard on a runner. They pass locally only because
-`~/.cache/pyvoa.data_<user>` is warm — `pytest` is green on this machine
-(176 passed, 17 deselected) and fails with a cold `HOME`.
-
-Fix: substitute `geo.GeoInfo.__new__(geo.GeoInfo)` for `geo.GeoInfo(0)` at all
-five sites, mirroring the `bare_manager` fixture already at
-`tests/test_geo.py:25`. Both methods under test only read the class-level
-`_list_field`, so no instance state is needed. Verify under a cold cache
-(`HOME=$(mktemp -d) pytest tests/test_geo.py`), not just a warm one.
-
-## 2. The Zenodo 0.5.0 record still differs from `CITATION.cff`
+## 1. The Zenodo 0.5.0 record still differs from `CITATION.cff`
 
 `CONTRIBUTING.md` §9.3 requires this check at every release. Four differences
 survive on record `21829902`; the other five noted earlier (Beau's missing
@@ -65,14 +50,14 @@ the Zenodo UI, or leave it and let v0.5.1 be the first consistent deposit.
 Editing metadata does not mint a new DOI; adding the wheel to an existing
 record does require a new version.
 
-## 3. `requirements.txt` duplicates `pyproject.toml`
+## 2. `requirements.txt` duplicates `pyproject.toml`
 
 It is tracked, and it restates the runtime dependencies plus `setuptools` and
 `wheel`. Since packaging moved to PEP 621 there is no consumer of it in the
 repository, and a second dependency list will drift from the real one. Delete
 it, or reduce it to a one-line pointer at `pip install -e ".[dev]"`.
 
-## 4. Confirm the issue forms render on GitHub
+## 3. Confirm the issue forms render on GitHub
 
 All four files under `.github/ISSUE_TEMPLATE/` parse as YAML locally, and every
 label they request (`bug`, `enhancement`, `new database`, `data`) exists on the
@@ -86,18 +71,10 @@ as the version placeholder, so it goes stale at every release — and the releas
 checklist in `CONTRIBUTING.md` §9 does not mention it. Add it to §9 as a fifth
 step, or the placeholder will drift again.
 
-## 5. The JOSS paper
+## 4. The JOSS paper
 
 `paper.md` and `paper.bib` are drafted outside this repository and are not in
 the tree. They are the remaining deliverable for the submission itself.
-
-## 6. Uncommitted work in the tree
-
-The documentation pass of 2026-08-07 is staged in the working tree but not
-committed: `README.md` (installation, first example, the 23-database table),
-`SUPPORT.md`, `CONTRIBUTING.md`, `CHANGELOG.md` (`Unreleased` section) and this
-file. Every code line in the new README was executed against a live `owid`
-before being written down. Commit them before starting anything above.
 
 ---
 

@@ -1,4 +1,8 @@
 # Unreleased
+- fix: the four `GeoInfo` tests built a real `GeoInfo(0)`, which builds a
+  `GeoManager` and downloads about ten pages, so they failed on CI and passed
+  locally only on a warm cache. They now use `GeoInfo.__new__`, like the
+  `GeoManager` tests next to them.
 - `README.md` now documents installation (`pip install pyvoa`, `pyvoa-full`), a
   first example, and a table of the 23 supported databases with their coverage,
   granularity and source.
