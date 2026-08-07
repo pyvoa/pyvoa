@@ -4,149 +4,112 @@ Context brief for an agent session run at the root of https://github.com/pyvoa/p
 Goal: bring the repository to the state expected by a JOSS software-paper review.
 Reference checklist: https://joss.readthedocs.io/en/latest/review_checklist.html
 
-Files already drafted and downloaded into the repository root (do not rewrite from
-scratch, review and integrate): `AUTHORS`, `CITATION.cff`, `CONTRIBUTING.md`,
-`CODE_OF_CONDUCT.md`, `SUPPORT.md`, `pyproject.toml`, `tests/test_tools.py`,
-`.github/workflows/ci.yml`, `.github/ISSUE_TEMPLATE/config.yml`.
+**Status, 2026-08-07.** Tasks 1-6 of the original plan are done and shipped as
+v0.5.0: the `shutil` fix, PEP 621 packaging, the offline pytest suite, GitHub
+Actions, the community files, and the README. The release is live on PyPI
+(0.5.0, both artifacts, 2026-08-06) and on Zenodo (concept
+`10.5281/zenodo.21829901`, version `10.5281/zenodo.21829902`). Discussions,
+issue labels, repository description, homepage and topics are all set on
+GitHub. `CITATION.cff` has no placeholders left. `git log` and `CHANGELOG.md`
+carry the detail; this file now tracks only what is still open.
 
-Work on a branch, one commit per task, and open a single pull request.
+Everything below was re-verified against GitHub, PyPI and Zenodo on 2026-08-07.
 
-**Status, 2026-08-07: tasks 1-5 are done and released as v0.5.0** (see
-"Release v0.5.0" below). `joss-readiness` was merged into `main` directly
-rather than through a pull request. Task 6 and the JOSS paper remain.
+---
 
-## Task 1 — Fix the missing `shutil` import (blocking, 1 line)
+## 1. CI is red on `main` — fix this first
 
-`pyvoa/error.py` calls `shutil.get_terminal_size()` but never imports `shutil`.
-Outside a TTY (script, cron, CI) `os.popen('stty size')` returns an empty string,
-the fallback branch runs, and every pyvoa error surfaces as
-`UnboundLocalError: cannot access local variable 'shutil'` instead of the intended
-`PyvoaError`.
+Three runs of `ci.yml` exist and all three failed (latest: run 31167114418 on
+`7e04993`). `ruff` is green; `pytest` fails on 3.10, 3.11 and 3.12 alike. The
+red badge sits at the top of `README.md`, which is the first thing a JOSS
+reviewer sees.
 
-Reproduce: `python -c "import pyvoa.tools as t; t.check_valid_date('2020-05-01')" > /dev/null`
+The cause is the trap that `tests/test_geo.py`'s own module docstring warns
+about. Five call sites build `geo.GeoInfo(0)`:
 
-- Add `import shutil` at the top of `pyvoa/error.py`.
-- Keep the regression test `test_error_display_works_without_a_tty` in
-  `tests/test_tools.py` green.
-- Open the corresponding issue on GitHub and reference it in the commit message.
+    tests/test_geo.py:73, 79, 80, 84, 90
 
-## Task 2 — Packaging metadata (PEP 621)
+`gm=0` makes `GeoInfo.__init__` construct a `GeoManager()` (`pyvoa/geo.py:542`),
+which downloads about ten upstream pages, so the tests trip `conftest.py`'s
+socket guard on a runner. They pass locally only because
+`~/.cache/pyvoa.data_<user>` is warm — `pytest` is green on this machine
+(176 passed, 17 deselected) and fails with a cold `HOME`.
 
-- Replace the current `pyproject.toml` with the drafted one, delete `setup.py`.
-- Check that `pip install -e ".[dev]"` and `python -m build` both succeed, and that
-  the version resolves from `pyvoa/__version__.py` (single source of truth).
-- `pyvoa/__init__.py` currently contains only `#nothing`: re-export `__version__`
-  so that `python -c "import pyvoa; print(pyvoa.__version__)"` works, without
-  importing heavy dependencies at package import time.
-- Reconcile `__email__` in `pyvoa/__version__.py` (`support@pyvoa.org`) with the
-  address used everywhere else (`contact@pyvoa.org`).
-- Decide the minimum Python version: `setup.py` says 3.8, which is end-of-life;
-  the draft assumes 3.9.
+Fix: substitute `geo.GeoInfo.__new__(geo.GeoInfo)` for `geo.GeoInfo(0)` at all
+five sites, mirroring the `bare_manager` fixture already at
+`tests/test_geo.py:25`. Both methods under test only read the class-level
+`_list_field`, so no instance state is needed. Verify under a cold cache
+(`HOME=$(mktemp -d) pytest tests/test_geo.py`), not just a warm one.
 
-## Task 3 — Test suite
+## 2. The Zenodo 0.5.0 record still differs from `CITATION.cff`
 
-- Keep `tests/test_tools.py` (validated against 0.4.2, 9 passing + 1 regression test).
-- Extend coverage to `pyvoa/geo.py`, `pyvoa/jsondb_parser.py` and the database
-  parsers, using **frozen fixtures** in `tests/data/` (a few lines of real upstream
-  payload) and `monkeypatch` on `pyvoa.tools.get_local_from_url`. No test in the
-  default selection may hit the network.
-- Mark any genuinely live test with `@pytest.mark.network`; it is deselected by
-  default and only run by the weekly CI job.
-- Target: every public function of `pyvoa/tools.py` covered.
+`CONTRIBUTING.md` §9.3 requires this check at every release. Four differences
+survive on record `21829902`; the other five noted earlier (Beau's missing
+ORCID, `dadoun, olivier` lowercased, `v0.5.0` vs `0.5.0`, publication date, the
+concept DOI) have since been corrected on Zenodo or in `CITATION.cff`.
 
-## Task 4 — Continuous integration
+| Field | Zenodo record | `CITATION.cff` |
+|---|---|---|
+| affiliations | `Université Paris Cité`, `Centre National de la Recherche Scientifique` | full UMR strings |
+| keywords | 6 | 8 — `epidemiology` and `COVID-19` dropped |
+| `continues` | `https://pyvoa.org` | the pycoa repository |
+| files archived | `pyvoa-0.5.0.tar.gz` only | wheel + sdist on the GitHub release |
 
-- Add `.github/workflows/ci.yml`, check that lint and test jobs pass on the matrix.
-- Fix or explicitly ignore the ruff findings; do not disable the linter wholesale.
-- Add CI and coverage badges to `README.md`.
-- `git rm -r --cached __pycache__` and add it to `.gitignore` (currently committed).
+`.zenodo.json` now exists in the repository (alongside `codemeta.json` and
+`schemaorg.jsonld`) and already carries the correct affiliations, all eight
+keywords and `continues → https://github.com/coa-project/pycoa`, so the **next**
+release is correct by construction. The 0.5.0 record predates it.
 
-## Task 5 — Community files
+Decide, and record the decision here: either edit the 0.5.0 record by hand in
+the Zenodo UI, or leave it and let v0.5.1 be the first consistent deposit.
+Editing metadata does not mint a new DOI; adding the wheel to an existing
+record does require a new version.
 
-- Integrate `AUTHORS`, `CITATION.cff`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`,
-  `SUPPORT.md`. Validate the citation file with `cffconvert --validate`.
-- Add `.github/ISSUE_TEMPLATE/config.yml` and a `bug_report.yml` form mirroring
-  the four items required in `CONTRIBUTING.md` §2.
-- Link Discussions and SUPPORT from `README.md`.
-- Human-only steps, to be listed in the pull request description rather than
-  automated: enable GitHub Discussions, confirm O. Dadoun's ORCID, confirm the
-  `@u-pariscite.fr` mail domain, mint the Zenodo concept DOI and paste it into
-  `CITATION.cff`.
+## 3. `requirements.txt` duplicates `pyproject.toml`
 
-### Status: done — human-only steps to paste into the pull request
+It is tracked, and it restates the runtime dependencies plus `setuptools` and
+`wheel`. Since packaging moved to PEP 621 there is no consumer of it in the
+repository, and a second dependency list will drift from the real one. Delete
+it, or reduce it to a one-line pointer at `pip install -e ".[dev]"`.
 
-Copy this checklist into the PR description. Nothing below can be done from a
-clone; each item is a setting or an external account.
+## 4. Confirm the issue forms render on GitHub
 
-- [X] **Enable GitHub Discussions** (Settings → General → Features). Until then,
-      the Discussions links in `README.md`, `SUPPORT.md`, `CONTRIBUTING.md` §1
-      and `.github/ISSUE_TEMPLATE/config.yml` all 404.
-- [X] **Create the issue labels** used by the forms, or they are silently
-      dropped: `bug`, `enhancement`, `new database`, `data`.
-- [X] **Confirm O. Dadoun's ORCID** — `0000-0002-2169-9725` in `AUTHORS` and
-      `CITATION.cff`, unverified.
-- [X] **Confirm the mail domain** — `@u-pariscite.fr` for T. Beau and
-      J. Browaeys; the institution also uses `@u-paris.fr`.
-- [ ] **Mint the Zenodo concept DOI**, then replace the
-      `10.5281/zenodo.0000000` placeholder in `CITATION.cff`. `date-released`
-      is no longer a placeholder: it was set to `2026-08-06` with the v0.5.0
-      release, and `version` to `0.5.0`. The concept DOI is the last remaining
-      placeholder in that file.
-- [ ] **Check the rendered forms**, now possible since `main` carries them:
-      `https://github.com/pyvoa/pyvoa/issues/new/choose` — issue-form schema
-      errors only surface on GitHub, not locally.
+All four files under `.github/ISSUE_TEMPLATE/` parse as YAML locally, and every
+label they request (`bug`, `enhancement`, `new database`, `data`) exists on the
+repository. But GitHub applies a stricter schema than a plain YAML parse, and
+those errors only surface on the site; `https://github.com/pyvoa/pyvoa/issues/new/choose`
+redirects for anonymous requests, so this cannot be checked from a clone.
+Open the page while signed in and confirm the three forms appear.
 
-## Release v0.5.0 — done, 2026-08-07
+While there: `.github/ISSUE_TEMPLATE/bug_report.yml:38` hardcodes `pyvoa 0.5.0`
+as the version placeholder, so it goes stale at every release — and the release
+checklist in `CONTRIBUTING.md` §9 does not mention it. Add it to §9 as a fifth
+step, or the placeholder will drift again.
 
-Cut from the merged `joss-readiness` work. The analysis API did not change;
-0.5.0 is the version that packages tasks 1-5.
+## 5. The JOSS paper
 
-- [X] **Version bumped to 0.5.0** in `pyvoa/__version__.py`. `pyvoa/help.py`
-      used to carry a second, independently hardcoded `__version__` and
-      `__author__` — it imports them now, so `pyvoa/__version__.py` is really
-      the single source of truth. Also bumped: `CITATION.cff` (`version`,
-      `date-released`) and the version placeholder in `bug_report.yml`.
-- [X] **`CHANGELOG.md`** has a 0.5.0 section, written from the branch's
-      fourteen commits and matching the file's existing style.
-- [X] **Merged to `main`** as a `--no-ff` merge (`efd1a47`), so the branch
-      stays visible in the history, and pushed.
-- [X] **Tagged `v0.5.0`** (annotated, on the merge commit) and pushed.
-- [X] **GitHub release** published at
-      `https://github.com/pyvoa/pyvoa/releases/tag/v0.5.0`, notes taken from
-      the changelog section, with `pyvoa-0.5.0-py3-none-any.whl` and
-      `pyvoa-0.5.0.tar.gz` attached. Created through the REST API: `gh` is not
-      installed on the release machine.
-- [X] **PyPI upload** — still pending, the only unfinished release step. The
-      artifacts are built and `twine check`-clean in `dist/`; the machine has
-      no `~/.pypirc`, no `TWINE_*` variables and an empty keyring, so the
-      upload needs a token typed interactively:
+`paper.md` and `paper.bib` are drafted outside this repository and are not in
+the tree. They are the remaining deliverable for the submission itself.
 
-      python -m twine upload dist/pyvoa-0.5.0-py3-none-any.whl dist/pyvoa-0.5.0.tar.gz
+## 6. Uncommitted work in the tree
 
-      List the two files explicitly: `dist/` still holds the 0.4.2 artifacts,
-      and a wildcard would try to re-upload them and fail the batch.
+The documentation pass of 2026-08-07 is staged in the working tree but not
+committed: `README.md` (installation, first example, the 23-database table),
+`SUPPORT.md`, `CONTRIBUTING.md`, `CHANGELOG.md` (`Unreleased` section) and this
+file. Every code line in the new README was executed against a live `owid`
+before being written down. Commit them before starting anything above.
 
-Verified before tagging: 176 tests pass, `ruff check pyvoa/ tests/` clean, both
-artifacts pass `twine check`, the wheel carries all 23 database JSON files and
-the 3 PNGs, and it installs into a fresh venv reporting 0.5.0. The only ruff
-findings in the tree are in `test.py`, which is untracked and invisible to CI.
+---
 
-Deferred deliberately, not forgotten:
+## Decisions already taken — do not re-open
 
-- `ruff format` is **not** run: the tree is not format-clean (22 files) and CI
-  does not check it. `CONTRIBUTING.md` §4 no longer claims otherwise, and §5
-  now tells contributors to match the surrounding style. Adopting a formatter
-  is a separate decision with a large, purely cosmetic diff.
-- No `PULL_REQUEST_TEMPLATE.md`: the checklist stays in `CONTRIBUTING.md` §4.
-
-## Task 6 — README and documentation
-
-- The `README.md` install section still points at the pycoa wiki
-  (`github.com/coa-project/pycoa/wiki/Installation`); replace with current
-  instructions.
-- Add: minimal usage example, list of supported databases, link to `examples/`,
-  licence, citation, community files.
-
-## Out of scope for this session
-
-The JOSS `paper.md` and `paper.bib` — drafted separately.
+- **`ruff format` is deliberately not run.** The tree is not format-clean
+  (22 files) and CI does not check formatting. `CONTRIBUTING.md` §5 tells
+  contributors to match the surrounding style instead. Adopting a formatter is
+  a separate decision with a large, purely cosmetic diff.
+- **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
+- **`CHANGELOG.md` does not follow Keep a Changelog.** It predates the project;
+  `CONTRIBUTING.md` §4.7 documents its actual convention. Do not restructure it.
+- **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases** rather
+  than 23. That is intentional — the exact count lives in `README.md`'s table,
+  which is the one place that has to stay in step with `pyvoa/data/`.

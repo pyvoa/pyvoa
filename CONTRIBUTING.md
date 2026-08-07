@@ -81,8 +81,12 @@ using the examples in `examples/`.
    `fix(dbparser): handle empty ISO-3166 field in OWID dataset`.
 6. **Open a pull request** against `main`, describing *what* changes and *why*,
    and linking the related issue (`Closes #42`).
-7. Update `CHANGELOG.md` under the *Unreleased* heading, following
-   [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+7. Add an entry to `CHANGELOG.md` under the *Unreleased* heading at the top of
+   the file, in the style of the entries already there: one bullet per
+   user-visible change, written for someone upgrading rather than for someone
+   reading the diff, and prefixed with `fix:` when it is a bug fix. The file
+   predates this project and does not follow *Keep a Changelog*; please match
+   the surrounding entries rather than introducing a new structure.
 
 A maintainer will review the pull request. Review comments are about the code,
 never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -123,7 +127,8 @@ standardised interface. A new data provider should:
    codes wherever possible);
 4. come with tests that do not depend on network availability (use a small
    fixture file rather than a live download);
-5. be added to the list of supported databases in the documentation.
+5. be added to the table of supported databases in `README.md`, so that it is
+   listed alongside the others and appears in `pf.listwhom()`.
 
 ## 7. Documentation and teaching material
 
