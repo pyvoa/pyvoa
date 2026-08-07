@@ -1,3 +1,8 @@
+# Unreleased
+- `README.md` now documents installation (`pip install pyvoa`, `pyvoa-full`), a
+  first example, and a table of the 23 supported databases with their coverage,
+  granularity and source.
+
 # version 0.5.0
 Publication-readiness release: no change to the analysis API, but the package,
 its error handling and its development process are now those expected of a
@@ -55,6 +60,3 @@ Adding geo and a python example
 
 # version 0.1.0
 First import, scheleton only
-
-# version 0.2.0
-Adding geo and a python example
