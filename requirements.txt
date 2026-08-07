@@ -1,15 +1,15 @@
-setuptools
-pandas
-geopandas
-shapely
-bs4
-numpy
-pycountry
-pycountry_convert
-requests
-unidecode
-lxml
-wheel
-IPython
-contextily
-html5lib
+# Dependencies are declared in pyproject.toml, under [project.dependencies],
+# which is the single source of truth. This file used to repeat that list and
+# had already drifted from it; it now installs the project itself and lets pip
+# resolve the dependencies from the packaging metadata.
+#
+# It is kept rather than deleted because mybinder.org builds its environment
+# from a requirements.txt at the repository root, and CONTRIBUTING.md section 3
+# names Binder as a supported environment. Installing the project here — rather
+# than only its dependencies, as before — is also what makes `import pyvoa`
+# work in a Binder session.
+#
+# For development, prefer the editable install with the test tools:
+#     pip install -e ".[dev]"
+
+.

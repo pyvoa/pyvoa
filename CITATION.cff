@@ -57,8 +57,11 @@ keywords:
 
 identifiers:
   - type: doi
-    value: "10.5281/zenodo.21829901"  
+    value: "10.5281/zenodo.21829901"
     description: "Concept DOI - all versions of pyvoa"
+  - type: doi
+    value: "10.5281/zenodo.21829902"
+    description: "Version DOI - pyvoa 0.5.0"
   - type: url
     value: "https://pypi.org/project/pyvoa/"
     description: "Package distributed on PyPI"
