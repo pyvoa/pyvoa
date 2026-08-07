@@ -69,25 +69,36 @@ def test_geomanager_advertises_its_databases(bare_manager):
 # GeoInfo : field catalogue
 # --------------------------------------------------------------------------
 
-def test_geoinfo_lists_its_fields():
-    fields = geo.GeoInfo(0).get_list_field()
+@pytest.fixture
+def bare_info():
+    """A GeoInfo built without __init__, hence without any download.
+
+    ``GeoInfo(0)`` would build a GeoManager, and with it a GeoRegion. Both
+    methods below only read the class-level ``_list_field``, so no instance
+    state is needed.
+    """
+    return geo.GeoInfo.__new__(geo.GeoInfo)
+
+
+def test_geoinfo_lists_its_fields(bare_info):
+    fields = bare_info.get_list_field()
     assert fields == sorted(fields)
     assert {"population", "geometry", "capital"} <= set(fields)
 
 
-def test_geoinfo_get_source_without_argument_returns_every_source():
-    sources = geo.GeoInfo(0).get_source()
-    assert set(sources) == set(geo.GeoInfo(0).get_list_field())
+def test_geoinfo_get_source_without_argument_returns_every_source(bare_info):
+    sources = bare_info.get_source()
+    assert set(sources) == set(bare_info.get_list_field())
 
 
-def test_geoinfo_get_source_names_the_field():
-    source = geo.GeoInfo(0).get_source("population")
+def test_geoinfo_get_source_names_the_field(bare_info):
+    source = bare_info.get_source("population")
     assert source.startswith("population : ")
 
 
-def test_geoinfo_get_source_rejects_an_unknown_field():
+def test_geoinfo_get_source_rejects_an_unknown_field(bare_info):
     with pytest.raises(PyvoaError) as excinfo:
-        geo.GeoInfo(0).get_source("not_a_field")
+        bare_info.get_source("not_a_field")
     assert "not_a_field" in str(excinfo.value)
 
 
