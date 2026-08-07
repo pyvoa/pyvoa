@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from ~24 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
+PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from 23 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
 
 ## Development Commands
 
