@@ -1,0 +1,124 @@
+{
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "@id": "https://doi.org/10.5281/zenodo.21829901",
+    "identifier": "https://doi.org/10.5281/zenodo.21829901",
+    "name": "pyvoa: Python Virus Open Analysis",
+    "alternateName": "pyvoa",
+    "description": "pyvoa is an open-source Python library providing unified access to epidemiological databases (COVID-19 and other viral datasets), a standardised data format, transparent joins with geolocation databases, and built-in tools for time-series and cartographic visualisation. It is designed to be usable by non-specialists — high-school and university students, science journalists, researchers unfamiliar with data extraction — while remaining scriptable for advanced Python users.",
+    "dateCreated": "2024-12-19",
+    "license": "https://spdx.org/licenses/MIT",
+    "isAccessibleForFree": true,
+    "inLanguage": "en",
+    "url": "https://pyvoa.org",
+    "codeRepository": "https://github.com/pyvoa/pyvoa",
+    "downloadUrl": "https://github.com/pyvoa/pyvoa/releases/latest",
+    "installUrl": "https://pypi.org/project/pyvoa/",
+    "sameAs": [
+        "https://pypi.org/project/pyvoa/",
+        "https://doi.org/10.5281/zenodo.21829901",
+        "https://github.com/pyvoa/pyvoa"
+    ],
+    "applicationCategory": "Epidemiology",
+    "programmingLanguage": {
+        "@type": "ComputerLanguage",
+        "name": "Python",
+        "url": "https://www.python.org"
+    },
+    "runtimePlatform": [
+        "Python 3.10",
+        "Python 3.11",
+        "Python 3.12"
+    ],
+    "operatingSystem": [
+        "Linux",
+        "macOS",
+        "Windows"
+    ],
+    "softwareRequirements": [
+        "Python >= 3.10",
+        "pandas",
+        "geopandas",
+        "shapely",
+        "bs4",
+        "numpy",
+        "pycountry",
+        "pycountry_convert",
+        "requests",
+        "unidecode",
+        "lxml",
+        "IPython",
+        "contextily",
+        "html5lib"
+    ],
+    "keywords": [
+        "epidemiology",
+        "COVID-19",
+        "open data",
+        "data visualisation",
+        "geolocation",
+        "Python",
+        "reproducible research",
+        "science education"
+    ],
+    "author": [
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0002-2022-2140",
+            "givenName": "Tristan",
+            "familyName": "Beau",
+            "name": "Tristan Beau",
+            "email": "tristan.beau@u-pariscite.fr",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Université Paris Cité, UFR de physique, and LPNHE (CNRS/IN2P3, Sorbonne Université, UMR 7585), Paris, France"
+            }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0003-4405-9875",
+            "givenName": "Julien",
+            "familyName": "Browaeys",
+            "name": "Julien Browaeys",
+            "email": "julien.browaeys@u-pariscite.fr",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "Université Paris Cité, UFR de physique, and MSC - Matière et Systèmes Complexes (CNRS, UMR 7057), Paris, France"
+            }
+        },
+        {
+            "@type": "Person",
+            "@id": "https://orcid.org/0000-0002-2169-9725",
+            "givenName": "Olivier",
+            "familyName": "Dadoun",
+            "name": "Olivier Dadoun",
+            "email": "olivier.dadoun@lpnhe.in2p3.fr",
+            "affiliation": {
+                "@type": "Organization",
+                "name": "LPNHE (CNRS/IN2P3, Sorbonne Université, Université Paris Cité, UMR 7585), Paris, France"
+            }
+        }
+    ],
+    "maintainer": {
+        "@type": "Person",
+        "@id": "https://orcid.org/0000-0002-2022-2140",
+        "name": "Tristan Beau",
+        "email": "tristan.beau@u-pariscite.fr"
+    },
+    "targetProduct": {
+        "@type": "SoftwareApplication",
+        "name": "pyvoa",
+        "applicationCategory": "Epidemiology",
+        "operatingSystem": [
+            "Linux",
+            "macOS",
+            "Windows"
+        ],
+        "downloadUrl": "https://pypi.org/project/pyvoa/",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "EUR"
+        }
+    }
+}
