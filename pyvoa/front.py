@@ -328,18 +328,7 @@ class front:
                 else:
                     kwargs['where'] = list(input['where'].unique())
             else:
-                wh = list(input['where'].unique()) if not input.empty else self.listwhere()
-                upwhere = [i.upper() for i in wh]
-                flat_where = []
-                for w in kwargs['where']:
-                    if isinstance(w, list):
-                        flat_where.extend(w)
-                    else:
-                        flat_where.append(w)
-                missing = [w for w in flat_where if w.upper() not in upwhere]
-
-                if missing:
-                    raise PyvoaError('This location do not exit in the DB :' + str(missing))
+                self.test_where(kwargs['where'])
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -386,6 +375,21 @@ class front:
                 kwargs['what'] = kwargs['which']
             return func(self,**kwargs)
         return wrapper
+
+    def test_where(self, where):
+        flat_where = []
+        upwhere = [i.upper() for i in self.listwhere()]
+        for w in where:
+            if isinstance(w, list):
+                flat_where.extend(w)
+            else:
+                flat_where.append(w)
+
+        missing = [w for w in flat_where if w.upper() not in upwhere]
+        if missing:
+            raise PyvoaError('This location do not exit in the DB :' + str(missing))
+        else:
+            return True
 
     def input_visuwrapper(func):
         """
@@ -586,7 +590,6 @@ class front:
                     kwargs['input'] = input
             return func(self,**kwargs)
         return inner
-
 
     def decohist(func):
         @wraps(func)
@@ -961,7 +964,7 @@ class front:
             raise PyvoaError('listwhich for which database ? I am lost ... are you ?')
         return sorted(self.meta.getcurrentmetadatawhich(dic))
 
-    def listwhere(self,clustered = False):
+    def listwhere(self, cluster_and_not = True):
         """Lists regions or countries based on the current metadata and specified granularity.
 
         Args:
@@ -997,9 +1000,8 @@ class front:
 
         if granularity == 'country' and code not in ['WLD','EUR']:
             return code
-        if clustered:
-            return clust()
-        else:
+
+        if cluster_and_not:
             if self.gpdbuilder.db_world:
                 if granularity == 'country' and code not in ['WLD','EUR'] :
                     r =  self.gpdbuilder.to_standard(code)
@@ -1021,7 +1023,10 @@ class front:
                     r.append(code)
                 else:
                     raise PyvoaError('What is the granularity of your DB ?')
-            return r
+            return r + clust()
+        else:
+            return clust()
+
 
     def listpop(self):
         """
