@@ -213,7 +213,6 @@ class front:
                 self.gpdbuildergeo = readpkl('geo'+base + '.pkl')
                 pandy = self.gpdbuilder.getwheregeometrydescription()
                 self.allvisu = AllVisu(base, pandy)
-                coge.GeoManager('name')
         self.db = base
         self.get_echoinfo()
 
@@ -986,6 +985,8 @@ class front:
             raise PyvoaError("listwhere not available use your on where ... ")
         granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = self.meta.getcurrentmetadata(self.db)['geoinfo']['iso3']
+        coge.GeoManager('name')
+        #self.gpdbuilder.geo.GeoManager('iso3')
         def clust():
             if granularity == 'country' and code not in ['WLD','EUR']:
                 return  self.gpdbuilder.geo.to_standard(code)
@@ -1010,7 +1011,7 @@ class front:
                         r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('World')
                     else:
                         r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('Europe')
-                    r = [self.gpdbuilder.geo.to_standard(c)[0] for c in r]
+                    r += [self.gpdbuilder.geo.to_standard(c)[0] for c in r]
             else:
                 if granularity == 'subregion':
                     pan = self.gpdbuilder.geo.get_subregion_list()
