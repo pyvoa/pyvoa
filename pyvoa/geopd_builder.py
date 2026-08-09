@@ -305,25 +305,15 @@ class GPDBuilder:
        # what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
+
        if input.empty:
             available_keywords = self.get_available_keywords()
             kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
             anticolumns = [x for x in available_keywords if x not in which]
             input = input.loc[:,~input.columns.isin(anticolumns)]
-       else:
-
-           input = input.loc[input['where'].str.upper().isin([w.upper() for w in flat_list(where)])]
-
-       if input.empty:
-            raise PyvoaError(f"No information is available for the provided locations: {where}")
-       else:
-           missing = [loc for loc in flat_list(where) if input.loc[input['where'].str.upper() == loc.upper()].empty]
-           if len(missing)>0:
-                PyvoaWarning('No data available for these locations: '+ str(missing))
 
        date_max_by_where = input.groupby('where')['date'].max()
-
        if date_max_by_where.nunique() > 1:
             PyvoaWarning(
                 "Some 'where' values have different end dates; "
@@ -365,14 +355,12 @@ class GPDBuilder:
            input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
            kwargs['input'] = input
            when_beg_data,when_end_data = when_beg, when_end
- 
+
        #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
-       flat_list(where)
 
        bypopvalue = None
        datesunique = list(input.date.unique())
-       len(datesunique)
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']
