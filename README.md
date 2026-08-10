@@ -3,6 +3,7 @@
 [![CI](https://github.com/pyvoa/pyvoa/actions/workflows/ci.yml/badge.svg)](https://github.com/pyvoa/pyvoa/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/pyvoa)](https://pypi.org/project/pyvoa/)
 [![Python](https://img.shields.io/pypi/pyversions/pyvoa)](https://pypi.org/project/pyvoa/)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21829901.svg)](https://doi.org/10.5281/zenodo.21829901)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [Pyvoa](https://pyvoa.org) (Python Virus Open Analysis) is a collection of Python™ code that provides:
