@@ -138,10 +138,9 @@ def test_geocountry_lists_the_supported_countries():
 # region converters too: they go through ``get_region_list()``, which
 # dissolves ``_country_data`` by its region columns.
 #
-# The converters select with ``isin()``, so a result comes back in data
-# order rather than in the order of the argument; the tests below therefore
-# compare order-independently, except where a single element makes the
-# correspondence unambiguous.
+# The conversion is positional: result[i] translates argument[i], whatever
+# the order of the underlying frame, and a repeated entry is translated as
+# many times as it appears. The tests below assert that exactly.
 # --------------------------------------------------------------------------
 
 CONVERTERS = [
@@ -179,7 +178,7 @@ def fake_country():
 
 def test_from_subregion_codes_to_names_converts_every_code(fake_country):
     names = fake_country.from_subregion_codes_to_names(["01A", "01B", "02A"])
-    assert sorted(names) == ["Alpha", "Beta", "Gamma"]
+    assert names == ["Alpha", "Beta", "Gamma"]
 
 
 def test_from_subregion_codes_to_names_converts_a_single_code(fake_country):
@@ -193,12 +192,12 @@ def test_from_subregion_names_to_codes_converts_a_single_name(fake_country):
 def test_the_subregion_converters_round_trip(fake_country):
     codes = ["01A", "01B", "02A"]
     names = fake_country.from_subregion_codes_to_names(codes)
-    assert sorted(fake_country.from_subregion_names_to_codes(names)) == codes
+    assert fake_country.from_subregion_names_to_codes(names) == codes
 
 
 def test_from_region_codes_to_names_converts_every_code(fake_country):
     names = fake_country.from_region_codes_to_names(["01", "02"])
-    assert sorted(names) == ["North", "South"]
+    assert names == ["North", "South"]
 
 
 def test_from_region_codes_to_names_converts_a_single_code(fake_country):
@@ -212,7 +211,50 @@ def test_from_region_names_to_codes_converts_a_single_name(fake_country):
 def test_the_region_converters_round_trip(fake_country):
     codes = ["01", "02"]
     names = fake_country.from_region_codes_to_names(codes)
-    assert sorted(fake_country.from_region_names_to_codes(names)) == codes
+    assert fake_country.from_region_names_to_codes(names) == codes
+
+
+# --- order and duplicates ------------------------------------------------
+
+@pytest.mark.parametrize(
+    "method, argument, expected",
+    [
+        ("from_subregion_codes_to_names", ["02A", "01A", "01B"],
+         ["Gamma", "Alpha", "Beta"]),
+        ("from_subregion_names_to_codes", ["Gamma", "Alpha", "Beta"],
+         ["02A", "01A", "01B"]),
+        ("from_region_codes_to_names", ["02", "01"], ["South", "North"]),
+        ("from_region_names_to_codes", ["South", "North"], ["02", "01"]),
+    ],
+)
+def test_the_converters_answer_in_the_order_of_the_argument(
+    fake_country, method, argument, expected
+):
+    """Against the frame order, so a filtering implementation would fail."""
+    assert getattr(fake_country, method)(argument) == expected
+
+
+@pytest.mark.parametrize(
+    "method, argument, expected",
+    [
+        ("from_subregion_codes_to_names", ["01A", "01A"], ["Alpha", "Alpha"]),
+        ("from_subregion_names_to_codes", ["Beta", "Beta"], ["01B", "01B"]),
+        ("from_region_codes_to_names", ["01", "01"], ["North", "North"]),
+        ("from_region_names_to_codes", ["South", "South"], ["02", "02"]),
+    ],
+)
+def test_the_converters_translate_a_repeated_entry_every_time(
+    fake_country, method, argument, expected
+):
+    assert getattr(fake_country, method)(argument) == expected
+
+
+def test_the_converters_name_the_offending_entry(fake_country):
+    with pytest.raises(PyvoaError) as excinfo:
+        fake_country.from_subregion_codes_to_names(["01A", "99Z", "88Y"])
+    message = str(excinfo.value)
+    assert "99Z" in message and "88Y" in message
+    assert "01A" not in message  # the known one is not reported as missing
 
 
 def test_a_region_gathers_its_subregions(fake_country):

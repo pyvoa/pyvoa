@@ -2259,27 +2259,52 @@ class GeoCountry:
         if self.test_is_init():
             return sorted(self._country_data.columns.to_list())
 
+    @staticmethod
+    def _translate_list(items,frame,from_column,to_column,what):
+        """Translates a list through two columns of a frame, position by position.
+
+        The lookup is positional: element i of the result is the translation of element i of `items`, whatever the order of the frame, and a repeated entry is translated as many times as it appears. Every entry is checked before anything is translated, so an unknown one names itself in the error.
+
+        Args:
+            items (list): The values to translate.
+            frame (pd.DataFrame): The data holding both columns.
+            from_column (str): The column `items` is looked up in.
+            to_column (str): The column the result is read from.
+            what (str): 'codes' or 'names', used in the error message.
+
+        Returns:
+            list: The translated values, in the order of `items`.
+
+        Raises:
+            PyvoaError: If any entry of `items` is absent from `from_column`.
+        """
+        translation=dict(zip(frame[from_column],frame[to_column]))
+        unknown=[i for i in dict.fromkeys(items) if i not in translation]
+        if unknown:
+            raise PyvoaError("Some "+what+" do not exist in the country data: "
+                             +", ".join(str(u) for u in unknown)+".")
+        return [translation[i] for i in items]
+
     def from_subregion_codes_to_names(self,codes):
         """Converts a list of codes to their corresponding names.
 
         This method takes a list of codes and returns a list of names that correspond to those codes based on the country data. It checks if the object is initialized before performing the conversion.
 
         Args:
-            codes (list): A list of codes to be converted to names. 
+            codes (list): A list of codes to be converted to names.
 
         Returns:
-            list: A list of names corresponding to the provided codes if exist, otherwise PyvoaError
+            list: A list of names corresponding to the provided codes, in the same order, if exist, otherwise PyvoaError
 
         """
         if type(codes) is not list:
             raise PyvoaError("The input should be a list of codes.")
 
         if self.test_is_init():
-            names=self._country_data[["code_subregion","name_subregion"]].loc[self._country_data.code_subregion.isin(codes)].name_subregion.to_list()
-            if len(names) != len(codes):
-                raise PyvoaError("Some codes do not exist in the country data.")
-            return names
-        
+            return self._translate_list(codes,self._country_data,
+                                        "code_subregion","name_subregion","codes")
+
+
     def from_subregion_names_to_codes(self,names):
         """Converts a list of names to their corresponding codes.
 
@@ -2289,16 +2314,14 @@ class GeoCountry:
             names (list): A list of names to be converted to codes.
 
         Returns:
-            list: A list of codes corresponding to the provided names if they exist, otherwise PyvoaError.
+            list: A list of codes corresponding to the provided names, in the same order, if they exist, otherwise PyvoaError.
         """
         if type(names) is not list:
             raise PyvoaError("The input should be a list of names.")
 
         if self.test_is_init():
-            codes=self._country_data[["code_subregion","name_subregion"]].loc[self._country_data.name_subregion.isin(names)].code_subregion.to_list()
-            if len(codes) != len(names):
-                raise PyvoaError("Some names do not exist in the country data.")
-            return codes
+            return self._translate_list(names,self._country_data,
+                                        "name_subregion","code_subregion","names")
 
     def from_region_names_to_codes(self,names):
         """Converts a list of region names to their corresponding codes.
@@ -2309,17 +2332,14 @@ class GeoCountry:
             names (list): A list of region names to be converted to codes.
 
         Returns:
-            list: A list of codes corresponding to the provided names if they exist, otherwise PyvoaError.
+            list: A list of codes corresponding to the provided names, in the same order, if they exist, otherwise PyvoaError.
         """
         if type(names) is not list:
             raise PyvoaError("The input should be a list of names.")
 
         if self.test_is_init():
-            rl=self.get_region_list()
-            codes=rl[["code_region","name_region"]].loc[rl.name_region.isin(names)].code_region.to_list()
-            if len(codes) != len(names):
-                raise PyvoaError("Some names do not exist in the country data.")
-            return codes
+            return self._translate_list(names,self.get_region_list(),
+                                        "name_region","code_region","names")
 
     def from_region_codes_to_names(self,codes):
         """Converts a list of region codes to their corresponding names.
@@ -2327,21 +2347,18 @@ class GeoCountry:
         This method takes a list of region codes and returns a list of names that correspond to those codes based on the country data. It checks if the object is initialized before performing the conversion.
 
         Args:
-            codes (list): A list of region codes to be converted to names. 
+            codes (list): A list of region codes to be converted to names.
 
         Returns:
-            list: A list of names corresponding to the provided codes if they exist, otherwise PyvoaError.
-        """ 
+            list: A list of names corresponding to the provided codes, in the same order, if they exist, otherwise PyvoaError.
+        """
 
         if type(codes) is not list:
             raise PyvoaError("The input should be a list of codes.")
 
         if self.test_is_init():
-            rl=self.get_region_list()
-            names=rl[["code_region","name_region"]].loc[rl.code_region.isin(codes)].name_region.to_list()
-            if len(names) != len(codes):
-                raise PyvoaError("Some codes do not exist in the country data.")
-            return names
+            return self._translate_list(codes,self.get_region_list(),
+                                        "code_region","name_region","codes")
 
     def get_data(self,region_version=False):
         """Retrieves country data based on the specified region version.
