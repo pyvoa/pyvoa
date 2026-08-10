@@ -15,3 +15,6 @@ __pycache__/
 coverage.xml
 .ipynb_checkpoints/
 *.swp
+
+# per-machine Claude Code notes, not shared with contributors
+CLAUDE.local.md

@@ -39,9 +39,6 @@ Two gotchas when adding tests:
 
 `HANDOFF.md` at the repo root tracks the JOSS-readiness plan and its current task status.
 
-### git
-The gh tool is not installed, but a token is available to run git commands.
-
 ## Lint
 
 `ruff check .` must be clean — it is enforced by CI, and the tree is currently at zero findings. The configuration lives in `[tool.ruff]` in `pyproject.toml`: ruff's own default rule set plus `E4`/`E7`/`E9`, with `*.ipynb` excluded (the example notebooks are documentation, not library code). The ruff version is **pinned** in the `dev` extra and in the workflow, because ruff widens its default selection between releases and an unpinned gate would start failing on its own.
