@@ -1,4 +1,11 @@
 # Unreleased
+- `GeoCountry` gained four converters between codes and names:
+  `from_subregion_codes_to_names`, `from_subregion_names_to_codes`,
+  `from_region_names_to_codes` and `from_region_codes_to_names`. Each takes a
+  list and answers in the same order, so the two lists can be zipped, and
+  translates a repeated entry as many times as it appears. A non-list
+  argument, or an entry absent from the country data, raises a `PyvoaError`
+  that names the offending entries.
 - Python 3.13 is declared as supported and added to the CI test matrix, which
   now covers 3.10, 3.11, 3.12 and 3.13.
 - fix: the four `GeoInfo` tests built a real `GeoInfo(0)`, which builds a
