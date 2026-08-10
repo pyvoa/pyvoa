@@ -131,6 +131,131 @@ def test_geocountry_lists_the_supported_countries():
 
 
 # --------------------------------------------------------------------------
+# GeoCountry : the code <-> name converters
+#
+# The instance is built with __new__ and handed a small hand-written
+# ``_country_data``, so no upstream page is fetched. That is enough for the
+# region converters too: they go through ``get_region_list()``, which
+# dissolves ``_country_data`` by its region columns.
+#
+# The converters select with ``isin()``, so a result comes back in data
+# order rather than in the order of the argument; the tests below therefore
+# compare order-independently, except where a single element makes the
+# correspondence unambiguous.
+# --------------------------------------------------------------------------
+
+CONVERTERS = [
+    "from_subregion_codes_to_names",
+    "from_subregion_names_to_codes",
+    "from_region_codes_to_names",
+    "from_region_names_to_codes",
+]
+
+
+@pytest.fixture
+def fake_country():
+    """A GeoCountry over two regions, the first holding two subregions.
+
+    ``DEU`` is deliberate: ``get_data(region_version=True)`` special-cases
+    FRA, ESP, PRT, USA and EUR, and none of that machinery is under test.
+    """
+    frame = gpd.GeoDataFrame(
+        {
+            "code_region": ["01", "01", "02"],
+            "name_region": ["North", "North", "South"],
+            "code_subregion": ["01A", "01B", "02A"],
+            "name_subregion": ["Alpha", "Beta", "Gamma"],
+        },
+        geometry=_squares([1, 2, 3]),
+        crs="epsg:4326",
+    )
+    country = geo.GeoCountry.__new__(geo.GeoCountry)
+    country._country = "DEU"
+    country._country_data = frame
+    country._country_data_region = None
+    country._country_data_subregion = None
+    return country
+
+
+def test_from_subregion_codes_to_names_converts_every_code(fake_country):
+    names = fake_country.from_subregion_codes_to_names(["01A", "01B", "02A"])
+    assert sorted(names) == ["Alpha", "Beta", "Gamma"]
+
+
+def test_from_subregion_codes_to_names_converts_a_single_code(fake_country):
+    assert fake_country.from_subregion_codes_to_names(["01B"]) == ["Beta"]
+
+
+def test_from_subregion_names_to_codes_converts_a_single_name(fake_country):
+    assert fake_country.from_subregion_names_to_codes(["Gamma"]) == ["02A"]
+
+
+def test_the_subregion_converters_round_trip(fake_country):
+    codes = ["01A", "01B", "02A"]
+    names = fake_country.from_subregion_codes_to_names(codes)
+    assert sorted(fake_country.from_subregion_names_to_codes(names)) == codes
+
+
+def test_from_region_codes_to_names_converts_every_code(fake_country):
+    names = fake_country.from_region_codes_to_names(["01", "02"])
+    assert sorted(names) == ["North", "South"]
+
+
+def test_from_region_codes_to_names_converts_a_single_code(fake_country):
+    assert fake_country.from_region_codes_to_names(["02"]) == ["South"]
+
+
+def test_from_region_names_to_codes_converts_a_single_name(fake_country):
+    assert fake_country.from_region_names_to_codes(["North"]) == ["01"]
+
+
+def test_the_region_converters_round_trip(fake_country):
+    codes = ["01", "02"]
+    names = fake_country.from_region_codes_to_names(codes)
+    assert sorted(fake_country.from_region_names_to_codes(names)) == codes
+
+
+def test_a_region_gathers_its_subregions(fake_country):
+    """Region 01 holds two subregions, so it must still convert as one code."""
+    assert fake_country.from_region_codes_to_names(["01"]) == ["North"]
+
+
+@pytest.mark.parametrize(
+    "method, unknown",
+    [
+        ("from_subregion_codes_to_names", ["01A", "99Z"]),
+        ("from_subregion_names_to_codes", ["Alpha", "Nowhere"]),
+        ("from_region_codes_to_names", ["01", "99"]),
+        ("from_region_names_to_codes", ["North", "Nowhere"]),
+    ],
+)
+def test_the_converters_reject_an_unknown_entry(fake_country, method, unknown):
+    with pytest.raises(PyvoaError) as excinfo:
+        getattr(fake_country, method)(unknown)
+    assert "do not exist" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("method", CONVERTERS)
+@pytest.mark.parametrize("bad_input", ["01A", None, ("01A",)])
+def test_the_converters_reject_a_non_list(fake_country, method, bad_input):
+    with pytest.raises(PyvoaError) as excinfo:
+        getattr(fake_country, method)(bad_input)
+    assert "should be a list" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("method", CONVERTERS)
+def test_the_converters_complain_when_the_country_is_not_set(method):
+    with pytest.raises(PyvoaError) as excinfo:
+        getattr(geo.GeoCountry(None), method)(["anything"])
+    assert "country is not set" in str(excinfo.value)
+
+
+@pytest.mark.parametrize("method", CONVERTERS)
+def test_the_converters_accept_an_empty_list(fake_country, method):
+    assert getattr(fake_country, method)([]) == []
+
+
+# --------------------------------------------------------------------------
 # pack_polygons_grid_by_area : pure geometry
 # --------------------------------------------------------------------------
 
