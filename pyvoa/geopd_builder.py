@@ -360,7 +360,7 @@ class GPDBuilder:
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
 
        bypopvalue = None
-       datesunique = list(input.date.unique())
+       #datesunique = list(input.date.unique())
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']
