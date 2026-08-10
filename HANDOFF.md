@@ -4,7 +4,7 @@ Context brief for an agent session run at the root of https://github.com/pyvoa/p
 Goal: bring the repository to the state expected by a JOSS software-paper review.
 Reference checklist: https://joss.readthedocs.io/en/latest/review_checklist.html
 
-**Status, 2026-08-07.** Tasks 1-6 of the original plan are done and shipped as
+**Status, 2026-08-10.** Tasks 1-6 of the original plan are done and shipped as
 v0.5.0: the `shutil` fix, PEP 621 packaging, the offline pytest suite, GitHub
 Actions, the community files, and the README. The release is live on PyPI
 (0.5.0, both artifacts, 2026-08-06) and on Zenodo (concept
@@ -20,9 +20,43 @@ about ten upstream pages, so they tripped `conftest.py`'s socket guard on a
 runner and passed locally only on a warm `~/.cache/pyvoa.data_<user>`. They now
 share a `bare_info` fixture built with `GeoInfo.__new__`, mirroring
 `bare_manager` next to it; both methods under test read only the class-level
-`_list_field`. `HOME=$(mktemp -d) pytest` is green (176 passed, 17 deselected).
+`_list_field`.
 
-Everything below was re-verified against GitHub, PyPI and Zenodo on 2026-08-07.
+**Landed since, 2026-08-10.** Five changes, each green on CI at the time of
+the push. The suite is at 218 passed, 17 deselected; `ruff check .` is clean.
+
+- **Python 3.13** is declared (trove classifier) and tested. The matrix is now
+  3.10/3.11/3.12/3.13 (#27); `requires-python` stays `>=3.10`, and the
+  single-version `lint` and `network` jobs stay on 3.12. The suite passes on
+  3.13 on a real runner, not only in a resolver check. Note that the PyPI
+  Python badge reads the published classifiers, so it keeps advertising
+  3.10-3.12 until 0.6.0 ships.
+- **The `lint` job had been red on `main`** since `9492bf9`, which deleted the
+  only reader of `datesunique` in `pyvoa/geopd_builder.py` and left an F841
+  behind. Fixed in #26 by commenting the assignment out, per the convention in
+  `CLAUDE.md`. The test jobs were green throughout.
+- **`GeoCountry` gained four code <-> name converters** —
+  `from_subregion_codes_to_names`, `from_subregion_names_to_codes`,
+  `from_region_names_to_codes`, `from_region_codes_to_names` — with 42 offline
+  tests. They share a `_translate_list` helper: the conversion is positional,
+  so `result[i]` translates `argument[i]` and the two lists can be zipped, a
+  repeated entry is translated as many times as it appears, and an absent
+  entry raises a `PyvoaError` naming the offenders. The tests build the
+  `GeoCountry` with `__new__` over a hand-written `_country_data`, which
+  reaches the region converters too, so nothing is downloaded.
+- **`README.md` carries the Zenodo concept-DOI badge** (`10.5281/zenodo.21829901`),
+  which had been recorded in `CITATION.cff` and `codemeta.json` but never
+  surfaced. A ruff badge was considered and rejected: the standard one is
+  static and says nothing about whether the lint passes, which the CI badge
+  already covers.
+- **The machine-local git note left `CLAUDE.md`** for an ignored
+  `CLAUDE.local.md`; it described one contributor's setup, and `CLAUDE.md` is
+  read by every contributor.
+
+Sections 1-3 below were last re-verified against GitHub, PyPI and Zenodo on
+2026-08-07. Of those, only the two Zenodo DOIs were re-checked on 2026-08-10,
+while adding the badge: both resolve, and `21829902` is the 0.5.0 version
+record.
 
 ---
 
@@ -68,6 +102,21 @@ step, or the placeholder will drift again.
 
 `paper.md` and `paper.bib` are drafted outside this repository and are not in
 the tree. They are the remaining deliverable for the submission itself.
+
+## 4. Dependencies are unpinned, and CI now resolves pandas 3.0
+
+`pyproject.toml` lists `pandas`, `geopandas`, `numpy` and the rest with no
+bounds at all, so every CI run installs whatever is newest that day — as of
+2026-08-10 that is pandas 3.0.5 and numpy 2.5.2, on every matrix entry. The
+suite passes on them, so nothing is broken. The exposure is that a major
+release upstream can turn `main` red without a commit, which is the same
+failure mode the pinned ruff version already guards against, and it also means
+a JOSS reviewer cannot reproduce a run from the metadata alone.
+
+Not urgent and not obviously worth a wide pin: a floor on the majors that are
+actually supported (`pandas>=2`, `numpy>=1.24`, …) would cost little and say
+something true, whereas upper bounds would need maintenance at every upstream
+release. Decide before 0.6.0 and record the decision here.
 
 ---
 
