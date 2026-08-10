@@ -2259,6 +2259,90 @@ class GeoCountry:
         if self.test_is_init():
             return sorted(self._country_data.columns.to_list())
 
+    def from_subregion_codes_to_names(self,codes):
+        """Converts a list of codes to their corresponding names.
+
+        This method takes a list of codes and returns a list of names that correspond to those codes based on the country data. It checks if the object is initialized before performing the conversion.
+
+        Args:
+            codes (list): A list of codes to be converted to names. 
+
+        Returns:
+            list: A list of names corresponding to the provided codes if exist, otherwise PyvoaError
+
+        """
+        if type(codes) is not list:
+            raise PyvoaError("The input should be a list of codes.")
+
+        if self.test_is_init():
+            names=self._country_data[["code_subregion","name_subregion"]].loc[self._country_data.code_subregion.isin(codes)].name_subregion.to_list()
+            if len(names) != len(codes):
+                raise PyvoaError("Some codes do not exist in the country data.")
+            return names
+        
+    def from_subregion_names_to_codes(self,names):
+        """Converts a list of names to their corresponding codes.
+
+        This method takes a list of names and returns a list of codes that correspond to those names based on the country data. It checks if the object is initialized before performing the conversion.
+
+        Args:
+            names (list): A list of names to be converted to codes.
+
+        Returns:
+            list: A list of codes corresponding to the provided names if they exist, otherwise PyvoaError.
+        """
+        if type(names) is not list:
+            raise PyvoaError("The input should be a list of names.")
+
+        if self.test_is_init():
+            codes=self._country_data[["code_subregion","name_subregion"]].loc[self._country_data.name_subregion.isin(names)].code_subregion.to_list()
+            if len(codes) != len(names):
+                raise PyvoaError("Some names do not exist in the country data.")
+            return codes
+
+    def from_region_names_to_codes(self,names):
+        """Converts a list of region names to their corresponding codes.
+
+        This method takes a list of region names and returns a list of codes that correspond to those names based on the country data. It checks if the object is initialized before performing the conversion.
+
+        Args:
+            names (list): A list of region names to be converted to codes.
+
+        Returns:
+            list: A list of codes corresponding to the provided names if they exist, otherwise PyvoaError.
+        """
+        if type(names) is not list:
+            raise PyvoaError("The input should be a list of names.")
+
+        if self.test_is_init():
+            rl=self.get_region_list()
+            codes=rl[["code_region","name_region"]].loc[rl.name_region.isin(names)].code_region.to_list()
+            if len(codes) != len(names):
+                raise PyvoaError("Some names do not exist in the country data.")
+            return codes
+
+    def from_region_codes_to_names(self,codes):
+        """Converts a list of region codes to their corresponding names.
+
+        This method takes a list of region codes and returns a list of names that correspond to those codes based on the country data. It checks if the object is initialized before performing the conversion.
+
+        Args:
+            codes (list): A list of region codes to be converted to names. 
+
+        Returns:
+            list: A list of names corresponding to the provided codes if they exist, otherwise PyvoaError.
+        """ 
+
+        if type(codes) is not list:
+            raise PyvoaError("The input should be a list of codes.")
+
+        if self.test_is_init():
+            rl=self.get_region_list()
+            names=rl[["code_region","name_region"]].loc[rl.code_region.isin(codes)].name_region.to_list()
+            if len(names) != len(codes):
+                raise PyvoaError("Some codes do not exist in the country data.")
+            return names
+
     def get_data(self,region_version=False):
         """Retrieves country data based on the specified region version.
 
