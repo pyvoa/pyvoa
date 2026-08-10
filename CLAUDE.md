@@ -58,7 +58,7 @@ Dead assignments are commented out rather than deleted, so the original intent s
 `.github/workflows/ci.yml` runs three jobs on push to `main` and on every pull request:
 
 - `lint` — pinned ruff, installed alone so the job does not build geopandas.
-- `test` — python 3.10/3.11/3.12 (matching the classifiers), the offline suite, coverage written to the GitHub Actions job summary and uploaded as a `coverage.xml` artefact. There is no third-party coverage service, hence a CI badge in `README.md` but no coverage badge.
+- `test` — python 3.10/3.11/3.12/3.13 (matching the classifiers), the offline suite, coverage written to the GitHub Actions job summary and uploaded as a `coverage.xml` artefact. There is no third-party coverage service, hence a CI badge in `README.md` but no coverage badge.
 - `network` — the `@pytest.mark.network` tests, restricted to the weekly cron and manual dispatch, so an upstream outage can never block a pull request.
 
 ## Architecture
