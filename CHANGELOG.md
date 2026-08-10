@@ -1,4 +1,6 @@
 # Unreleased
+- Python 3.13 is declared as supported and added to the CI test matrix, which
+  now covers 3.10, 3.11, 3.12 and 3.13.
 - fix: the four `GeoInfo` tests built a real `GeoInfo(0)`, which builds a
   `GeoManager` and downloads about ten pages, so they failed on CI and passed
   locally only on a warm cache. They now use `GeoInfo.__new__`, like the
