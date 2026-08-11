@@ -108,32 +108,91 @@ Packaging, tests and process:
   `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` and the issue forms.
 - `__pycache__` is no longer tracked.
 
-# versions 0.4.1, 0.4.2
-- cosmetic changes
+# version 0.4.2
+- a re-release for pip: the version string and the help text, nothing else.
+
+# version 0.4.1
+- cosmetic: the project logo is the PNG one, and the JPEG `pyvoa_logo2.jpg` is
+  dropped from the package data.
 
 # version 0.4.0
+Five months and 359 commits (2025-07-08 to 2025-12-12). The release settles the
+vocabulary of the front-end API and finishes the visualization layer inherited
+from pycoa, so nearly every rename a 0.3.x user has to know about is here.
+
 - Most of the work consisted in adding decorators to the classes.
-- Jupyter is not mandatory to use pyvoa; it can be used from a console. 
+- Jupyter is not mandatory to use pyvoa; it can be used from a console.
 - add json description of the database
 - we use one class per visualization
+- renamed on the front, with no compatibility aliases: `setvisu()` is
+  `setvis()` (by way of a short-lived `setgraphics()`), `listvisu()` is
+  `listvis()`, `getrawdb()` is `getdatabase()`, `listbypop()` is `listpop()`,
+  `listtiles()` is `listtile()`, `listmapoption()` is `listmap()`,
+  `listchartkargskeys()` is `listargument()`, and `getvisukwargs()` is
+  `getkwargsvisu()`. `setdisplay()`, `getdisplay()` and `setoptvis()` are gone.
+  `getvis()`, `listchart()`, `listargumentvalue()` and `getdbmetadata()` are
+  new.
+- renamed among the chart options: `bylocation` is `location`, `byvalue` is
+  `value`, `menulocation` is `compare`, `bypop` is `pop`. `typeofmap` is new.
+- `setbatch()` renders without opening a window, on every backend.
+- a date slider for the bokeh maps, histograms and pie charts, with a play
+  button.
+- an external pandas or geopandas frame can be passed as `input=` and charted
+  without loading a database at all, and the figure or map object can be
+  retrieved rather than only displayed.
+- a `help()` function in English, using ANSI codes instead of colorama, and a
+  welcome message on import.
+- matplotlib, seaborn and bokeh are detected at import, so a missing backend is
+  reported instead of raising. The seaborn backend caught up with the others
+  (yearly plot, legends, `savefig`, watermark, use from a terminal), and a
+  folium map was added and then withdrawn from the advertised list before the
+  tag.
+- titles, legends, axis labels, logo and watermark were harmonised across the
+  backends, and the plot title carries the database name and the date.
+- fix: `bypop` was broken outright; `nonneg` is no longer applied by default;
+  `sumall`, the cumulative sums, the empty-data cases and the map bounds under
+  the date slider were each fixed several times over.
+- fix: geography — the FRA description left an obsolete URL for the cached
+  copy, France's overseas collectivities joined the dense geometry, GRC got a
+  working URL, `europa` and `govcy` entered `geo.py`, and the mpox database
+  lost an invalid `XKX` iso3.
+- the JHU database is back, the `empty` placeholder is gone, and the Olympics
+  database was removed for not being a virus database.
+- the surviving `pycoa` references became `pyvoa`, and `pyvoa.fr` became
+  `pyvoa.org`.
 
 # version 0.3.1
+First full release on PyPI. No git tag was ever pushed for it; the release was
+prepared in `3384862`.
+
 - cosmetic and docstrings
-- version for pip, first full version 
+- version for pip, first full version
+- the docstrings were written across the whole code base with LLM assistance.
+- Google Colab is detected and handled.
+- the front-end input handling was refactored, and the error messages with it.
+  `PyvoaError` no longer calls `sys.exit()`, so a caller can catch it and carry
+  on.
+- the error banner adapts to the terminal size, and to there being no terminal.
 
 # version 0.3.0
 - import of the whole former pycoa software into pyvoa
 - using matplotlib as graphical output
+- the import landed in a single commit — 24 files, about 5100 lines — bringing
+  the bokeh, matplotlib and seaborn visualizers, the geo module and the JSON
+  database descriptions.
+- bokeh is detected rather than assumed, and the data path the import brought
+  with it was corrected.
 
 # version 0.2.2
 - nothing (pip troubles with previous version)
 
 # version 0.2.1
 - Structure of the package to deal with pip
-- data file can be access now. See test1.py 
+- data file can be access now. See test1.py
+- no git tag was pushed for this one either.
 
 # version 0.2.0
-Adding geo and a python example
+Adding geo and a python example. This changelog starts here.
 
 # version 0.1.0
-First import, scheleton only
+First import, skeleton only: the project structure and a first upload to PyPI.
