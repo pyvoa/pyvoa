@@ -22,8 +22,9 @@ share a `bare_info` fixture built with `GeoInfo.__new__`, mirroring
 `bare_manager` next to it; both methods under test read only the class-level
 `_list_field`.
 
-**Landed since, 2026-08-10.** Five changes, each green on CI at the time of
-the push. The suite is at 218 passed, 17 deselected; `ruff check .` is clean.
+**Landed since, 2026-08-10 and 2026-08-11.** Seven changes, each green on CI at
+the time of the push. The suite is at 218 passed, 17 deselected; `ruff check .`
+is clean.
 
 - **Python 3.13** is declared (trove classifier) and tested. The matrix is now
   3.10/3.11/3.12/3.13 (#27); `requires-python` stays `>=3.10`, and the
@@ -52,6 +53,36 @@ the push. The suite is at 218 passed, 17 deselected; `ruff check .` is clean.
 - **The machine-local git note left `CLAUDE.md`** for an ignored
   `CLAUDE.local.md`; it described one contributor's setup, and `CLAUDE.md` is
   read by every contributor.
+- **`CHANGELOG.md` now covers every release.** The 0.5.0 entry described the
+  publication-readiness work of its last two days and nothing of the eight
+  months before it; it was rewritten from all 220 non-merge commits since
+  v0.4.2 and grouped into data sources and caching, geography, visualization,
+  data handling, errors and verbosity, packaging and process. Its opening no
+  longer claims the analysis API is unchanged, because `setvisu()`,
+  `get_echoinfo()` and the axis-type option were all renamed in 0.5.0, so it is
+  not a drop-in upgrade from 0.4.2.
+- **The entries for 0.1.0 to 0.4.2 were filled out** from their own ranges of
+  the log; 0.4.1 and 0.4.2 are separate sections now. 0.4.0 is the substantial
+  one — five months, 359 commits — and carries a verified rename table for the
+  front-end API and the chart options.
+
+Two things learned while doing that, both worth knowing before the next release
+or any archival work:
+
+- **The `v0.1.0`, `v0.2.0`, `v0.2.2` and `v0.3.0` tags are not ancestors of
+  `main`.** The early history was rewritten and `main` carries its own copies
+  under different hashes, so a range like `v0.3.0..v0.4.0` silently includes
+  rewritten duplicates — 397 commits, against 378 for the same span measured
+  from `main`'s own 0.3.0 release commit (`638bce2..v0.4.0`). Use `main`'s
+  release commits as boundaries. Two releases, **0.2.1 and
+  0.3.1, were published to PyPI but never tagged at all**; 0.3.1 was prepared
+  in `3384862`.
+- **Commit subjects do not always match what shipped.** The 0.4.0 rename list
+  was built by diffing the front methods and the option vocabulary between the
+  two trees, not by transcribing the log, and that caught two errors: a commit
+  reads "change which to what", but `which` and `what` both exist before and
+  after with different meanings, so no rename happened; and `getversion()`
+  already existed at 0.3.1 rather than arriving in 0.4.0.
 
 Sections 1-3 below were last re-verified against GitHub, PyPI and Zenodo on
 2026-08-07. Of those, only the two Zenodo DOIs were re-checked on 2026-08-10,
