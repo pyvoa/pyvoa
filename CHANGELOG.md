@@ -196,3 +196,60 @@ Adding geo and a python example. This changelog starts here.
 
 # version 0.1.0
 First import, skeleton only: the project structure and a first upload to PyPI.
+
+---
+
+# Before pyvoa — pycoa, 2020 to 2025
+
+pyvoa continues PyCoA (Python Covid Analysis), written at
+<https://github.com/coa-project/pycoa>, which is now a private repository.
+Version 0.3.0 above is the import of that code base, so the history below is
+where most of the analysis and visualization code actually comes from. It is
+summarised from pycoa's own `Release_notes.md` and from its log; that log is
+the authoritative record, and it is not public.
+
+The project started during the Covid Hackathon of April 2020; the git history
+opens on 2020-11-18 and closes on 2025-03-24, with 1924 commits on the main
+line — Olivier Dadoun (about 1350), Tristan Beau (about 470), Noam Boulze (77),
+Alexander Martínez Méndez and Julien Browaeys. 2021 was the busiest year, at
+822 commits.
+
+- **v1.0, november 2020** — first official release: the worldwide JHU database.
+- **v2.0, february 2021** — major release. More than one database at last:
+  OWID worldwide, JHU-USA, and SPF and OpenCovid19 for France. A `GeoCountry`
+  class for local geography, an automatic cache, and a wide rework of the
+  graphical output, the data processing and the front end.
+- **v2.01 and v2.02, march 2021** — local databases for the USA
+  (Covidtracking), Italy (dpc) and India (covid19india). A pandas dataframe
+  became the standard output; pie charts and the date slider arrived; Windows
+  and SPF fixes.
+- **v2.10, october 2021** — national databases for ESP, DEU, BEL, GBR and PRT,
+  the Obépine and opencovid19national French sets, map labels for the bokeh
+  maps, a `rapport` class, `export` and `merger`, and `sumall` over lists of
+  lists.
+- **v2.11** — decorators and kwargs uniformised across the front, date plots
+  over several variables and locations, `vline` and `hline` modes, the GRC and
+  CYP databases, geopandas output.
+- **v2.20, march 2022** — population figures for the USA and France and
+  normalisation by population, yearly and spiral plots, a choice between dense
+  and standard geometry for ESP, FRA and USA, the Insee, Risklayer, Europa,
+  Greece and Cyprus databases, and the bokeh figure handed back to the caller.
+- **v2.21, september 2022** — the `condensed` map label for USA and FRA, and
+  repairs to databases that had changed shape upstream. Tagged for FdS 2022.
+- **v2.22, november 2023** — the database parsing split into a `dbparser`
+  class, so that one file describes a database; `setwhom(reload=True)` reading
+  a pickled cache; OWID replacing JHU as the default database.
+
+After v2.22 the work went on untagged for 311 more commits, and that stretch is
+what became pyvoa:
+
+- matplotlib and seaborn backends joined bokeh in may 2024, and the front end
+  was pulled apart from the visualization classes — batch output separated from
+  graphical output, `bypop` moved out of `allvisu`, `front.py` rewritten.
+- an Olympics medal dataset was carried for a while as an experiment. pyvoa
+  dropped it in 0.4.0, on the grounds that it is not a virus database.
+- in february and march 2025 the rename happened: `src` became `pyvoa`, the
+  JSON descriptions became `pyvoa-data`, `Coa` became `Pyvoa` throughout, and
+  the covid-specific vocabulary was taken out of the code — the point at which
+  the project stopped being about one virus. The last pycoa commit is dated
+  2025-03-24, and pyvoa 0.3.0 was tagged two days later.
