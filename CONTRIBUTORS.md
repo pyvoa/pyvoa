@@ -33,6 +33,22 @@ COVID Analysis, 2020–2025), started during the Covid Hackathon of 2020.
 Contributions made to pycoa are recorded in the git history of that repository,
 which is no longer public; [`CHANGELOG.md`](CHANGELOG.md) carries a summary.
 
+### Interns and student contributors
+
+With thanks to the students who worked on pyvoa and on pycoa before it, during
+an internship or a research project.
+
+- Boulze, Noam — 2024, L3, Université Paris I Panthéon-Sorbonne. The main
+  example notebook, work on the seaborn backend, the continuous integration,
+  and the help system that pyvoa still ships as `pyvoa/help.py`.
+- Brassart, Aurélie — 2022, L3, Sorbonne Université.
+- Herry, Saméo — 2023, L3, Sorbonne Université.
+- Kande, Seydina — 2023, L3, Sorbonne Université.
+- Martínez Méndez, Alexander — 2023, PhD, LA-CoNGA physics. Dependency versions
+  and the development environment, and the move to Zenodo for data storage,
+  which is how pyvoa serves its databases today.
+- Triantafyllidou, Lemonia — 2022, L3, Sorbonne Université.
+
 ## Data providers
 
 pyvoa would not exist without the institutions and projects that publish
