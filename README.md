@@ -148,6 +148,16 @@ If you use pyvoa in your work, please cite it. The metadata lives in
 the *Cite this repository* button. Authorship is documented in
 [AUTHORS](AUTHORS), and other contributions in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
+## Funding
+
+This work was supported by the IdEx « Université Paris Cité 2022 »
+(ANR-18-IDEX-0001) and by the
+[« Institut Covid-19 Ad Memoriam »](https://institut-ad-memoriam.u-pariscite.fr/)
+of Université Paris Cité.
+
+Both must be acknowledged in any publication, presentation or derived material
+about pyvoa; see the *Funding* section of [AUTHORS](AUTHORS).
+
 ## Licence
 
 [MIT](LICENSE).

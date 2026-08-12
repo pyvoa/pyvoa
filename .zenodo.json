@@ -4,6 +4,7 @@
     "description": "<p>pyvoa is an open-source Python library providing unified access to epidemiological databases (COVID-19 and other viral datasets), a standardised data format, transparent joins with geolocation databases, and built-in tools for time-series and cartographic visualisation. It is designed to be usable by non-specialists &mdash; high-school and university students, science journalists, researchers unfamiliar with data extraction &mdash; while remaining scriptable for advanced Python users.</p>",
     "license": "mit",
     "language": "eng",
+    "notes": "This work was supported by the IdEx « Université Paris Cité 2022 » (ANR-18-IDEX-0001) and by the « Institut Covid-19 Ad Memoriam » of Université Paris Cité (https://institut-ad-memoriam.u-pariscite.fr/).",
     "creators": [
         {
             "name": "Beau, Tristan",
@@ -52,6 +53,12 @@
         {
             "identifier": "https://github.com/coa-project/pycoa",
             "relation": "continues",
+            "resource_type": "software",
+            "scheme": "url"
+        },
+        {
+            "identifier": "https://github.com/tjbtjbtjb/CoCoA",
+            "relation": "isDerivedFrom",
             "resource_type": "software",
             "scheme": "url"
         }

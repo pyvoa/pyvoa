@@ -115,6 +115,32 @@ the Zenodo UI, or leave it and let v0.5.1 be the first consistent deposit.
 Editing metadata does not mint a new DOI; adding the wheel to an existing
 record does require a new version.
 
+### The IdEx grant, and why `.zenodo.json` does not declare it
+
+The funding acknowledgement is in `.zenodo.json` as free-text `notes` only. A
+structured `grants` entry would link the deposit to the funder in Zenodo and in
+OpenAIRE, and the award does exist — but do not add one blind, because the
+documentation and the live API disagree. Checked on 2026-08-12:
+
+| check | result |
+|---|---|
+| `GET /api/awards/00rbzpz17::ANR-18-IDEX-0001` | **200**, titled "Université de Paris" — the former name of Université Paris Cité, so this is the right award |
+| `GET /api/funders/00rbzpz17` | 200, Agence Nationale de la Recherche, carrying both the ROR `00rbzpz17` and the funder DOI `10.13039/501100001665` |
+| `GET /api/grants/10.13039/501100001665::ANR-18-IDEX-0001` | **404** |
+| `GET /api/grants/?q=ANR` | **404** — the whole legacy grants API is gone |
+| developers.zenodo.org | still documents `grants` as `[{"id": "10.13039/…::<code>"}]` |
+
+So the format the deposit documentation asks for is the one that no longer
+resolves, and the id that does resolve is InvenioRDM's ROR-based
+`00rbzpz17::ANR-18-IDEX-0001`. Which of the two the GitHub-integration deposit
+path accepts cannot be established without attempting a real deposit, and a
+rejected `grants` value fails the release.
+
+Attach the award through the Zenodo UI after depositing instead: the form
+validates as you type, so a wrong value costs nothing there. If a future
+release is to declare it in the file, test it on the Zenodo **sandbox**
+(sandbox.zenodo.org) first, never on a real release.
+
 ## 2. Confirm the issue forms render on GitHub
 
 All four files under `.github/ISSUE_TEMPLATE/` parse as YAML locally, and every
@@ -133,6 +159,14 @@ step, or the placeholder will drift again.
 
 `paper.md` and `paper.bib` are drafted outside this repository and are not in
 the tree. They are the remaining deliverable for the submission itself.
+
+The paper must carry the funding acknowledgement, in an `# Acknowledgements`
+section: the IdEx « Université Paris Cité 2022 » (ANR-18-IDEX-0001) and the
+« Institut Covid-19 Ad Memoriam » of Université Paris Cité. The sentence to
+reuse verbatim is in the *Funding* section of `AUTHORS`; `README.md` and
+`.zenodo.json` carry it too. `CITATION.cff` does not, and cannot: CFF 1.2.0 has
+no funding key and its schema sets `additionalProperties: false`, so adding one
+makes the file invalid.
 
 ## 4. Dependencies are unpinned, and CI now resolves pandas 3.0
 

@@ -105,3 +105,18 @@ references:
       - family-names: "Dadoun"
         given-names: "Olivier"
         orcid: "https://orcid.org/0000-0002-2169-9725"
+  - type: software
+    title: "CoCoA: Covid Collaborative Analysis"
+    abstract: "Origin of pycoa and pyvoa, started at the Covid Hackathon (2020)."
+    repository-code: "https://github.com/tjbtjbtjb/CoCoA"
+    year: 2020
+    authors:
+      - family-names: "Beau"
+        given-names: "Tristan"
+        orcid: "https://orcid.org/0000-0002-2022-2140"
+      - family-names: "Browaeys"
+        given-names: "Julien"
+        orcid: "https://orcid.org/0000-0003-4405-9875"
+      - family-names: "Dadoun"
+        given-names: "Olivier"
+        orcid: "https://orcid.org/0000-0002-2169-9725"

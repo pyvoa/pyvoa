@@ -37,15 +37,34 @@ Olivier Dadoun <olivier.dadoun@lpnhe.in2p3.fr>
 
 ## History
 
-pyvoa is the successor of pycoa (Python COVID Analysis, 2020–2025), developed by
-the same authors and started during the Covid Hackathon (2020). Earlier
-contributions are recorded in the git history of
-https://github.com/coa-project/pycoa, which is no longer public; CHANGELOG.md
-carries a summary of it.
+pyvoa is the third name of one continuous project, developed throughout by the
+same authors:
+
+  CoCoA  Covid Collaborative Analysis, 2020
+         started during the Covid Hackathon of April 2020
+         https://github.com/tjbtjbtjb/CoCoA (public, archived)
+  PyCoA  Python COVID Analysis, 2020–2025
+         https://github.com/coa-project/pycoa (no longer public)
+  pyvoa  Python Virus Open Analysis, since 2025
+         https://github.com/pyvoa/pyvoa
+
+Earlier contributions are recorded in the git histories of those repositories.
+CHANGELOG.md carries a summary of both, which is the only public record of the
+pycoa years.
 
 ## Institutional support
 
 Université Paris Cité — https://u-pariscite.fr
 LPNHE (CNRS/IN2P3 — Sorbonne Université — Université Paris Cité), UMR 7585 — https://lpnhe.in2p3.fr
 MSC — Matière et Systèmes Complexes (CNRS — Université Paris Cité), UMR 7057 — https://msc.u-paris.fr
-Institut Covid-19 Ad Memoriam — https://institut-ad-memoriam.u-pariscite.fr/
+
+## Funding — required acknowledgement
+
+This work was supported by the IdEx « Université Paris Cité 2022 »
+(ANR-18-IDEX-0001) and by the « Institut Covid-19 Ad Memoriam » of Université
+Paris Cité (https://institut-ad-memoriam.u-pariscite.fr/).
+
+Both must be acknowledged in any publication, presentation, poster or derived
+material about pyvoa. This is a condition of the funding, not a courtesy: keep
+the sentence above intact when reusing it, and add it to the JOSS paper and to
+any release announcement.

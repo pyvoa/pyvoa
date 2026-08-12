@@ -199,20 +199,45 @@ First import, skeleton only: the project structure and a first upload to PyPI.
 
 ---
 
-# Before pyvoa — pycoa, 2020 to 2025
+# Before pyvoa — CoCoA and pycoa, 2020 to 2025
 
-pyvoa continues PyCoA (Python Covid Analysis), written at
-<https://github.com/coa-project/pycoa>, which is now a private repository.
-Version 0.3.0 above is the import of that code base, so the history below is
-where most of the analysis and visualization code actually comes from. It is
-summarised from pycoa's own `Release_notes.md` and from its log; that log is
-the authoritative record, and it is not public.
+pyvoa is the third name of one continuous project, and version 0.3.0 above is
+the import of the code base it had already accumulated. The lineage:
 
-The project started during the Covid Hackathon of April 2020; the git history
-opens on 2020-11-18 and closes on 2025-03-24, with 1924 commits on the main
-line — Olivier Dadoun (about 1350), Tristan Beau (about 470), Noam Boulze (77),
-Alexander Martínez Méndez and Julien Browaeys. 2021 was the busiest year, at
-822 commits.
+| | name | dates | repository |
+|---|---|---|---|
+| 1 | **CoCoA** — Covid Collaborative Analysis | 2020-04-29 to 2020-11-26 | <https://github.com/tjbtjbtjb/CoCoA> (public, archived) |
+| 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2025-03-24 | <https://github.com/coa-project/pycoa> (private) |
+| 3 | **pyvoa** — Python Virus Open Analysis | since 2025-03 | <https://github.com/pyvoa/pyvoa> |
+
+## CoCoA, april to november 2020
+
+Started during the Covid Hackathon of April 2020 by Tristan Beau, Julien
+Browaeys and Olivier Dadoun. 266 commits, tags `v0.1` (may 2020), `v0.2` and
+`v0.3` (june 2020), and a `1.0` announced in the README while the code still
+called itself `pre1.0`.
+
+- the aim was already the one pyvoa states today: simplified, unified access to
+  Covid databases for people who are not data specialists — pupils, students,
+  science journalists, and scientists outside the field — with raw data, time
+  series and maps a few lines of code away.
+- bokeh output from `v0.2`, in may 2020; worldometers support in july.
+- three modules of that first design are still in pyvoa under the same names:
+  `geo.py`, which arrived in july 2020 already carrying `GeoManager` and the
+  standardisation of location names, and `tools.py`, renamed from `verb.py` in
+  november 2020. A third, `error.py`, survived until 0.5.0 folded it into
+  `tools.py`.
+- in november 2020 the project was renamed and moved; the CoCoA README has
+  pointed at the new home ever since.
+
+## PyCoA, november 2020 to march 2025
+
+The repository is private, so the history below is summarised from pycoa's own
+`Release_notes.md` and from its log — the authoritative record, and not public.
+
+1924 commits on the main line — Olivier Dadoun (about 1350), Tristan Beau
+(about 470), Noam Boulze (77), Alexander Martínez Méndez and Julien Browaeys.
+2021 was the busiest year, at 822 commits.
 
 - **v1.0, november 2020** — first official release: the worldwide JHU database.
 - **v2.0, february 2021** — major release. More than one database at last:
