@@ -28,10 +28,13 @@ Also listed in [`AUTHORS`](AUTHORS), with affiliations and CRediT roles.
      - Family Name, Given Name — short description of the contribution
 -->
 
-pyvoa is the successor of [pycoa](https://github.com/coa-project/pycoa) (Python
-COVID Analysis, 2020–2025), started during the Covid Hackathon of 2020.
-Contributions made to pycoa are recorded in the git history of that repository,
-which is no longer public; [`CHANGELOG.md`](CHANGELOG.md) carries a summary.
+pyvoa is the third name of one continuous project: it began as
+[CoCoA](https://github.com/tjbtjbtjb/CoCoA) (Covid Collaborative Analysis) at
+the Covid Hackathon of April 2020, became
+[pycoa](https://github.com/coa-project/pycoa) (Python COVID Analysis) that
+November, and pyvoa in 2025. Contributions made to CoCoA and pycoa are recorded
+in the git histories of those repositories; the pycoa one is no longer public,
+and [`CHANGELOG.md`](CHANGELOG.md) carries a summary of both.
 
 ### Interns and student contributors
 
