@@ -93,7 +93,7 @@ identifiers:
 references:
   - type: software
     title: "pycoa: Python COVID Analysis"
-    abstract: "Predecessor of pyvoa (2020-2023)."
+    abstract: "Predecessor of pyvoa (2020-2025)."
     repository-code: "https://github.com/coa-project/pycoa"
     authors:
       - family-names: "Beau"
