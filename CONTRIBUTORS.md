@@ -29,8 +29,9 @@ Also listed in [`AUTHORS`](AUTHORS), with affiliations and CRediT roles.
 -->
 
 pyvoa is the successor of [pycoa](https://github.com/coa-project/pycoa) (Python
-COVID Analysis, 2020–2023), started during the Covid Hackathon of 2020.
-Contributions made to pycoa are recorded in the git history of that repository.
+COVID Analysis, 2020–2025), started during the Covid Hackathon of 2020.
+Contributions made to pycoa are recorded in the git history of that repository,
+which is no longer public; [`CHANGELOG.md`](CHANGELOG.md) carries a summary.
 
 ## Data providers
 
