@@ -37,10 +37,11 @@ Olivier Dadoun <olivier.dadoun@lpnhe.in2p3.fr>
 
 ## History
 
-pyvoa is the successor of pycoa (Python COVID Analysis, 2020–2023), developed by
+pyvoa is the successor of pycoa (Python COVID Analysis, 2020–2025), developed by
 the same authors and started during the Covid Hackathon (2020). Earlier
 contributions are recorded in the git history of
-https://github.com/coa-project/pycoa
+https://github.com/coa-project/pycoa, which is no longer public; CHANGELOG.md
+carries a summary of it.
 
 ## Institutional support
 
