@@ -55,10 +55,11 @@ Dead assignments are commented out rather than deleted, so the original intent s
 
 ## Continuous integration
 
-`.github/workflows/ci.yml` runs three jobs on push to `main` and on every pull request:
+`.github/workflows/ci.yml` runs four jobs on push to `main` and on every pull request:
 
 - `lint` — pinned ruff, installed alone so the job does not build geopandas.
 - `test` — python 3.10/3.11/3.12/3.13 (matching the classifiers), the offline suite, coverage written to the GitHub Actions job summary and uploaded as a `coverage.xml` artefact. There is no third-party coverage service, hence a CI badge in `README.md` but no coverage badge.
+- `minimum` — the same offline suite on python 3.10 with every direct dependency pinned to the lower bound declared in `pyproject.toml` (`uv pip install --resolution lowest-direct`). `test` always resolves to the newest release, so without this job the floors would be unverified claims. If you raise a floor, this is what proves it was necessary; if you lower one, this is what proves it works.
 - `network` — the `@pytest.mark.network` tests, restricted to the weekly cron and manual dispatch, so an upstream outage can never block a pull request.
 
 ## Architecture
