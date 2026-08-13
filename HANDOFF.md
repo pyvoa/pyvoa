@@ -194,7 +194,25 @@ reuse verbatim is in the *Funding* section of `AUTHORS`; `README.md` and
 no funding key and its schema sets `additionalProperties: false`, so adding one
 makes the file invalid.
 
-## 4. Dependencies are unpinned, and CI now resolves pandas 3.0
+## 4. Dependencies are unpinned, and CI now resolves pandas 3.0 — **done**
+
+Settled on 2026-08-13: lower bounds on every direct dependency, no upper
+bounds, and a `minimum` CI job that installs the floors on python 3.10 with
+`uv pip install --resolution lowest-direct` and runs the offline suite, so a
+floor that is not true fails CI instead of a user's install. The floors were
+picked as the oldest release with a wheel for python 3.10 in the API era the
+code is written against, then verified: 218 passed on 3.10 and on 3.12, and
+`import pyvoa.front` works on both. `bs4` became `beautifulsoup4`, since `bs4`
+is a thin forwarding package whose own versions are `0.0.x` and cannot carry a
+meaningful bound.
+
+No upper bounds, deliberately. Capping a library's dependencies propagates the
+cap into every environment that installs it, and is the usual cause of
+unresolvable installs; a new upstream major is caught by the `test` job, which
+always resolves to the newest release. The original text follows, for the
+reasoning.
+
+
 
 `pyproject.toml` lists `pandas`, `geopandas`, `numpy` and the rest with no
 bounds at all, so every CI run installs whatever is newest that day — as of

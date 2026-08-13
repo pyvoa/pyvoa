@@ -79,6 +79,37 @@ jobs:
           path: coverage.xml
           if-no-files-found: warn
 
+  minimum:
+    name: pytest (oldest allowed dependencies)
+    # The `test` job always resolves to the newest release of everything, so on
+    # its own it proves nothing about the lower bounds declared in pyproject.
+    # This one pins every direct dependency to its floor, so a bound that is not
+    # actually supported fails here instead of in a user's install.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # The floors are what an installation on the oldest supported python
+          # resolves to, so this job runs there.
+          python-version: '3.10'
+
+      - name: Install uv
+        run: python -m pip install --disable-pip-version-check uv
+
+      # --resolution lowest-direct: floors for our own dependencies, newest for
+      # everything they drag in, which is what a user pinning nothing would get
+      # on an old environment.
+      - name: Install pyvoa at its declared floors
+        run: uv pip install --system --resolution lowest-direct -e ".[dev]"
+
+      - name: Show what was resolved
+        run: uv pip list --system
+
+      - name: Run the offline test suite
+        run: pytest -q
+
   network:
     name: pytest -m network
     # Upstream outages must never block a pull request, so the tests that
