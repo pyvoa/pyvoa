@@ -1,8 +1,15 @@
 # Handoff — pyvoa publication readiness
 
 Context brief for an agent session run at the root of https://github.com/pyvoa/pyvoa.
-Goal: bring the repository to the state expected by a JOSS software-paper review.
-Reference checklist: https://joss.readthedocs.io/en/latest/review_checklist.html
+Goal: bring the repository to the state expected by a software-paper review.
+Target journal: **SoftwareX** (Elsevier, ISSN 2352-7110), article type *Original
+Software Publication*. Guide for authors:
+https://www.elsevier.com/journals/softwarex/23527110/guide-for-authors
+
+The target was JOSS until 2026-08-13. Most of the work carries over unchanged —
+open licence, public repository, documentation, tests, CI, a citable archived
+release — since those are what any software-paper venue asks for. What changes
+is the paper itself; see section 3.
 
 **Status, 2026-08-10.** Tasks 1-6 of the original plan are done and shipped as
 v0.5.0: the `shutil` fix, PEP 621 packaging, the offline pytest suite, GitHub
@@ -155,12 +162,31 @@ as the version placeholder, so it goes stale at every release — and the releas
 checklist in `CONTRIBUTING.md` §9 does not mention it. Add it to §9 as a fifth
 step, or the placeholder will drift again.
 
-## 3. The JOSS paper
+## 3. The SoftwareX paper
 
 `paper.md` and `paper.bib` are drafted outside this repository and are not in
 the tree. They are the remaining deliverable for the submission itself.
 
-The paper must carry the funding acknowledgement, in an `# Acknowledgements`
+They were drafted for JOSS, and SoftwareX is not the same deliverable. Known
+differences, from the guide for authors:
+
+- the manuscript goes on **Elsevier's SoftwareX template**, not JOSS's
+  `paper.md` + `paper.bib`. The prose can be reused; the format cannot.
+- SoftwareX requires a **code metadata table** in the manuscript. Take the
+  field list from the current template rather than from any summary of it —
+  it asks for things this repository already has (permanent link to the code,
+  licence, versioning, languages and tools, compilation and dependency
+  requirements, link to the documentation, support contact), so filling it is
+  transcription rather than new work. The exact fields could not be retrieved
+  here: sciencedirect.com serves 403 to automated fetches, so download the
+  template from the guide-for-authors page above.
+- the review is ordinary Elsevier peer review, not the public GitHub-issue
+  review JOSS runs, so there is no reviewer checklist to pre-satisfy.
+- the published article gets a DOI under `10.1016/j.softx.…` and an article
+  number rather than page numbers. `CITATION.cff` carries a commented-out
+  `preferred-citation` block ready for it.
+
+The paper must carry the funding acknowledgement, in an acknowledgements
 section: the IdEx « Université Paris Cité 2022 » (ANR-18-IDEX-0001) and the
 « Institut Covid-19 Ad Memoriam » of Université Paris Cité. The sentence to
 reuse verbatim is in the *Funding* section of `AUTHORS`; `README.md` and
@@ -176,7 +202,8 @@ bounds at all, so every CI run installs whatever is newest that day — as of
 suite passes on them, so nothing is broken. The exposure is that a major
 release upstream can turn `main` red without a commit, which is the same
 failure mode the pinned ruff version already guards against, and it also means
-a JOSS reviewer cannot reproduce a run from the metadata alone.
+a reviewer cannot reproduce a run from the metadata alone — and SoftwareX asks
+for the dependency requirements explicitly, in the code metadata table.
 
 Not urgent and not obviously worth a wide pin: a floor on the majors that are
 actually supported (`pandas>=2`, `numpy>=1.24`, …) would cost little and say

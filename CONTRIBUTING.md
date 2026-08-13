@@ -143,8 +143,10 @@ committing, unless the output is the point of the example.
 - All contributors are acknowledged in `CONTRIBUTORS.md`.
 - The `AUTHORS` file lists the **authors of the software**, i.e. people who have
   made a substantial and sustained intellectual contribution to its design,
-  implementation or scientific direction. Following
-  [JOSS policy](https://joss.readthedocs.io/en/latest/submitting.html#authorship),
+  implementation or scientific direction. We follow the
+  [JOSS authorship policy](https://joss.readthedocs.io/en/latest/submitting.html#authorship)
+  as our reference standard for this, whatever the venue a given paper is
+  submitted to:
   purely financial or purely supervisory contributions do not qualify, whereas
   active project direction and non-code contributions do. Contributions are
   described with the [CRediT taxonomy](https://credit.niso.org/). Additions to
