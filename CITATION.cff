@@ -83,12 +83,11 @@ identifiers:
 #     - family-names: "Dadoun"
 #       given-names: "Olivier"
 #       orcid: "https://orcid.org/0000-0002-2169-9725"
-#   journal: "Journal of Open Source Software"
+#   journal: "SoftwareX"
 #   year: 2026
 #   volume: 0
-#   issue: 0
-#   start: 0000
-#   doi: "10.21105/joss.00000"
+#   start: 000000          # SoftwareX numbers articles instead of pages
+#   doi: "10.1016/j.softx.2026.000000"
 
 references:
   - type: software

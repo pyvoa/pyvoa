@@ -37,7 +37,7 @@ Two gotchas when adding tests:
 
 `test.py` is an untracked local scratch script, not a committed part of the repo — treat it as a convenience harness, not a source of truth. It loops over `pf.listwhom()` and calls `pf.setwhom(w)` for each; check the `continue` filter at the top of the loop before relying on it, since it's routinely edited in place to target whichever database(s) are currently being debugged (a recurring set: covidtracking, escovid19data, jhu-usa, moh, rki, sciensano).
 
-`HANDOFF.md` at the repo root tracks the JOSS-readiness plan and its current task status.
+`HANDOFF.md` at the repo root tracks the publication-readiness plan and its current task status. The target journal is SoftwareX (it was JOSS until 2026-08-13).
 
 ## Lint
 
