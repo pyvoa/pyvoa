@@ -1,4 +1,12 @@
 # Unreleased
+- every dependency now declares a lower bound, and the bounds are tested: a
+  `minimum` CI job installs the floors on python 3.10 and runs the suite, so
+  they cannot quietly become false. There are no upper bounds, on purpose — a
+  cap in a library propagates into every environment that installs it. The
+  declared minimum is pandas 2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26.
+- `bs4` is replaced by `beautifulsoup4` in the dependency list. It is the same
+  code — `bs4` is a forwarding package — but its versions are `0.0.x`, so it
+  could not carry a meaningful bound.
 - `GeoCountry` gained four converters between codes and names:
   `from_subregion_codes_to_names`, `from_subregion_names_to_codes`,
   `from_region_names_to_codes` and `from_region_codes_to_names`. Each takes a
