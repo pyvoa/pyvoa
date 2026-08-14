@@ -18,3 +18,18 @@ coverage.xml
 
 # per-machine Claude Code notes, not shared with contributors
 CLAUDE.local.md
+
+# LaTeX build products of the software paper. The sources (main.tex, the
+# Makefile) and the figures are tracked; the PDFs are rebuilt with `make`.
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.spl
+paper/*.bbl
+paper/*.blg
+paper/*.fls
+paper/*.fdb_latexmk
+paper/*.run.xml
+paper/*.synctex.gz
+paper/pyvoa-softwarex.pdf
+paper/pyvoa-softwarex-draft.pdf

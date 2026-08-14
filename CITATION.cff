@@ -72,7 +72,7 @@ identifiers:
 #
 # preferred-citation:
 #   type: article
-#   title: "pyvoa: a Python package for open analysis of viral epidemiological data"
+#   title: "pyvoa: a Python framework for unified access, standardisation and visualisation of open epidemiological data"
 #   authors:
 #     - family-names: "Beau"
 #       given-names: "Tristan"
