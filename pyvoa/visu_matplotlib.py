@@ -297,7 +297,9 @@ class visu_matplotlib:
         import numpy as np
         from matplotlib.ticker import ScalarFormatter
 
-        cmap = plt.cm.get_cmap("viridis").reversed()
+        # plt.get_cmap, not plt.cm.get_cmap: the latter was removed in
+        # matplotlib 3.9, which made every matplotlib map raise.
+        cmap = plt.get_cmap("viridis").reversed()
         ax = kwargs.get('ax')
         ax.axis('off')
 
@@ -307,9 +309,19 @@ class visu_matplotlib:
         title = kwargs.get('title')
         tile = kwargs.get('tile')
 
+        # The frames arrive labelled EPSG:4326 whatever their units: the world
+        # geometries are in Web Mercator metres, the dense country geometries in
+        # degrees. Both the minimum extent below and the CRS handed to contextily
+        # depend on which one it is, so read it off the extent instead of
+        # assuming metres — a 10 km floor is 10 000 degrees on a lon/lat frame,
+        # which is what drew metropolitan France as a speck in a world-sized box.
         minx, miny, maxx, maxy = input.total_bounds
-        dx = max(maxx - minx, 10_000)
-        dy = max(maxy - miny, 10_000)
+        in_degrees = abs(minx) <= 180 and abs(maxx) <= 180 and abs(miny) <= 90 and abs(maxy) <= 90
+        data_crs = "EPSG:4326" if in_degrees else "EPSG:3857"
+        minimum_extent = 1 if in_degrees else 10_000        # one degree, or 10 km
+
+        dx = max(maxx - minx, minimum_extent)
+        dy = max(maxy - miny, minimum_extent)
 
         factor = 0.5 if len(input) < 10 else 0.1
 
@@ -327,7 +339,9 @@ class visu_matplotlib:
         #fig.set_figheight(fig.get_figwidth() * ratio)
         # color range
         min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
-        input = input.set_crs("EPSG:2154", allow_override=True)
+        # The units the frame is actually in, not Lambert-93: overriding every
+        # frame to EPSG:2154 mislabelled both the world and the dense maps.
+        input = input.set_crs(data_crs, allow_override=True)
 
         # plot
         plot = input.plot(
@@ -362,7 +376,7 @@ class visu_matplotlib:
         if tile == 'openstreet':
             cx.add_basemap(
                 ax,
-                crs='EPSG:3857',
+                crs=data_crs,
                 source=cx.providers.OpenStreetMap.Mapnik,
             )
 
@@ -379,7 +393,7 @@ class visu_matplotlib:
         elif tile == 'positron':
             cx.add_basemap(
                 ax,
-                crs='EPSG:3857',
+                crs=data_crs,
                 source=cx.providers.CartoDB.PositronNoLabels
             )
 
