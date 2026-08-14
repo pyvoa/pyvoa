@@ -79,6 +79,31 @@ jobs:
           path: coverage.xml
           if-no-files-found: warn
 
+  paper:
+    name: paper/code consistency
+    # tests/test_paper.py also runs inside the `test` job, since pyproject's
+    # testpaths covers the whole tests/ directory. It gets a job of its own
+    # because it needs neither pyvoa nor the geospatial stack — it only reads
+    # files — so it answers "does the manuscript still describe this commit?"
+    # in seconds, without waiting for geopandas to build.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: python -m pip install --disable-pip-version-check pytest
+
+      # --noconftest: tests/conftest.py imports pyvoa for the socket guard and
+      # the cache fixture, and this job deliberately has neither installed.
+      # test_paper.py uses none of those fixtures — it opens no socket and
+      # reads no cache — and it skips itself when paper/main.tex is absent.
+      - name: Check the manuscript against the code it describes
+        run: pytest -q -p no:cacheprovider --noconftest tests/test_paper.py
+
   minimum:
     name: pytest (oldest allowed dependencies)
     # The `test` job always resolves to the newest release of everything, so on
