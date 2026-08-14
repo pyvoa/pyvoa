@@ -152,7 +152,7 @@ class AllVisu:
             which = kwargs.get('which')
             which = which[0]
             # what = kwargs.get('what')
-            when = kwargs.get('when')
+            # when = kwargs.get('when') : the title now reads the date drawn
             typeofhist = kwargs.get('typeofhist')
 
             kwargs['logo'] = self.logo
@@ -199,7 +199,12 @@ class AllVisu:
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if not kwargs['dateslider']:
-                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which']) + '(' + str(when[0].split(':')[1]) +')'
+                # The date drawn, not the end of the requested range: `when` has
+                # already been expanded to the database's full span by the time
+                # it gets here, so it named the last day of the data rather than
+                # the day selected, e.g. when='01/12/2022' was titled 09/03/2023.
+                drawn = input['date'].max()
+                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which']) + '(' + drawn.strftime('%d/%m/%Y') +')'
             else:
                 kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which'])
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay

@@ -755,7 +755,9 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
-                self.outcome = fig
+            # outside the batch test, as in map() and hist(): savefig() reads
+            # self.outcome, and setbatch() must not leave it unset.
+            self.outcome = fig
             return fig
 
     def setnamefunction(self,name):
@@ -1246,7 +1248,10 @@ class front:
                 output_file(name+'.html')
                 save(self.outcome)
             else:
-                    self.outcome.figure.savefig(name)
+                    # bbox_inches='tight': the location histogram puts its
+                    # labels outside the axes and the legend to the right of
+                    # them, and the default bounding box cuts both off.
+                    self.outcome.figure.savefig(name, bbox_inches='tight')
             print('Figure :', name, ' has been saved ')
         else:
             raise PyvoaError('savefig can\'t be used to store a panda DataFrame')
