@@ -91,6 +91,29 @@ or any archival work:
   after with different meanings, so no rename happened; and `getversion()`
   already existed at 0.3.1 rather than arriving in 0.4.0.
 
+**Landed 2026-08-13, while producing the manuscript figures.** Running the
+paper's own examples end to end found four defects in the plotting path, none of
+which any test covered, all fixed with the figures as evidence:
+
+- `plt.cm.get_cmap`, removed in matplotlib 3.9, made **every matplotlib map
+  raise** (`visu_matplotlib.py`).
+- `front.plot()` assigned `self.outcome` inside its `if not self.batch` branch,
+  so **`savefig()` after `setbatch()` failed** on a plot — the headless path a
+  script uses. `map()` and `hist()` already did it correctly.
+- `matplotlib_map` overrode every frame's CRS to Lambert-93 and used a 10 km
+  minimum extent, which is 10 000 degrees on a lon/lat frame: the **dense French
+  map drew metropolitan France as a speck** in a world-sized box. The units are
+  now read off the extent and handed to contextily.
+- The map/histogram title printed the end of the requested range rather than the
+  **date actually drawn**, so `when='01/12/2022'` was titled `09/03/2023`.
+
+Two things found and *not* changed, because they are decisions rather than bugs:
+the default basemap `tile='openstreet'` now returns OpenStreetMap's "Access
+blocked" 403 images (the paper passes `tile='positron'` instead), and
+`contextily` — a required dependency — itself requires `matplotlib`, so a plain
+`pip install pyvoa` always has matplotlib, whatever "optional backend" means
+elsewhere.
+
 Sections 1-3 below were last re-verified against GitHub, PyPI and Zenodo on
 2026-08-07. Of those, only the two Zenodo DOIs were re-checked on 2026-08-10,
 while adding the badge: both resolve, and `21829902` is the 0.5.0 version
@@ -164,8 +187,40 @@ step, or the placeholder will drift again.
 
 ## 3. The SoftwareX paper
 
-`paper.md` and `paper.bib` are drafted outside this repository and are not in
-the tree. They are the remaining deliverable for the submission itself.
+**In the tree since 2026-08-13**, as `paper/main.tex` (elsarticle), `paper/Makefile`,
+`paper/README.md`, `paper/figures/` and `tests/test_paper.py`. It builds: `make
+draft` and `make final` both compile, and the consistency tests are green. What
+remains is editorial, and is listed in the `\attn` annotations of `main.tex`
+itself — the reproducible-capsule link (C3/S3), the third-party-adoption
+evidence for Section 4, the AI-use declaration, and a check of the official
+template's exact section list.
+
+Four things worth knowing before touching it again:
+
+- **The figures are produced, not drawn.** `examples/pyfiles/paper_examples.py`
+  writes all five of them into `paper/figures/` under the names the .tex
+  includes; `make figures` runs it. `architecture.png` is the exception — it is
+  a drawing, supplied by the authors. Re-run the script after any release and
+  after any change to a listing, and run `--check` first, which validates every
+  database, indicator and option against the installed version without plotting.
+- **Page count.** `make final` gives 13 pages, but the class is
+  `preprint,12pt,a4paper`, a reading layout. Recompiled with Elsevier's
+  `final,5p,times,twocolumn`, the same source is 6 pages including the metadata
+  tables and the references. That is the layout the 6-page limit refers to. The
+  word count (about 2400 of 3000) is checked by `tests/test_paper.py`.
+- **elsarticle is not in every TeX Live.** It was absent here; the CTAN source
+  builds the class with `tex elsarticle.ins`, and it drops into
+  `~/texmf/tex/latex/elsarticle/`. `latexmk` was absent too, so the Makefile
+  falls back to three `pdflatex` passes.
+- **`CITATION.cff`'s commented `preferred-citation` title was changed** to the
+  manuscript's, since the two must be the same string and the test enforces it.
+  If the title changes at submission, change it in both.
+
+### The original text of this section
+
+`paper.md` and `paper.bib` were drafted outside this repository. They are
+superseded by `paper/main.tex`; the notes below are kept for the venue
+requirements they record.
 
 They were drafted for JOSS, and SoftwareX is not the same deliverable. Known
 differences, from the guide for authors:
