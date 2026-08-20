@@ -1026,9 +1026,9 @@ class front:
                     r.append(code)
                 else:
                     raise PyvoaError('What is the granularity of your DB ?')
-            return r + clust()
+            return sorted(r + clust())
         else:
-            return clust()
+            return sorted(clust())
 
 
     def listpop(self):
