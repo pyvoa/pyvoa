@@ -45,6 +45,15 @@ def quiet_verbosity():
     tools.set_verbose_mode(previous)
 
 
+@pytest.fixture(autouse=True)
+def archived_data_source():
+    """Restore the global data source mode after each test that changes it."""
+    previous = tools.get_live_mode()
+    tools.set_live_mode(False)
+    yield
+    tools.set_live_mode(previous)
+
+
 @pytest.fixture
 def cache_dir(tmp_path, monkeypatch):
     """Redirect the pyvoa download/pickle cache into a temporary directory."""

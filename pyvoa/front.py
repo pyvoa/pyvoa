@@ -40,10 +40,12 @@ from pyvoa.tools import (
     all_or_none_lists,
     convertmercator,
     fill_missing_dates,
+    get_live_mode,
     info,
     kwargs_keystesting,
     kwargs_values_testing,
     readpkl,
+    set_live_mode,
 )
 from pyvoa.visualizer import AllVisu
 
@@ -87,6 +89,8 @@ class front:
     Methods:
         whattodo(): Generates a DataFrame summarizing available methods and their options.
         setwhom(base, **kwargs): Sets the current GPDBuilder database and optionally reloads it.
+        setlive(live=True): Switches between the frozen Zenodo archive and the live upstream sources.
+        getlive(): Returns True if the live upstream sources are currently used.
         get(**kwargs): Retrieves and processes data based on the specified output format.
         listoutput(): Returns the list of currently available output types for the get() function.
         listvis(): Returns the list of currently available visualizations for the map() function.
@@ -174,6 +178,50 @@ class front:
         pd1.index = pd1.index.rename('Methods')
         pd1 = pd1.sort_values(by='Arguments',ascending = False)
         return pd1
+
+    def setlive(self,live=True):
+        """Chooses where the data are downloaded from.
+
+        By default, pyvoa reads every file from a frozen Zenodo archive, so that
+        a given release always returns the same data. Calling setlive(True)
+        switches to the live upstream sources, i.e. the 'urlparent' field of the
+        json database description files for the epidemiological data.
+
+        The live sources are the most recent ones, but they may have moved,
+        changed format or disappeared. Some datasets have no live source
+        declared; those keep using the archive and a warning is issued.
+
+        Args:
+            live (bool): True to use the live sources, False for the archive.
+
+        Returns:
+            bool: The data source mode which has been set.
+        """
+        if live not in [0,1]:
+            raise PyvoaError('live must be a boolean ... ')
+        previous = get_live_mode()
+        set_live_mode(live)
+        if get_live_mode() != previous:
+            # the currently loaded database comes from the other source, so it
+            # must be parsed again by the next setwhom call
+            self.db = ''
+            self.gpdbuilder = None
+            self.gpdbuilderdata = None
+            self.gpdbuildergeo = None
+            self.allvisu = None
+        if get_live_mode():
+            PyvoaWarning('Using live upstream data sources. '
+                         'Results may change from one day to the next, and some '
+                         'sources may be unreachable.')
+        else:
+            info('Using the archived (Zenodo) data sources.')
+        return get_live_mode()
+
+    def getlive(self,):
+        """Returns True if the live upstream sources are currently used,
+        False if the frozen Zenodo archive is used.
+        """
+        return get_live_mode()
 
     def setwhom(self,base,**kwargs):
         """Sets the current GPDBuilder database and optionally reloads it.
