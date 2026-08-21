@@ -1184,6 +1184,9 @@ class GeoCountry:
                     'GRC':'https://github.com/coa-project/coadata/raw/refs/heads/main/coastore/nomoiokxe.zip',\
                     # previously 'GRC':'https://geodata.gov.gr/dataset/6deb6a12-1a54-41b4-b53b-6b36068b8348/resource/3e571f7f-42a4-4b49-8db0-311695d72fa3/download/nomoiokxe.zip',\
                     'JPN':'https://raw.githubusercontent.com/piuccio/open-data-jp-prefectures-geojson/master/output/prefectures.geojson',\
+                    # health zones ("zones de santé") of the Democratic Republic of the Congo,
+                    # the geometry the INSP situation reports of the 2026 Ebola outbreak are indexed by
+                    'COD':'https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/drc_health_zones.geojson',\
                     }
 
     _source_dict: ClassVar[dict] = {'FRA':{'Basics':_country_info_dict['FRA'],\
@@ -1207,6 +1210,8 @@ class GeoCountry:
                     'EUR':{'Basics':_country_info_dict['EUR']},\
                     'GRC':{'Basics':_country_info_dict['GRC']},\
                     'JPN':{'Basics':_country_info_dict['JPN']},\
+                    'COD':{'Basics':_country_info_dict['COD'],\
+                    'Population':'https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/worldpop__pop_count.csv'},\
                     }
 
     def __init__(self,country=None):
@@ -1219,7 +1224,7 @@ class GeoCountry:
                 'IND' for India, 'DEU' for Germany, 'ESP' for Spain, 'GBR' for the
                 United Kingdom, 'BEL' for Belgium, 'PRT' for Portugal, 'MYS' for
                 Malaysia, 'CHL' for Chile, 'EUR' for Europe, 'GRC' for Greece,
-                and 'JPN' for Japan.
+                'JPN' for Japan and 'COD' for the Democratic Republic of the Congo.
 
         Raises:
             PyvoaError: If the provided country code is not supported.
@@ -1668,6 +1673,35 @@ class GeoCountry:
             self._country_data = gpd.GeoDataFrame(df_final_japan)
             #code_subregion as to be str to be able to be merged ...
             self._country_data['code_subregion']=self._country_data['code_subregion'].astype(str)
+
+        # --- 'COD' case ---------------------------------------------------------------------------------------
+        elif self._country == 'COD':
+            # health zones ("zones de santé") of the Democratic Republic of the Congo.
+            # The geojson also carries all the epidemiological and contextual data of the
+            # source repository as nested properties, which are dropped here : only the
+            # geography is the business of this class.
+            self._country_data = gpd.read_file(get_local_from_url(url,0)) # this is a geojson file
+            self._country_data.rename(columns={\
+                'nom':'name_subregion',\
+                'zscode':'code_subregion',\
+                'province':'name_region',\
+                },
+                inplace=True)
+
+            # the geojson gives no code for the provinces, but they all are
+            # resolved by their ISO 3166-2:CD code through pycountry
+            cd_subdivisions={tostdstring(sub.name):sub.code \
+                    for sub in pc.subdivisions.get(country_code='CD')}
+            self._country_data['code_region']=[cd_subdivisions.get(tostdstring(p),p) \
+                    for p in self._country_data['name_region']]
+
+            self._country_data=self._country_data[['name_subregion','code_subregion',\
+                    'name_region','code_region','geometry']]
+
+            # WorldPop count, given for every health zone of the country
+            pop_cod=pd.read_csv(get_local_from_url(self._source_dict['COD']['Population'],0),\
+                    header=None,names=['name_subregion','population_subregion'])
+            self._country_data=self._country_data.merge(pop_cod,how='left',on='name_subregion')
 
     # def get_region_from_municipality(self,lname):
     #     """  Return region list from a municipality list
