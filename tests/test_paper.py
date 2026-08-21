@@ -266,11 +266,28 @@ def test_title_agrees_with_the_preferred_citation(body: str) -> None:
 
 
 def test_release_dois_are_the_project_ones(tex: str) -> None:
+    """A Zenodo DOI presented as a release of pyvoa must be one of ours.
+
+    Checked in the metadata block and in every bibliography entry that names
+    the project. A third-party deposit cited under its own entry — a mirrored
+    dataset, for instance — is somebody else's identifier and has no reason to
+    appear in our repository metadata.
+    """
     zenodo = (ROOT / ".zenodo.json").read_text(encoding="utf-8")
-    for doi in re.findall(r"10\.5281/zenodo\.(\d+)", tex):
-        assert doi in zenodo or doi in (ROOT / "CITATION.cff").read_text(
-            encoding="utf-8"
-        ), f"the paper cites Zenodo {doi}, which no repository metadata mentions"
+    citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+
+    head, _, bibliography = tex.partition(r"\begin{thebibliography}")
+    ours = [
+        block
+        for block in re.split(r"\\bibitem\{", bibliography)
+        if re.search(r"pyvoa", block, re.IGNORECASE)
+    ]
+
+    for doi in re.findall(r"10\.5281/zenodo\.(\d+)", head + "".join(ours)):
+        assert doi in zenodo or doi in citation, (
+            f"the paper presents Zenodo {doi} as a release of pyvoa, "
+            "which no repository metadata mentions"
+        )
 
 
 # ---------------------------------------------------------------------------

@@ -157,8 +157,8 @@ souhaité, il faut le décider maintenant et le répercuter dans \texttt{CITATIO
 \begin{abstract}
 pyvoa (Python Virus Open Analysis) is an open-source Python library giving
 unified access to 25 open epidemiological databases --- among them Our World in
-Data, Johns Hopkins University CSSE and Santé publique France --- through a
-single five-keyword query grammar. Each source is described declaratively by a
+Data and Johns Hopkins University CSSE for COVID-19, and mpox, measles and
+Ebola series --- through a single five-keyword query grammar. Each source is described declaratively by a
 JSON file and normalised into a common pandas or geopandas frame; a geolocation
 layer reconciles country, region and sub-region names across sources and
 supplies the geometries needed for mapping. Because the payloads are read from
@@ -365,7 +365,11 @@ pyvoa answers both problems with one design. Twenty-five databases are
 described declaratively, normalised into one schema, joined to a geolocation
 layer that resolves names and supplies geometries, and served from the project's
 own Zenodo deposits rather than from upstream URLs. A complete figure is two
-lines of Python.
+lines of Python. Nothing in that design is specific to COVID-19, and the
+catalogue has stopped being: mpox, the acute respiratory infections of the
+Réseau Sentinelles, United States measles cases~\cite{ahmadi2025} and the 2026
+Bundibugyo ebolavirus outbreak in the Democratic Republic of the
+Congo~\cite{bdbv2026} are described by the same JSON descriptors as the rest.
 
 \attnpar{Références remplacées. Le brouillon citait \texttt{ritchie2020} (page web OWID)
 et \texttt{covidcast} (site web Delphi) ; je les ai remplacés par les articles évalués
@@ -573,7 +577,7 @@ ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on
 \section{Illustrative examples}
 \label{sec:examples}
 
-The four examples below are drawn from the notebooks shipped with the package
+The five examples below are drawn from the notebooks shipped with the package
 and run in a plain Jupyter session after \texttt{pip install pyvoa-full}.
 
 \subsection*{Example 1 --- comparing countries}
@@ -645,7 +649,7 @@ COVID-19 vaccine dose, Asian countries, ranked.}
 \label{fig:hist}
 \end{figure}
 
-\subsection*{Example 4 --- sub-national data, and beyond COVID-19}
+\subsection*{Example 4 --- sub-national data}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')             # Sante publique France, departements
@@ -660,7 +664,9 @@ The same four keywords address a sub-national French source at
 \emph{départements} into the frame rather than dropping them
 (Fig.~\ref{fig:mortality}), and then a wastewater surveillance series, whose
 yearly overlay exposes the seasonal structure that a chronological axis hides.
-Neither call required knowing anything about the two providers' file formats.
+Neither call required knowing anything about the two providers' file formats:
+one publishes daily hospital counts by \emph{département}, the other a weekly
+concentration ratio measured at treatment plants.
 
 \begin{figure}[!h]
 \centering
@@ -673,11 +679,51 @@ overlay of the SARS-CoV-2 signal in French wastewater (SUM'EAU).}
 \label{fig:mortality}
 \end{figure}
 
+\subsection*{Example 5 --- beyond COVID-19}
+
+\begin{lstlisting}[style=python]
+pf.setwhom('measles-usa')     # JHU measles tracking team, US states
+pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
+
+pf.setwhom('ebolardc')        # INSP situation reports, DRC health zones
+pf.map(which='tot_confirmed', tile='positron')
+\end{lstlisting}
+
+The grammar does not change with the disease. The measles source publishes
+county-level increments rather than the cumulative national series the previous
+examples used~\cite{ahmadi2025}; its descriptor declares as much, and the
+counties of a state are summed and cumulated at parse time, so
+\texttt{tot\_cases} means the same thing here as in
+Example~1 (Fig.~\ref{fig:beyond}a). The Ebola source is finer still: the
+situation reports of the Institut National de Santé Publique are indexed by
+\emph{zone de santé}, a geography the geolocation layer resolves --- and whose
+provinces it maps to their ISO~3166-2 codes --- exactly as it does French
+\emph{départements} or United States
+states~\cite{bdbv2026} (Fig.~\ref{fig:beyond}b). Mpox and the Réseau
+Sentinelles series for acute respiratory infections are read on the same terms.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.49\textwidth]{figures/fig6a_measles_usa.png}\hfill
+\includegraphics[width=0.49\textwidth]{figures/fig6b_ebola_drc.png}\\
+\makebox[0.49\textwidth]{(a)}\hfill\makebox[0.49\textwidth]{(b)}
+\caption{Example 5. (a) Cumulative laboratory-confirmed measles cases in three
+United States states, summed by pyvoa from the county increments reported by the
+Johns Hopkins University Measles Tracking Team. (b) Confirmed cases of the 2026
+Bundibugyo ebolavirus outbreak by health zone of the Democratic Republic of the
+Congo, from the situation reports of the Institut National de Santé Publique.}
+\label{fig:beyond}
+\end{figure}
+
 \attnpar{Exemples entièrement réécrits --- le brouillon n'était pas exécutable.
 \textbf{(1)}~L'exemple~4 portait sur une base \texttt{insee} qui \emph{n'existe pas} dans
 \texttt{pyvoa/data/} (INSEE figurait dans PyCoA v2.20, mais pas dans le catalogue
-pyvoa~0.5.0). Remplacé par \texttt{spf} + \texttt{sumeau}, ce qui illustre en outre la
-sortie du cadre COVID. \textbf{(2)}~\texttt{typeofhist='byvalue'} a été renommé
+pyvoa~0.5.0). Remplacé par \texttt{spf} + \texttt{sumeau}. La sortie du cadre COVID, que
+l'exemple~4 revendiquait sans la montrer --- SPF comme SUM'EAU portent sur le
+SARS-CoV-2 ---, fait désormais l'objet de l'exemple~5 (\texttt{measles-usa} et
+\texttt{ebolardc}, figure~\ref{fig:beyond}), et le titre de l'exemple~4 a été
+corrigé en conséquence. Les deux figures de l'exemple~5 sont produites par
+\texttt{paper\_examples.py -{-}example 5}. \textbf{(2)}~\texttt{typeofhist='byvalue'} a été renommé
 \texttt{'value'} en 0.4.0 (cf.~\texttt{CHANGELOG.md}). Corrigé.
 \textbf{(3)}~\texttt{total\_people\_fully\_vaccinated\_per\_hundred} n'existe pas dans
 \texttt{owid.json} ; les colonnes disponibles sont
@@ -687,9 +733,9 @@ figure~\ref{fig:hist} ajustée en conséquence (« au moins une dose »).
 \textbf{(4)}~\texttt{option=['smooth7','sumall']} du brouillon combinait un lissage et
 une somme sur toutes les localisations, ce qui n'a pas de sens pour une superposition
 annuelle par pays. Simplifié. \\[2pt]
-\textbf{Il reste à exécuter les quatre exemples et à produire les figures.} Deux fichiers
+\textbf{Il reste à exécuter les cinq exemples et à produire les figures.} Deux fichiers
 sont fournis avec ce manuscrit : le notebook \texttt{PaperExamples.ipynb}, qui exécute
-les quatre listings dans l'ordre de l'article et dont chaque cellule de code est
+les cinq listings dans l'ordre de l'article et dont chaque cellule de code est
 identique caractère pour caractère au listing imprimé --- de sorte qu'un relecteur peut
 les comparer plutôt que les croire --- et le script \texttt{paper\_examples.py}, sa
 version sans interface graphique (\texttt{matplotlib.use('Agg')}), doté d'un mode
@@ -729,6 +775,9 @@ against the aggregator's rendering of it --- a comparison that surfaces
 reporting artefacts rather than assuming them away. Second, retrospective work
 on sources that have ceased. The JHU series used in Section~\ref{sec:examples}
 is no longer published; it is nonetheless fetched, by identifier, in one line.
+The reverse case is served by the same code: an outbreak still under way, such
+as the Ebola epidemic of Example~5, is read from the provider itself, the
+archive being consulted only when it holds the file.
 
 \textbf{Existing questions pursued better.} The gain is on reproducibility
 rather than on speed. An analysis written against pyvoa records which database,
@@ -825,9 +874,11 @@ frame is one call away, so the framework is a point of entry rather than a
 boundary.
 
 The pandemic's open data are now a historical record, and an increasingly
-fragile one. Work ahead follows from that: widening the catalogue to further
-respiratory and vector-borne diseases, deepening the sub-national geolocation
-layer, and continuing to mirror sources before they disappear. Contributions ---
+fragile one, while the diseases that followed produce their own. Work ahead
+follows from that: widening the catalogue beyond the mpox, measles, Ebola and
+acute respiratory infection series it already carries, deepening the
+sub-national geolocation layer, and continuing to mirror sources before they
+disappear. Contributions ---
 in particular new database descriptors --- are welcome through the
 repository~\cite{pyvoa_github}, which documents the procedure.
 
@@ -953,6 +1004,16 @@ Bokeh Development Team, Bokeh: Python library for interactive visualization,
 \bibitem{waskom2021}
 M.L.~Waskom, seaborn: statistical data visualization, J.\ Open Source Softw.\
 6~(60) (2021) 3021. \url{https://doi.org/10.21105/joss.03021}.
+
+\bibitem{ahmadi2025}
+F.~Ahmadi, E.~Dong, L.~Gardner, Tracking county-level measles cases in the US,
+JAMA 334~(23) (2025) 2130--2132.
+\url{https://doi.org/10.1001/jama.2025.17812}.
+
+\bibitem{bdbv2026}
+C.~Judge, B.~Gutierrez, L.H.~Tsui, M.U.G.~Kraemer, et~al., INRB-UMIE/BDBV2026-Data:
+data for the 2026 Bundibugyo ebolavirus outbreak, Zenodo (2026).
+\url{https://doi.org/10.5281/zenodo.21223302}.
 
 \bibitem{modcov19}
 T.~Beau, J.~Browaeys, O.~Dadoun, PyCoa: Python Covid Analysis, MODCOV19

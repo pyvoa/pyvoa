@@ -152,11 +152,11 @@ def example_3(pf, vis: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Example 4 — sub-national data, and beyond COVID-19 (SPF, SUM'EAU)
+# Example 4 — sub-national data (SPF, SUM'EAU)
 # ---------------------------------------------------------------------------
 
 def example_4(pf, vis: str) -> None:
-    banner(4, "sub-national data, and beyond COVID-19", f"""
+    banner(4, "sub-national data", f"""
         pf.setwhom('spf')             # Sante publique France, departements
         pf.map(which='cur_hosp', typeofmap='dense', tile='{TILE}')
 
@@ -175,13 +175,38 @@ def example_4(pf, vis: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Example 5 — the geolocation layer on its own (Section 2.1 / Impact)
+# Example 5 — beyond COVID-19 (measles in the US, Ebola in the DR Congo)
 # ---------------------------------------------------------------------------
 
 def example_5(pf, vis: str) -> None:
+    banner(5, "beyond COVID-19", f"""
+        pf.setwhom('measles-usa')     # JHU measles tracking team, US states
+        pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
+
+        pf.setwhom('ebolardc')        # INSP situation reports, DRC health zones
+        pf.map(which='tot_confirmed', tile='{TILE}')
+    """)
+    pf.setvis(vis)
+
+    # county-level increments upstream: the descriptor sums the counties of a
+    # state and cumulates them, so tot_cases is a cumulative count here too
+    pf.setwhom('measles-usa')
+    pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
+    save(pf, "fig6a_measles_usa.png")
+
+    pf.setwhom('ebolardc')
+    pf.map(which='tot_confirmed', tile=TILE)
+    save(pf, "fig6b_ebola_drc.png")
+
+
+# ---------------------------------------------------------------------------
+# Example 6 — the geolocation layer on its own (Section 2.1 / Impact)
+# ---------------------------------------------------------------------------
+
+def example_6(pf, vis: str) -> None:
     """Not a manuscript listing: supports the claim that pyvoa.geo is usable
     outside epidemiology, made in Sections 2.1 and 4."""
-    banner(5, "the geolocation layer on its own (not a listing)", """
+    banner(6, "the geolocation layer on its own (not a listing)", """
         import pyvoa.geo as pg
         gm = pg.GeoManager('name')
         gm.to_standard(['fr', 'US', 'china', "cote d'ivoire"], output='list')
@@ -211,11 +236,11 @@ def example_5(pf, vis: str) -> None:
 # Impact §4, point 1 — a question that needs the multi-source reconciliation
 # ---------------------------------------------------------------------------
 
-def example_6(pf, vis: str) -> None:
+def example_7(pf, vis: str) -> None:
     """Wastewater signal against reported incidence, same country, same axis.
     This is the concrete illustration suggested for Impact, point 1: two
     unrelated providers, one query grammar, one geographic key."""
-    banner(6, "wastewater vs reported incidence (Impact, point 1)", """
+    banner(7, "wastewater vs reported incidence (Impact, point 1)", """
         pf.setwhom('sumeau')
         waste = pf.get(which='ratio', what='current', output='pandas')
 
@@ -261,7 +286,8 @@ def check(pf, vis: str = 'matplotlib') -> int:
 
     print("\n== vocabulary check ==")
     whom = set(pf.listwhom())
-    for db in ('owid', 'jhu', 'spf', 'spfnational', 'sumeau'):
+    for db in ('owid', 'jhu', 'spf', 'spfnational', 'sumeau',
+               'measles-usa', 'ebolardc'):
         want("database", db, whom)
 
     want("what", 'daily', set(pf.listwhat()))
@@ -283,7 +309,9 @@ def check(pf, vis: str = 'matplotlib') -> int:
                            ('jhu', ('tot_confirmed',)),
                            ('spf', ('cur_hosp',)),
                            ('spfnational', ('cur_cas',)),
-                           ('sumeau', ('ratio',))):
+                           ('sumeau', ('ratio',)),
+                           ('measles-usa', ('tot_cases',)),
+                           ('ebolardc', ('tot_confirmed',))):
         try:
             pf.setwhom(db, reload=False)
             available = set(pf.listwhich())
@@ -314,6 +342,7 @@ EXAMPLES = {
     4: example_4,
     5: example_5,
     6: example_6,
+    7: example_7,
 }
 
 
