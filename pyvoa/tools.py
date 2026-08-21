@@ -410,11 +410,19 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     try:
         #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
+        urlfile = None
         if not _live_mode and 'zenodo.org' not in url:
+            archived='https://zenodo.org/api/records/18784098/files/'+local_base_filename+'/content'
             verb('Instead of using original URL '+url)
-            url='https://zenodo.org/api/records/18784098/files/'+local_base_filename+'/content'
-            verb('using zenodo archived file '+url)
-        urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
+            verb('using zenodo archived file '+archived)
+            urlfile = requests.get(archived, allow_redirects=True,headers=headers)
+            if not urlfile.ok or len(urlfile.content) < 1000:
+                # nothing archived under that name, as for a database added
+                # after the last archive was published : take the original one
+                verb('No archived version of '+url+' . Using the original source.')
+                urlfile = None
+        if urlfile is None:
+            urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
         with open(local_filename,'wb') as fp:
             fp.write(urlfile.content)
         verb('Download content of '+url+' . Locally stored as cached data in '+local_filename)
