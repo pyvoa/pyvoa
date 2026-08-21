@@ -1,0 +1,61 @@
+{
+  "header": "Laboratory-confirmed measles cases in the United States, by state, from the Johns Hopkins University Measles Tracking Team. The upstream counts are county-level increments reported on the day of the update, see https://github.com/CSSEGISandData/measles_data",
+  "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "USA",
+    "locationmode": "name"
+  },
+  "datasets": [
+    {
+      "urldata": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
+      "urlparent": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
+      "urlmaster": "https://github.com/CSSEGISandData/measles_data",
+      "separator": ",",
+      "splitwhere": {
+        "separator": ",",
+        "keep": -1
+      },
+      "columns": [
+        {
+          "name": "where",
+          "alias": "location_name"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_cases",
+          "alias": "value",
+          "description": "Cumulative number of laboratory-confirmed measles cases, summed by pyvoa from the increments reported by the counties of the state",
+          "fillmissing": true,
+          "cumulative": true
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
+      "urlparent": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
+      "urlmaster": "https://github.com/CSSEGISandData/measles_data",
+      "separator": ",",
+      "splitwhere": {
+        "separator": ",",
+        "keep": -1
+      },
+      "columns": [
+        {
+          "name": "where",
+          "alias": "location_name"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "cur_cases",
+          "alias": "value",
+          "description": "Number of laboratory-confirmed measles cases reported by the counties of the state on that day",
+          "fillmissing": true
+        }
+      ]
+    }
+  ]
+}
