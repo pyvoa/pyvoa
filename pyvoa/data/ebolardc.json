@@ -1,0 +1,278 @@
+{
+  "header": "Bundibugyo ebolavirus outbreak 2026 in the Democratic Republic of the Congo, by health zone, from the INSP situation reports collated by INRB/UMIE. Preliminary data, see https://github.com/INRB-UMIE/BDBV2026-Data",
+  "geoinfo": {
+    "granularity": "subregion",
+    "iso3": "COD",
+    "locationmode": "name"
+  },
+  "replace": {
+    "Gethy": "Gety",
+    "Makiso-Kisangani": "Makiso Kisangani",
+    "Miti-Murhesa": "Miti Murhesa",
+    "Nia-Nia": "Nia Nia",
+    "Lubunga": "Lubunga (Tshopo)"
+  },
+  "datasets": [
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "tot_confirmed"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_confirmed",
+          "description": "Cumulative number of confirmed Bundibugyo ebolavirus cases, as transcribed from the INSP situation reports"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "tot_deaths"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_deaths",
+          "description": "Cumulative number of deaths among confirmed cases"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "tot_suspected_cases"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_suspected_cases",
+          "description": "Cumulative number of suspected cases"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "tot_suspected_deaths"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_suspected_deaths",
+          "description": "Cumulative number of deaths among suspected cases"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "tot_contacts_traced"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_contacts_traced",
+          "description": "Cumulative number of contacts traced"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "cur_confirmed"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "cur_confirmed",
+          "description": "Number of confirmed cases reported on that day"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "cur_suspected_cases"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "cur_suspected_cases",
+          "description": "Number of suspected cases reported on that day"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "cur_suspected_deaths"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "cur_suspected_deaths",
+          "description": "Number of deaths among suspected cases reported on that day"
+        }
+      ]
+    },
+    {
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
+      "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
+      "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
+      "separator": ",",
+      "names": [
+        "where",
+        "date",
+        "cur_hospitalised"
+      ],
+      "na_values": [
+        "ND",
+        "NA",
+        "17-",
+        "1]"
+      ],
+      "columns": [
+        {
+          "name": "where"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "cur_hospitalised",
+          "description": "Number of patients hospitalised in an Ebola treatment centre on that day"
+        }
+      ]
+    }
+  ]
+}
