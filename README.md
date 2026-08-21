@@ -79,7 +79,7 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 
 ## Supported databases
 
-23 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+24 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
 `pf.setwhom(key)` selects one. Each is described by a JSON file in
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
@@ -92,6 +92,7 @@ stays reproducible after its original provider stops publishing.
 | `covidtracking` | United States | subregion (states) | The COVID Tracking Project |
 | `dgs` | Portugal | region | Direção-Geral da Saúde |
 | `dpc` | Italy | region | Dipartimento della Protezione Civile |
+| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE |
 | `escovid19data` | Spain | subregion (provinces) | escovid19data |
 | `europa` | worldwide | country | European Commission, Joint Research Centre |
 | `govcy` | Cyprus | country | Government of Cyprus |
@@ -112,8 +113,9 @@ stays reproducible after its original provider stops publishing.
 | `spfnational` | France | country | Santé publique France |
 | `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater |
 
-Most of these are COVID-19 series; `mpoxgh` covers mpox and `sentinellesIRA`
-acute respiratory infections. Upstream providers stopped updating several of
+Most of these are COVID-19 series; `mpoxgh` covers mpox, `sentinellesIRA`
+acute respiratory infections and `ebolardc` the 2026 Bundibugyo ebolavirus
+outbreak in the Democratic Republic of the Congo. Upstream providers stopped updating several of
 these datasets after the pandemic, so the last available date varies from one
 database to the next — `setwhom()` prints it.
 

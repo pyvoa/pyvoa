@@ -118,6 +118,20 @@ def test_geocountry_france_knows_its_departments():
     assert country.is_subregion("Ain") or country.is_subregion("01")
 
 
+def test_geocountry_drc_maps_its_health_zones():
+    """COD is the geography the DRC Ebola sitreps are indexed by."""
+    country = geo.GeoCountry("COD")
+    data = country.get_data()
+    # 519 health zones grouped in the 26 provinces of the country
+    assert len(data) == 519
+    assert len(country.get_region_list()) == 26
+    assert country.is_subregion("bunia") == "Bunia"
+    # every province is resolved to its ISO 3166-2:CD code
+    assert data["code_region"].str.startswith("CD-").all()
+    # WorldPop count, of the order of the population of the country
+    assert 80e6 < data["population_subregion"].sum() < 140e6
+
+
 # --------------------------------------------------------------------------
 # GeoInfo
 # --------------------------------------------------------------------------
@@ -134,7 +148,7 @@ def test_geoinfo_adds_a_population_column():
 # database parsers, end to end
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("database", ["spfnational", "owid"])
+@pytest.mark.parametrize("database", ["spfnational", "owid", "ebolardc"])
 def test_dataparser_builds_a_usable_frame(database):
     parser = DataParser(database)
     frame = parser.get_maingeopandas()
@@ -143,3 +157,21 @@ def test_dataparser_builds_a_usable_frame(database):
     assert isinstance(frame["date"].iloc[0], datetime.date)
     assert parser.get_locations()
     assert parser.get_available_keywords()
+
+
+def test_ebolardc_matches_the_upstream_sitreps():
+    """The health-zone series must carry the values of the source csv."""
+    from pyvoa.tools import set_live_mode
+
+    set_live_mode(True)
+    try:
+        frame = DataParser("ebolardc").get_maingeopandas()
+    finally:
+        set_live_mode(False)
+
+    assert {"tot_confirmed", "tot_deaths"} <= set(frame.columns)
+    # the outbreak started in Ituri, and Bunia is its main health zone
+    bunia = frame.loc[frame["where"] == "Bunia", "tot_confirmed"].dropna()
+    assert not bunia.empty
+    assert bunia.is_monotonic_increasing  # a cumulative count never decreases
+    assert bunia.iloc[-1] > 1000

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from 23 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
+PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from 24 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
 
 ## Development Commands
 
@@ -66,7 +66,7 @@ Dead assignments are commented out rather than deleted, so the original intent s
 
 ### Database configuration
 
-Each supported database is described by a JSON file in `pyvoa/data/`. These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
+Each supported database is described by a JSON file in `pyvoa/data/`. These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Two dataset keys are easy to confuse: `names` declares the columns of a CSV shipped **without** a header line (`ebolardc`), while `namedata` marks a *wide* file whose columns are dates and triggers a melt to long form (`jhu`, `jpnmhlw`) — a file that is already long must not carry it. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
 
 ### Caching
 
@@ -92,6 +92,8 @@ The user-facing switch is `front.setlive(live=True)` / `front.getlive()`, export
 - `urlparent` — the live data *file* upstream, used in live mode. All 41 datasets carry one, and `tests/test_jsondb_parser.py::test_every_shipped_dataset_declares_a_live_source` keeps it that way.
 - `urlmaster` — the human-readable page of the provider (a GitHub repo, a data.gouv.fr dataset page). Optional, purely informative, never fetched.
 
+A database added after the last archive run has no Zenodo copy at all (`ebolardc` is the first). `get_local_from_url()` handles that by itself: if the mirror answers with an error or with less than 1000 characters, it falls back to the original URL, so a new database works in both modes without a Zenodo deposit.
+
 `spf.json` and `sumeau.json` used to hold the opposite convention (live file in `urlmaster`, landing page in `urlparent`); they were swapped to match `sentinellesIRA.json` and the rest. A dataset with no `urlparent` still falls back to `urldata` with a `PyvoaWarning`, but none is in that case today.
 
 **Four databases are dead upstream** and therefore only work from the archive, whatever `urlparent` says: `phe` (all five datasets — `api.coronavirus.data.gov.uk` no longer resolves; UKHSA moved to `api.ukhsa-dashboard.data.gov.uk`, whose API is not a drop-in replacement), `minciencia` (404), and `moh` datasets #1 and #3 (the upstream repo renamed the files to `epidemic/deaths_state.csv` and `vaccination/vax_state.csv`, whose columns still need checking against the JSON). Their `urlparent` values are the historical ones and have deliberately not been touched.
@@ -99,6 +101,12 @@ The user-facing switch is `front.setlive(live=True)` / `front.getlive()`, export
 ### Geographic normalization
 
 All location names are normalized through `tostdstring()` (a module-level function in `tools.py`, not a `GeoManager` method), which strips accents via `unidecode`, collapses whitespace and hyphens, and upper-cases. Country names, ISO3 codes, regions, and subregions are all supported. Mappings use `pycountry` and `pycountry_convert`.
+
+### Country geographies (`GeoCountry`)
+
+`_country_info_dict` maps an ISO3 code to one geometry file, `_source_dict` adds the auxiliary sources, and one `elif self._country == 'XXX':` branch in `__init__` normalises whatever that file ships into `name_subregion` / `code_subregion` / `name_region` / `code_region` / `geometry` (plus optional `population_subregion`, `flag_subregion`, …). Everything downstream — `get_subregion_list()`, the region dissolve in `get_data(True)`, `jsondb_parser` — only ever sees those normalised names.
+
+`COD` (Democratic Republic of the Congo) is the geography of the Ebola database: 519 health zones (*zones de santé*) from the INRB/UMIE build, grouped in the 26 provinces. The provinces carry no code upstream, so they are resolved to their ISO 3166-2:CD code through `pycountry` keyed on `tostdstring(name)` — all 26 match. Population comes from the WorldPop count shipped by the same repository. The geojson also embeds the whole epidemiological payload as nested properties; the branch keeps the geographic columns only.
 
 ### Error handling
 
