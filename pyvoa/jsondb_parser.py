@@ -287,6 +287,10 @@ class DataParser:
           na_values = ''
           if 'na_values' in list(datasets.keys()):
               na_values = datasets['na_values']
+          names = None
+          if 'names' in list(datasets.keys()):
+              # csv shipped without any header line, the json gives the columns
+              names = datasets['names']
           drop = {}
           if 'drop' in list(datasets.keys()):
               drop=datasets['drop']
@@ -317,7 +321,9 @@ class DataParser:
                           cast={thewhere[0]:'str'}
               pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
               #pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
-                            keep_default_na = False, na_values = na_values , header=0, dtype = cast, decimal = decimal,
+                            keep_default_na = False, na_values = na_values ,
+                            header = 0 if names is None else None, names = names,
+                            dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
               if pdata.empty:
                  pdata = pdatatemp.copy()

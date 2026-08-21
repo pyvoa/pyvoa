@@ -1,0 +1,39 @@
+{
+  "header": "A minimal but valid pyvoa database description whose csv has no header line, used by the tests",
+  "geoinfo": {
+    "granularity": "country",
+    "iso3": "FRA",
+    "locationmode": "code"
+  },
+  "datasets": [
+    {
+      "urldata": "https://example.org/frozen/tiny_headerless.csv",
+      "separator": ",",
+      "columns": [
+        {
+          "name": "date"
+        },
+        {
+          "name": "where",
+          "alias": "location"
+        },
+        {
+          "name": "tot_cases",
+          "alias": "cases",
+          "description": "Cumulative number of confirmed cases"
+        },
+        {
+          "name": "tot_deaths",
+          "alias": "deaths"
+        }
+      ],
+      "urlparent": "https://example.org/live/tiny_headerless.csv",
+      "names": [
+        "date",
+        "location",
+        "cases",
+        "deaths"
+      ]
+    }
+  ]
+}
