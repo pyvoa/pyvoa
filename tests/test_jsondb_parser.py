@@ -377,6 +377,29 @@ def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
     assert "good_db" in warnings[0]
 
 
+def test_dataparser_reads_a_csv_without_a_header_line(monkeypatch):
+    """The 'names' key names the columns of a headerless csv, as the DRC
+    Ebola long files are shipped."""
+    with open(DATA / "headerless_db.json") as handle:
+        metadata = json.load(handle)
+
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(
+        jsondb_parser, "get_local_from_url",
+        lambda url, *args, **kwargs: str(DATA / "tiny_headerless.csv"),
+    )
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+
+    frame = jsondb_parser.DataParser("headerless_db").get_maingeopandas()
+    # the three rows are data, none of them was eaten as a header
+    assert len(frame) == 3
+    assert {"date", "where", "tot_cases", "tot_deaths"} <= set(frame.columns)
+    assert sorted(frame.tot_cases) == [100, 150, 210]
+
+
 def test_dataparser_exposes_the_description(offline_parser):
     assert "minimal" in offline_parser.get_dbdescription()
 

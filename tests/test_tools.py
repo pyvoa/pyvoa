@@ -512,8 +512,9 @@ def test_readpkl_reports_a_corrupted_file(cache_dir):
 
 
 class _FakeResponse:
-    def __init__(self, content):
+    def __init__(self, content, ok=True):
         self.content = content
+        self.ok = ok
 
 
 def test_get_local_from_url_downloads_and_caches(cache_dir, monkeypatch):
@@ -638,6 +639,41 @@ def test_get_local_from_url_caches_the_two_modes_apart(cache_dir, monkeypatch):
     tools.set_live_mode(True)
     live = tools.get_local_from_url("https://upstream.example.org/data.csv")
     assert archived != live
+
+
+def test_get_local_from_url_falls_back_when_nothing_is_archived(cache_dir, monkeypatch):
+    """A database added after the last archive run has no zenodo copy."""
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append(url)
+        if "zenodo.org" in url:
+            return _FakeResponse(b"404: Not Found", ok=False)
+        return _FakeResponse(b"live payload" + b"x" * 2000)
+
+    monkeypatch.setattr(tools.requests, "get", fake_get)
+
+    path = tools.get_local_from_url("https://example.org/brand-new.csv")
+    assert len(calls) == 2
+    assert calls[0].startswith("https://zenodo.org/api/records/")
+    assert calls[1] == "https://example.org/brand-new.csv"
+    with open(path, "rb") as handle:
+        assert handle.read().startswith(b"live payload")
+
+
+def test_get_local_from_url_falls_back_on_a_too_small_archive(cache_dir, monkeypatch):
+    """An archived answer below the threshold is an error page, not data."""
+    calls = []
+
+    def fake_get(url, **kwargs):
+        calls.append(url)
+        if "zenodo.org" in url:
+            return _FakeResponse(b"{}")  # ok, but far too short to be data
+        return _FakeResponse(b"y" * 2000)
+
+    monkeypatch.setattr(tools.requests, "get", fake_get)
+    tools.get_local_from_url("https://example.org/tiny-archive.csv")
+    assert len(calls) == 2
 
 
 def test_get_local_from_url_reports_a_connection_failure(cache_dir, monkeypatch):
