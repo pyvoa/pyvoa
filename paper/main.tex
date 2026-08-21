@@ -156,7 +156,7 @@ souhaité, il faut le décider maintenant et le répercuter dans \texttt{CITATIO
 
 \begin{abstract}
 pyvoa (Python Virus Open Analysis) is an open-source Python library giving
-unified access to 24 open epidemiological databases --- among them Our World in
+unified access to 25 open epidemiological databases --- among them Our World in
 Data, Johns Hopkins University CSSE and Santé publique France --- through a
 single five-keyword query grammar. Each source is described declaratively by a
 JSON file and normalised into a common pandas or geopandas frame; a geolocation
@@ -169,7 +169,7 @@ are produced in two lines of code.
 
 \attnpar{Résumé. 112 mots, contre $\sim$100 demandés par le \emph{template} v4 ; c'est
 acceptable mais ne pas l'allonger. Il compte dans la limite globale de 3000 mots.
-Vérifier le nombre de bases (24) au moment de la soumission : le décompte doit être
+Vérifier le nombre de bases (25) au moment de la soumission : le décompte doit être
 celui du tableau de \texttt{README.md}, seule source de vérité selon \texttt{HANDOFF.md}.}
 
 \begin{keyword}
@@ -351,7 +351,7 @@ COVID19Py~\cite{covid19py}                  & Python & 1   & --         & --    
 COVIDcast~\cite{reinhart2021}               & Py/R   & 10+ & US only    & \checkmark & -- \\
 \texttt{covid19.analytics}~\cite{ponce2020} & R      & 2   & --         & \checkmark & -- \\
 Dash~\cite{dash}                            & Python & --  & --         & \checkmark & -- \\
-\textbf{pyvoa}                              & Python & 24  & \checkmark & \checkmark & Zenodo \\
+\textbf{pyvoa}                              & Python & 25  & \checkmark & \checkmark & Zenodo \\
 \bottomrule
 \end{tabular}
 \caption{pyvoa and comparable tools. ``Sources'': databases exposed through one
@@ -361,7 +361,7 @@ archive with a persistent identifier rather than from the upstream URL.}
 \label{tab:comparison}
 \end{table}
 
-pyvoa answers both problems with one design. Twenty-four databases are
+pyvoa answers both problems with one design. Twenty-five databases are
 described declaratively, normalised into one schema, joined to a geolocation
 layer that resolves names and supplies geometries, and served from the project's
 own Zenodo deposits rather than from upstream URLs. A complete figure is two
@@ -541,7 +541,7 @@ COVID-specific vocabulary was removed from the code base and the project became
 about one virus.
 
 Version 0.5.0 (August 2026) is the first release prepared for external scrutiny.
-The catalogue grew from 12 to 24 databases; payloads moved to the Zenodo
+The catalogue grew from 12 to 25 databases; payloads moved to the Zenodo
 mirrors; packaging moved to PEP~621; an offline test suite was added, in which
 any test needing an upstream server must be marked and is deselected by default,
 so that a test cannot silently start depending on the network; and continuous
@@ -721,7 +721,7 @@ premier.}
 \label{sec:impact}
 
 \textbf{Questions that become tractable.} Two kinds. First, cross-source
-comparison. Because twenty-four databases share one schema and one geographic
+comparison. Because twenty-five databases share one schema and one geographic
 key, a sub-national national source and an international country-level source
 can be put side by side without writing a join: the French wastewater signal and
 the reported incidence over the same territory, or a country's own agency series
@@ -816,7 +816,7 @@ d'exemples fourni contient la requête correspondante.}
 \section{Conclusions}
 \label{sec:conclusions}
 
-pyvoa gives one Python interface to twenty-four open epidemiological databases.
+pyvoa gives one Python interface to twenty-five open epidemiological databases.
 Sources are described declaratively rather than coded, normalised into a common
 frame, reconciled geographically by a layer that is useful in its own right, and
 served from archived copies with persistent identifiers rather than from

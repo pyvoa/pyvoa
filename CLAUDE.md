@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from 24 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
+PyVOA (Python Virus Open Analysis) is a Python library for accessing, standardizing, and visualizing COVID-19 and other viral epidemiological datasets from 25 databases (JHU, OWID, PHE, RKI, DPC, etc.). It targets non-specialist audiences (students, journalists, researchers).
 
 ## Development Commands
 
@@ -66,7 +66,9 @@ Dead assignments are commented out rather than deleted, so the original intent s
 
 ### Database configuration
 
-Each supported database is described by a JSON file in `pyvoa/data/`. These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Two dataset keys are easy to confuse: `names` declares the columns of a CSV shipped **without** a header line (`ebolardc`), while `namedata` marks a *wide* file whose columns are dates and triggers a melt to long form (`jhu`, `jpnmhlw`) — a file that is already long must not carry it. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
+Each supported database is described by a JSON file in `pyvoa/data/`. These files specify: data URLs, column definitions with aliases, granularity (country/region/subregion), and parsing rules. Two dataset keys are easy to confuse: `names` declares the columns of a CSV shipped **without** a header line (`ebolardc`), while `namedata` marks a *wide* file whose columns are dates and triggers a melt to long form (`jhu`, `jpnmhlw`) — a file that is already long must not carry it. `splitwhere` (`{"separator": ",", "keep": -1}`) cuts a composite location such as `"Gaines, Texas"` down to the part the database is indexed by; the parser then sums the rows that collapse onto the same `(date, where)`, which is how `measles-usa` and `jhu-usa` aggregate counties into states.
+
+Two column keys handle sources that report *increments* rather than totals, as `measles-usa` does. `cumulative: true` runs a `cumsum()` per location at parse time, since pyvoa's `what` has no cumulating step and every `tot_*` series is expected to be cumulative already. That sum stops at the first missing day, so a sparse source must also carry `fillmissing: true`, which turns the days `fill_missing_dates()` inserted into zeros first. Both are opt-in per column: the six databases that used `cumulative` before are dense and unaffected. Adding a new database means adding a JSON file and no Python changes in most cases. `CONTRIBUTING.md` §6 has the checklist for new-database PRs (open licence, stable URL, ISO 3166-resolvable geography, documented caveats).
 
 ### Caching
 

@@ -79,7 +79,7 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 
 ## Supported databases
 
-24 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+25 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
 `pf.setwhom(key)` selects one. Each is described by a JSON file in
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
@@ -100,6 +100,7 @@ stays reproducible after its original provider stops publishing.
 | `jhu` | worldwide | country | Johns Hopkins University CSSE |
 | `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE |
 | `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare |
+| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team |
 | `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación |
 | `moh` | Malaysia | subregion (states) | Ministry of Health |
 | `mpoxgh` | worldwide | country | Global.health, via Our World in Data |
@@ -114,8 +115,9 @@ stays reproducible after its original provider stops publishing.
 | `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater |
 
 Most of these are COVID-19 series; `mpoxgh` covers mpox, `sentinellesIRA`
-acute respiratory infections and `ebolardc` the 2026 Bundibugyo ebolavirus
-outbreak in the Democratic Republic of the Congo. Upstream providers stopped updating several of
+acute respiratory infections, `ebolardc` the 2026 Bundibugyo ebolavirus
+outbreak in the Democratic Republic of the Congo and `measles-usa` the U.S.
+measles cases. Upstream providers stopped updating several of
 these datasets after the pandemic, so the last available date varies from one
 database to the next — `setwhom()` prints it.
 

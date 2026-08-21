@@ -148,7 +148,7 @@ def test_geoinfo_adds_a_population_column():
 # database parsers, end to end
 # --------------------------------------------------------------------------
 
-@pytest.mark.parametrize("database", ["spfnational", "owid", "ebolardc"])
+@pytest.mark.parametrize("database", ["spfnational", "owid", "ebolardc", "measles-usa"])
 def test_dataparser_builds_a_usable_frame(database):
     parser = DataParser(database)
     frame = parser.get_maingeopandas()
@@ -175,3 +175,28 @@ def test_ebolardc_matches_the_upstream_sitreps():
     assert not bunia.empty
     assert bunia.is_monotonic_increasing  # a cumulative count never decreases
     assert bunia.iloc[-1] > 1000
+
+
+def test_measles_usa_cumulates_the_reported_increments():
+    """Upstream gives county increments; pyvoa must expose state totals."""
+    import pandas as pd
+
+    from pyvoa.tools import get_local_from_url, set_live_mode
+
+    set_live_mode(True)
+    try:
+        frame = DataParser("measles-usa").get_maingeopandas()
+        source = pd.read_csv(get_local_from_url(
+            "https://raw.githubusercontent.com/CSSEGISandData/measles_data/"
+            "main/measles_county_all_updates.csv"))
+    finally:
+        set_live_mode(False)
+
+    last = frame.loc[frame["date"] == frame["date"].max()]
+    # no state may be left out of the last date, or a map would show holes
+    assert last["tot_cases"].notna().all()
+    # every case reported upstream, and no more, ends up in the total
+    assert last["tot_cases"].sum() == source["value"].sum()
+
+    texas = frame.loc[frame["where"] == "Texas"].sort_values("date")["tot_cases"]
+    assert texas.is_monotonic_increasing
