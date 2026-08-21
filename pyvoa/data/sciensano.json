@@ -31,7 +31,8 @@
 	},
 	  	{	
 	 "urldata": "https://zenodo.org/records/18790064/files/sciensano_COVID19BE_HOSP.csv?content",
-	 "urlparent":"https://epistat.sciensano.be/covid/",
+	 "urlparent":"https://epistat.sciensano.be/Data/COVID19BE_HOSP.csv",
+	 "urlmaster":"https://epistat.sciensano.be/covid/",
 	 "na_values":"NA",
 	 "cast":{
 				"TOTAL_IN":"float64",

@@ -72,6 +72,30 @@ Each supported database is described by a JSON file in `pyvoa/data/`. These file
 
 Downloaded files are cached under `~/.cache/pyvoa.data_<username>/`. Files smaller than 1000 characters are considered corrupt/empty and re-downloaded. Cache invalidation is CRC32-based (in `tools.py`).
 
+### Data source mode: archive vs live
+
+`get_local_from_url()` in `tools.py` serves **every** download — database payloads *and* the ~20 reference pages `geo.py` scrapes — from a frozen Zenodo record by default: any non-Zenodo url is rewritten to `https://zenodo.org/api/records/18784098/files/<netloc>_<crc32>/content`, and the caller's `expiration_time` is forced to 0 so an archived file is fetched once and never again. That is what makes a given release reproducible.
+
+The global `_live_mode` (`get_live_mode()` / `set_live_mode()` in `tools.py`, same shape as `_verbose_mode`) turns that off. When it is on:
+
+- the Zenodo rewrite is skipped, so the original url is fetched;
+- the caller's `expiration_time` is honoured again (`jsondb_parser` passes 10000 s);
+- `jsondb_parser.get_parsing()` reads `datasets['urlparent']` — the upstream source declared in the JSON description — instead of `datasets['urldata']`, which is the Zenodo mirror.
+
+The cache filename is `netloc + crc32(url)`, so the archived and the live copy of the same dataset land in different files and switching mode cannot corrupt either.
+
+The user-facing switch is `front.setlive(live=True)` / `front.getlive()`, exported at module level like everything else on the singleton (`pv.setlive(True)`). Changing the mode resets `self.db = ''`, because `setwhom()` early-returns when the requested database is already the current one and would otherwise keep serving the frame parsed from the other source.
+
+**URL fields in the JSON descriptions.** Three keys, with one meaning each:
+
+- `urldata` — what is actually downloaded by default: the Zenodo mirror. Mandatory (`checkmetadatastructure`).
+- `urlparent` — the live data *file* upstream, used in live mode. All 41 datasets carry one, and `tests/test_jsondb_parser.py::test_every_shipped_dataset_declares_a_live_source` keeps it that way.
+- `urlmaster` — the human-readable page of the provider (a GitHub repo, a data.gouv.fr dataset page). Optional, purely informative, never fetched.
+
+`spf.json` and `sumeau.json` used to hold the opposite convention (live file in `urlmaster`, landing page in `urlparent`); they were swapped to match `sentinellesIRA.json` and the rest. A dataset with no `urlparent` still falls back to `urldata` with a `PyvoaWarning`, but none is in that case today.
+
+**Four databases are dead upstream** and therefore only work from the archive, whatever `urlparent` says: `phe` (all five datasets — `api.coronavirus.data.gov.uk` no longer resolves; UKHSA moved to `api.ukhsa-dashboard.data.gov.uk`, whose API is not a drop-in replacement), `minciencia` (404), and `moh` datasets #1 and #3 (the upstream repo renamed the files to `epidemic/deaths_state.csv` and `vaccination/vax_state.csv`, whose columns still need checking against the JSON). Their `urlparent` values are the historical ones and have deliberately not been touched.
+
 ### Geographic normalization
 
 All location names are normalized through `tostdstring()` (a module-level function in `tools.py`, not a `GeoManager` method), which strips accents via `unidecode`, collapses whitespace and hyphens, and upper-cases. Country names, ISO3 codes, regions, and subregions are all supported. Mappings use `pycountry` and `pycountry_convert`.

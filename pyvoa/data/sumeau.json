@@ -11,8 +11,8 @@
   "datasets": [
   	{	
 	 "urldata":"https://zenodo.org/records/18790381/files/sumeau-indicateurs.csv?content",
-	 "urlmaster":"https://www.data.gouv.fr/fr/datasets/r/2963ccb5-344d-4978-bdd3-08aaf9efe514",
-	 "urlparent":"https://www.data.gouv.fr/fr/datasets/surveillance-du-sars-cov-2-dans-les-eaux-usees-sumeau",
+	 "urlparent":"https://www.data.gouv.fr/fr/datasets/r/2963ccb5-344d-4978-bdd3-08aaf9efe514",
+	 "urlmaster":"https://www.data.gouv.fr/fr/datasets/surveillance-du-sars-cov-2-dans-les-eaux-usees-sumeau",
 	 "decimal":",",
   	"columns": [
     		{
