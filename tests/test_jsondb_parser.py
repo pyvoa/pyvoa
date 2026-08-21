@@ -14,7 +14,7 @@ from typing import ClassVar
 import pytest
 import shapely.geometry as sg
 
-from pyvoa import jsondb_parser
+from pyvoa import jsondb_parser, tools
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.tools import PyvoaError
 
@@ -95,6 +95,22 @@ def test_every_shipped_database_description_is_valid():
     assert invalid.empty, "invalid database descriptions: " + ", ".join(
         f"{row['name']} ({row.parsingjson})" for _, row in invalid.iterrows()
     )
+
+
+def test_every_shipped_dataset_declares_a_live_source():
+    """Live mode reads urlparent, so every dataset must carry one.
+
+    It must be the data file itself, not the human-readable page of the
+    provider: those are kept in urlmaster.
+    """
+    missing = []
+    for path in sorted((Path(__file__).parents[1] / "pyvoa" / "data").glob("*.json")):
+        with open(path) as handle:
+            metadata = json.load(handle)
+        for index, dataset in enumerate(metadata.get("datasets", [])):
+            if not dataset.get("urlparent"):
+                missing.append(f"{path.name} #{index}")
+    assert not missing, "datasets with no live source: " + ", ".join(missing)
 
 
 def test_getallmetadata_lists_the_well_known_databases():
@@ -306,6 +322,59 @@ def test_dataparser_exposes_the_keyword_urls(offline_parser):
 
 def test_dataparser_exposes_the_parsed_urls(offline_parser):
     assert offline_parser.get_url() == ["https://example.org/frozen/tiny.csv"]
+
+
+def _parse_recording_the_url(monkeypatch, metadata):
+    """Build a DataParser on the given metadata, returning the urls fetched."""
+    calls = []
+
+    def fake_download(url, *args, **kwargs):
+        calls.append(url)
+        return str(DATA / "tiny.csv")
+
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(jsondb_parser, "get_local_from_url", fake_download)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+    jsondb_parser.DataParser("good_db")
+    return calls
+
+
+def _metadata_with_a_live_source():
+    with open(DATA / "good_db.json") as handle:
+        metadata = json.load(handle)
+    metadata["datasets"][0]["urlparent"] = "https://upstream.example.org/live.csv"
+    return metadata
+
+
+def test_dataparser_reads_the_archive_by_default(monkeypatch):
+    calls = _parse_recording_the_url(monkeypatch, _metadata_with_a_live_source())
+    assert calls == ["https://example.org/frozen/tiny.csv"]
+
+
+def test_dataparser_reads_the_urlparent_in_live_mode(monkeypatch):
+    tools.set_live_mode(True)
+    calls = _parse_recording_the_url(monkeypatch, _metadata_with_a_live_source())
+    assert calls == ["https://upstream.example.org/live.csv"]
+
+
+def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
+    """A dataset with no live source keeps using urldata, and warns about it."""
+    with open(DATA / "good_db.json") as handle:
+        metadata = json.load(handle)
+    assert "urlparent" not in metadata["datasets"][0]
+
+    warnings = []
+    monkeypatch.setattr(
+        jsondb_parser, "PyvoaWarning", lambda message: warnings.append(message)
+    )
+    tools.set_live_mode(True)
+    calls = _parse_recording_the_url(monkeypatch, metadata)
+    assert calls == ["https://example.org/frozen/tiny.csv"]
+    assert len(warnings) == 1
+    assert "good_db" in warnings[0]
 
 
 def test_dataparser_exposes_the_description(offline_parser):
