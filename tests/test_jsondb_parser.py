@@ -400,6 +400,41 @@ def test_dataparser_reads_a_csv_without_a_header_line(monkeypatch):
     assert sorted(frame.tot_cases) == [100, 150, 210]
 
 
+def _increments_parser(monkeypatch):
+    with open(DATA / "increments_db.json") as handle:
+        metadata = json.load(handle)
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(
+        jsondb_parser, "get_local_from_url",
+        lambda url, *args, **kwargs: str(DATA / "increments.csv"),
+    )
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+    return jsondb_parser.DataParser("increments_db").get_maingeopandas()
+
+
+def test_dataparser_splits_the_where_of_a_composite_location(monkeypatch):
+    """"Paris, FRA" and "Lyon, FRA" are one location once split."""
+    frame = _increments_parser(monkeypatch)
+    # the three rows carry two cities of the same country, which the geo
+    # resolution then names
+    assert set(frame["where"]) == {"France"}
+
+
+def test_dataparser_fills_and_cumulates_increments(monkeypatch):
+    """fillmissing turns a silent day into a zero, so the sum never stops.
+
+    The payload has 1 case on the 1st, then 2 + 1 on the 3rd, and says
+    nothing about the 2nd.
+    """
+    frame = _increments_parser(monkeypatch).sort_values("date")
+    assert list(frame.tot_cases) == [1, 1, 4]
+    # a column with fillmissing but no cumulative keeps its own values
+    assert list(frame.cur_deaths) == [0, 0, 1]
+
+
 def test_dataparser_exposes_the_description(offline_parser):
     assert "minimal" in offline_parser.get_dbdescription()
 

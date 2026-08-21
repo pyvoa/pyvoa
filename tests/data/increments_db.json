@@ -1,0 +1,39 @@
+{
+  "header": "A description exercising splitwhere and fillmissing, used by the tests",
+  "geoinfo": {
+    "granularity": "country",
+    "iso3": "FRA",
+    "locationmode": "code"
+  },
+  "datasets": [
+    {
+      "urldata": "https://example.org/frozen/increments.csv",
+      "urlparent": "https://example.org/live/increments.csv",
+      "separator": ",",
+      "splitwhere": {
+        "separator": ",",
+        "keep": -1
+      },
+      "columns": [
+        {
+          "name": "where",
+          "alias": "location"
+        },
+        {
+          "name": "date"
+        },
+        {
+          "name": "tot_cases",
+          "alias": "cases",
+          "fillmissing": true,
+          "cumulative": true
+        },
+        {
+          "name": "cur_deaths",
+          "alias": "deaths",
+          "fillmissing": true
+        }
+      ]
+    }
+  ]
+}

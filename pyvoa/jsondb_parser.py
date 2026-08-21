@@ -272,6 +272,11 @@ class DataParser:
           else:
             pdatatemp['cumulative'] = False
 
+          if 'fillmissing' in list(pdatatemp.columns):
+             pdatatemp['fillmissing'] = pdatatemp['fillmissing'].fillna(value=False)
+          else:
+            pdatatemp['fillmissing'] = False
+
           usecols = pdatatemp.alias.to_list()
           selections = None
           if 'selections' in list(datasets.keys()):
@@ -291,6 +296,11 @@ class DataParser:
           if 'names' in list(datasets.keys()):
               # csv shipped without any header line, the json gives the columns
               names = datasets['names']
+          splitwhere = None
+          if 'splitwhere' in list(datasets.keys()):
+              # location given as "sub unit, parent unit", only a part of which
+              # is the location the database is indexed by
+              splitwhere = datasets['splitwhere']
           drop = {}
           if 'drop' in list(datasets.keys()):
               drop=datasets['drop']
@@ -355,6 +365,11 @@ class DataParser:
              pandas_temp = pandas_temp.replace(replace_field)
           pandas_temp = pandas_temp.rename(columns = rename_columns)
 
+          if splitwhere and 'where' in list(pandas_temp.columns):
+              pandas_temp['where'] = pandas_temp['where'].astype(str).\
+                  str.split(splitwhere.get('separator',',')).\
+                  str[splitwhere.get('keep',-1)].str.strip()
+
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
           value_name = None
@@ -389,6 +404,13 @@ class DataParser:
           self.url += [url]
 
       pandas_db = fill_missing_dates(pandas_db)
+
+      # a source reporting increments says nothing on a day with no new count :
+      # such a day is a zero, and filling it here keeps the cumulative sum below
+      # from stopping at the first gap
+      coltofill = pdata.loc[pdata['fillmissing'], 'name'].to_list()
+      if coltofill:
+          pandas_db[coltofill] = pandas_db[coltofill].fillna(0)
 
       coltocumul = pdata.loc[pdata['cumulative'], 'name'].to_list()
 
