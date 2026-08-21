@@ -21,7 +21,14 @@ import pandas as pd
 
 import pyvoa
 import pyvoa.geo as coge
-from pyvoa.tools import PyvoaError, fill_missing_dates, get_local_from_url, week_to_date
+from pyvoa.tools import (
+    PyvoaError,
+    PyvoaWarning,
+    fill_missing_dates,
+    get_live_mode,
+    get_local_from_url,
+    week_to_date,
+)
 
 
 class MetaInfo:
@@ -242,6 +249,12 @@ class DataParser:
       pdata = pd.DataFrame()
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
+          if get_live_mode():
+              if datasets.get('urlparent'):
+                  url = datasets['urlparent']
+              else:
+                  PyvoaWarning('No live source (urlparent) for one dataset of '
+                               +self.db+'. Using the archived data instead.')
           pdatatemp = pd.DataFrame(datasets['columns'])
 
           if 'alias' in list(pdatatemp.columns):
