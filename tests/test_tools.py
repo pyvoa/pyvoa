@@ -569,6 +569,77 @@ def test_get_local_from_url_uses_a_distinct_file_per_url(cache_dir, monkeypatch)
     assert first != second
 
 
+def test_live_mode_defaults_to_the_archive():
+    assert tools.get_live_mode() is False
+
+
+def test_set_live_mode_returns_the_new_value():
+    assert tools.set_live_mode(True) is True
+    assert tools.get_live_mode() is True
+    assert tools.set_live_mode(False) is False
+
+
+def test_get_local_from_url_redirects_to_the_archive_by_default(cache_dir, monkeypatch):
+    """Out of live mode, any url is served by the frozen Zenodo record."""
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
+    tools.get_local_from_url("https://example.org/data.csv")
+    assert len(calls) == 1
+    # the archived filename embeds the original netloc, hence the startswith
+    assert calls[0].startswith("https://zenodo.org/api/records/")
+
+
+def test_get_local_from_url_keeps_the_original_url_in_live_mode(cache_dir, monkeypatch):
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
+    tools.set_live_mode(True)
+    tools.get_local_from_url("https://example.org/data.csv")
+    assert calls == ["https://example.org/data.csv"]
+
+
+def test_get_local_from_url_ignores_the_expiration_out_of_live_mode(cache_dir, monkeypatch):
+    """The archive never changes, so a negative expiration is not honoured."""
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
+    tools.get_local_from_url("https://example.org/data.csv", -1)
+    tools.get_local_from_url("https://example.org/data.csv", -1)
+    assert len(calls) == 1
+
+
+def test_get_local_from_url_honours_the_expiration_in_live_mode(cache_dir, monkeypatch):
+    """Upstream data do change, so the caller's expiration time is obeyed."""
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
+    tools.set_live_mode(True)
+    tools.get_local_from_url("https://example.org/data.csv", -1)
+    tools.get_local_from_url("https://example.org/data.csv", -1)
+    assert len(calls) == 2
+
+
+def test_get_local_from_url_caches_the_two_modes_apart(cache_dir, monkeypatch):
+    """Switching mode must not make one source overwrite the other's file."""
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: _FakeResponse(b"x" * 2000),
+    )
+    archived = tools.get_local_from_url("https://example.org/data.csv")
+    tools.set_live_mode(True)
+    live = tools.get_local_from_url("https://upstream.example.org/data.csv")
+    assert archived != live
+
+
 def test_get_local_from_url_reports_a_connection_failure(cache_dir, monkeypatch):
     def fake_get(url, **kwargs):
         raise tools.requests.exceptions.RequestException("no route to host")

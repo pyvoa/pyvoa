@@ -55,6 +55,14 @@ if _coacache_module_info is not None:
 # Verbosity of pyvoa
 _verbose_mode = 1 # default
 
+# Data source mode of pyvoa
+# False (default) : the frozen Zenodo archive is used for every download, so a
+#                   given pyvoa release always returns the very same data.
+# True            : the upstream ("live") sources are used instead, i.e. the
+#                   'urlparent' field of the json database description files for
+#                   the epidemiological data, and the original urls elsewhere.
+_live_mode = False
+
 maintmpdir=os.path.join(Path.home(),".cache")
 tmpdir=os.path.join(maintmpdir,"pyvoa.data"+"_"+getuser())
 pklpath=tmpdir
@@ -81,6 +89,24 @@ def set_verbose_mode(v):
         warnings.simplefilter("default")
 
     return get_verbose_mode()
+
+def get_live_mode():
+    """Return the data source mode, True if live (upstream) sources are used,
+    False if the frozen Zenodo archive is used.
+    """
+    return _live_mode
+
+def set_live_mode(live=True):
+    """Set the data source mode.
+
+    If live is True, downloads are made from the original upstream sources,
+    which give the most recent data available but may have moved, changed
+    format or disappeared. If live is False (default), everything is read from
+    the frozen Zenodo archive, which guarantees reproducible results.
+    """
+    global _live_mode
+    _live_mode = bool(live)
+    return get_live_mode()
 
 def info(*args):
     """Print to stdout with similar args as the builtin print function,
@@ -344,8 +370,11 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     One may add a suffix to the local filename if known.
     """
 
-    # Force no update of the file
-    expiration_time=0
+    # Archived files never change, so they are downloaded once and for all.
+    # In live mode the caller's expiration time is honoured, so that upstream
+    # updates are eventually seen.
+    if not _live_mode:
+        expiration_time=0
 
     if not os.path.exists(tmpdir):
         os.makedirs(tmpdir)
@@ -381,7 +410,7 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     try:
         #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
-        if 'zenodo.org' not in url:
+        if not _live_mode and 'zenodo.org' not in url:
             verb('Instead of using original URL '+url)
             url='https://zenodo.org/api/records/18784098/files/'+local_base_filename+'/content'
             verb('using zenodo archived file '+url)
