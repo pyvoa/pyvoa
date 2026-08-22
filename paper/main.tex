@@ -493,13 +493,20 @@ choropleths over standard or dense geometries, with a date slider under bokeh.
 Titles, legends, watermarks and \texttt{savefig()} behave identically across
 backends, and \texttt{setbatch()} renders without opening a window.
 
-\textbf{Caching and mirroring.} Downloads are cached under
+\textbf{Caching, mirroring and live sources.} Downloads are cached under
 \texttt{\textasciitilde/.cache/pyvoa.data\_<user>/} with CRC32 invalidation; a
 file below 1000 characters is treated as a failed download and re-fetched.
 Since v0.5.0 the payloads themselves are read from the project's Zenodo
-deposits, the upstream URL being retained in the descriptor for provenance.
-A series therefore stays fetchable, and an analysis re-runnable, after its
-provider stops publishing.
+deposits, the upstream URL being retained in the descriptor. A series therefore
+stays fetchable, and an analysis re-runnable, after its provider stops
+publishing. That upstream URL is not merely documentary:
+\texttt{setlive(True)} reads it instead of the mirror, which is what an
+epidemic still under way requires, at the cost of the reproducibility the
+archive gives. Of the twenty-five databases, twenty are readable both ways,
+three only from the archive --- their provider has withdrawn the files --- and
+two, added since the last deposit, only from their provider. The two copies are
+cached apart, and a database absent from the archive falls back to its provider
+in either mode.
 
 \textbf{Errors.} \texttt{PyvoaError} is the library's single exception type; it
 renders a coloured banner at construction, so the message reaches a notebook
