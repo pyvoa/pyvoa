@@ -64,6 +64,35 @@ Downloads are cached under `~/.cache/pyvoa.data_<username>/`, so the second run
 of a script is fast; `pf.setwhom('owid', reload=False)` goes further and reuses
 the local copy saved by a previous call rather than fetching anything.
 
+### Archived data, live data
+
+By default pyvoa reads every payload from the project's Zenodo mirrors. A given
+release therefore always returns the same numbers, whatever has become of the
+provider since — which is the point, most of these series being a historical
+record whose original URLs have moved or gone.
+
+For a source still publishing, that is not always what you want:
+
+```python
+pf.setlive(True)            # read the upstream sources instead
+pf.setwhom('ebolardc')      # ... and fetch today's file
+pf.getlive()                # True
+pf.setlive(False)           # back to the archive
+```
+
+The live URL of each dataset is the `urlparent` field of its JSON descriptor,
+next to the `urldata` mirror the archive mode uses. Switching mode clears the
+selected database, so call `setwhom()` again afterwards — the frame in memory
+came from the other source. The two copies are cached under different names and
+never overwrite each other; in live mode a cached file is re-downloaded once it
+is more than a few hours old, whereas an archived one is fetched once and kept.
+
+Live data are the most recent ones, and the least dependable: an upstream file
+may have moved, changed format or disappeared since the release you are running,
+and results change from one day to the next. A database whose archive does not
+carry a given file — one added after the last deposit — is fetched from its
+provider in either mode.
+
 The introspection functions are the fastest way to explore the API — every one
 of them returns a plain Python list:
 
@@ -84,35 +113,42 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
 The payloads are read from Zenodo mirrors of the upstream files, so a series
-stays reproducible after its original provider stops publishing.
+stays reproducible after its original provider stops publishing. *Read from*
+says where each one is available: **both** for the twenty databases carrying a
+mirror and an upstream file that still resolves — which does not mean the
+provider still updates it — **archive only** for the three whose provider has
+gone (`phe` lost its API host, `minciencia` and `moh` renamed or withdrew
+files), and **live only** for the two added since the last deposit, which are
+always fetched from their provider. Only the archived ones are
+reproducible; see [Archived data, live data](#archived-data-live-data).
 
-| Key | Coverage | Granularity | Source |
-|---|---|---|---|
-| `covid19india` | India | region | covid19india.org |
-| `covidtracking` | United States | subregion (states) | The COVID Tracking Project |
-| `dgs` | Portugal | region | Direção-Geral da Saúde |
-| `dpc` | Italy | region | Dipartimento della Protezione Civile |
-| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE |
-| `escovid19data` | Spain | subregion (provinces) | escovid19data |
-| `europa` | worldwide | country | European Commission, Joint Research Centre |
-| `govcy` | Cyprus | country | Government of Cyprus |
-| `imed` | Greece | subregion | iMEDD |
-| `jhu` | worldwide | country | Johns Hopkins University CSSE |
-| `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE |
-| `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare |
-| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team |
-| `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación |
-| `moh` | Malaysia | subregion (states) | Ministry of Health |
-| `mpoxgh` | worldwide | country | Global.health, via Our World in Data |
-| `owid` | worldwide | country | Our World in Data |
-| `phe` | United Kingdom | subregion | Public Health England / UKHSA |
-| `risklayer` | Europe | subregion | Risklayer, for WHO Europe |
-| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut |
-| `sciensano` | Belgium | region | Sciensano |
-| `sentinellesIRA` | France | region | Réseau Sentinelles — acute respiratory infections |
-| `spf` | France | subregion (*départements*) | Santé publique France |
-| `spfnational` | France | country | Santé publique France |
-| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater |
+| Key | Coverage | Granularity | Source | Read from |
+|---|---|---|---|---|
+| `covid19india` | India | region | covid19india.org | both |
+| `covidtracking` | United States | subregion (states) | The COVID Tracking Project | both |
+| `dgs` | Portugal | region | Direção-Geral da Saúde | both |
+| `dpc` | Italy | region | Dipartimento della Protezione Civile | both |
+| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | live only |
+| `escovid19data` | Spain | subregion (provinces) | escovid19data | both |
+| `europa` | worldwide | country | European Commission, Joint Research Centre | both |
+| `govcy` | Cyprus | country | Government of Cyprus | both |
+| `imed` | Greece | subregion | iMEDD | both |
+| `jhu` | worldwide | country | Johns Hopkins University CSSE | both |
+| `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE | both |
+| `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare | both |
+| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team | live only |
+| `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación | archive only |
+| `moh` | Malaysia | subregion (states) | Ministry of Health | archive only |
+| `mpoxgh` | worldwide | country | Global.health, via Our World in Data | both |
+| `owid` | worldwide | country | Our World in Data | both |
+| `phe` | United Kingdom | subregion | Public Health England / UKHSA | archive only |
+| `risklayer` | Europe | subregion | Risklayer, for WHO Europe | both |
+| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut | both |
+| `sciensano` | Belgium | region | Sciensano | both |
+| `sentinellesIRA` | France | region | Réseau Sentinelles — acute respiratory infections | both |
+| `spf` | France | subregion (*départements*) | Santé publique France | both |
+| `spfnational` | France | country | Santé publique France | both |
+| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | both |
 
 Most of these are COVID-19 series; `mpoxgh` covers mpox, `sentinellesIRA`
 acute respiratory infections, `ebolardc` the 2026 Bundibugyo ebolavirus
