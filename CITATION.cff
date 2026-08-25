@@ -1,7 +1,9 @@
 # CITATION.cff — Citation File Format 1.2.0
 # Specification: https://github.com/citation-file-format/citation-file-format/blob/main/schema-guide.md
 # Validate with: pip install cffconvert && cffconvert --validate
-# Keep consistent with AUTHORS, LICENSE, pyproject.toml and the Zenodo deposit.
+# Keep consistent with AUTHORS, LICENSE, pyproject.toml, the Zenodo deposit
+# (.zenodo.json), codemeta.json, schemaorg.jsonld and paper/main.tex: names,
+# emails, affiliations and keywords are duplicated across all of them.
 
 cff-version: 1.2.0
 message: "If you use pyvoa in your work, please cite it using the metadata below."
@@ -30,19 +32,19 @@ authors:
     given-names: "Tristan"
     orcid: "https://orcid.org/0000-0002-2022-2140"
     email: "tristan.beau@u-pariscite.fr"
-    affiliation: "Université Paris Cité, UFR de physique, and LPNHE (CNRS/IN2P3, Sorbonne Université, UMR 7585), Paris, France"
+    affiliation: "Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France"
     country: FR
   - family-names: "Browaeys"
     given-names: "Julien"
     orcid: "https://orcid.org/0000-0003-4405-9875"
     email: "julien.browaeys@u-pariscite.fr"
-    affiliation: "Université Paris Cité, UFR de physique, and MSC - Matière et Systèmes Complexes (CNRS, UMR 7057), Paris, France"
+    affiliation: "Université Paris Cité, CNRS, Matière et systèmes complexes, F-75013 Paris, France"
     country: FR
   - family-names: "Dadoun"
     given-names: "Olivier"
     orcid: "https://orcid.org/0000-0002-2169-9725"
-    email: "olivier.dadoun@lpnhe.in2p3.fr"
-    affiliation: "LPNHE (CNRS/IN2P3, Sorbonne Université, Université Paris Cité, UMR 7585), Paris, France"
+    email: "dadoun@in2p3.fr"
+    affiliation: "Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France"
     country: FR
 
 keywords:
