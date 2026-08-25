@@ -124,8 +124,8 @@ class visu_matplotlib:
         what = kwargs.get('what')
         ax = kwargs['ax']
         loc = list(input['where'].unique())
-        ax.set_xlabel()(what[0], fontsize=10)
-        ax.set_ylabel()(what[1], fontsize=10)
+        ax.set_xlabel(what[0], fontsize=10)
+        ax.set_ylabel(what[1], fontsize=10)
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
