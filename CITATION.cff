@@ -46,11 +46,11 @@ authors:
     country: FR
 
 keywords:
-  - "epidemiology"
+  - "epidemiological data"
   - "COVID-19"
   - "open data"
   - "data visualisation"
-  - "geolocation"
+  - "geospatial data"
   - "Python"
   - "reproducible research"
   - "science education"
