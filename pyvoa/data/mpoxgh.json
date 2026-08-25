@@ -13,7 +13,7 @@
   	{	
 	 "urldata": "https://zenodo.org/records/11222009/files/mpoxgh_owid-monkeypox-data.csv?content",
 	 "urlparent":"https://raw.githubusercontent.com/owid/monkeypox/main/owid-monkeypox-data.csv",
-	 "urlmaster":"https://ourworldindata.org/mpox",
+	 "urlmaster":"https://github.com/owid/monkeypox",
 	 "drop":
             {
             "iso_code": ["OWID_","XKX"]
