@@ -232,7 +232,7 @@ class visu_bokeh:
             'linear': kwargs.get('bokeh_figure_linear'),
             'log': kwargs.get('bokeh_figure_log')
         }
-        dicof={'title':kwargs.get('title')+}
+        dicof={'title':kwargs.get('title')}
         for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_label'] = which[0]
