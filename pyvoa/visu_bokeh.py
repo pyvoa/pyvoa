@@ -116,7 +116,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_linear']      = figure(x_axis_type='linear', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log']         = figure(x_axis_type='log', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_loglog']      = figure(x_axis_type='log', y_axis_type='log', width=width, height=height)
-            dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=350, height=300, match_aspect=True)
+            dicfig['bokeh_figure_map']         = figure(x_axis_type='mercator', y_axis_type='mercator',width=350, height=350, match_aspect=True)
             dicfig['bokeh_figure_linear_date'] = figure(x_axis_type='datetime', y_axis_type='linear', width=width, height=height)
             dicfig['bokeh_figure_log_date']    = figure(x_axis_type='datetime', y_axis_type='log', width=width, height=height)
             dicfig['bokeh_figure_yearly']      = figure(x_axis_type='linear', y_axis_type='linear',  width=width, height=height)
@@ -130,7 +130,7 @@ class visu_bokeh:
                 #else:
                 #    fig.title = title + str(kwargs['kwargsuser']['when'])
                 dicfig[key]=fig
-            d = Div(text = '<div style="position: absolute; left:-400px; top:100px"><img src=' + logo_url + ' style="width:140px; height:55px; opacity: 0.1"></div>')
+            d = Div(text = '<div style="position: absolute; left:-300px; top:100px"><img src=' + logo_url + ' style="width:100px; height:40px; opacity: 0.1"></div>')
             #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
             kwargs['watermark'] = d
             kwargs = { **kwargs, **dicfig }
@@ -1192,8 +1192,8 @@ class visu_bokeh:
 
         bokeh_figure.image_url(
             url=[logo_url],
-            x=0.25*bokeh_figure.width,
-            y=0.25*bokeh_figure.height,
+            x=0.2*bokeh_figure.width,
+            y=0.2*bokeh_figure.height,
             w=bokeh_figure.width, w_units="screen",
             h=bokeh_figure.height, h_units="screen",
             anchor="center",
