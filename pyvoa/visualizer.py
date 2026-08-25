@@ -128,7 +128,7 @@ class AllVisu:
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             if func.__name__ == 'plot' and title == InputOption().d_graphicsinput_args['title']:
-                kwargs['title'] = self.database_name.upper() + ': database '+ str(which) + ' time evolution between ' + str(when)
+                kwargs['title'] = self.database_name.upper() + ' database'
 
             loc=list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }

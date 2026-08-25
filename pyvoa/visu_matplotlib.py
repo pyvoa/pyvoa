@@ -375,29 +375,34 @@ class visu_matplotlib:
         # basemap
         if tile == 'openstreet':
             cx.add_basemap(
+            ax,
+            crs=data_crs,
+            source=cx.providers.OpenStreetMap.Mapnik,
+            headers={
+                "User-Agent": "pyvoa/<version> (+https://github.com/pyvoa/pyvoa)"
+            },
+            )
+        elif tile == 'esri':
+            cx.add_basemap(
                 ax,
                 crs=data_crs,
-                source=cx.providers.OpenStreetMap.Mapnik,
-            )
-
-        elif tile == 'esri':
-            PyvoaWarning(
-                "Problem occurs with esri and matplotlib, using default tile..."
+                source=cx.providers.Esri.WorldStreetMap,
             )
 
         elif tile == 'stamen':
-            PyvoaWarning(
-                "Couldn't find stamen for matplotlib, using default tile..."
+            cx.add_basemap(
+                ax,
+                crs=data_crs,
+                source=cx.providers.Stamen.TonerLite,
             )
 
         elif tile == 'positron':
             cx.add_basemap(
                 ax,
                 crs=data_crs,
-                source=cx.providers.CartoDB.PositronNoLabels
+                source=cx.providers.CartoDB.PositronNoLabels,
             )
 
         else:
             raise PyvoaError("Don't know what kind of tile it is...")
-
         return ax
