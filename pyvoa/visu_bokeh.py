@@ -34,6 +34,7 @@ from bokeh.models import (
     CrosshairTool,
     CustomJS,
     CustomJSHover,
+    CustomJSTickFormatter,
     DatetimeTickFormatter,
     Div,
     GeoJSONDataSource,
@@ -46,10 +47,8 @@ from bokeh.models import (
     Range1d,
     Row,
     Select,
-    Title,
     Toggle,
     WMTSTileSource,
-    CustomJSTickFormatter
 )
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.palettes import Category10, Category20, Viridis256
@@ -1220,8 +1219,8 @@ class visu_bokeh:
             divisor = 1
 
         color_bar.formatter = CustomJSTickFormatter(
-        args=dict(divisor=divisor, exp=exp),
-        code="""
+            args={'divisor': divisor, 'exp': exp},
+            code="""
             const val = (tick / divisor).toFixed(1);
             return val + " ×10" + exp.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || d).join('');
         """
