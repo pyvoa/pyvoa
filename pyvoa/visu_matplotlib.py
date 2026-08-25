@@ -61,6 +61,7 @@ class visu_matplotlib:
 
             fig, ax = plt.subplots(1, 1, figsize=(10, 5))
             ax.set_title(title)
+            #ax.grid(True)
 
             # Scale logo to ~15% of figure width
             logo_width = int(0.40 * fig.get_figwidth() * fig.dpi)
@@ -96,6 +97,7 @@ class visu_matplotlib:
         ax.set_xlabel("date", fontsize=10)
         ax.set_ylabel(what[0], fontsize=10)
         ax.set_yscale(ay_type)
+        ax.grid(True)
         st=['-','--',':']
 
         for idx, i in enumerate(what):
@@ -126,6 +128,7 @@ class visu_matplotlib:
         loc = list(input['where'].unique())
         ax.set_xlabel(what[0], fontsize=10)
         ax.set_ylabel(what[1], fontsize=10)
+        ax.grid(True)
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
@@ -164,6 +167,7 @@ class visu_matplotlib:
 
         ax.set_xticks(month_starts)
         ax.set_xticklabels(month_labels)
+        ax.grid(True)
         ax.legend()
         return ax
 
@@ -185,7 +189,7 @@ class visu_matplotlib:
         input = input.set_index('where')
         ax =  input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
-        ax.legend(bbox_to_anchor=(0.8, 0.9), loc='upper left',title=what)
+        ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=what)
         ax.set_title(title)
         return ax
 
@@ -207,6 +211,7 @@ class visu_matplotlib:
         input_sorted = input.sort_values(by=what,ascending=True)
         ax.set_title(title)
         ax.set_xlabel(what)
+        ax.grid(True)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
         return ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
@@ -287,11 +292,11 @@ class visu_matplotlib:
         ax.set_xlabel(which)
         ax.set_ylabel("frequency")
         ax.legend(
-            title="Country",
             bbox_to_anchor=(1.05, 1),
             loc="upper left",
             borderaxespad=0
         )
+        ax.grid(True)
         return ax
 
     @decomatplotlib
