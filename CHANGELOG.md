@@ -1,4 +1,25 @@
 # Unreleased
+- the distribution now names its authors: `[project] authors` in
+  `pyproject.toml` carries the three people, spelled as in `AUTHORS` and
+  `CITATION.cff`, instead of the project address, so
+  `importlib.metadata.metadata("pyvoa")["Author"]` and `pyvoa.__author__` no
+  longer disagree. `maintainers` stays `contact@pyvoa.org`, the stable contact
+  point. The build requirements dropped `wheel`, which setuptools declares by
+  itself, and gained the `setuptools>=64` floor that reading the version out of
+  `pyvoa/__version__.py` needs.
+- `pyvoa/__version__.py` documents what it is instead of referring to the
+  `setup.py` that no longer exists: that setuptools and `tests/test_paper.py`
+  both read it *statically*, and that it must therefore stay a plain literal
+  with no imports. `__author__` and `__email__` are marked as a mirror of
+  `AUTHORS`, which is the canonical record.
+- author metadata is aligned across the repository. `AUTHORS` and
+  `paper/main.tex` carry the affiliations in the form the journal expects, and
+  `CITATION.cff`, `.zenodo.json`, `codemeta.json` and `schemaorg.jsonld` now
+  repeat them verbatim, together with Olivier Dadoun's `dadoun@in2p3.fr`
+  address and the paper's keywords (`epidemiological data`, `geospatial data`).
+  The same pass brought the two schema files back in step with
+  `pyproject.toml`: `beautifulsoup4` instead of `bs4`, and Python 3.13 among
+  the supported runtimes.
 - every dependency now declares a lower bound, and the bounds are tested: a
   `minimum` CI job installs the floors on python 3.10 and runs the suite, so
   they cannot quietly become false. There are no upper bounds, on purpose — a
