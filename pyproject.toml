@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+# `wheel` is not listed: setuptools declares it itself, and PyPA advises against
+# repeating it. The floor is what `[tool.setuptools.dynamic]` below needs to
+# read the version out of pyvoa/__version__.py without importing the package.
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,8 +12,14 @@ description = "Python virus open analysis. See more on pyvoa.org"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
+# The people, in the order and spelling of AUTHORS and CITATION.cff, so that
+# importlib.metadata.metadata("pyvoa")["Author"] agrees with pyvoa.__author__.
+# The maintainer stays the project address, which is the stable contact point
+# and matches the `contact:` block of CITATION.cff.
 authors = [
-    { name = "pyvoa.org", email = "contact@pyvoa.org" },
+    { name = "Tristan Beau", email = "tristan.beau@u-pariscite.fr" },
+    { name = "Julien Browaeys", email = "julien.browaeys@u-pariscite.fr" },
+    { name = "Olivier Dadoun", email = "dadoun@in2p3.fr" },
 ]
 maintainers = [
     { name = "pyvoa.org", email = "contact@pyvoa.org" },
