@@ -232,14 +232,14 @@ class visu_bokeh:
             'linear': kwargs.get('bokeh_figure_linear'),
             'log': kwargs.get('bokeh_figure_log')
         }
-        dicof={'title':kwargs.get('title')}
+        dicof={'title':kwargs.get('title')+}
         for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_label'] = which[0]
             dicof['y_axis_label'] = which[1]
             dicof['y_axis_type' ] = axis_type
-
-
+            fig.xaxis.axis_label = which[0]
+            fig.yaxis.axis_label = which[1]
             fig.add_tools(HoverTool(
                 tooltips=[('where', '@where'), ('date', '@date{%F}'),
                           (which[0], '@{casesx}' + '{custom}'),
@@ -298,7 +298,6 @@ class visu_bokeh:
         which = kwargs.get('which')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')
-        # title = kwargs.get('title',None)
         panels = []
         listfigs = []
         visu_bokeh().rollerJS()
@@ -329,6 +328,7 @@ class visu_bokeh:
             tooltips=[]
             colors = list(input['colors'].unique())
             for idx,val in enumerate(which):
+                fig.yaxis.axis_label = val
                 for ldx,loc in enumerate(list(input['where'].unique())):
                     pyvoa = ColumnDataSource(input.loc[input['where'].isin([loc])])
                     if legend:
@@ -370,7 +370,7 @@ class visu_bokeh:
 
             if axis_type == 'linear' and maxi < 1e4 :
                 fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-            fig.legend.title=", ".join(which)
+            #fig.legend.title=", ".join(which)
             fig.legend.ncols = len(which)
             fig.legend.visible = True
             fig.legend.background_fill_alpha = 0.6
@@ -886,7 +886,6 @@ class visu_bokeh:
 
         input = kwargs.get('input')
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
-        list(input['where'].unique())
         which  = kwargs.get('which')
         if isinstance(which,list):
             which = which[0]
@@ -971,6 +970,7 @@ class visu_bokeh:
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
         # input = kwargs.get('input')
+        which=kwargs['which']
         columndatasrc = kwargs.get('columndatasrc')
         # which = kwargs.get('which')
 
@@ -988,6 +988,7 @@ class visu_bokeh:
         for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             fig.y_range = kwargs['yrange']
+            fig.xaxis.axis_label = which
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
@@ -1117,6 +1118,7 @@ class visu_bokeh:
         controls = kwargs.get('controls', None)
         dateslider = kwargs.get('dateslider')
         mode = kwargs.get('mode')
+        which=kwargs.get('which')
 
         # taille et apparence
         fig.height = 450
@@ -1147,15 +1149,16 @@ class visu_bokeh:
             text_font_size="10pt",
             source=columndatasrc
         )
-        '''
-        labels2 = LabelSet(
-            x=0, y=0,
-            text='textdisplayed2',
-            angle=cumsum('angle', include_zero=True),
-            text_font_size="8pt",
-            source=columndatasrc
+        from bokeh.models import Label
+        labeltitre = Label(
+            x=0.8, y=0.95,
+            text=which,
+            text_align="right",
+            text_font_size="12px",
+            text_font_style="bold",
+            text_color="black"
         )
-        '''
+
         cases_custom = visu_bokeh().rollerJS()
         hover_tool = HoverTool(
             tooltips=[('where', '@where'), ('cases', '@right{0,0}')],
@@ -1165,6 +1168,7 @@ class visu_bokeh:
         fig.add_tools(hover_tool)
 
         fig.add_layout(labels)
+        fig.add_layout(labeltitre)
         #fig.add_layout(labels2)
         fig = Row(fig,kwargs['watermark'])
         if dateslider:
