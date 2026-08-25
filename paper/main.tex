@@ -104,81 +104,46 @@ absent. Les deux PDF sortent de la même source : \texttt{make final} passe
 \texttt{-pretex='\textbackslash def\textbackslash paperfinal\{1\}'}, rien n'est édité.
 \textbf{Point à trancher} : ces annotations deviennent publiques. \texttt{HANDOFF.md}
 fait déjà ce choix, mais l'appréciation portée en §4 sur la faiblesse des preuves
-d'adoption est d'une autre nature. Alternative décrite dans \texttt{paper/README.md}.}
-
+d'adoption est d'une autre nature. Alternative décrite dans \texttt{paper/README.md}.
 \textbf{Derniers commentaires lors du push git du papier par Claude} 
 Still yours to decide, all recorded in HANDOFF.md: the Zenodo 0.5.0 metadata (§1), the issue-form check (§2), and inside main.tex the reproducible-capsule link for C3/S3, the Section 4 adoption evidence, the AI-use declaration, and a look at the official template's exact section list — plus the two I flagged but didn't act on, the openstreet default and contextily forcing matplotlib.
+}
 
 \begin{frontmatter}
 
 \title{pyvoa: a Python framework for unified access, standardisation and
 visualisation of open epidemiological data}
 
-\attnpar{Titre. J'ai retiré « COVID-19 » et « pandemic » du titre : depuis la 0.5.0 le
-catalogue contient mpox (\texttt{mpoxgh}), les infections respiratoires aiguës
-(\texttt{sentinellesIRA}) et la surveillance des eaux usées (\texttt{sumeau}), et le nom
-même du logiciel (Python \emph{Virus} Open Analysis) marque la sortie du cadre
-strictement COVID en 2025. Le titre initial, centré COVID-19, sous-vend le logiciel et
-contredit \texttt{CITATION.cff}. Variante plus courte possible :
-« pyvoa: unified access to open epidemiological databases in Python ».\\[3pt]
-\textbf{Point de cohérence dépôt/article.} Le bloc \texttt{preferred-citation} de
-\texttt{CITATION.cff} (commenté, prêt pour SoftwareX depuis le commit \texttt{074f255})
-porte un troisième titre : « pyvoa: a Python package for open analysis of viral
-epidemiological data ». \textbf{Un seul titre doit survivre} : celui qui sera soumis. Le
-répercuter dans \texttt{CITATION.cff} au moment de l'acceptation, en même temps que
-volume, numéro d'article et DOI \texttt{10.1016/j.softx.\ldots}}
-
-\author[upc,lpnhe]{Tristan~Beau}
+\author[lpnhe]{Tristan~Beau\corref{cor1}}
 \ead{tristan.beau@u-pariscite.fr}
-\author[upc,msc]{Julien~Browaeys}
+\author[msc]{Julien~Browaeys}
 \ead{julien.browaeys@u-pariscite.fr}
-\author[lpnhe]{Olivier~Dadoun\corref{cor1}}
-\ead{olivier.dadoun@lpnhe.in2p3.fr}
+\author[lpnhe]{Olivier~Dadoun}
+\ead{dadoun@in2p3.fr}
 \cortext[cor1]{Corresponding author.}
 
-\address[upc]{Université Paris Cité, UFR de physique, F-75013 Paris, France}
-\address[lpnhe]{LPNHE, CNRS/IN2P3, Sorbonne Université, Université Paris Cité,
-UMR 7585, F-75005 Paris, France}
-\address[msc]{MSC --- Matière et Systèmes Complexes, CNRS, Université Paris Cité,
-UMR 7057, F-75013 Paris, France}
-
-\attnpar{Auteurs et affiliations. Corrigées d'après \texttt{AUTHORS} et
-\texttt{CITATION.cff} : chaque auteur porte bien deux affiliations pour T.~Beau et
-J.~Browaeys, une seule pour O.~Dadoun. \textbf{(a)} Confirmer qui est
-\emph{corresponding author} : le brouillon plaçait \texttt{\textbackslash corref} après
-O.~Dadoun mais donnait l'adresse générique \texttt{contact@pyvoa.org} ; j'ai retenu
-O.~Dadoun avec son adresse institutionnelle, ce qu'Elsevier préfère à une adresse de
-projet. \textbf{(b)} Ajouter les ORCID à la soumission dans Editorial Manager
-(0000-0002-2022-2140 ; 0000-0003-4405-9875 ; 0000-0002-2169-9725). \textbf{(c)} L'ordre
-alphabétique retenu ici est celui d'\texttt{AUTHORS} ; si un ordre par contribution est
-souhaité, il faut le décider maintenant et le répercuter dans \texttt{CITATION.cff},
-\texttt{.zenodo.json} et \texttt{codemeta.json}.}
+\address[lpnhe]{Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France}
+\address[msc]{Université Paris Cité, CNRS, Matière et systèmes complexes, F-75013 Paris, France}
 
 \begin{abstract}
-pyvoa (Python Virus Open Analysis) is an open-source Python library giving
-unified access to 25 open epidemiological databases --- among them Our World in
-Data and Johns Hopkins University CSSE for COVID-19, and mpox, measles and
-Ebola series --- through a single five-keyword query grammar. Each source is described declaratively by a
-JSON file and normalised into a common pandas or geopandas frame; a geolocation
-layer reconciles country, region and sub-region names across sources and
-supplies the geometries needed for mapping. Because the payloads are read from
-the project's own Zenodo mirrors, series remain reproducible after their
-original providers stop publishing. Time series, choropleth maps and histograms
-are produced in two lines of code.
+
+pyvoa (Python Virus Open Analysis) is an open-source Python library providing
+access to 25 epidemiological data resources through a single query with five keywords. They range from global aggregators, such as Our World in Data, to
+national agencies, and cover COVID-19, mpox, measles, and Ebola. Each resource
+is described by a JSON file rather than by code, so the catalogue can be
+extended without modifying the library. Resources are normalised into a common
+pandas DataFrame, and a geolocation layer reconciles location identifiers and
+provides geometries. Data are read from the project's Zenodo archive by
+default, or directly from live sources for ongoing outbreaks, so series remain accessible after providers stop publishing. Charts and maps can be produced in a few lines of Python. pyvoa is MIT-licensed and available from PyPI.
+
 \end{abstract}
 
-\attnpar{Résumé. 112 mots, contre $\sim$100 demandés par le \emph{template} v4 ; c'est
-acceptable mais ne pas l'allonger. Il compte dans la limite globale de 3000 mots.
-Vérifier le nombre de bases (25) au moment de la soumission : le décompte doit être
-celui du tableau de \texttt{README.md}, seule source de vérité selon \texttt{HANDOFF.md}.}
 
 \begin{keyword}
-epidemiology \sep COVID-19 \sep open data \sep Python \sep data visualisation
-\sep geolocation
-\end{keyword}
 
-\attn{Six mots-clés exactement, maximum autorisé ; « reproducible research » a été
-retiré. Ils reprennent six des huit mots-clés de \texttt{CITATION.cff}.}
+epidemiological data  \sep geospatial data \sep open data \sep reproducible research \sep data visualisation  \sep Python 
+
+\end{keyword}
 
 \end{frontmatter}
 
@@ -187,6 +152,7 @@ retiré. Ils reprennent six des huit mots-clés de \texttt{CITATION.cff}.}
 %%  METADATA TABLES
 %% ============================================================================
 
+\clearpage
 \section*{Metadata}
 \label{metadata}
 
@@ -204,7 +170,9 @@ archived release: \url{https://doi.org/10.5281/zenodo.21829902} \newline
 concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \\
 \hline
 C3 & Permanent link to Reproducible Capsule &
-\attn{à compléter --- voir note ci-dessous} \\
+\attn{donner un lien Binder
+(\url{https://mybinder.org/v2/gh/pyvoa/pyvoa/main}), e.g. le 
+notebook \texttt{PyvoaForBeginners.ipynb}. Ne pas laisser la case vide : c'est un motif de renvoi éditorial. } \\
 \hline
 C4 & Legal Code License & MIT License \\
 \hline
@@ -247,7 +215,9 @@ S2 & Permanent link to executables of this version &
 \url{https://pypi.org/project/pyvoa/0.5.0/} \newline
 \url{https://pypi.org/project/pyvoa-full/} \\
 \hline
-S3 & Permanent link to Reproducible Capsule & \attn{idem C3} \\
+S3 & Permanent link to Reproducible Capsule & \attn{donner un lien Binder
+(\url{https://mybinder.org/v2/gh/pyvoa/pyvoa/main}), e.g. le 
+notebook \texttt{PyvoaForBeginners.ipynb}. Ne pas laisser la case vide : c'est un motif de renvoi éditorial. } \\
 \hline
 S4 & Legal Software License & MIT License \\
 \hline
@@ -270,27 +240,6 @@ S8 & Support email for questions & contact@pyvoa.org \\
 \label{executableMetadata}
 \end{table}
 
-\attnpar{Métadonnées. Le brouillon annonçait v0.4.2, Python~$\geq$~3.8, un wiki GitHub
-(\texttt{/pyvoa/pyvoa/wiki}) qui n'existe pas, et une liste de dépendances incomplète :
-tout cela est corrigé d'après \texttt{pyproject.toml} et \texttt{CHANGELOG.md}.
-\textbf{Trois décisions restent à prendre.} \textbf{(1)~C3/S3, \emph{Reproducible
-Capsule}} : le plus simple est de déposer sur Code Ocean une capsule exécutant le
-notebook des exemples ; à défaut, donner le lien Binder
-(\url{https://mybinder.org/v2/gh/pyvoa/pyvoa/main}), qui fonctionne déjà puisque
-\texttt{requirements.txt} est maintenu à la racine pour cela, ou le lien Colab du
-notebook \texttt{PyvoaForBeginners.ipynb}. Ne pas laisser la case vide : c'est un motif
-de renvoi éditorial. \textbf{(2)} Si une version 0.5.1 est publiée avant soumission,
-reprendre partout numéro, date et DOI de version --- le DOI \emph{concept}
-\texttt{21829901} reste stable. \textbf{(3)} \texttt{HANDOFF.md} §1 signale que
-l'enregistrement Zenodo 0.5.0 diverge encore de \texttt{CITATION.cff} (affiliations,
-mots-clés, relation \texttt{continues}, wheel absente). À régler \emph{avant} de citer ce
-DOI dans un article : un relecteur vérifiera la concordance, et c'est la seule
-incohérence documentée qui subsiste entre le dépôt et ses métadonnées publiées.
-\textbf{(4)} \texttt{HANDOFF.md} §2, mineur : confirmer, en étant connecté, que les
-formulaires d'issue s'affichent bien sur GitHub, et sortir le numéro de version figé de
-\texttt{bug\_report.yml}.}
-
-
 %% ============================================================================
 %%  1. MOTIVATION AND SIGNIFICANCE
 %% ============================================================================
@@ -299,99 +248,151 @@ formulaires d'issue s'affichent bien sur GitHub, et sortir le numéro de version
 \label{sec:motivation}
 
 The COVID-19 pandemic produced open epidemiological data at an unprecedented
-scale. Global aggregators --- the Johns Hopkins University Center for Systems
-Science and Engineering (JHU CSSE)~\cite{dong2020,dong2022} and Our World in
-Data (OWID)~\cite{mathieu2021} --- and national agencies such as Santé publique
-France, the Robert Koch Institut or the Italian Dipartimento della Protezione
-Civile all published daily series. They did so, however, with incompatible file
-formats, column vocabularies, temporal granularities and, above all,
-incompatible geographic labels.
+scale. Global aggregators such as the Johns Hopkins University Center for
+Systems Science and Engineering (JHU CSSE)~\cite{dong2020,dong2022} and Our
+World in Data (OWID)~\cite{mathieu2021}, as well as national agencies such as
+Santé publique France, the German Robert Koch-Institut, and the Italian
+Dipartimento della Protezione Civile, published frequently updated series
+online. These data, however, were released using heterogeneous file formats,
+column vocabularies, temporal granularities and, above all, incompatible
+geographic identifiers.
 
-Two consequences follow, and pyvoa addresses both.
+Two major challenges limit the reuse of these data: heterogeneity and
+impermanence.
 
-\textbf{Heterogeneity.} Comparing two sources means reconciling them by hand.
-Country names differ (\texttt{United States} / \texttt{US} / \texttt{USA}),
-sub-national units are keyed sometimes by name and sometimes by code, cumulative
-and incident quantities are mixed, and equivalent indicators carry different
-names. This reconciliation is repeated independently by every analyst, is rarely
-published with the analysis, and is a frequent source of silent error. It also
-puts the data out of reach of the audiences for whom these series are most
-instructive --- secondary-school and university students, science journalists,
-and researchers from outside epidemiology.
+\bigskip
 
-\textbf{Impermanence.} The problem has since changed nature. JHU CSSE stopped
-collecting on 10 March 2023~\cite{dong2022}; several national portals have been
-retired or restructured, and URLs that anchored thousands of analyses no longer
-resolve. Retrospective and comparative work on the pandemic --- which is now
-most of the work being done --- therefore rests on sources that are no longer
-where they were, and that a reviewer often cannot re-fetch. Long-term
-accessibility has become the binding constraint on reproducibility.
+\textbf{Heterogeneity.} Datasets from different providers cannot generally be
+compared directly. Equivalent indicators carry different column names from one
+source to another, dates follow different formats, daily and cumulative
+quantities appear under similar labels, country names vary
+(\texttt{United States} / \texttt{US} / \texttt{USA}), and sub-national units
+are identified sometimes by name and sometimes by code. 
+Reporting schedules also differ: pauses over weekends or holidays can produce
+artificial spikes when publication resumes~\cite{dong2022}. Comparative analysis therefore requires
+source-specific reconciliation procedures, often implemented separately for
+each study and not always made available alongside the resulting analysis. This
+process is both time-consuming and error-prone. Heterogeneity also raises the
+technical barrier for audiences to whom these data are particularly valuable:
+secondary-school and university students, science journalists, and researchers
+from other disciplines.
 
-Several Python and R tools give programmatic access to pandemic data.
-\texttt{covid}~\cite{covid_pypi} and COVID19Py~\cite{covid19py} are thin
-wrappers around a single upstream feed, with no visualisation and no geographic
-layer. The COVIDcast Epidata API~\cite{reinhart2021} of the Delphi group offers
-a rich, well-documented set of signals with genuine normalisation, but is
-centred on the United States. \texttt{covid19.analytics}~\cite{ponce2020} covers
-JHU data with analysis and plotting facilities, within the R ecosystem. Generic
-dashboard frameworks such as Dash~\cite{dash} render anything but reconcile
-nothing. None of them mirrors its payloads, so all of them degrade as their
-upstream sources disappear. Table~\ref{tab:comparison} summarises the
-comparison.
+
+
+\bigskip
+
+\textbf{Impermanence.} Open data are not necessarily permanent data. The JHU
+CSSE team documented the substantial effort required to maintain access to
+pandemic data~\cite{dong2022}: web scrapers were developed for more than four
+hundred sources, each requiring maintenance whenever a provider changed the
+structure of its website. Availability also changed over time. Some providers reduced the geographic resolution of their reporting; others
+shifted from daily to weekly updates or adopted an irregular schedule. In other cases,
+datasets themselves disappeared. The Chilean Ministry of Science, for
+instance, published national COVID-19 data in a public GitHub repository that
+is no longer publicly accessible~\cite{minciencia}.
+Retrospective and comparative analyses depend on datasets that are sometimes
+no longer available at their original locations and therefore cannot always be
+independently retrieved by a reviewer. Long-term data accessibility has thus
+become a key requirement for reproducibility.
+
+\bigskip
+
+Dashboards were an early response to the demand for accessible pandemic
+information. A survey conducted in 2020 initially identified 265 public
+web-based COVID-19 dashboards, of which 158 were ultimately included in its
+comparative assessment~\cite{ivankovic2021}. Dashboards, however, are primarily
+designed to display information rather than to provide reusable data. Their
+choice of indicators, geographic coverage, and temporal scope is determined by
+their authors; the underlying datasets may not be available for download; and
+the displayed information cannot be readily recombined with data
+from other sources.
+
+\bigskip
+
+Several software tools have also been developed to facilitate access to pandemic data. \texttt{covid}~\cite{covid_pypi} and
+\texttt{COVID19Py}~\cite{covid19py} provide lightweight interfaces to a small
+number of original data sources, but offer limited support for analysis and
+visualisation.  The COVIDcast Epidata API~\cite{reinhart2021} offers a
+well-documented collection of more than 170 signals from 12 data sources,
+combining traditional public health indicators with auxiliary signals derived
+from medical claims, surveys, mobility data, and internet search trends. These
+signals are provided in a common format at fine geographic and temporal
+resolution, and historical revisions are explicitly tracked. Its geographic
+coverage, however, remains focused on the United States.
+\texttt{covid19.analytics}~\cite{ponce2020} gives access within the R
+ecosystem to several sources of global COVID-19 data, including case, testing,
+vaccination, and genomic data. It also includes data-integrity checks,
+analytical and modelling tools, and static and interactive visualisations.
+Replicas of live datasets are maintained in a dedicated GitHub backup
+repository for redundancy and robust accessibility.
+
+
+\texttt{pyvoa} was designed to combine data access, geographic reconciliation,
+visualisation, and data preservation within a single Python framework.
+Table~\ref{tab:comparison} summarises the main differences between
+\texttt{pyvoa} and the tools discussed above.
 
 \begin{table}[!h]
 \centering
-\small
+\footnotesize
+\setlength{\tabcolsep}{3pt}
 \begin{tabular}{lccccc}
 \toprule
-\textbf{Tool} & \textbf{Lang.} & \textbf{Sources} & \textbf{Geo.} & \textbf{Viz.} & \textbf{Mirrored} \\
+\textbf{Tool} & \textbf{Lang.} & \textbf{Resources} &
+\textbf{Geo.} & \textbf{Viz.} & \textbf{Preservation} \\
 \midrule
-\texttt{covid}~\cite{covid_pypi}            & Python & 2   & --         & --         & -- \\
-COVID19Py~\cite{covid19py}                  & Python & 1   & --         & --         & -- \\
-COVIDcast~\cite{reinhart2021}               & Py/R   & 10+ & US only    & \checkmark & -- \\
-\texttt{covid19.analytics}~\cite{ponce2020} & R      & 2   & --         & \checkmark & -- \\
-Dash~\cite{dash}                            & Python & --  & --         & \checkmark & -- \\
-\textbf{pyvoa}                              & Python & 25  & \checkmark & \checkmark & Zenodo \\
+\texttt{covid}~\cite{covid_pypi}
+    & Python & 2 & No & No & No \\
+\texttt{COVID19Py}~\cite{covid19py}
+    & Python & 1 & No & No & No \\
+COVIDcast~\cite{reinhart2021}
+    & Python/R & 12 & Yes (US) & Yes & Revision history \\
+\texttt{covid19.analytics}~\cite{ponce2020}
+    & R & 7 & No & Yes & GitHub backup repo \\
+\texttt{pyvoa} (this work)
+    & Python & 25 & Yes & Yes & Zenodo archive \\
 \bottomrule
 \end{tabular}
-\caption{pyvoa and comparable tools. ``Sources'': databases exposed through one
-interface; ``Geo.'': reconciliation of geographic identifiers across sources;
-``Viz.'': built-in charts and maps; ``Mirrored'': payloads served from an
-archive with a persistent identifier rather than from the upstream URL.}
+
+\caption{Comparison of tools for accessing, analysing, and visualising pandemic
+data. ``Resources'': distinct data resources accessible through the tool's interface;
+``Geo.'': automatic reconciliation of geographic identifiers across
+heterogeneous data sources; ``Viz.'': built-in visualisation capabilities;
+``Preservation'': mechanisms for retaining data or historical versions beyond
+direct retrieval from the original source.}
+
 \label{tab:comparison}
 \end{table}
 
-pyvoa answers both problems with one design. Twenty-five databases are
-described declaratively, normalised into one schema, joined to a geolocation
-layer that resolves names and supplies geometries, and served from the project's
-own Zenodo deposits rather than from upstream URLs. A complete figure is two
-lines of Python. Nothing in that design is specific to COVID-19, and the
-catalogue has stopped being: mpox, the acute respiratory infections of the
-Réseau Sentinelles, United States measles cases~\cite{ahmadi2025} and the 2026
-Bundibugyo ebolavirus outbreak in the Democratic Republic of the
-Congo~\cite{bdbv2026} are described by the same JSON descriptors as the rest.
+The two challenges identified above are addressed in \texttt{pyvoa} through a
+common architecture. Twenty-five data resources are described declaratively,
+normalised into a common schema, and linked to a geographic layer that
+reconciles location identifiers and provides the corresponding geometries.
+Data can be retrieved either from their original sources, when current values
+are required, or from the project's Zenodo deposits, which preserve previously
+retrieved datasets. Once a data resource has been integrated, the same interface can
+be used for data retrieval, geographic processing, and visualisation, allowing
+a complete figure to be produced in only a few lines of Python.
 
-\attnpar{Références remplacées. Le brouillon citait \texttt{ritchie2020} (page web OWID)
-et \texttt{covidcast} (site web Delphi) ; je les ai remplacés par les articles évalués
-par les pairs correspondants (\emph{Sci. Data} pour OWID~\cite{mathieu2021},
-\emph{PNAS} pour COVIDcast~\cite{reinhart2021}), plus citables dans un journal Elsevier.
-Le brouillon citait aussi \texttt{heer2008} pour désigner Tableau : cet article porte sur
-l'historique graphique en visualisation et n'est pas une référence de Tableau ; la
-mention de Tableau a été supprimée, et un outil commercial propriétaire n'a de toute
-façon pas sa place dans le tableau comparatif. Enfin ECDC et INSEE, cités dans
-l'introduction du brouillon, ne correspondent à \emph{aucune} base du catalogue
-(cf.~\texttt{pyvoa/data/}) : supprimés.}
 
-\attnpar{À vérifier avant soumission. \textbf{(a)}~La date d'arrêt de JHU CSSE
-(10~mars~2023) : contrôler dans~\cite{dong2022} ou sur le dépôt CSSEGISandData, et
-harmoniser avec la formulation retenue. \textbf{(b)}~Le nombre de sources attribué à
-COVIDcast (« 10+ ») dans le tableau~\ref{tab:comparison} : le vérifier sur la
-documentation Delphi actuelle, ou remplacer par une formulation qualitative pour éviter
-une contestation en relecture. \textbf{(c)}~Le tableau comparatif est le passage le plus
-exposé d'un article SoftwareX : chaque « -- » doit être défendable. Vérifier en
-particulier que \texttt{covid19.analytics} n'a effectivement pas de couche de
-réconciliation géographique.}
+\bigskip
 
+This architecture is not specific to COVID-19. The catalogue has progressively
+been extended to other infectious diseases and surveillance systems, including
+mpox~\cite{owid_mpox}, acute respiratory infections monitored by the French
+Réseau Sentinelles~\cite{sentinelles_ira}, measles cases in the United
+States~\cite{ahmadi2025}, and the 2026 Bundibugyo ebolavirus outbreak in the
+Democratic Republic of the Congo~\cite{bdbv2026}. These resources are described using the same JSON-based mechanism as their
+COVID-19 counterparts. New resources can therefore be added without modifying
+the core library.
+
+
+\bigskip
+
+The archival component complements this source-agnostic architecture by
+preserving retrieved datasets as persistent and independently citable records.
+Archived copies can therefore remain accessible even if the original source
+changes or disappears, improving both recoverability and reproducibility.
 
 %% ============================================================================
 %%  2. SOFTWARE DESCRIPTION
@@ -898,7 +899,7 @@ que si c'est décidé.}
 %%  DECLARATIONS
 %% ============================================================================
 
-\section*{CRediT authorship contribution statement}
+\section*{CrediT authorship contribution statement}
 
 \textbf{Tristan Beau:} Conceptualization, Methodology, Software, Project
 administration, Writing -- original draft.
@@ -964,22 +965,40 @@ in real time, Lancet Infect.\ Dis.\ 20~(5) (2020) 533--534.
 
 \bibitem{dong2022}
 E.~Dong, J.~Ratcliff, T.D.~Goyea, et~al., The Johns Hopkins University Center
-for Systems Science and Engineering COVID-19 Dashboard: data collection process,
-challenges and future enhancements, Can.\ J.\ Stat.\ 50~(4) (2022) 1418--1438.
-\url{https://doi.org/10.1002/cjs.11744}.
+for Systems Science and Engineering COVID-19 Dashboard: data collection
+process, challenges faced, and lessons learned, Lancet Infect.\ Dis.\ 22~(12)
+(2022) e370--e376. \url{https://doi.org/10.1016/S1473-3099(22)00434-0}.
 
 \bibitem{mathieu2021}
 E.~Mathieu, H.~Ritchie, E.~Ortiz-Ospina, et~al., A global database of COVID-19
 vaccinations, Nat.\ Hum.\ Behav.\ 5 (2021) 947--953.
 \url{https://doi.org/10.1038/s41562-021-01122-8}.
 
+
+\bibitem{minciencia}
+Ministerio de Ciencia, Tecnología, Conocimiento e Innovación (Chile),
+Datos-COVID19,
+\url{https://github.com/MinCiencia/Datos-COVID19}
+(repository no longer public; URL unresolved as of 25 August 2026).
+An archived snapshot of the GitHub repository, dated 3 September 2023, is
+available from the Internet Archive:
+\url{https://web.archive.org/web/20230903082956/https://github.com/MinCiencia/Datos-COVID19/}.
+
+
+\bibitem{ivankovic2021}
+D.~Ivanković, E.~Barbazza, V.~Bos, et~al., Features constituting actionable
+COVID-19 dashboards: descriptive assessment and expert appraisal of 158 public
+web-based COVID-19 dashboards, J.\ Med.\ Internet Res.\ 23~(2) (2021) e25682.
+\url{https://doi.org/10.2196/25682}.
+
+
 \bibitem{covid_pypi}
 covid --- Python package to get information regarding the novel coronavirus,
-\url{https://pypi.org/project/covid/}.
+\url{https://pypi.org/project/covid/}, accessed 25 August 2026.
 
 \bibitem{covid19py}
 COVID19Py --- a tiny Python package for easy access to up-to-date coronavirus
-data, \url{https://pypi.org/project/COVID19Py/}.
+data, \url{https://pypi.org/project/COVID19Py/}, accessed 25 August 2026.
 
 \bibitem{reinhart2021}
 A.~Reinhart, L.~Brooks, M.~Jahja, et~al., An open repository of real-time
@@ -991,9 +1010,30 @@ M.~Ponce, A.~Sandhel, covid19.analytics: An R package to obtain, analyze and
 visualize data from the 2019 coronavirus disease pandemic, J.\ Open Source
 Softw.\ 6~(60) (2021) 2995. \url{https://doi.org/10.21105/joss.02995}.
 
-\bibitem{dash}
-Plotly, Dash: a Python framework for building analytical web applications,
-\url{https://dash.plotly.com/}.
+
+\bibitem{owid_mpox}
+Our World in Data,
+Mpox data,
+\url{https://github.com/owid/monkeypox},
+accessed 25 August 2026.
+
+\bibitem{sentinelles_ira}
+Réseau Sentinelles,
+Infection respiratoire aiguë (IRA),
+\url{https://www.sentiweb.fr/?page=maladies&mal=25},
+accessed 25 August 2026.
+
+\bibitem{ahmadi2025}
+F.~Ahmadi, E.~Dong, L.~Gardner, Tracking county-level measles cases in the US,
+JAMA 334~(23) (2025) 2130--2132.
+\url{https://doi.org/10.1001/jama.2025.17812}.
+
+\bibitem{bdbv2026}
+C.~Judge, B.~Gutierrez, L.H.~Tsui, M.U.G.~Kraemer, et~al., INRB-UMIE/BDBV2026-Data:
+data for the 2026 Bundibugyo ebolavirus outbreak, Zenodo (2026).
+\url{https://doi.org/10.5281/zenodo.21223302}.
+
+
 
 \bibitem{mckinney2010}
 W.~McKinney, Data structures for statistical computing in Python, in: Proc.\
@@ -1012,15 +1052,6 @@ Bokeh Development Team, Bokeh: Python library for interactive visualization,
 M.L.~Waskom, seaborn: statistical data visualization, J.\ Open Source Softw.\
 6~(60) (2021) 3021. \url{https://doi.org/10.21105/joss.03021}.
 
-\bibitem{ahmadi2025}
-F.~Ahmadi, E.~Dong, L.~Gardner, Tracking county-level measles cases in the US,
-JAMA 334~(23) (2025) 2130--2132.
-\url{https://doi.org/10.1001/jama.2025.17812}.
-
-\bibitem{bdbv2026}
-C.~Judge, B.~Gutierrez, L.H.~Tsui, M.U.G.~Kraemer, et~al., INRB-UMIE/BDBV2026-Data:
-data for the 2026 Bundibugyo ebolavirus outbreak, Zenodo (2026).
-\url{https://doi.org/10.5281/zenodo.21223302}.
 
 \bibitem{modcov19}
 T.~Beau, J.~Browaeys, O.~Dadoun, PyCoa: Python Covid Analysis, MODCOV19
