@@ -151,6 +151,8 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             which = which[0]
+            title = kwargs['title']
+            drawn = input['date'].max()
             # what = kwargs.get('what')
             # when = kwargs.get('when') : the title now reads the date drawn
             typeofhist = kwargs.get('typeofhist')
@@ -158,7 +160,8 @@ class AllVisu:
             kwargs['logo'] = self.logo
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             windows =  InputOption().windows
-
+            if title == InputOption().d_graphicsinput_args['title']:
+                kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
@@ -198,15 +201,6 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            if not kwargs['dateslider']:
-                # The date drawn, not the end of the requested range: `when` has
-                # already been expanded to the database's full span by the time
-                # it gets here, so it named the last day of the data rather than
-                # the day selected, e.g. when='01/12/2022' was titled 09/03/2023.
-                drawn = input['date'].max()
-                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which']) + '(' + drawn.strftime('%d/%m/%Y') +')'
-            else:
-                kwargs['title'] = self.database_name.upper() + ': database ' + str(kwargs['which'])
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
             if kwargs['kwargsuser']['what'] != 'current':
