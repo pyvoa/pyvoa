@@ -114,7 +114,7 @@ class visu_matplotlib:
                     linestyle=st[idx]
                 )
 
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, title=", ".join(what),ncol=len(what))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10,ncol=len(what))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
         return ax
 
@@ -152,13 +152,19 @@ class visu_matplotlib:
         input['allyears'] = input['allyears'].astype(int)
 
         input.loc[:,'dayofyear']= input['date'].apply(lambda x : x.dayofyear)
+        where = input['where'][0]
 
-        input['where'][0]
         d = input.allyears.unique()
         for i in d:
             df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
-            ax.plot(df.index,df,label=f'{i}')
-        ax.legend(d)
+            ax.plot(df.index,df,label=f'{i} {where}')
+        month_starts = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
+        month_labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+                        'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']
+
+        ax.set_xticks(month_starts)
+        ax.set_xticklabels(month_labels)
+        ax.legend()
         return ax
 
     @decomatplotlib
@@ -179,7 +185,7 @@ class visu_matplotlib:
         input = input.set_index('where')
         ax =  input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
-        ax.legend(bbox_to_anchor=(0.8, 0.9), loc='upper left')
+        ax.legend(bbox_to_anchor=(0.8, 0.9), loc='upper left',title=what)
         ax.set_title(title)
         return ax
 
