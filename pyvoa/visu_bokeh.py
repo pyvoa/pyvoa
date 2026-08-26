@@ -1468,8 +1468,9 @@ class visu_bokeh:
 
         _min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
 
-        color_bar = ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
-                             border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
+        color_bar = ColorBar(title=which,color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
+                             border_line_color=None, location=(0, 0), orientation='horizontal',
+                             ticker=BasicTicker())
         color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
 
         max_val = np.nanmax(input[which])
@@ -1493,7 +1494,6 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
-
         bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
         fill_color = {'field': which, 'transform': color_mapper},
         line_color = 'black', line_width = 0.25)
