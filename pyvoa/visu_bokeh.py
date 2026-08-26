@@ -1,18 +1,15 @@
 
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""The bokeh visualisation backend.
+
+The most complete of the three backends: the only one offering the ``compare``
+and ``spiral`` plots and the date slider, alongside the plots, histograms and
+maps the others share. Figures are returned as bokeh objects.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.visu_bokeh
-
-About :
--------
-
-
 """
 import base64
 import bisect
@@ -60,6 +57,12 @@ from pyvoa.tools import PyvoaError, min_max_range, verb
 
 
 def safe_output_notebook():
+    """Enable bokeh's notebook output, but only inside a notebook.
+
+    Calling output_notebook() from a plain interpreter emits a warning and
+    achieves nothing, so the environment is detected first and the failure
+    reported through verb() rather than raised.
+    """
     try:
         from IPython import get_ipython
         ipy = get_ipython()
@@ -74,7 +77,20 @@ safe_output_notebook()
 
 
 class visu_bokeh:
+    """The bokeh backend, drawing interactive charts.
+
+    The most complete of the three: it is the only one offering the
+    'compare' and 'spiral' plots and the date slider, alongside the plots,
+    histograms and maps the others share. Figures are returned as bokeh
+    objects and shown in the notebook by front.
+    """
+
     def __init__(self,):
+        """Set the colour cycles and the default figure size.
+
+        Category20 gives the twenty colours locations are cycled through, and
+        Category10 the five used where fewer are needed.
+        """
         self.av = InputOption()
         self.lcolors = Category20[20]
         self.scolors = Category10[5]
@@ -84,12 +100,38 @@ class visu_bokeh:
 
     @staticmethod
     def rollerJS():
+        """Return the hover formatter shared by the bokeh charts.
+
+        Reads pyvoa/js/rollover_callback.js and wraps it in a CustomJSHover, so
+        that the tooltip formatting lives in a javascript file rather than in a
+        string here.
+
+        Returns
+        -------
+        CustomJSHover
+            the formatter.
+        """
         from pathlib import Path
         jsfile = Path(__file__).parent / "js/rollover_callback.js"
         return CustomJSHover(code=jsfile.read_text(encoding="utf-8"))
 
     @staticmethod
     def pyvoalogo(logo):
+        """Read a logo file and return it as a data: URL.
+
+        Embedding the image in the document rather than linking it keeps a
+        saved chart self-contained.
+
+        Parameters
+        ----------
+        logo : str
+            path to the png.
+
+        Returns
+        -------
+        str
+            a 'data:image/png;base64,...' URL.
+        """
         with open(logo, "rb") as f:
             data = f.read()
         b64 = base64.b64encode(data).decode("utf-8")
@@ -97,8 +139,15 @@ class visu_bokeh:
         return url
 
     def deco_bokeh(func):
+        """Decorate building the bokeh figure a chart is drawn on.
+
+        Gives each location a stable colour from the Category20 cycle, then
+        creates the figure, its title and the logo watermark, and passes them
+        on to the drawing method.
+        """
         @wraps(func)
         def innerdeco_bokeh(self,**kwargs):
+            """Assign the location colours, build the figure, then draw."""
             input = kwargs.get('input')
             unique_where = input['where'].unique()
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
@@ -138,6 +187,23 @@ class visu_bokeh:
 
     @staticmethod
     def geosource_bounds(geosource):
+        """Return the bounding box of every geometry in a GeoJSON source.
+
+        Parameters
+        ----------
+        geosource : GeoJSONDataSource
+            the source to measure.
+
+        Returns
+        -------
+        tuple
+            (x_min, y_min, x_max, y_max).
+
+        Raises
+        ------
+        ValueError
+            if the source holds no usable geometry.
+        """
         from shapely.geometry import shape
 
         data = json.loads(geosource.geojson)
@@ -158,6 +224,13 @@ class visu_bokeh:
 
     @staticmethod
     def bokeh_legend(bkfigure):
+        """Make a double-click on the figure hide and show the legend.
+
+        Parameters
+        ----------
+        bkfigure
+            the bokeh figure to attach the callback to.
+        """
         from bokeh.models import CustomJS
         toggle_legend_js = CustomJS(args={'leg': bkfigure.legend[0]},
         code="""
@@ -173,16 +246,24 @@ class visu_bokeh:
         bkfigure.js_on_event(events.DoubleTap, toggle_legend_js)
 
     def get_listfigures(self):
+        """Return the figures built by the last call."""
         return  self.listfigs
 
     def set_listfigures(self,fig):
+            """Record the figures built, wrapping a single one in a list."""
             if not isinstance(fig,list):
                 fig = [fig]
             self.listfigs = fig
 
     def bokeh_plot(func):
+        """Decorate shortening the location labels before a chart is drawn.
+
+        Replaces each location by its display name, and drops the geometry
+        column, which the non-map charts have no use for.
+        """
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
+            """Shorten the location labels and drop the geometry, then draw."""
             input=kwargs['input']
             kwargs['maxlettersdisplay']
             input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
@@ -195,29 +276,35 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_versus_plot(self,**kwargs):
-        '''
-        -----------------
-        Create a versus plot according to arguments.
-        See help(bokeh_versus_plot).
-        Keyword arguments
-        -----------------
-        - input = None : if None take first element. A DataFrame with a Pypyvoa.struture is mandatory
-        |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-        - which = if None take second element. It should be a list dim=2. Moreover the 2 variables must be present
-        in the DataFrame considered.
-        - plot_heigh = Width_Height_Default[1]
-        - graph_width = Width_Height_Default[0]
-        - title = None
-        - copyright = default
-        - mode = mouse
-        - dateslider = None if True
-                - orientation = horizontal
-        - when : default min and max according to the inpude DataFrame.
-                 Dates are given under the format dd/mm/yyyy.
-                 when format [dd/mm/yyyy : dd/mm/yyyy]
-                 if [:dd/mm/yyyy] min date up to
-                 if [dd/mm/yyyy:] up to max date
-        '''
+        """Create a versus plot according to arguments.
+
+        Parameters
+        ----------
+        input : pd.DataFrame
+            If None, take the first element. A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It must be a list of dimension 2, and
+            both variables must be present in the DataFrame considered.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        mode : str
+            Default is 'mouse'.
+        dateslider : bool
+            Default is None. If True, orientation is horizontal.
+        when : str
+            Default is the min and the max of the input DataFrame. Dates are given
+            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
+            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
+            max date.
+        """
         input = kwargs.get('input')
         which = kwargs.get('which')
         # copyright = kwargs.get('copyright')
@@ -271,28 +358,36 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_date_plot(self,**kwargs):
-        '''
-        -----------------
-        Create a date plot according to arguments. See help(bokeh_date_plot).
-        Keyword arguments
-        -----------------
-        - input = None : if None take first element. A DataFrame with a Pypyvoa.struture is mandatory
-        |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-        - which = if None take second element could be a list
-        - plot_heigh= Width_Height_Default[1]
-        - graph_width = Width_Height_Default[0]
-        - title = None
-        - copyright = default
-        - mode = mouse
-        - guideline = False
-        - dateslider = None if True
-                - orientation = horizontal
-        - when : default min and max according to the inpude DataFrame.
-                 Dates are given under the format dd/mm/yyyy.
-                 when format [dd/mm/yyyy : dd/mm/yyyy]
-                 if [:dd/mm/yyyy] min date up to
-                 if [dd/mm/yyyy:] up to max date
-        '''
+        """Create a date plot according to arguments.
+
+        Parameters
+        ----------
+        input : pd.DataFrame
+            If None, take the first element. A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It could be a list.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        mode : str
+            Default is 'mouse'.
+        guideline : bool
+            Default is False.
+        dateslider : bool
+            Default is None. If True, orientation is horizontal.
+        when : str
+            Default is the min and the max of the input DataFrame. Dates are given
+            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
+            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
+            max date.
+        """
         input = kwargs.get('input')
 
         which = kwargs.get('which')
@@ -393,6 +488,25 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_spiral_plot(self, **kwargs):
+        """Draw one location's series as an Archimedean spiral.
+
+        Each year is one turn, the day of the year giving the angle, so that
+        seasonality shows up as alignment between successive turns. The value
+        is drawn as a ribbon whose width straddles the baseline. The 29th of
+        February is dropped so that a day number means the same date every
+        year.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input' (a single
+            location) and 'which'.
+
+        Raises
+        ------
+        PyvoaError
+            if the selection holds more than one location.
+        """
         input = kwargs.get('input')
         which = kwargs.get('which')
         dicof={'title':kwargs.get('title')}
@@ -421,6 +535,7 @@ class visu_bokeh:
         radius = 200
         polar_norm = radius/input["r_baseline"].max()
         def polar(theta,r,norm=polar_norm):
+            """Convert an angle and a radius to x, y, scaled to the figure."""
             x = norm*r*np.cos(theta)
             y = norm*r*np.sin(theta)
             return x,y
@@ -478,31 +593,38 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_menu_plot(self, **kwargs):
-        '''
-        -----------------
-        Create a date plot, with a scrolling menu location, according to arguments.
-        See help(bokeh_menu_plot).
-        Keyword arguments
-        -----------------
-        len(location) > 2
-        - input = None : if None take first element. A DataFrame with a Pypyvoa.struture is mandatory
-        |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-        - which = if None take second element could be a list
-        - plot_heigh= Width_Height_Default[1]
-        - graph_width = Width_Height_Default[0]
-        - title = None
-        - copyright = default
-        - mode = mouse
-        - guideline = False
-        - dateslider = None if True
-                - orientation = horizontal
-        - when : default min and max according to the inpude DataFrame.
-                 Dates are given under the format dd/mm/yyyy.
-                 when format [dd/mm/yyyy : dd/mm/yyyy]
-                 if [:dd/mm/yyyy] min date up to
-                 if [dd/mm/yyyy:] up to max date
-        '''
+        """Create a date plot with a scrolling menu of locations.
 
+        Requires more than two locations.
+
+        Parameters
+        ----------
+        input : pd.DataFrame
+            If None, take the first element. A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It could be a list.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        mode : str
+            Default is 'mouse'.
+        guideline : bool
+            Default is False.
+        dateslider : bool
+            Default is None. If True, orientation is horizontal.
+        when : str
+            Default is the min and the max of the input DataFrame. Dates are given
+            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
+            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
+            max date.
+        """
         input = kwargs.get('input')
         which= kwargs.get('which')
         guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
@@ -551,6 +673,17 @@ class visu_bokeh:
                 cross= CrosshairTool()
                 fig.add_tools(cross)
             def add_line(pyvoa, options, init, color, fig=fig):
+                """Add one selectable series to the figure.
+
+                Builds the Select widget and the line it drives, wired together by a
+                javascript callback so that changing the selection swaps the data
+                without a round trip to python.
+
+                Returns
+                -------
+                tuple
+                    (the Select widget, its legend item).
+                """
                 s = Select(options = options, value = init)
                 r = fig.line(x = 'date', y = 'cases', source = pyvoa, line_width = 3, line_color = color)
                 li = LegendItem(label = init, renderers = [r])
@@ -579,28 +712,36 @@ class visu_bokeh:
     @deco_bokeh
     @bokeh_plot
     def bokeh_yearly_plot(self,**kwargs):
-        '''
-        -----------------
-        Create a date plot according to arguments. See help(bokeh_date_plot).
-        Keyword arguments
-        -----------------
-        - input = None : if None take first element. A DataFrame with a Pypyvoa.struture is mandatory
-        |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-        - which = if None take second element could be a list
-        - plot_heigh= Width_Height_Default[1]
-        - graph_width = Width_Height_Default[0]
-        - title = None
-        - copyright = default
-        - mode = mouse
-        - guideline = False
-        - dateslider = None if True
-                - orientation = horizontal
-        - when : default min and max according to the inpude DataFrame.
-                 Dates are given under the format dd/mm/yyyy.
-                 when format [dd/mm/yyyy : dd/mm/yyyy]
-                 if [:dd/mm/yyyy] min date up to
-                 if [dd/mm/yyyy:] up to max date
-        '''
+        """Create a yearly plot according to arguments.
+
+        Parameters
+        ----------
+        input : pd.DataFrame
+            If None, take the first element. A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It could be a list.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        mode : str
+            Default is 'mouse'.
+        guideline : bool
+            Default is False.
+        dateslider : bool
+            Default is None. If True, orientation is horizontal.
+        when : str
+            Default is the min and the max of the input DataFrame. Dates are given
+            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
+            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
+            max date.
+        """
         input = kwargs['input']
         which = kwargs['which']
         guideline = kwargs.get('guideline',self.av.d_graphicsinput_args['guideline'][0])
@@ -683,8 +824,15 @@ class visu_bokeh:
 
     ''' VERTICAL HISTO '''
     def decodateslider(func):
+        """Decorate adding a date slider to a chart.
+
+        Wires a slider to the figure so the drawn date can be moved through the
+        series. Histograms are not covered: the slider is declined there, with
+        a message. Bokeh only; front refuses 'dateslider' for other backends.
+        """
         @wraps(func)
         def inner_decodateslider(self, **kwargs):
+            """Attach the slider to the figure, then draw."""
             input = kwargs['input']
             which  = kwargs.get('which')
             if isinstance(which,list):
@@ -864,26 +1012,30 @@ class visu_bokeh:
 
     @deco_bokeh
     def bokeh_histo(self, **kwargs):
-        '''
-            -----------------
-            Create 1D histogramme by value according to arguments.
-            See help(bokeh_histo).
-            Keyword arguments
-            -----------------
-            - input : A DataFrame with a Pypyvoa.struture is mandatory
-            |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-            - which = if None take second element could be a list
-            - plot_heigh= Width_Height_Default[1]
-            - graph_width = Width_Height_Default[0]
-            - title = None
-            - copyright = default
-            - when : default min and max according to the inpude DataFrame.
-                     Dates are given under the format dd/mm/yyyy.
-                     when format [dd/mm/yyyy : dd/mm/yyyy]
-                     if [:dd/mm/yyyy] min date up to
-                     if [dd/mm/yyyy:] up to max date
-        '''
+        """Create a 1D histogram by value according to arguments.
 
+        Parameters
+        ----------
+        input : pd.DataFrame
+            A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It could be a list.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        when : str
+            Default is the min and the max of the input DataFrame. Dates are given
+            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
+            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
+            max date.
+        """
         input = kwargs.get('input')
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which  = kwargs.get('which')
@@ -999,6 +1151,21 @@ class visu_bokeh:
     @decodateslider
     def bokeh_horizonhisto(self, **kwargs):
         # input = kwargs.get('input')
+        """Draw a horizontal bar chart, one bar per location.
+
+        Bars are ranked by value and labelled with it. Only maxcountrydisplay
+        locations are shown at a time, the rest reachable through the widget.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'which', the column
+            data source, and optionally 'dateslider'.
+
+        Returns
+        -------
+        The bokeh figure.
+        """
         which=kwargs['which']
         columndatasrc = kwargs.get('columndatasrc')
         # which = kwargs.get('which')
@@ -1076,10 +1243,34 @@ class visu_bokeh:
         return tabs
 
     def addcolumnshisto(self,mypd,which,maxcountrydisplay):
+        """Add the geometry columns a horizontal bar chart needs.
+
+        Computes each bar's left, right, top and bottom edges, and the position
+        and text of its label, so the chart can be drawn from plain rectangles.
+
+        Parameters
+        ----------
+        mypd : pd.DataFrame
+            one row per location.
+        which : str
+            the column holding the value.
+        maxcountrydisplay : int
+            how many bars fit on screen at once.
+
+        Returns
+        -------
+        pd.DataFrame
+            mypd with the drawing columns added.
+        """
         ymax = self.figure_height
         mypd['left'] = mypd[which]
         mypd['right'] = mypd[which]
         def _fmt(v):
+            """Format a bar label.
+
+            Three significant digits for very large or very small values, two decimals
+            otherwise.
+            """
             fv = float(v)
             if fv == 0:
                 return '0'
@@ -1101,6 +1292,23 @@ class visu_bokeh:
 
     ''' PIE '''
     def addcolumnspie(self,df,column_name):
+        """Add the angle columns a pie chart needs.
+
+        Turns each value into its share of the total and into the start and end
+        angles of its wedge.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            one row per location.
+        column_name : str
+            the column holding the value.
+
+        Returns
+        -------
+        pd.DataFrame
+            df with 'percentage', 'angle', 'starts' and 'ends'.
+        """
         df = df.copy()
         column_sum = df[column_name].sum()
         df['percentage'] = df[column_name]/column_sum
@@ -1125,23 +1333,29 @@ class visu_bokeh:
     @deco_bokeh
     @decodateslider
     def bokeh_pie(self, **kwargs):
-        '''
-            -----------------
-            Create a pie chart according to arguments.
-            See help(bokeh_pie).
-            Keyword arguments
-            -----------------
-            - pyvoafiltered : A DataFrame with a Pypyvoa.struture is mandatory
-            |location|date|Variable desired|daily|cumul|weekly|code|clustername|rolloverdisplay|
-            - which = if None take second element could be a list
-            - plot_heigh= Width_Height_Default[1]
-            - graph_width = Width_Height_Default[0]
-            - title = None
-            - copyright = default
-            - mode = mouse
-            - dateslider = None if True
-                    - orientation = horizontal
-        '''
+        """Create a pie chart according to arguments.
+
+        Parameters
+        ----------
+        pyvoafiltered : pd.DataFrame
+            A DataFrame with a pyvoa structure is
+            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
+            clustername|rolloverdisplay|``.
+        which : list
+            If None, take the second element. It could be a list.
+        plot_heigh : int
+            Default is Width_Height_Default[1].
+        graph_width : int
+            Default is Width_Height_Default[0].
+        title : str
+            Default is None.
+        copyright : str
+            Default is the pyvoa copyright.
+        mode : str
+            Default is 'mouse'.
+        dateslider : bool
+            Default is None. If True, orientation is horizontal.
+        """
         columndatasrc = kwargs.get('columndatasrc')
         fig = kwargs.get('bokeh_figure_linear')
         controls = kwargs.get('controls', None)
@@ -1208,6 +1422,22 @@ class visu_bokeh:
     @deco_bokeh
     @decodateslider
     def bokeh_map(self,**kwargs):
+        """Draw a choropleth map of one variable.
+
+        Colours each location by its value and, unless the map is drawn dense,
+        lays it over the background tiles named by 'tile'. The pyvoa logo is
+        stamped in a corner.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including the GeoJSON source, the
+            colour mapper, 'which', 'typeofmap' and 'tile'.
+
+        Returns
+        -------
+        The bokeh figure holding the map.
+        """
         input = kwargs.get('input')
         geocolumndatasrc = kwargs.get('geocolumndatasrc')
         which = kwargs.get('which')
@@ -1278,11 +1508,20 @@ class visu_bokeh:
 
     @staticmethod
     def bokeh_savefig(fig,name):
+        """Write a bokeh figure to a png file.
+
+        Parameters
+        ----------
+        fig
+            the figure to export.
+        name : str
+            the destination file name.
+        """
         export_png(fig, filename = name)
 
     @staticmethod
     def convert_tile(tilename, which = 'bokeh'):
-        ''' Return tiles url according to folium or bokeh resquested'''
+        """Return tiles url according to folium or bokeh resquested."""
         tile = 'openstreet'
         if tilename == 'openstreet':
             if which == 'folium':
