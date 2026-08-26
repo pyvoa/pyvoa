@@ -11,6 +11,21 @@ open licence, public repository, documentation, tests, CI, a citable archived
 release — since those are what any software-paper venue asks for. What changes
 is the paper itself; see section 3.
 
+## Still open, at a glance
+
+Updated 2026-08-26. Detail in the numbered sections below.
+
+| # | Open item | Blocking? |
+|---|---|---|
+| 3.1 | **The manuscript is 354 words over the SoftwareX limit.** The only red job on CI. Editorial, and the authors' call. | **yes — CI is red** |
+| 3 | The editorial `\attn` items inside `main.tex`: the reproducible-capsule link (C3/S3), the §4 adoption evidence, the AI-use declaration, the official template's section list. | submission |
+| 1 | The Zenodo `0.5.0` record still differs from `CITATION.cff` — affiliations, keywords, `continues`, and the wheel is not archived. Decide: edit by hand, or let `0.5.1` be the first consistent deposit. | no |
+| 1 | Whether to declare the IdEx award as a structured Zenodo `grants` entry. Attach through the UI; test on the sandbox before putting it in the file. | no |
+| 2 | Confirm the four issue forms render on GitHub while signed in, and add the version placeholder in `bug_report.yml` to the release checklist. | no |
+| 5 | Two documentation URLs now exist — `pyvoa.org` and `pyvoa.github.io/pyvoa`. Decide how they relate. | no |
+| 6 | `front.merger()` has never been callable. Implement or remove before the paper claims an API. | no |
+| — | `tile='openstreet'`, the default basemap, returns OpenStreetMap's 403 "Access blocked" tiles. A default that does not work. | no |
+
 **Status, 2026-08-10.** Tasks 1-6 of the original plan are done and shipped as
 v0.5.0: the `shutil` fix, PEP 621 packaging, the offline pytest suite, GitHub
 Actions, the community files, and the README. The release is live on PyPI
@@ -18,7 +33,8 @@ Actions, the community files, and the README. The release is live on PyPI
 `10.5281/zenodo.21829901`, version `10.5281/zenodo.21829902`). Discussions,
 issue labels, repository description, homepage and topics are all set on
 GitHub. `CITATION.cff` has no placeholders left. `git log` and `CHANGELOG.md`
-carry the detail; this file now tracks only what is still open.
+carry the detail; this file tracks what is still open, summarised in *Still
+open, at a glance* above.
 
 The documentation pass of 2026-08-07 is committed. So is the fix for the red
 CI: the four `GeoInfo` tests built a real `GeoInfo(0)`, whose `gm=0` makes
@@ -114,6 +130,64 @@ blocked" 403 images (the paper passes `tile='positron'` instead), and
 `pip install pyvoa` always has matplotlib, whatever "optional backend" means
 elsewhere.
 
+**Landed 2026-08-25 and 2026-08-26.** Authorship metadata, the docstrings, and
+the documentation site. The suite is at 250 passed, 22 deselected, with one
+known failure — see section 3, which is now the only thing keeping CI red.
+`ruff check` on the tracked tree is clean.
+
+- **Authorship metadata is aligned across the repository.** `AUTHORS` and
+  `paper/main.tex` carry the affiliations in the form the journal expects, and
+  `CITATION.cff`, `.zenodo.json`, `codemeta.json` and `schemaorg.jsonld` now
+  repeat them verbatim, with Olivier Dadoun's `dadoun@in2p3.fr` and the paper's
+  keywords. The same pass brought the two schema files back in step with
+  `pyproject.toml` (`beautifulsoup4`, python 3.13) and put the three people in
+  `[project] authors`, where the project address had stood, so
+  `importlib.metadata.metadata("pyvoa")["Author"]` and `pyvoa.__author__` agree.
+  `maintainers` stays `contact@pyvoa.org`. Build requirements dropped `wheel`
+  and gained the `setuptools>=64` floor the `attr:` version read needs.
+- **`pyvoa/__version__.py` documents what reads it** — setuptools statically,
+  and `tests/test_paper.py` as text — and therefore why it must stay a plain
+  literal with no imports. It described a `setup.py` that has not existed since
+  the move to PEP 621.
+- **`saveoutput()` wrote `pycoa.ut.xlsx`.** A `pycoa` rename had run through
+  the default string itself; it is `pyvoa_out` now. Called before `setwhom()`
+  it raised a bare `AttributeError` on `None`, and raises `PyvoaError` now.
+- **Every function and class in `pyvoa/` has a docstring**, 274 of them, up
+  from 176. Worst case were the four chart methods: `functools.wraps` carries
+  the *innermost* docstring out to the caller, so `pf.get` had none at all and
+  `pf.plot` and `pf.hist` advertised a `fig` parameter no caller can pass. The
+  public contract is written on the innermost definition, which is what reaches
+  `pf.plot?`.
+- **Docstrings are NumPy style throughout, and ruff enforces it.** 135 Google
+  sections converted, 87 summaries put in the imperative mood, five class
+  `Methods` sections dropped as duplicating autodoc. `pyproject.toml` selects
+  `D` with `convention = "numpy"`; `examples/*` is exempt entirely and
+  `tests/*` from `D100`-`D104` only. The tree is at zero `D` findings, so a
+  docstring that drifts now fails CI.
+- **The API documentation is generated and published.** `docs/` is a Sphinx
+  tree read by napoleon; `.github/workflows/docs.yml` builds it on every pull
+  request and deploys from `main` to GitHub Pages, live at
+  <https://pyvoa.github.io/pyvoa/>. `make html` passes `-W`, so a docstring
+  that stops rendering fails the build. The landing page carries two figures
+  from `paper/figures/`.
+
+Three things worth knowing before touching the docs again:
+
+- **A module added to or renamed in `pyvoa/` needs its `.rst` in `docs/api/`.**
+  This already bit once: `kwarg_options.py` became `kwargs_options.py` and the
+  docs build went red, which under `-W` is how a silently missing page
+  surfaces. `sphinx-apidoc` would generate the stubs automatically, at the cost
+  of the hand-written grouping in `backends.rst` and `front.rst`.
+- **`docs/_static` is kept in git by a `.gitkeep`.** `conf.py` names it in
+  `html_static_path` and Sphinx warns fatally under `-W` when it is missing.
+  Git does not track empty directories, so without that file the build passed
+  locally and failed on CI alone. Rehearse a docs change from `git archive`,
+  never from a copied working tree.
+- **The four optional backends are mocked** (`bokeh`, `seaborn`, `folium`,
+  `branca`) in `autodoc_mock_imports`: none is a hard dependency, so none is
+  present in the environment the workflow builds from. autodoc still reads the
+  real `pyvoa` modules.
+
 Sections 1-3 below were last re-verified against GitHub, PyPI and Zenodo on
 2026-08-07. Of those, only the two Zenodo DOIs were re-checked on 2026-08-10,
 while adding the badge: both resolve, and `21829902` is the 0.5.0 version
@@ -128,10 +202,14 @@ survive on record `21829902`; the other five noted earlier (Beau's missing
 ORCID, `dadoun, olivier` lowercased, `v0.5.0` vs `0.5.0`, publication date, the
 concept DOI) have since been corrected on Zenodo or in `CITATION.cff`.
 
-| Field | Zenodo record | `CITATION.cff` |
+Re-checked against the live record on 2026-08-26. The divergence has widened
+slightly, because `CITATION.cff`'s affiliations and keywords were rewritten on
+2026-08-25 and the deposit predates that.
+
+| Field | Zenodo record `21829902` | `CITATION.cff` |
 |---|---|---|
-| affiliations | `Université Paris Cité`, `Centre National de la Recherche Scientifique` | full UMR strings |
-| keywords | 6 | 8 — `epidemiology` and `COVID-19` dropped |
+| affiliations | `Université Paris Cité` (Beau, Browaeys), `Centre National de la Recherche Scientifique` (Dadoun) | `Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France` and the MSC equivalent |
+| keywords | 6: `open data`, `data visualisation`, `geolocation`, `python`, `reproducible research`, `science education` | 8: adds `epidemiological data` and `COVID-19`, has `geospatial data` for `geolocation` and `Python` for `python` |
 | `continues` | `https://pyvoa.org` | the pycoa repository |
 | files archived | `pyvoa-0.5.0.tar.gz` only | wheel + sdist on the GitHub release |
 
@@ -206,8 +284,10 @@ Four things worth knowing before touching it again:
 - **Page count.** `make final` gives 13 pages, but the class is
   `preprint,12pt,a4paper`, a reading layout. Recompiled with Elsevier's
   `final,5p,times,twocolumn`, the same source is 6 pages including the metadata
-  tables and the references. That is the layout the 6-page limit refers to. The
-  word count (about 2400 of 3000) is checked by `tests/test_paper.py`.
+  tables and the references. That is the layout the 6-page limit refers to.
+- **The word count is over, and it is what keeps CI red.** See §3.1 below; the
+  "about 2400 of 3000" recorded here on 2026-08-13 was measured by a counter
+  that was reading the wrong region.
 - **elsarticle is not in every TeX Live.** It was absent here; the CTAN source
   builds the class with `tex elsarticle.ins`, and it drops into
   `~/texmf/tex/latex/elsarticle/`. `latexmk` was absent too, so the Makefile
@@ -215,6 +295,41 @@ Four things worth knowing before touching it again:
 - **`CITATION.cff`'s commented `preferred-citation` title was changed** to the
   manuscript's, since the two must be the same string and the test enforces it.
   If the title changes at submission, change it in both.
+
+### 3.1 The manuscript is 354 words over — the only red job on CI
+
+`tests/test_paper.py::test_within_softwarex_limits` fails, and with it all five
+`pytest` jobs and `paper/code consistency`, since they run the same suite. It
+is the only failure; `ruff` and `Docs` are green.
+
+It reported 4050 words for a long time, and that number was wrong. The test
+ends the counted region at `\section*{CRediT`, and the manuscript spelled the
+heading `\section*{CrediT`, so the split never matched and the count swept in
+the declarations, the acknowledgements and the whole bibliography — 696 words
+SoftwareX does not count. The manuscript had the typo, not the test: the
+taxonomy is CRediT, Elsevier's own heading spells it so, and `AUTHORS` and
+`CONTRIBUTING.md` already did. Corrected on 2026-08-26.
+
+That leaves the real number, **3354 against a limit of 3000**. The counter was
+checked for other over-counting and there is none: the metadata tables sit
+before §1, `tabular` and `lstlisting` environments are stripped, the `\attn`
+annotations are removed, comments are dropped.
+
+| Section | Words |
+|---|---:|
+| Abstract | 130 |
+| 1. Motivation and significance | 904 |
+| 2. Software description | 1080 |
+| 3. Illustrative examples | 618 |
+| 4. Impact | 469 |
+| 5. Conclusions | 153 |
+| **Total** | **3354** — over by **354** |
+
+Trimming 354 words is editorial work on the authors' own prose, and `4d616f6`
+records the abstract and §1 as settled, so it was deliberately not done. §2 at
+1080 words is the obvious candidate and §4 usually compresses well. Do **not**
+raise the 3000 in the test: it encodes a journal requirement, and the paper
+would be desk-rejected instead of failing a test.
 
 ### The original text of this section
 
@@ -282,6 +397,39 @@ Not urgent and not obviously worth a wide pin: a floor on the majors that are
 actually supported (`pandas>=2`, `numpy>=1.24`, …) would cost little and say
 something true, whereas upper bounds would need maintenance at every upstream
 release. Decide before 0.6.0 and record the decision here.
+
+## 5. Two documentation URLs now exist
+
+`https://pyvoa.github.io/pyvoa/` went live on 2026-08-26, built from `docs/` by
+`.github/workflows/docs.yml`. `https://pyvoa.org` was already live and is what
+`CITATION.cff`, `codemeta.json`, `schemaorg.jsonld`, `.zenodo.json` and the
+README all name as the project URL, and what the Zenodo record carries as
+`isDocumentedBy`.
+
+Nothing is broken by having both, but a reader should not have to guess which
+is current, and the SoftwareX code metadata table asks for a documentation
+link. Three ways out, none of them started:
+
+- point `pyvoa.org` at the Pages site with a link or a redirect, and keep the
+  metadata as it is;
+- make `pyvoa.org` a custom domain for the Pages site (a `CNAME` in the
+  published artefact plus a DNS record), so the two become one address;
+- keep them separate, `pyvoa.org` as the project's front page and the Pages
+  site as the API reference, and add the Pages URL to the metadata files.
+
+Whichever is chosen, record it here and put the answer in the code metadata
+table before submission.
+
+## 6. `front.merger()` has never been callable
+
+`pyvoa/front.py:1774` calls `self.gpdbuilder.merger(coapandas=...)`, and no
+`merger` exists on `GPDBuilder` or anywhere else in the package — the method
+raises `AttributeError` on any call. It is a public method with a docstring,
+so it reads as API.
+
+Implement it or remove it. Removing is a breaking change to a documented name
+and belongs in `CHANGELOG.md`; leaving it means the published API reference
+now advertises it, since the docs are generated from the docstrings.
 
 ---
 
