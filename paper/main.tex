@@ -453,9 +453,6 @@ rather than failing on import.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.5\textwidth]{figures/schema_PYVOA_vertical.pdf}
-\attn{figure matricielle (1500$\times$1934~px, RGBA). Elsevier demande 300~dpi
-minimum pour un dessin au trait : à cette largeur elle passe, mais une version
-vectorielle (PDF/EPS) serait préférable.}
 \caption{Architecture of pyvoa. Upstream providers are mirrored on Zenodo; JSON
 descriptors drive the parser; the geolocation layer reconciles names and adds
 geometries; the front end exposes one query grammar and three chart families.}
@@ -687,28 +684,7 @@ reports of the Institut National de Santé Publique.}
 \label{fig:beyond}
 \end{figure}
 
-\attnpar{\textbf{Exemples et figures refaits} à partir du notebook
-\texttt{PaperExamples.ipynb} mis à jour. Quatre exemples au lieu de cinq, quatre
-figures au lieu de six : le compte de figures passe à cinq avec
-l'architecture, sous la limite de six, et la section perd environ 200 mots ---
-ce qui aide, le manuscrit dépassant la limite de 3000. Les quatre listings sont
-\emph{identiques caractère pour caractère} aux cellules du notebook et aux
-\emph{banners} de \texttt{paper\_examples.py}~; un test le vérifie côté dépôt.
-\textbf{(1)}~L'exemple~1 passe de \texttt{'European Union'} à
-\texttt{'Western Europe'} (sous-région du découpage géographique des Nations
-unies, neuf États, dont trois hors UE). \textbf{(2)}~L'exemple~2 passe de
-\texttt{'OECD'} au \texttt{'G20'} et du 01/12/2022 au 31/12/2021~; l'argument
-\texttt{tile=} disparaît, la valeur par défaut étant \texttt{'esri'}, qui rend
-correctement. \textbf{(3)}~L'exemple~3 remplace l'histogramme de vaccination
-\texttt{owid} par les hospitalisations \texttt{spf} normalisées à la
-population, ce qui montre l'option \texttt{normalize:} et la granularité
-départementale en une seule figure au lieu de deux. La phrase sur la sortie
-pandas y est conservée : c'est le seul endroit du manuscrit qui cite
-\texttt{mckinney2010}. \textbf{(4)}~L'exemple~5 (\texttt{measles-usa} +
-\texttt{ebolardc}, deux figures) devient l'exemple~4, une seule figure, un
-camembert par \emph{zone de santé}~; la rougeole reste citée en texte, sa
-référence \texttt{ahmadi2025} étant par ailleurs appelée section~2.
-\textbf{Reste à trancher} : la figure~\ref{fig:beyond} porte la date du
+\attnpar{\textbf{Reste à trancher} : la figure~\ref{fig:beyond} porte la date du
 17/08/2026, dernier jour couvert par la source --- à figer si la soumission
 tarde. \textbf{À relancer avant soumission} :
 \texttt{python paper\_examples.py -{-}check}, puis
