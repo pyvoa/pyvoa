@@ -324,9 +324,10 @@ def test_within_softwarex_limits(body: str) -> None:
     every digit in the PDF renders as U+FFFD, so a text extraction of it is
     not a usable source and the pages have to be read.
 
-    The figure limit is not stated in the guide at all. Six is kept as the
-    working assumption of the LaTeX template, which is not in this repository;
-    it is not a number this test can defend.
+    The figure limit is not in the guide, but the template is now in the
+    repository and states it: "Limit figures to a maximum of six (6) and
+    sparingly include any further display media." So all three numbers here
+    are sourced.
     """
     figures = len(re.findall(r"\\begin\{figure\}", body))
     assert figures <= 6, f"SoftwareX allows 6 figures, the manuscript has {figures}"
