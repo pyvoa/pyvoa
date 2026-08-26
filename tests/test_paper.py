@@ -305,16 +305,34 @@ def test_release_dois_are_the_project_ones(tex: str) -> None:
 
 
 def test_within_softwarex_limits(body: str) -> None:
+    """Check the manuscript against the limits of the guide for authors.
+
+    The numbers come from the SoftwareX guide for authors,
+    https://www.elsevier.com/journals/softwarex/23527110/guide-for-authors,
+    read on 2026-08-26: "A short descriptive paper of 4000-word limit" and
+    "You are required to provide 1 to 7 keywords for indexing purposes".
+
+    Both were previously asserted at values that are not in the guide -- 3000
+    words and 6 keywords -- and the word figure alone failed every pytest job
+    on a manuscript that was inside the real limit the whole time. Change a
+    number here only against the guide, and record which edition says so:
+    every digit in the PDF renders as U+FFFD, so a text extraction of it is
+    not a usable source and the pages have to be read.
+
+    The figure limit is not stated in the guide at all. Six is kept as the
+    working assumption of the LaTeX template, which is not in this repository;
+    it is not a number this test can defend.
+    """
     figures = len(re.findall(r"\\begin\{figure\}", body))
     assert figures <= 6, f"SoftwareX allows 6 figures, the manuscript has {figures}"
 
     keywords = re.search(r"\\begin\{keyword\}(.*?)\\end\{keyword\}", body, re.DOTALL)
     assert keywords, "no \\begin{keyword} block"
     n_kw = len([k for k in keywords.group(1).split(r"\sep") if k.strip()])
-    assert n_kw <= 6, f"SoftwareX allows 6 keywords, the manuscript has {n_kw}"
+    assert n_kw <= 7, f"SoftwareX allows 7 keywords, the manuscript has {n_kw}"
 
-    assert _word_count(body) <= 3000, (
-        f"SoftwareX allows 3000 words for the abstract and sections 1-5; "
+    assert _word_count(body) <= 4000, (
+        f"SoftwareX allows 4000 words for the abstract and sections 1-5; "
         f"the manuscript has about {_word_count(body)}"
     )
 
