@@ -61,29 +61,6 @@ class GeoManager:
         List of supported output types.
     _standard : str
         Currently used normalization standard.
-
-    Methods
-    -------
-    __init__
-        Initializes the GeoManager with a specified standard.
-    get_GeoRegion
-        Returns the local instance of GeoRegion.
-    get_region_list
-        Returns a list of regions via the GeoRegion instance.
-    get_list_standard
-        Returns the list of supported standard names for countries.
-    get_list_output
-        Returns the list of supported output types.
-    get_list_db
-        Returns the list of supported database names for country name translation.
-    get_standard
-        Returns the current standard used within the GeoManager class.
-    set_standard
-        Sets the working standard type within the GeoManager class.
-    to_standard
-        Converts a list of location strings to a normalized list according to the current standard.
-    first_db_translation
-        Translates country names to standard formats for specific databases.
     """
 
     _list_standard: ClassVar[list]=['iso2',   # Iso2 standard, default
@@ -490,18 +467,6 @@ class GeoInfo:
         DataFrame containing population data.
     _data_flag : pd.DataFrame
         DataFrame containing flag data.
-
-    Methods
-    -------
-    get_GeoManager
-        Return the local instance of the GeoManager used.
-    get_list_field
-        Return a sorted list of the supported additional fields.
-    get_source
-        Return the source of the information provided for a given field.
-    add_field
-        Add the requested fields to a pandas DataFrame, keyed on its
-        location column. See the method for its own parameters.
     """
 
     """GeoInfo class definition. No inheritance from any other class.
@@ -841,21 +806,6 @@ class GeoRegion:
         A dictionary mapping region codes to region names.
     _p_gs : DataFrame
         A pandas DataFrame containing geographical data including country codes and region associations.
-
-    Methods
-    -------
-    __init__
-        Initializes the GeoRegion instance, populating region and country data from external sources.
-    get_source
-        Returns the source dictionary containing URLs for geographical data.
-    get_region_list
-        Returns a list of all region names available in the region dictionary.
-    is_region
-        Checks if the provided region name is valid and returns the correctly formatted region name or False.
-    get_countries_from_region
-        Returns a sorted list of ISO3 country codes for the specified region.
-    get_pandas
-        Returns the pandas DataFrame containing geographical data.
     """
 
     """GeoRegion class definition. Does not inheritate from any other
@@ -1194,57 +1144,6 @@ class GeoCountry:
         A dictionary mapping country ISO3 codes to their respective data source URLs.
     _source_dict : dict
         A dictionary mapping country ISO3 codes to their respective data sources and additional information.
-
-    Methods
-    -------
-    __init__
-        Initializes the GeoCountry instance with a specified country.
-    set_dense_geometry
-        Sets the geometry to a dense representation for subregions and regions.
-    set_exploded_geometry
-        Sets the geometry to an exploded representation for certain countries.
-    set_main_geometry
-        Sets the geometry to the main representation for subregions and regions.
-    is_dense_geometry
-        Returns whether the current geometry is dense.
-    is_exploded_geometry
-        Returns whether the current geometry is exploded.
-    is_main_geometry
-        Returns whether the current geometry is the main representation.
-    get_source
-        Returns information about the data source for the current country.
-    get_country
-        Returns the currently set country.
-    get_list_countries
-        Returns a sorted list of supported countries.
-    is_init
-        Checks if the country is initialized.
-    test_is_init
-        Raises an error if the country is not initialized.
-    get_region_list
-        Returns a list of available regions with their codes, names, and geometries.
-    is_region
-        Checks if a given region is valid and returns its correctly capitalized name.
-    get_subregion_list
-        Returns a list of available subregions with their codes, names, and geometries.
-    is_subregion
-        Checks if a given subregion is valid and returns its correctly capitalized name.
-    get_subregions_from_region
-        Returns a list of subregions within a specified region.
-    get_subregions_from_list_of_region_names
-        Returns a list of subregions based on a list of region names.
-    get_regions_from_subregion
-        Returns a list of regions containing a specified subregion.
-    get_regions_from_list_of_subregion_codes
-        Returns a list of regions based on a list of subregion codes.
-    get_regions_from_macroregion
-        Retrieves regions from a specified macroregion based on its name or code.
-    get_list_properties
-        Retrieves and sorts the properties of the country data.
-    get_data
-        Returns the entire geopandas data, optionally region-based.
-    add_field
-        Adds an additional column to the data with specified properties.
     """
 
     """GeoCountry class definition.
@@ -1835,7 +1734,7 @@ class GeoCountry:
         ------
         PyvoaError
             If the geometry is already set to main or exploded, or if the current country
-        does not support dense geometry.
+            does not support dense geometry.
 
         Returns
         -------
@@ -2097,7 +1996,7 @@ class GeoCountry:
         ------
         PyvoaError
             If the object is not initialized with a non-empty
-        country string.
+            country string.
 
         Returns
         -------
@@ -2162,7 +2061,7 @@ class GeoCountry:
         -------
         DataFrame
             A DataFrame containing the subregion properties and their
-        corresponding geometries.
+            corresponding geometries.
         """
         cols=[c for c in self.get_list_properties() if '_subregion' in c ]
         cols.append('geometry')
@@ -2311,7 +2210,7 @@ class GeoCountry:
         -------
         list
             A list of unique regions associated with the specified subregion code,
-        either as codes or names based on the output parameter.
+            either as codes or names based on the output parameter.
         """
         """ Return the list of regions where the subregion, given by a code, is.
         Output default is 'code' of subregions. Can be changer with output='name'.
