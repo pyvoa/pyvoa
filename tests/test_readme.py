@@ -30,7 +30,7 @@ def readme() -> str:
 
 @pytest.fixture(scope="module")
 def rows(readme: str) -> dict[str, list[str]]:
-    """The database table, as {key: [coverage, granularity, source, read from]}."""
+    """Return the database table, as {key: [coverage, granularity, source, read from]}."""
     found = {}
     for line in readme.splitlines():
         m = re.match(r"^\|\s*`([^`]+)`\s*\|(.*)\|\s*$", line)

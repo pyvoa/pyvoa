@@ -227,7 +227,7 @@ class _FakeGeoInfo:
 
 @pytest.fixture
 def offline_parser(monkeypatch):
-    """A DataParser built from tests/data/good_db.json and tests/data/tiny.csv."""
+    """Build a DataParser from tests/data/good_db.json and tests/data/tiny.csv."""
     with open(DATA / "good_db.json") as handle:
         metadata = json.load(handle)
 
@@ -378,8 +378,11 @@ def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
 
 
 def test_dataparser_reads_a_csv_without_a_header_line(monkeypatch):
-    """The 'names' key names the columns of a headerless csv, as the DRC
-    Ebola long files are shipped."""
+    """Read a headerless csv through the 'names' key.
+
+    The key names the columns of a csv shipped without a header line, as the
+    DRC Ebola long files are.
+    """
     with open(DATA / "headerless_db.json") as handle:
         metadata = json.load(handle)
 
@@ -424,7 +427,7 @@ def test_dataparser_splits_the_where_of_a_composite_location(monkeypatch):
 
 
 def test_dataparser_fills_and_cumulates_increments(monkeypatch):
-    """fillmissing turns a silent day into a zero, so the sum never stops.
+    """Fillmissing turns a silent day into a zero, so the sum never stops.
 
     The payload has 1 case on the 1st, then 2 + 1 on the 3rd, and says
     nothing about the 2nd.

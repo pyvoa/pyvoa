@@ -23,7 +23,7 @@ from pyvoa.tools import PyvoaError
 
 @pytest.fixture
 def bare_manager():
-    """A GeoManager built without __init__, hence without any download."""
+    """Build a GeoManager without __init__, hence without any download."""
     return geo.GeoManager.__new__(geo.GeoManager)
 
 
@@ -71,7 +71,7 @@ def test_geomanager_advertises_its_databases(bare_manager):
 
 @pytest.fixture
 def bare_info():
-    """A GeoInfo built without __init__, hence without any download.
+    """Build a GeoInfo without __init__, hence without any download.
 
     ``GeoInfo(0)`` would build a GeoManager, and with it a GeoRegion. Both
     methods below only read the class-level ``_list_field``, so no instance
@@ -153,7 +153,7 @@ CONVERTERS = [
 
 @pytest.fixture
 def fake_country():
-    """A GeoCountry over two regions, the first holding two subregions.
+    """Build a GeoCountry over two regions, the first holding two subregions.
 
     ``DEU`` is deliberate: ``get_data(region_version=True)`` special-cases
     FRA, ESP, PRT, USA and EUR, and none of that machinery is under test.
