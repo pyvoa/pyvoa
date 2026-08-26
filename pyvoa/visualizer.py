@@ -115,7 +115,6 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             # what = kwargs.get('what')
-            when = kwargs.get('when')
             title = kwargs.get('title')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logosmall
