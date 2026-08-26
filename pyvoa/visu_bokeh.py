@@ -905,7 +905,9 @@ class visu_bokeh:
             else:
                 bins = 11
 
-        delta = (max_val - min_val) / bins
+        # Dead assignment kept for the record: the bin width is implied by the
+        # linspace below, which is what the histogram actually uses.
+        # delta = (max_val - min_val) / bins
 
         interval = np.linspace(
             min_val,
@@ -938,7 +940,7 @@ class visu_bokeh:
                 'right': interval[1:],
                 'middle_bin': [
                     format((i + j) / 2, ".1f")
-                    for i, j in zip(interval[:-1], interval[1:])
+                    for i, j in itertools.pairwise(interval)
                 ],
                 'top': [
                     len(contributors[i])
