@@ -13,18 +13,44 @@ is the paper itself; see section 3.
 
 ## Still open, at a glance
 
-Updated 2026-08-26. Detail in the numbered sections below.
+Updated 2026-08-26, after the guide for authors and the LaTeX template were
+added to `paper/`. **CI is green.** Detail in the numbered sections below.
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 3.1 | **The manuscript is 354 words over the SoftwareX limit.** The only red job on CI. Editorial, and the authors' call. | **yes — CI is red** |
-| 3 | The editorial `\attn` items inside `main.tex`: the reproducible-capsule link (C3/S3), the §4 adoption evidence, the AI-use declaration, the official template's section list. | submission |
+| 3.2 | **The generative-AI declaration is an annotation, not a statement.** The guide requires the declaration on submission, and the repository carries public traces of AI assistance a reviewer will find. | **yes, for submission** |
+| 3.3 | Highlights (3–5 bullets, ≤85 characters, separate file) and a graphical abstract (531×1328 px). Both *encouraged*, neither written. | no |
+| 3.4 | The funding wording now follows the journal and no longer matches `AUTHORS` to the letter. Confirm the funder accepts it, or revert to parentheses. | decision |
+| 3 | The `\attn` items still inside `main.tex`: the §4 adoption evidence, and moving the bibliography to BibTeX before submission. | submission |
 | 1 | The Zenodo `0.5.0` record still differs from `CITATION.cff` — affiliations, keywords, `continues`, and the wheel is not archived. Decide: edit by hand, or let `0.5.1` be the first consistent deposit. | no |
 | 1 | Whether to declare the IdEx award as a structured Zenodo `grants` entry. Attach through the UI; test on the sandbox before putting it in the file. | no |
 | 2 | Confirm the four issue forms render on GitHub while signed in, and add the version placeholder in `bug_report.yml` to the release checklist. | no |
 | 5 | Two documentation URLs now exist — `pyvoa.org` and `pyvoa.github.io/pyvoa`. Decide how they relate. | no |
 | 6 | `front.merger()` has never been callable. Implement or remove before the paper claims an API. | no |
-| — | `tile='openstreet'`, the default basemap, returns OpenStreetMap's 403 "Access blocked" tiles. A default that does not work. | no |
+| — | The template asks for a `Licence.txt`; the repository has `LICENSE`, no extension. Almost certainly fine, but "your paper will be returned if these are missing" is their wording. | no |
+| — | `GeoRegion` resolves `'G20'` to twenty entries with `MEX` duplicated — nineteen distinct countries. | no |
+
+### Closed since the previous revision
+
+- **The word limit is 4000, not 3000.** The guide says so and the template
+  repeats it. `tests/test_paper.py` asserted 3000 with no source, which failed
+  every pytest job and the paper/code job on a manuscript that was inside the
+  real limit throughout. Keywords likewise: the guide allows 1 to 7, the test
+  demanded 6 or fewer. Both corrected, and the figure limit of six now has the
+  template as its source. This was the whole of the red CI.
+- **The reproducible-capsule cells are no longer a blocker.** The current
+  template has eight code-metadata rows and no such row at all; the manuscript
+  was carrying a table from an older edition. Both C3 and S3 are gone, and the
+  tables now follow the template, headings included, with the executable
+  software version after the bibliography where the template puts it.
+- **The subsections of §3 are numbered** 3.1 to 3.4, as the guide asks, and a
+  stale reference to a deleted "Example 5" was found and fixed in §4.
+- **The funding statement** is in the journal's prescribed `Funding: ...`
+  form — see 3.4 above for what that cost.
+- **`tile='openstreet'` was never the default.** This file said it was, twice.
+  `listtile()` is `['esri', 'positron', 'stamen', 'openstreet', None]` and the
+  first entry is the default, so maps are drawn on Esri tiles and render
+  correctly. The 403 applies only when `'openstreet'` is asked for by name.
 
 **Status, 2026-08-10.** Tasks 1-6 of the original plan are done and shipped as
 v0.5.0: the `shutil` fix, PEP 621 packaging, the offline pytest suite, GitHub
@@ -124,8 +150,10 @@ which any test covered, all fixed with the figures as evidence:
   **date actually drawn**, so `when='01/12/2022'` was titled `09/03/2023`.
 
 Two things found and *not* changed, because they are decisions rather than bugs:
-the default basemap `tile='openstreet'` now returns OpenStreetMap's "Access
-blocked" 403 images (the paper passes `tile='positron'` instead), and
+`tile='openstreet'` returns OpenStreetMap's "Access blocked" 403 images (the
+paper passed `tile='positron'` to avoid it, and now passes nothing, `'esri'`
+being the default — this entry originally said openstreet was the default,
+which it is not), and
 `contextily` — a required dependency — itself requires `matplotlib`, so a plain
 `pip install pyvoa` always has matplotlib, whatever "optional backend" means
 elsewhere.
@@ -267,13 +295,18 @@ step, or the placeholder will drift again.
 
 **In the tree since 2026-08-13**, as `paper/main.tex` (elsarticle), `paper/Makefile`,
 `paper/README.md`, `paper/figures/` and `tests/test_paper.py`. It builds: `make
-draft` and `make final` both compile, and the consistency tests are green. What
-remains is editorial, and is listed in the `\attn` annotations of `main.tex`
-itself — the reproducible-capsule link (C3/S3), the third-party-adoption
-evidence for Section 4, the AI-use declaration, and a check of the official
-template's exact section list.
+draft` and `make final` both compile, and all thirteen consistency tests pass.
 
-Four things worth knowing before touching it again:
+Since 2026-08-26 the two authorities are in `paper/` as well:
+`softwarex-osp-template.tex`, which is LPPL-licensed and committed, and the
+guide for authors as a PDF, which is Elsevier copyright and **gitignored** —
+read it, cite it, do not push it. `main.tex` has been checked against both and
+now follows the template's metadata tables, headings, section order and
+numbering. What remains is editorial: §3.2 to §3.4 below, plus the
+third-party-adoption evidence for Section 4 and the move to BibTeX, both still
+`\attn` annotations in the file.
+
+Five things worth knowing before touching it again:
 
 - **The figures are produced, not drawn.** `examples/pyfiles/paper_examples.py`
   writes all five of them into `paper/figures/` under the names the .tex
@@ -285,9 +318,15 @@ Four things worth knowing before touching it again:
   `preprint,12pt,a4paper`, a reading layout. Recompiled with Elsevier's
   `final,5p,times,twocolumn`, the same source is 6 pages including the metadata
   tables and the references. That is the layout the 6-page limit refers to.
-- **The word count is over, and it is what keeps CI red.** See §3.1 below; the
-  "about 2400 of 3000" recorded here on 2026-08-13 was measured by a counter
-  that was reading the wrong region.
+- **The word count is fine, and always was.** 3231 against 4000. See §3.1; the
+  "about 2400 of 3000" recorded here on 2026-08-13 was two errors cancelling —
+  a counter reading the wrong region, against a limit that was never the
+  journal's.
+- **The metadata tables come from the template, not from memory.** Eight code
+  rows, seven software rows, and the executable-software section sits after the
+  bibliography because that is where the template puts it. Renumbering them
+  moves the row `tests/test_paper.py` reads for the dependency check, which is
+  C6.
 - **elsarticle is not in every TeX Live.** It was absent here; the CTAN source
   builds the class with `tex elsarticle.ins`, and it drops into
   `~/texmf/tex/latex/elsarticle/`. `latexmk` was absent too, so the Makefile
@@ -296,40 +335,70 @@ Four things worth knowing before touching it again:
   manuscript's, since the two must be the same string and the test enforces it.
   If the title changes at submission, change it in both.
 
-### 3.1 The manuscript is 354 words over — the only red job on CI
+### 3.1 The word count — closed
 
-`tests/test_paper.py::test_within_softwarex_limits` fails, and with it all five
-`pytest` jobs and `paper/code consistency`, since they run the same suite. It
-is the only failure; `ruff` and `Docs` are green.
+The manuscript is 3231 words against a limit of **4000**, and CI is green.
 
-It reported 4050 words for a long time, and that number was wrong. The test
-ends the counted region at `\section*{CRediT`, and the manuscript spelled the
-heading `\section*{CrediT`, so the split never matched and the count swept in
-the declarations, the acknowledgements and the whole bibliography — 696 words
-SoftwareX does not count. The manuscript had the typo, not the test: the
-taxonomy is CRediT, Elsevier's own heading spells it so, and `AUTHORS` and
-`CONTRIBUTING.md` already did. Corrected on 2026-08-26.
+The limit had been asserted at 3000 in `tests/test_paper.py`, with no source,
+and that one number failed all five pytest jobs and the paper/code consistency
+job for as long as this file has existed. The guide for authors, now in
+`paper/`, says "A short descriptive paper of 4000-word limit"; the template
+repeats it as "Our word limit is 4,000 words". Nothing was ever wrong with the
+manuscript's length.
 
-That leaves the real number, **3354 against a limit of 3000**. The counter was
-checked for other over-counting and there is none: the metadata tables sit
-before §1, `tabular` and `lstlisting` environments are stripped, the `\attn`
-annotations are removed, comments are dropped.
+Two traps for anyone re-checking this. The guide's PDF renders **every digit**
+as U+FFFD, so `pdftotext` and `pypdf` both report the limits as `����` — the
+pages have to be read as images. And the counted region depends on the CRediT
+heading being spelled `CRediT`: the test ends the region at that string, and
+while the manuscript spelled it `CrediT` the count swept in the declarations,
+the acknowledgements and the whole bibliography, giving 4050.
 
-| Section | Words |
-|---|---:|
-| Abstract | 130 |
-| 1. Motivation and significance | 904 |
-| 2. Software description | 1080 |
-| 3. Illustrative examples | 618 |
-| 4. Impact | 469 |
-| 5. Conclusions | 153 |
-| **Total** | **3354** — over by **354** |
+Section 3 was also shortened, from five examples to four, when the figures were
+reworked. That was worth doing on its own merits but was not, in the end,
+necessary to fit.
 
-Trimming 354 words is editorial work on the authors' own prose, and `4d616f6`
-records the abstract and §1 as settled, so it was deliberately not done. §2 at
-1080 words is the obvious candidate and §4 usually compresses well. Do **not**
-raise the 3000 in the test: it encodes a journal requirement, and the paper
-would be desk-rejected instead of failing a test.
+### 3.2 The generative-AI declaration is still an annotation — blocking
+
+`\section*{Declaration of generative AI and AI-assisted technologies in the
+writing process}` exists and contains only an `\attnpar` telling the authors
+what to write. The guide requires the declaration at submission. The suggested
+wording is in the annotation itself.
+
+Two things the annotation already notes and that remain true. Use of assistants
+in the *code* is not what this declaration covers — it is about the writing —
+but the repository carries public traces either way (`CLAUDE.md`, this file,
+and the 0.3.1 changelog entry recording that docstrings were written with LLM
+assistance), and a reviewer will find them. And Elsevier has revised the
+required wording twice; check it at submission rather than trusting the
+annotation.
+
+### 3.3 Highlights and a graphical abstract
+
+Neither exists. Both are *encouraged*, not required, and both are submitted as
+separate files rather than in the manuscript:
+
+- **Highlights** — 3 to 5 bullet points, each at most 85 characters including
+  spaces, in a file with "highlights" in its name.
+- **Graphical abstract** — 531 x 1328 pixels (h x w) or proportionally larger,
+  readable at 5 x 13 cm, as TIFF, EPS, PDF or an MS Office file.
+
+`paper/figures/architecture.png` is close to what a graphical abstract wants
+and is already the paper's own diagram; it is portrait, 1500 x 1934, so it
+would need recomposing to the required aspect.
+
+### 3.4 The funding wording no longer matches AUTHORS to the letter
+
+The guide prescribes a literal form, `Funding: This work was supported by ...
+[grant numbers xxxx]`, and the acknowledgements now use it. `AUTHORS` requires
+its own sentence to be reused verbatim — with `(ANR-18-IDEX-0001)` in
+parentheses — and says so as a condition of the grant. The two cannot both
+hold to the word.
+
+Every element the funder mandates is present, and
+`test_funding_acknowledgement_is_present` checks those four fragments against
+`AUTHORS`, so the repository's guard still holds. What is not settled is
+whether the funder cares about the punctuation. If it does, revert to
+parentheses and tell the journal why.
 
 ### The original text of this section
 
