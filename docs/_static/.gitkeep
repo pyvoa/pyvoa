@@ -1,0 +1,5 @@
+# Keeps this directory in git. `html_static_path = ["_static"]` in conf.py
+# names it, and Sphinx warns -- fatally, since the build runs with -W -- when
+# it is absent. Git does not track empty directories, so without this file the
+# directory exists in a working tree but not in a fresh checkout, and the
+# build fails only in CI. Custom CSS or images for the docs go here.
