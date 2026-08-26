@@ -124,47 +124,6 @@ class front:
         Name of the currently set function.
     _setkwargsvisu : dict
         Dictionary for visualization options.
-
-    Methods
-    -------
-    whattodo
-        Generates a DataFrame summarizing available methods and their options.
-    setwhom
-        Sets the current GPDBuilder database and optionally reloads it.
-    setlive
-        Switches between the frozen Zenodo archive and the live upstream sources.
-    getlive
-        Returns True if the live upstream sources are currently used.
-    get
-        Retrieves and processes data based on the specified output format.
-    listoutput
-        Returns the list of currently available output types for the get() function.
-    listvis
-        Returns the list of currently available visualizations for the map() function.
-    listwhom
-        Returns the list of currently available GPDBuilders for geopd_builder data in Pyvoa.
-    listwhat
-        Returns the list of currently available types of series.
-    listhist
-        Returns the list of currently available types of histograms.
-    listplot
-        Returns the list of currently available types of plots.
-    listoption
-        Returns the list of currently available options applied to data.
-    listtile
-        Returns the list of currently available tile options for maps.
-    listwhich
-        Gets the available fields for the specified database.
-    listwhere
-        Gets the list of available regions/subregions managed by the current GPDBuilder.
-    getdatabase
-        Returns the main pandas DataFrame with all values loaded from the selected GPDBuilder.
-    saveoutput
-        Exports pandas DataFrame as an output file.
-    merger
-        Merges two or more pandas DataFrames from get_stats operation.
-    savefig
-        Saves the current figure to a file.
     """
 
     def __init__(self):
@@ -222,8 +181,8 @@ class front:
         -------
         pd.DataFrame
             A DataFrame with methods as the index and their available
-        options listed in the columns. The DataFrame is sorted by the 'Arguments'
-        column in descending order.
+            options listed in the columns. The DataFrame is sorted by the 'Arguments'
+            column in descending order.
 
         Raises
         ------
@@ -731,52 +690,56 @@ class front:
 
         This is the data-access entry point of pyvoa. It applies the selection
         described by the keyword arguments to the database chosen with
-        setwhom(), and returns the result in the format asked for by 'output'.
-        plot(), hist() and map() take the same selection arguments and draw the
-        result instead of returning it.
+        :meth:`setwhom`, and returns the result in the format asked for by
+        ``output``. :meth:`plot`, :meth:`hist` and :meth:`map` take the same
+        selection arguments and draw the result instead of returning it.
 
-        A database must have been selected with setwhom() beforehand, unless a
-        table of your own is passed as 'input'.
+        A database must have been selected with :meth:`setwhom` beforehand,
+        unless a table of your own is passed as ``input``.
 
         Parameters
         ----------
-        **kwargs
-            the selection, every key optional.
-        - where (str | list): the location(s) to select. Defaults to
-        every location the database holds; listwhere() lists them.
-        - which (str | list): the variable(s) to read. Defaults to the
-        first keyword the database declares; listwhich() lists them.
-        - what (str): 'current' (default), 'daily' or 'weekly'; see
-        listwhat().
-        - when (str): a date as 'dd/mm/yyyy', or a range as
-        'dd/mm/yyyy:dd/mm/yyyy'. Either side may be left empty.
-        - option (str | list): '', 'nonneg', 'smooth7', 'sumall' or
-        'normalize:pop...'; see listoption().
-        - input (pd.DataFrame): read this table instead of the database.
-        It must carry at least a 'date' and a 'where' column.
-        - output (str): 'pandas' (default), 'geopandas', 'list', 'dict'
-        or 'array'; see listoutput().
-        'typeofplot' and 'typeofhist' are refused here: they belong to
-        plot() and hist().
+        where : str or list of str, optional
+            The location(s) to select. Defaults to every location the database
+            holds; :meth:`listwhere` lists them.
+        which : str or list of str, optional
+            The variable(s) to read. Defaults to the first keyword the database
+            declares; :meth:`listwhich` lists them.
+        what : {'current', 'daily', 'weekly'}, optional
+            How the values are reported. Defaults to 'current'; see
+            :meth:`listwhat`.
+        when : str, optional
+            A date as ``dd/mm/yyyy``, or a range as ``dd/mm/yyyy:dd/mm/yyyy``.
+            Either side of the range may be left empty.
+        option : str or list of str, optional
+            One or more of '', 'nonneg', 'smooth7', 'sumall' or
+            'normalize:pop...'; see :meth:`listoption`.
+        input : pandas.DataFrame, optional
+            Read this table instead of the database. It must carry at least a
+            'date' and a 'where' column.
+        output : {'pandas', 'geopandas', 'list', 'dict', 'array'}, optional
+            The type to return. Defaults to 'pandas'; see :meth:`listoutput`.
 
         Returns
         -------
-        The selected data, in the type named by 'output'. A pandas
-        DataFrame by default, indexed by 'date' and 'where'.
+        pandas.DataFrame or geopandas.GeoDataFrame or list or dict or numpy.ndarray
+            The selected data, in the type named by ``output``.
 
         Raises
         ------
         PyvoaError
-            if no database has been selected and no 'input' was
-            given, if a keyword or one of its values is not recognised, or
-            if a location asked for in 'where' is not in the database.
+            If no database has been selected and no ``input`` was given, if a
+            keyword or one of its values is not recognised, if a location asked
+            for in ``where`` is absent from the database, or if ``typeofplot`` or
+            ``typeofhist`` is passed, both belonging to :meth:`plot` and
+            :meth:`hist`.
 
         Notes
         -----
-        The signature above is the one this method answers to, not the one
-        written below it: the decorators consume those keyword arguments
-        and hand the undecorated body the assembled table. whattodo() lists
-        every argument with the values it accepts.
+        The signature above is the one this method answers to, not the one written
+        in the source below it: the decorators consume these keyword arguments and
+        hand the undecorated body the assembled table. :meth:`whattodo` lists every
+        argument together with the values it accepts.
         """
         return kwargs['input']
 
@@ -903,62 +866,72 @@ class front:
     def map(self,**kwargs):
         """Draw the selected data on a choropleth map.
 
-        Selects data exactly as get() does, then renders it geographically with
-        the current visualisation backend. Like hist(), it takes a single
-        variable. setvis() must have chosen a backend first, and setwhom() a
-        database whose geography is known.
+        Selects data exactly as :meth:`get` does, then renders it geographically
+        with the current visualisation backend. Like :meth:`hist`, it takes a
+        single variable. :meth:`setvis` must have chosen a backend first, and
+        :meth:`setwhom` a database whose geography is known.
 
         Parameters
         ----------
-        **kwargs
-            the selection, every key optional.
-        - where (str | list): the location(s) to select. Defaults to
-        every location the database holds; listwhere() lists them.
-        - which (str | list): the variable(s) to read. Defaults to the
-        first keyword the database declares; listwhich() lists them.
-        - what (str): 'current' (default), 'daily' or 'weekly'; see
-        listwhat().
-        - when (str): a date as 'dd/mm/yyyy', or a range as
-        'dd/mm/yyyy:dd/mm/yyyy'. Either side may be left empty.
-        - option (str | list): '', 'nonneg', 'smooth7', 'sumall' or
-        'normalize:pop...'; see listoption().
-        - input (pd.DataFrame): read this table instead of the database.
-        It must carry at least a 'date' and a 'where' column.
-        - output (str): 'pandas' (default), 'geopandas', 'list', 'dict'
-        or 'array'; see listoutput().
-        and the drawing arguments:
-        - typeofmap (str): None (default), 'not dense', 'dense' or
-        'folium'; listmap() lists them.
-        - tile (str): the background tiles, 'esri', 'positron', 'stamen',
-        'openstreet' or None; listtile() lists them.
-        - vis (str): the backend, 'matplotlib', 'bokeh' or 'seaborn';
-        listvis() gives the ones actually installed.
-        - title, copyright (str): the text drawn on the figure.
-        - mode (str): the hover mode, 'mouse', 'vline' or 'hline'.
-        - dateslider, guideline (bool): bokeh only for dateslider.
-        - scale (str): 'linear' (default) or 'log'.
-        - maxlettersdisplayed (int): where names are cut past this length.
-        'typeofplot' and 'typeofhist' are refused here: they belong to
-        plot() and hist().
+        where : str or list of str, optional
+            The location(s) to select. Defaults to every location the database
+            holds; :meth:`listwhere` lists them.
+        which : str or list of str, optional
+            The variable(s) to read. Defaults to the first keyword the database
+            declares; :meth:`listwhich` lists them.
+        what : {'current', 'daily', 'weekly'}, optional
+            How the values are reported. Defaults to 'current'; see
+            :meth:`listwhat`.
+        when : str, optional
+            A date as ``dd/mm/yyyy``, or a range as ``dd/mm/yyyy:dd/mm/yyyy``.
+            Either side of the range may be left empty.
+        option : str or list of str, optional
+            One or more of '', 'nonneg', 'smooth7', 'sumall' or
+            'normalize:pop...'; see :meth:`listoption`.
+        input : pandas.DataFrame, optional
+            Read this table instead of the database. It must carry at least a
+            'date' and a 'where' column.
+        typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
+            How the geography is drawn; :meth:`listmap` lists them.
+        tile : {'esri', 'positron', 'stamen', 'openstreet', None}, optional
+            The background tiles; :meth:`listtile` lists them.
+        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+            The backend to draw with; :meth:`listvis` gives the ones actually
+            installed.
+        title, copyright : str, optional
+            The text drawn on the figure.
+        mode : {'mouse', 'vline', 'hline'}, optional
+            The hover mode.
+        guideline : bool, optional
+            Whether to draw the guide lines.
+        scale : {'linear', 'log'}, optional
+            The scale of the value axis. Defaults to 'linear'.
+        maxlettersdisplayed : int, optional
+            Location names are cut past this length.
+        dateslider : bool, optional
+            Add a slider over the dates. Bokeh only.
 
         Returns
         -------
-        The map built by the backend. With bokeh it is also shown, unless
-        setbatch(True) was called.
+        object
+            The map built by the backend. Under bokeh it is also shown, unless
+            :meth:`setbatch` was called.
 
         Raises
         ------
         PyvoaError
-            if no backend has been set up, if 'which' names more
-            than one variable, if 'dateslider' is asked for outside bokeh,
-            or if a keyword or one of its values is not recognised.
+            If no backend has been set up, if ``which`` names more than one
+            variable, if ``dateslider`` is asked for outside bokeh, if a keyword
+            or one of its values is not recognised, or if ``typeofplot`` or
+            ``typeofhist`` is passed, both belonging to :meth:`plot` and
+            :meth:`hist`.
 
         Notes
         -----
-        The signature above is the one this method answers to, not the one
-        written below it: the decorators consume those keyword arguments
-        and hand the undecorated body the map it has built. whattodo() lists
-        every argument with the values it accepts.
+        The signature above is the one this method answers to, not the one written
+        in the source below it: the decorators consume these keyword arguments and
+        hand the undecorated body the map it has built. :meth:`whattodo` lists every
+        argument together with the values it accepts.
         """
         self.setnamefunction(self.map)
         if self.getvis():
@@ -988,61 +961,73 @@ class front:
     def hist(self,fig):
         """Draw the selected data as a histogram or a pie chart.
 
-        Selects data exactly as get() does, then renders it with the current
-        visualisation backend instead of returning it. Unlike plot(), it takes
-        a single variable. setvis() must have chosen a backend first, and
-        setwhom() a database.
+        Selects data exactly as :meth:`get` does, then renders it with the current
+        visualisation backend instead of returning it. Unlike :meth:`plot`, it
+        takes a single variable. :meth:`setvis` must have chosen a backend first,
+        and :meth:`setwhom` a database.
 
         Parameters
         ----------
-        **kwargs
-            the selection, every key optional.
-        - where (str | list): the location(s) to select. Defaults to
-        every location the database holds; listwhere() lists them.
-        - which (str | list): the variable(s) to read. Defaults to the
-        first keyword the database declares; listwhich() lists them.
-        - what (str): 'current' (default), 'daily' or 'weekly'; see
-        listwhat().
-        - when (str): a date as 'dd/mm/yyyy', or a range as
-        'dd/mm/yyyy:dd/mm/yyyy'. Either side may be left empty.
-        - option (str | list): '', 'nonneg', 'smooth7', 'sumall' or
-        'normalize:pop...'; see listoption().
-        - input (pd.DataFrame): read this table instead of the database.
-        It must carry at least a 'date' and a 'where' column.
-        - output (str): 'pandas' (default), 'geopandas', 'list', 'dict'
-        or 'array'; see listoutput().
-        and the drawing arguments:
-        - typeofhist (str): 'location' (default), 'value' or 'pie';
-        listhist() lists them.
-        - bins (int): the number of bins, 10 by default.
-        - orientation (str): 'horizontal' or 'vertical'.
-        - vis (str): the backend, 'matplotlib', 'bokeh' or 'seaborn';
-        listvis() gives the ones actually installed.
-        - title, copyright (str): the text drawn on the figure.
-        - mode (str): the hover mode, 'mouse', 'vline' or 'hline'.
-        - dateslider, guideline (bool): bokeh only for dateslider.
-        - scale (str): 'linear' (default) or 'log'.
-        - maxlettersdisplayed (int): where names are cut past this length.
-        'typeofplot' is refused here: it belongs to plot().
+        where : str or list of str, optional
+            The location(s) to select. Defaults to every location the database
+            holds; :meth:`listwhere` lists them.
+        which : str or list of str, optional
+            The variable(s) to read. Defaults to the first keyword the database
+            declares; :meth:`listwhich` lists them.
+        what : {'current', 'daily', 'weekly'}, optional
+            How the values are reported. Defaults to 'current'; see
+            :meth:`listwhat`.
+        when : str, optional
+            A date as ``dd/mm/yyyy``, or a range as ``dd/mm/yyyy:dd/mm/yyyy``.
+            Either side of the range may be left empty.
+        option : str or list of str, optional
+            One or more of '', 'nonneg', 'smooth7', 'sumall' or
+            'normalize:pop...'; see :meth:`listoption`.
+        input : pandas.DataFrame, optional
+            Read this table instead of the database. It must carry at least a
+            'date' and a 'where' column.
+        typeofhist : {'location', 'value', 'pie'}, optional
+            The kind of histogram. Defaults to 'location'; :meth:`listhist` lists
+            them.
+        bins : int, optional
+            The number of bins. Defaults to 10.
+        orientation : {'horizontal', 'vertical'}, optional
+            The direction the bars run in.
+        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+            The backend to draw with; :meth:`listvis` gives the ones actually
+            installed.
+        title, copyright : str, optional
+            The text drawn on the figure.
+        mode : {'mouse', 'vline', 'hline'}, optional
+            The hover mode.
+        guideline : bool, optional
+            Whether to draw the guide lines.
+        scale : {'linear', 'log'}, optional
+            The scale of the value axis. Defaults to 'linear'.
+        maxlettersdisplayed : int, optional
+            Location names are cut past this length.
+        dateslider : bool, optional
+            Add a slider over the dates. Bokeh only.
 
         Returns
         -------
-        The figure built by the backend. With bokeh it is also shown,
-        unless setbatch(True) was called.
+        object
+            The figure built by the backend. Under bokeh it is also shown, unless
+            :meth:`setbatch` was called.
 
         Raises
         ------
         PyvoaError
-            if no backend has been set up, if 'which' names more
-            than one variable, or if a keyword or one of its values is not
-            recognised.
+            If no backend has been set up, if ``which`` names more than one
+            variable, if a keyword or one of its values is not recognised, or if
+            ``typeofplot`` is passed, which belongs to :meth:`plot`.
 
         Notes
         -----
-        The signature above is the one this method answers to, not the one
-        written below it: the decorators consume those keyword arguments
-        and hand the undecorated body the figure it has built. whattodo() lists
-        every argument with the values it accepts.
+        The signature above is the one this method answers to, not the one written
+        in the source below it: the decorators consume these keyword arguments and
+        hand the undecorated body the figure it has built. :meth:`whattodo` lists every
+        argument together with the values it accepts.
         """
         self.setnamefunction(self.hist)
         if self.getvis() == 'bokeh':
@@ -1109,59 +1094,70 @@ class front:
     def plot(self,fig):
         """Draw the selected data as a time series.
 
-        Selects data exactly as get() does, then renders it with the current
-        visualisation backend instead of returning it. setvis() must have
-        chosen a backend first, and setwhom() a database.
+        Selects data exactly as :meth:`get` does, then renders it with the current
+        visualisation backend instead of returning it. :meth:`setvis` must have
+        chosen a backend first, and :meth:`setwhom` a database.
 
         Parameters
         ----------
-        **kwargs
-            the selection, every key optional.
-        - where (str | list): the location(s) to select. Defaults to
-        every location the database holds; listwhere() lists them.
-        - which (str | list): the variable(s) to read. Defaults to the
-        first keyword the database declares; listwhich() lists them.
-        - what (str): 'current' (default), 'daily' or 'weekly'; see
-        listwhat().
-        - when (str): a date as 'dd/mm/yyyy', or a range as
-        'dd/mm/yyyy:dd/mm/yyyy'. Either side may be left empty.
-        - option (str | list): '', 'nonneg', 'smooth7', 'sumall' or
-        'normalize:pop...'; see listoption().
-        - input (pd.DataFrame): read this table instead of the database.
-        It must carry at least a 'date' and a 'where' column.
-        - output (str): 'pandas' (default), 'geopandas', 'list', 'dict'
-        or 'array'; see listoutput().
-        and the drawing arguments:
-        - typeofplot (str): 'date' (default), 'compare', 'versus',
-        'spiral' or 'yearly'; listplot() lists them. 'compare' and
-        'spiral' are bokeh only. 'versus' takes exactly two variables.
-        - vis (str): the backend, 'matplotlib', 'bokeh' or 'seaborn';
-        listvis() gives the ones actually installed.
-        - title, copyright (str): the text drawn on the figure.
-        - mode (str): the hover mode, 'mouse', 'vline' or 'hline'.
-        - dateslider, guideline (bool): bokeh only for dateslider.
-        - scale (str): 'linear' (default) or 'log'.
-        - maxlettersdisplayed (int): where names are cut past this length.
-        'typeofhist' is refused here: it belongs to hist().
+        where : str or list of str, optional
+            The location(s) to select. Defaults to every location the database
+            holds; :meth:`listwhere` lists them.
+        which : str or list of str, optional
+            The variable(s) to read. Defaults to the first keyword the database
+            declares; :meth:`listwhich` lists them.
+        what : {'current', 'daily', 'weekly'}, optional
+            How the values are reported. Defaults to 'current'; see
+            :meth:`listwhat`.
+        when : str, optional
+            A date as ``dd/mm/yyyy``, or a range as ``dd/mm/yyyy:dd/mm/yyyy``.
+            Either side of the range may be left empty.
+        option : str or list of str, optional
+            One or more of '', 'nonneg', 'smooth7', 'sumall' or
+            'normalize:pop...'; see :meth:`listoption`.
+        input : pandas.DataFrame, optional
+            Read this table instead of the database. It must carry at least a
+            'date' and a 'where' column.
+        typeofplot : {'date', 'compare', 'versus', 'spiral', 'yearly'}, optional
+            The kind of plot. Defaults to 'date'; :meth:`listplot` lists them.
+            'compare' and 'spiral' are bokeh only, and 'versus' takes exactly two
+            variables.
+        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+            The backend to draw with; :meth:`listvis` gives the ones actually
+            installed.
+        title, copyright : str, optional
+            The text drawn on the figure.
+        mode : {'mouse', 'vline', 'hline'}, optional
+            The hover mode.
+        guideline : bool, optional
+            Whether to draw the guide lines.
+        scale : {'linear', 'log'}, optional
+            The scale of the value axis. Defaults to 'linear'.
+        maxlettersdisplayed : int, optional
+            Location names are cut past this length.
+        dateslider : bool, optional
+            Add a slider over the dates. Bokeh only.
 
         Returns
         -------
-        The figure built by the backend. With bokeh it is also shown,
-        unless setbatch(True) was called.
+        object
+            The figure built by the backend. Under bokeh it is also shown, unless
+            :meth:`setbatch` was called.
 
         Raises
         ------
         PyvoaError
-            if no backend has been set up, if 'versus' is asked for
-            with more than two variables, or if a keyword or one of its
-            values is not recognised.
+            If no backend has been set up, if 'versus' is asked for with other
+            than two variables, if a keyword or one of its values is not
+            recognised, or if ``typeofhist`` is passed, which belongs to
+            :meth:`hist`.
 
         Notes
         -----
-        The signature above is the one this method answers to, not the one
-        written below it: the decorators consume those keyword arguments
-        and hand the undecorated body the figure it has built. whattodo() lists
-        every argument with the values it accepts.
+        The signature above is the one this method answers to, not the one written
+        in the source below it: the decorators consume these keyword arguments and
+        hand the undecorated body the figure it has built. :meth:`whattodo` lists every
+        argument together with the values it accepts.
         """
         self.setnamefunction(self.plot)
         ''' show plot '''
@@ -1241,8 +1237,8 @@ class front:
         -------
         list
             the values 'typeofmap' accepts. 'folium' is left out: it is
-        selected through map(typeofmap='folium') but is not a rendering
-        mode of the other backends.
+            selected through map(typeofmap='folium') but is not a rendering
+            mode of the other backends.
         """
         optmap = [ i for i in list(self.av.d_graphicsinput_args['typeofmap']) if i ]
         if 'folium' in optmap:
@@ -1314,7 +1310,7 @@ class front:
         -------
         pd.Series
             the plot, histogram and map types supported by the
-        backend chosen with setvis(), indexed by method name.
+            backend chosen with setvis(), indexed by method name.
 
         Raises
         ------

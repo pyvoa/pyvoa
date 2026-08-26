@@ -197,7 +197,7 @@ class MetaInfo:
           -------
           list
               [1, 'validated'] if all are there, else [0, a message
-          naming the first one missing].
+              naming the first one missing].
           """
           sig = 1
           msg = 'pyvoa.json meta structure is validated'
