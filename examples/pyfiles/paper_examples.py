@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 paper_examples.py — reproduces every code listing of the pyvoa software paper
 and writes the manuscript figures.
 
@@ -20,6 +20,11 @@ Usage
 The first run downloads the datasets into ~/.cache/pyvoa.data_<user>/ and takes
 a few minutes; later runs are fast. Nothing is written outside the figure
 directory: paper/figures/ inside a checkout, ./figures/ otherwise.
+
+Figures are written as PDF, which is the vector artwork Elsevier asks for and
+what \includegraphics pulls in from the .tex. Examples 1-4 are the manuscript
+listings and produce Figs. 2-5; examples 5 and 6 are not listings and draw
+nothing — they support claims made in Sections 2.1 and 4.
 
 Each example is self-contained and prints the exact snippet that appears in the
 manuscript, so that the listings in the .tex file and the code actually executed
@@ -53,14 +58,14 @@ def _default_figdir() -> Path:
 
 FIGDIR = _default_figdir()
 
-# Reference the paper cites; kept here so that a change of date or indicator is
-# made in one place and stays consistent with the .tex listings.
-JHU_DATE = "01/12/2022"          # JHU CSSE stopped collecting in March 2023
-OWID_VACC = "total_people_vaccinated_per_hundred"
-# Not the library default ('openstreet'): OpenStreetMap's tile policy blocks
-# contextily, so that default serves "Access blocked" images and the map is
-# drawn over them. CartoDB Positron allows the use and renders clean.
-TILE = "positron"
+# Nothing is factored out into a constant. Each listing spells its arguments
+# out literally, so that the .tex and this file can be diffed line by line; a
+# listing that reads `when=JHU_DATE` here and `when='31/12/2021'` in the paper
+# cannot be compared at all, which is the point of this file.
+#
+# No `tile=` either: the default is 'esri' (the first entry of listtile()), and
+# it renders. An earlier draft passed 'positron' to avoid OpenStreetMap's
+# blocked tiles, which only matters if 'openstreet' is asked for by name.
 
 
 # ---------------------------------------------------------------------------
@@ -90,7 +95,7 @@ def save(pf, name: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Example 1 — comparing countries (OWID)
+# Example 1 — comparing countries (Fig. 2)
 # ---------------------------------------------------------------------------
 
 def example_1(pf, vis: str) -> None:
@@ -98,115 +103,71 @@ def example_1(pf, vis: str) -> None:
         import pyvoa.front as pf
         pf.setwhom('owid')            # Our World in Data, worldwide, by country
         pf.setvis('matplotlib')
-        pf.plot(which='total_deaths', where='European Union',
+        pf.plot(which='total_deaths', where='Western Europe',
                 what='daily', option='smooth7')
     """)
     pf.setwhom('owid')
     pf.setvis(vis)
-    pf.plot(which='total_deaths', where='European Union',
+    pf.plot(which='total_deaths', where='Western Europe',
             what='daily', option='smooth7')
-    save(pf, "fig2_timeseries_eu.png")
+    save(pf, "fig2_timeseries_weu.pdf")
 
 
 # ---------------------------------------------------------------------------
-# Example 2 — mapping a grouping (JHU)
+# Example 2 — mapping a grouping (Fig. 3)
 # ---------------------------------------------------------------------------
 
 def example_2(pf, vis: str) -> None:
-    banner(2, "mapping a grouping", f"""
+    banner(2, "mapping a grouping", """
         pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
-        pf.map(which='tot_confirmed', where='OECD',
-               what='daily', when='{JHU_DATE}', tile='{TILE}')
+        pf.map(which='tot_confirmed', where='G20',
+               what='daily', when='31/12/2021')
     """)
-    pf.setwhom('jhu')
     pf.setvis(vis)
-    pf.map(which='tot_confirmed', where='OECD',
-           what='daily', when=JHU_DATE, tile=TILE)
-    save(pf, "fig3_map_oecd.png")
+    pf.setwhom('jhu')
+    pf.map(which='tot_confirmed', where='G20',
+           what='daily', when='31/12/2021')
+    save(pf, "fig3_map_g20.pdf")
 
 
 # ---------------------------------------------------------------------------
-# Example 3 — ranking, and leaving the framework (OWID)
+# Example 3 — sub-national data, ranked and normalised by population (Fig. 4)
 # ---------------------------------------------------------------------------
 
 def example_3(pf, vis: str) -> None:
-    banner(3, "ranking, and leaving the framework", f"""
-        pf.setwhom('owid')
-        pf.hist(which='{OWID_VACC}',
-                where='Asia', typeofhist='location')
-
-        df = pf.get(which='{OWID_VACC}',
-                    where='Asia', output='pandas')
+    banner(3, "sub-national data, normalised by population", """
+        pf.setwhom('spf')    # Sante Publique France db
+        pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
     """)
-    pf.setwhom('owid')
     pf.setvis(vis)
-    # 'location', not 'value': 'value' bins the countries into a frequency
-    # histogram, while the manuscript describes one ranked bar per country.
-    pf.hist(which=OWID_VACC, where='Asia', typeofhist='location')
-    save(pf, "fig4_hist_asia.png")
-
-    df = pf.get(which=OWID_VACC, where='Asia', output='pandas')
-    print(f"    get() -> {type(df).__name__}, shape={df.shape}")
-    print(f"    columns: {list(df.columns)}")
-    print(textwrap.indent(str(df.head(3)), "    "))
+    pf.setwhom('spf')
+    pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
+    save(pf, "fig4_hist_spf.pdf")
 
 
 # ---------------------------------------------------------------------------
-# Example 4 — sub-national data (SPF, SUM'EAU)
+# Example 4 — beyond COVID-19: Ebola in the DR Congo (Fig. 5)
 # ---------------------------------------------------------------------------
 
 def example_4(pf, vis: str) -> None:
-    banner(4, "sub-national data", f"""
-        pf.setwhom('spf')             # Sante publique France, departements
-        pf.map(which='cur_hosp', typeofmap='dense', tile='{TILE}')
-
-        pf.setwhom('sumeau')          # SARS-CoV-2 in wastewater, France
-        pf.plot(which='ratio', typeofplot='yearly')
+    banner(4, "beyond COVID-19 (Ebola, DR Congo)", """
+        pf.setwhom('ebolardc')
+        pf.hist(which='tot_confirmed',typeofhist='pie')
     """)
     pf.setvis(vis)
-
-    pf.setwhom('spf')
-    pf.map(which='cur_hosp', typeofmap='dense', tile=TILE)
-    save(pf, "fig5a_map_spf_dense.png")
-
-    pf.setwhom('sumeau')
-    pf.plot(which='ratio', typeofplot='yearly')
-    save(pf, "fig5b_sumeau_yearly.png")
+    pf.setwhom('ebolardc')
+    pf.hist(which='tot_confirmed',typeofhist='pie')
+    save(pf, "fig5_ebola_drc.pdf")
 
 
 # ---------------------------------------------------------------------------
-# Example 5 — beyond COVID-19 (measles in the US, Ebola in the DR Congo)
+# Example 5 — the geolocation layer on its own (Section 2.1 / Impact)
 # ---------------------------------------------------------------------------
 
 def example_5(pf, vis: str) -> None:
-    banner(5, "beyond COVID-19", f"""
-        pf.setwhom('measles-usa')     # JHU measles tracking team, US states
-        pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
-
-        pf.setwhom('ebolardc')        # INSP situation reports, DRC health zones
-        pf.map(which='tot_confirmed', tile='{TILE}')
-    """)
-    pf.setvis(vis)
-
-    # county-level increments upstream: the descriptor sums the counties of a
-    # state and cumulates them, so tot_cases is a cumulative count here too
-    pf.setwhom('measles-usa')
-    pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
-    save(pf, "fig6a_measles_usa.png")
-
-    pf.setwhom('ebolardc')
-    pf.map(which='tot_confirmed', tile=TILE)
-    save(pf, "fig6b_ebola_drc.png")
-
-
-# ---------------------------------------------------------------------------
-# Example 6 — the geolocation layer on its own (Section 2.1 / Impact)
-# ---------------------------------------------------------------------------
-
-def example_6(pf, vis: str) -> None:
     """Not a manuscript listing: supports the claim that pyvoa.geo is usable
     outside epidemiology, made in Sections 2.1 and 4."""
-    banner(6, "the geolocation layer on its own (not a listing)", """
+    banner(5, "the geolocation layer on its own (not a listing)", """
         import pyvoa.geo as pg
         gm = pg.GeoManager('name')
         gm.to_standard(['fr', 'US', 'china', "cote d'ivoire"], output='list')
@@ -233,14 +194,14 @@ def example_6(pf, vis: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Impact §4, point 1 — a question that needs the multi-source reconciliation
+# Example 6 — Impact §4, point 1: a question needing multi-source reconciliation
 # ---------------------------------------------------------------------------
 
-def example_7(pf, vis: str) -> None:
+def example_6(pf, vis: str) -> None:
     """Wastewater signal against reported incidence, same country, same axis.
     This is the concrete illustration suggested for Impact, point 1: two
     unrelated providers, one query grammar, one geographic key."""
-    banner(7, "wastewater vs reported incidence (Impact, point 1)", """
+    banner(6, "wastewater vs reported incidence (Impact, point 1)", """
         pf.setwhom('sumeau')
         waste = pf.get(which='ratio', what='current', output='pandas')
 
@@ -259,8 +220,9 @@ def example_7(pf, vis: str) -> None:
     print(f"    spfnational-> shape={cases.shape}, "
           f"{cases['date'].min()} .. {cases['date'].max()}")
 
-    overlap = set(waste['date']) & set(cases['date'])
-    print(f"    overlapping dates: {len(overlap)}")
+    merged = waste.merge(cases, on=['date', 'where'],
+                         suffixes=('_waste', '_cases'))
+    print(f"    overlapping rows after the merge: {len(merged)}")
     print("    NB: both frames carry the same 'date'/'where' keys, so the "
           "join is a one-liner —\n"
           "        merged = waste.merge(cases, on=['date', 'where'])")
@@ -274,7 +236,12 @@ def check(pf, vis: str = 'matplotlib') -> int:
     """Assert that every database, indicator, option and grouping used in the
     manuscript exists in the installed version. Cheap guard against the class
     of error that made the first draft's listings unrunnable (a database that
-    was never in the catalogue, an option renamed in 0.4.0)."""
+    was never in the catalogue, an option renamed in 0.4.0).
+
+    Kept in step with the same cell of PaperExamples.ipynb: it checks what the
+    listings actually use, and only that. A check that tests vocabulary no
+    listing exercises passes while saying nothing.
+    """
     failures: list[str] = []
 
     def want(label, value, allowed):
@@ -284,39 +251,44 @@ def check(pf, vis: str = 'matplotlib') -> int:
             failures.append(f"{label}: {value!r} not in {sorted(allowed)}")
             print(f"    FAIL {label}: {value!r}")
 
+    def want_ci(label, value, allowed):
+        """As want(), case-insensitively: listwhere() answers in the source's
+        own casing, which is not the casing a listing is written in."""
+        want(label, value.upper(), {str(a).upper() for a in allowed})
+
     print("\n== vocabulary check ==")
     whom = set(pf.listwhom())
-    for db in ('owid', 'jhu', 'spf', 'spfnational', 'sumeau',
-               'measles-usa', 'ebolardc'):
+    for db in ('owid', 'jhu', 'spf', 'ebolardc', 'spfnational', 'sumeau'):
         want("database", db, whom)
 
-    want("what", 'daily', set(pf.listwhat()))
-    want("what", 'current', set(pf.listwhat()))
-    for opt in ('smooth7',):
-        want("option", opt, set(pf.listoption()))
-    want("output", 'pandas', set(pf.listoutput()))
+    want("what",   'daily',           set(pf.listwhat()))
+    want("what",   'current',         set(pf.listwhat()))
+    want("option", 'smooth7',         set(pf.listoption()))
+    want("option", 'normalize:pop1M', set(pf.listoption()))
+    want("output", 'pandas',          set(pf.listoutput()))
 
-    # listhist(), listplot() and listmap() read the chart vocabulary of the
-    # selected backend, so they raise until setvis() has been called.
+    # listhist() reads the chart vocabulary of the selected backend, so it
+    # raises until setvis() has been called. Only 'pie' is asked for by name;
+    # the other three listings take the default chart of their method.
     want("vis", vis, set(pf.listvis()))
     pf.setvis(vis)
-    want("typeofhist", 'value', set(pf.listhist()))
-    want("typeofplot", 'yearly', set(pf.listplot()))
-    want("typeofmap", 'dense', {str(m) for m in pf.listmap()})
+    want("typeofhist", 'pie', set(pf.listhist()))
 
-    print("\n   indicators (needs setwhom, hence a download):")
-    for db, indicators in (('owid', ('total_deaths', OWID_VACC)),
-                           ('jhu', ('tot_confirmed',)),
-                           ('spf', ('cur_hosp',)),
-                           ('spfnational', ('cur_cas',)),
-                           ('sumeau', ('ratio',)),
-                           ('measles-usa', ('tot_cases',)),
-                           ('ebolardc', ('tot_confirmed',))):
+    print("\n   indicators and groupings (needs setwhom, hence a download):")
+    for db, indicators, groupings in (
+            ('owid',        ('total_deaths',),  ('Western Europe',)),
+            ('jhu',         ('tot_confirmed',), ('G20',)),
+            ('spf',         ('cur_hosp',),      ()),
+            ('ebolardc',    ('tot_confirmed',), ()),
+            ('spfnational', ('cur_cas',),       ()),
+            ('sumeau',      ('ratio',),         ())):
         try:
             pf.setwhom(db, reload=False)
             available = set(pf.listwhich())
             for ind in indicators:
                 want(f"{db}.which", ind, available)
+            for g in groupings:
+                want_ci(f"{db}.where", g, pf.listwhere())
         except Exception as exc:
             failures.append(f"setwhom({db!r}) raised {exc}")
             print(f"    FAIL setwhom({db!r}): {exc}")
@@ -340,9 +312,8 @@ EXAMPLES = {
     2: example_2,
     3: example_3,
     4: example_4,
-    5: example_5,
-    6: example_6,
-    7: example_7,
+    5: example_5,   # the geolocation layer alone — not a manuscript listing
+    6: example_6,   # wastewater vs incidence — not a manuscript listing
 }
 
 
