@@ -793,7 +793,7 @@ class visu_bokeh:
 
 
             fig.yaxis.formatter = BasicTickFormatter(use_scientific=False)
-
+            fig.yaxis.axis_label = which[0]
             fig.legend.label_text_font_size = "12px"
             panel = TabPanel(child=Row(fig,kwargs['watermark']), title = axis_type)
             panels.append(panel)
