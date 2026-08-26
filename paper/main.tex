@@ -584,7 +584,7 @@ ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on
 \section{Illustrative examples}
 \label{sec:examples}
 
-The five examples below are drawn from the notebooks shipped with the package
+The four examples below are drawn from the notebook shipped with the package
 and run in a plain Jupyter session after \texttt{pip install pyvoa-full}.
 
 \subsection*{Example 1 --- comparing countries}
@@ -593,20 +593,22 @@ and run in a plain Jupyter session after \texttt{pip install pyvoa-full}.
 import pyvoa.front as pf
 pf.setwhom('owid')            # Our World in Data, worldwide, by country
 pf.setvis('matplotlib')
-pf.plot(which='total_deaths', where='European Union',
+pf.plot(which='total_deaths', where='Western Europe',
         what='daily', option='smooth7')
 \end{lstlisting}
 
-\texttt{where='European Union'} expands to the member states through
-\texttt{GeoRegion}; \texttt{what='daily'} differentiates the cumulative series
-the source publishes; \texttt{option='smooth7'} applies a weekly rolling mean,
-removing the reporting-day artefact visible in every national series
+\texttt{where='Western Europe'} expands through \texttt{GeoRegion} to the nine
+states of the United Nations geoscheme subregion --- Switzerland,
+Liechtenstein and Monaco among them, so the grouping is not the European Union
+and does not have to be; \texttt{what='daily'} differentiates the cumulative
+series the source publishes; \texttt{option='smooth7'} applies a weekly rolling
+mean, removing the reporting-day artefact visible in every national series
 (Fig.~\ref{fig:timeseries}).
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_eu.png}
-\caption{Example 1. Daily COVID-19 deaths in the European Union member states,
+\includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_weu.pdf}
+\caption{Example 1. Daily COVID-19 deaths in the nine Western European states,
 seven-day smoothed, from Our World in Data.}
 \label{fig:timeseries}
 \end{figure}
@@ -615,156 +617,101 @@ seven-day smoothed, from Our World in Data.}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
-pf.map(which='tot_confirmed', where='OECD',
-       what='daily', when='01/12/2022', tile='positron')
+pf.map(which='tot_confirmed', where='G20',
+       what='daily', when='31/12/2021')
 \end{lstlisting}
 
-One keyword selects the OECD member states, and the geolocation layer
-supplies their geometries; the JHU series is read from its Zenodo mirror, the
-upstream collection having ended in March 2023 (Fig.~\ref{fig:map}).
+One keyword selects the G20 member states, and the geolocation layer supplies
+their geometries; the countries outside the grouping are left unpainted. The
+JHU series is read from its Zenodo mirror, the upstream collection having ended
+in March 2023 (Fig.~\ref{fig:map}).
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.9\textwidth]{figures/fig3_map_oecd.png}
-\caption{Example 2. Daily confirmed COVID-19 cases across OECD member states on
-1~December 2022, from the Johns Hopkins CSSE mirror.}
+\includegraphics[width=0.9\textwidth]{figures/fig3_map_g20.pdf}
+\caption{Example 2. Daily confirmed COVID-19 cases across the G20 member states
+on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 \label{fig:map}
 \end{figure}
 
-\subsection*{Example 3 --- ranking, and leaving the framework}
+\subsection*{Example 3 --- sub-national data, normalised by population}
 
 \begin{lstlisting}[style=python]
-pf.setwhom('owid')
-pf.hist(which='total_people_vaccinated_per_hundred',
-        where='Asia', typeofhist='location')
-
-df = pf.get(which='total_people_vaccinated_per_hundred',
-            where='Asia', output='pandas')
+pf.setwhom('spf')    # Sante Publique France db
+pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
 \end{lstlisting}
 
-\texttt{typeofhist='location'} draws one bar per country, ranked by magnitude
-rather than by name
-(Fig.~\ref{fig:hist}). The second call returns the same selection as a pandas
-frame~\cite{mckinney2010}, with one row per date and place and standardised
-geographic keys: pyvoa is a starting point for an analysis, not an enclosure.
+The same keywords address a French source at \emph{département} granularity.
+\texttt{option='normalize:pop1M'} divides the count by the population the
+geolocation layer carries, turning patient numbers into a rate per million
+inhabitants, which is what makes \emph{départements} of very different sizes
+comparable at all; the bars are ranked by value rather than by name
+(Fig.~\ref{fig:hist}). The same selection is returned as a pandas
+frame~\cite{mckinney2010} by \texttt{pf.get()}, one row per date and place with
+standardised geographic keys: pyvoa is a starting point for an analysis, not an
+enclosure.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.85\textwidth]{figures/fig4_hist_asia.png}
-\caption{Example 3. Share of the population having received at least one
-COVID-19 vaccine dose, Asian countries, ranked.}
+\includegraphics[width=0.85\textwidth]{figures/fig4_hist_spf.pdf}
+\caption{Example 3. Patients hospitalised for COVID-19 per million inhabitants
+by French \emph{département} on 31~December 2021, ranked, from Santé publique
+France.}
 \label{fig:hist}
 \end{figure}
 
-\subsection*{Example 4 --- sub-national data}
+\subsection*{Example 4 --- beyond COVID-19}
 
 \begin{lstlisting}[style=python]
-pf.setwhom('spf')             # Sante publique France, departements
-pf.map(which='cur_hosp', typeofmap='dense', tile='positron')
-
-pf.setwhom('sumeau')          # SARS-CoV-2 in wastewater, France
-pf.plot(which='ratio', typeofplot='yearly')
+pf.setwhom('ebolardc')
+pf.hist(which='tot_confirmed',typeofhist='pie')
 \end{lstlisting}
 
-The same four keywords address a sub-national French source at
-\emph{département} granularity, \texttt{typeofmap='dense'} bringing the overseas
-\emph{départements} into the frame rather than dropping them
-(Fig.~\ref{fig:mortality}), and then a wastewater surveillance series, whose
-yearly overlay exposes the seasonal structure that a chronological axis hides.
-Neither call required knowing anything about the two providers' file formats:
-one publishes daily hospital counts by \emph{département}, the other a weekly
-concentration ratio measured at treatment plants.
+The grammar does not change with the disease. The situation reports of the
+Institut National de Santé Publique are indexed by \emph{zone de santé}, a
+geography the geolocation layer resolves --- and whose provinces it maps to
+their ISO~3166-2 codes --- exactly as it does French \emph{départements} or
+United States states~\cite{bdbv2026}; \texttt{typeofhist='pie'} asks for a
+composition rather than a ranking, the smaller zones being collected into a
+single slice instead of dropped (Fig.~\ref{fig:beyond}). Measles in the United
+States~\cite{ahmadi2025}, mpox and the Réseau Sentinelles series for acute
+respiratory infections are read on the same terms.
 
 \begin{figure}[!h]
 \centering
-\includegraphics[width=0.49\textwidth]{figures/fig5a_map_spf_dense.png}\hfill
-\includegraphics[width=0.49\textwidth]{figures/fig5b_sumeau_yearly.png}\\
-\makebox[0.49\textwidth]{(a)}\hfill\makebox[0.49\textwidth]{(b)}
-\caption{Example 4. (a) Patients hospitalised for COVID-19 by French
-\emph{département}, dense geometry, from Santé publique France. (b) Yearly
-overlay of the SARS-CoV-2 signal in French wastewater (SUM'EAU).}
-\label{fig:mortality}
-\end{figure}
-
-\subsection*{Example 5 --- beyond COVID-19}
-
-\begin{lstlisting}[style=python]
-pf.setwhom('measles-usa')     # JHU measles tracking team, US states
-pf.plot(which='tot_cases', where=['Texas', 'Utah', 'South Carolina'])
-
-pf.setwhom('ebolardc')        # INSP situation reports, DRC health zones
-pf.map(which='tot_confirmed', tile='positron')
-\end{lstlisting}
-
-The grammar does not change with the disease. The measles source publishes
-county-level increments rather than the cumulative national series the previous
-examples used~\cite{ahmadi2025}; its descriptor declares as much, and the
-counties of a state are summed and cumulated at parse time, so
-\texttt{tot\_cases} means the same thing here as in
-Example~1 (Fig.~\ref{fig:beyond}a). The Ebola source is finer still: the
-situation reports of the Institut National de Santé Publique are indexed by
-\emph{zone de santé}, a geography the geolocation layer resolves --- and whose
-provinces it maps to their ISO~3166-2 codes --- exactly as it does French
-\emph{départements} or United States
-states~\cite{bdbv2026} (Fig.~\ref{fig:beyond}b). Mpox and the Réseau
-Sentinelles series for acute respiratory infections are read on the same terms.
-
-\begin{figure}[!h]
-\centering
-\includegraphics[width=0.49\textwidth]{figures/fig6a_measles_usa.png}\hfill
-\includegraphics[width=0.49\textwidth]{figures/fig6b_ebola_drc.png}\\
-\makebox[0.49\textwidth]{(a)}\hfill\makebox[0.49\textwidth]{(b)}
-\caption{Example 5. (a) Cumulative laboratory-confirmed measles cases in three
-United States states, summed by pyvoa from the county increments reported by the
-Johns Hopkins University Measles Tracking Team. (b) Confirmed cases of the 2026
-Bundibugyo ebolavirus outbreak by health zone of the Democratic Republic of the
-Congo, from the situation reports of the Institut National de Santé Publique.}
+\includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
+\caption{Example 4. Confirmed cases of the 2026 Bundibugyo ebolavirus outbreak
+by health zone of the Democratic Republic of the Congo, from the situation
+reports of the Institut National de Santé Publique.}
 \label{fig:beyond}
 \end{figure}
 
-\attnpar{Exemples entièrement réécrits --- le brouillon n'était pas exécutable.
-\textbf{(1)}~L'exemple~4 portait sur une base \texttt{insee} qui \emph{n'existe pas} dans
-\texttt{pyvoa/data/} (INSEE figurait dans PyCoA v2.20, mais pas dans le catalogue
-pyvoa~0.5.0). Remplacé par \texttt{spf} + \texttt{sumeau}. La sortie du cadre COVID, que
-l'exemple~4 revendiquait sans la montrer --- SPF comme SUM'EAU portent sur le
-SARS-CoV-2 ---, fait désormais l'objet de l'exemple~5 (\texttt{measles-usa} et
-\texttt{ebolardc}, figure~\ref{fig:beyond}), et le titre de l'exemple~4 a été
-corrigé en conséquence. Les deux figures de l'exemple~5 sont produites par
-\texttt{paper\_examples.py -{-}example 5}. \textbf{(2)}~\texttt{typeofhist='byvalue'} a été renommé
-\texttt{'value'} en 0.4.0 (cf.~\texttt{CHANGELOG.md}). Corrigé.
-\textbf{(3)}~\texttt{total\_people\_fully\_vaccinated\_per\_hundred} n'existe pas dans
-\texttt{owid.json} ; les colonnes disponibles sont
-\texttt{total\_people\_fully\_vaccinated} et
-\texttt{total\_people\_vaccinated\_per\_hundred}. Corrigé, et la légende de la
-figure~\ref{fig:hist} ajustée en conséquence (« au moins une dose »).
-\textbf{(4)}~\texttt{option=['smooth7','sumall']} du brouillon combinait un lissage et
-une somme sur toutes les localisations, ce qui n'a pas de sens pour une superposition
-annuelle par pays. Simplifié. \\[2pt]
-\textbf{Il reste à exécuter les cinq exemples et à produire les figures.} Deux fichiers
-sont fournis avec ce manuscrit : le notebook \texttt{PaperExamples.ipynb}, qui exécute
-les cinq listings dans l'ordre de l'article et dont chaque cellule de code est
-identique caractère pour caractère au listing imprimé --- de sorte qu'un relecteur peut
-les comparer plutôt que les croire --- et le script \texttt{paper\_examples.py}, sa
-version sans interface graphique (\texttt{matplotlib.use('Agg')}), doté d'un mode
-\texttt{-{-}check} qui valide, sans rien tracer, que chaque base, indicateur, option et
-regroupement cité existe dans la version installée. C'est exactement la classe d'erreur
-qui rendait les listings du premier jet inexécutables. \textbf{Lancer
-\texttt{python paper\_examples.py -{-}check} avant toute soumission}, et à nouveau après
-toute montée de version. Vérifier en particulier :
-que \texttt{when='01/12/2022'} tombe dans la couverture du miroir JHU ;
-que \texttt{'OECD'} est bien accepté tel quel par \texttt{GeoRegion} (la casse est
-normalisée, mais le confirmer) ; que \texttt{'Asia'} renvoie une liste non vide dans
-\texttt{owid} ; et que \texttt{sumeau} accepte \texttt{typeofplot='yearly'} (base à
-granularité \texttt{country}, une seule localisation : c'est la condition requise).
-Générer les figures en PDF ou EPS vectoriel --- Elsevier refuse les captures d'écran
-basse résolution. Déposer le notebook dans \texttt{examples/notebooks/} et le script dans
-\texttt{examples/pyfiles/} du dépôt en ferait aussi la capsule reproductible demandée en
-C3/S3, avec un lien Colab immédiat.\\[3pt]
-\textbf{Défaut corrigé au passage} : le listing~3 supposait \texttt{owid} actif alors que
-le listing~2 avait basculé sur \texttt{jhu}. L'appel \texttt{setwhom('owid')} a été
-rétabli. C'est précisément le genre d'erreur qu'un relecteur exécutant le code trouve en
-premier.}
-
+\attnpar{\textbf{Exemples et figures refaits} à partir du notebook
+\texttt{PaperExamples.ipynb} mis à jour. Quatre exemples au lieu de cinq, quatre
+figures au lieu de six : le compte de figures passe à cinq avec
+l'architecture, sous la limite de six, et la section perd environ 200 mots ---
+ce qui aide, le manuscrit dépassant la limite de 3000. Les quatre listings sont
+\emph{identiques caractère pour caractère} aux cellules du notebook et aux
+\emph{banners} de \texttt{paper\_examples.py}~; un test le vérifie côté dépôt.
+\textbf{(1)}~L'exemple~1 passe de \texttt{'European Union'} à
+\texttt{'Western Europe'} (sous-région du découpage géographique des Nations
+unies, neuf États, dont trois hors UE). \textbf{(2)}~L'exemple~2 passe de
+\texttt{'OECD'} au \texttt{'G20'} et du 01/12/2022 au 31/12/2021~; l'argument
+\texttt{tile=} disparaît, la valeur par défaut étant \texttt{'esri'}, qui rend
+correctement. \textbf{(3)}~L'exemple~3 remplace l'histogramme de vaccination
+\texttt{owid} par les hospitalisations \texttt{spf} normalisées à la
+population, ce qui montre l'option \texttt{normalize:} et la granularité
+départementale en une seule figure au lieu de deux. La phrase sur la sortie
+pandas y est conservée : c'est le seul endroit du manuscrit qui cite
+\texttt{mckinney2010}. \textbf{(4)}~L'exemple~5 (\texttt{measles-usa} +
+\texttt{ebolardc}, deux figures) devient l'exemple~4, une seule figure, un
+camembert par \emph{zone de santé}~; la rougeole reste citée en texte, sa
+référence \texttt{ahmadi2025} étant par ailleurs appelée section~2.
+\textbf{Reste à trancher} : la figure~\ref{fig:beyond} porte la date du
+17/08/2026, dernier jour couvert par la source --- à figer si la soumission
+tarde. \textbf{À relancer avant soumission} :
+\texttt{python paper\_examples.py -{-}check}, puis
+\texttt{python paper\_examples.py} pour régénérer les quatre PDF.}
 
 %% ============================================================================
 %%  4. IMPACT
