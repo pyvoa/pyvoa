@@ -33,3 +33,6 @@ paper/*.run.xml
 paper/*.synctex.gz
 paper/pyvoa-softwarex.pdf
 paper/pyvoa-softwarex-draft.pdf
+
+# Sphinx build output
+docs/_build/

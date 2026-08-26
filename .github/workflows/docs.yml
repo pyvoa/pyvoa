@@ -1,0 +1,66 @@
+name: Docs
+
+# Kept apart from ci.yml because publishing needs permissions and an
+# environment that the rest of the CI has no business holding.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one half-way: an interrupted
+# deploy would leave the published site in an undefined state. Independent of
+# ci.yml's concurrency group, so a docs deploy is not cancelled by a push that
+# only reruns the tests.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: sphinx
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The package itself, because autodoc imports it to read the
+      # docstrings. seaborn, folium and branca stay out on purpose: they are
+      # optional backends, and conf.py mocks them, so the docs build from a
+      # minimal environment.
+      - name: Install pyvoa and the docs requirements
+        run: |
+          python -m pip install --disable-pip-version-check --upgrade pip
+          pip install .
+          pip install -r docs/requirements.txt
+
+      # The Makefile passes -W: a docstring that stops rendering fails the
+      # build instead of degrading the published page quietly.
+      - name: Build the documentation
+        run: make -C docs html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+  deploy:
+    name: github pages
+    # Pull requests build the docs but must not publish them: only what is on
+    # main is ever served.
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
