@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from pyvoa.kwarg_options import InputOption
+from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
     min_max_range,

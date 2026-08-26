@@ -41,7 +41,7 @@ import pyvoa.geo as coge
 import pyvoa.geopd_builder as coco
 import pyvoa.help as h
 from pyvoa.jsondb_parser import MetaInfo
-from pyvoa.kwarg_options import InputOption
+from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
     PyvoaInfo,
