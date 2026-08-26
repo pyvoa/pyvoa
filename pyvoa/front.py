@@ -56,6 +56,14 @@ from pyvoa.tools import (
     readpkl,
     set_live_mode,
 )
+
+# Aliased, and deliberately so. The loop at the foot of this module copies every
+# public method of the singleton onto the module, which overwrites a module
+# global of the same name: were these imported under their own names, the
+# methods below would call themselves and recurse. setlive() escapes the same
+# trap only because set_live_mode() happens to be spelled differently.
+from pyvoa.tools import get_verbose_mode as _get_verbose_mode
+from pyvoa.tools import set_verbose_mode as _set_verbose_mode
 from pyvoa.visualizer import AllVisu
 
 
@@ -275,6 +283,45 @@ class front:
             Zenodo archive is.
         """
         return get_live_mode()
+
+    def set_verbose_mode(self, v):
+        """Set how much pyvoa prints.
+
+        The verbosity is global to the library: it governs info(), verb(),
+        PyvoaInfo() and PyvoaWarning() wherever they are called, not only the
+        front end.
+
+        Parameters
+        ----------
+        v : int
+            0 to silence everything, 1 for information and warnings, which is
+            the default, 2 to add the debug output. At verbosity 2 pandas and
+            the standard warnings filter are set back to their default noise;
+            below it, both are quietened.
+
+        Returns
+        -------
+        int
+            The verbosity which has been set.
+
+        Raises
+        ------
+        PyvoaError
+            If v is not 0, 1 or 2.
+        """
+        if v not in (0, 1, 2):
+            raise PyvoaError('verbose mode must be 0 (silent), 1 (info) or 2 (debug) ...')
+        return _set_verbose_mode(v)
+
+    def get_verbose_mode(self):
+        """Return how much pyvoa prints.
+
+        Returns
+        -------
+        int
+            0 if silent, 1 for information and warnings, 2 for debug.
+        """
+        return _get_verbose_mode()
 
     def setwhom(self,base,**kwargs):
         """Set the current GPDBuilder database and optionally reloads it.
