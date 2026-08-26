@@ -113,7 +113,6 @@ class AllVisu:
         @wraps(func)
         def inner_plot(self ,**kwargs):
             input = kwargs.get('input')
-            which = kwargs.get('which')
             # what = kwargs.get('what')
             title = kwargs.get('title')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
