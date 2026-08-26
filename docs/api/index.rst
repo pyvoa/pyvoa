@@ -17,7 +17,7 @@ exposes every method of the front singleton at module level, so ``pf.get()``,
    geopd_builder
    jsondb_parser
    tools
-   kwarg_options
+   kwargs_options
    visualizer
    backends
    help
