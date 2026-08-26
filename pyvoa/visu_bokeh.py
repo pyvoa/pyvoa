@@ -52,7 +52,7 @@ from bokeh.palettes import Category10, Category20, Viridis256
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
-from pyvoa.kwarg_options import InputOption
+from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import PyvoaError, min_max_range, verb
 
 

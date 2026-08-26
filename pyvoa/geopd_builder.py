@@ -22,7 +22,7 @@ import pandas as pd
 
 import pyvoa.geo as coge
 import pyvoa.jsondb_parser as parser
-from pyvoa.kwarg_options import InputOption
+from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
    PyvoaError,
    PyvoaWarning,
