@@ -91,7 +91,11 @@ extend-exclude = ["*.ipynb"]
 # (E4 imports, E7 statements, E9 runtime). The ruff version is pinned in the
 # dev extra so that the gate is reproducible: a new ruff may widen its default
 # selection, and the CI lint job must not start failing on its own.
-extend-select = ["E4", "E7", "E9"]
+# "D" is pydocstyle: docstrings are held to the NumPy convention, configured
+# under [tool.ruff.lint.pydocstyle] below. The package is at zero D findings,
+# so a new docstring that drifts from the convention fails CI rather than
+# landing and being tidied up later.
+extend-select = ["E4", "E7", "E9", "D"]
 
 # Every other finding reported by this selection has been fixed. The three rules
 # below are switched off deliberately, because applying them would change
@@ -107,7 +111,25 @@ ignore = [
     "DTZ001", "DTZ007", "DTZ011",
 ]
 
+[tool.ruff.lint.pydocstyle]
+# NumPy docstring convention: a one-line summary in the imperative mood, a
+# blank line, then the prose and the underlined sections (Parameters, Returns,
+# Raises, ...). Setting `convention` also switches off the D rules that
+# contradict it, so this line is what makes the selection above coherent
+# rather than self-conflicting. See
+# https://numpydoc.readthedocs.io/en/latest/format.html
+convention = "numpy"
+
 [tool.ruff.lint.per-file-ignores]
+# The example scripts are documentation, not library code, exactly like the
+# notebooks excluded above: they are meant to read as a user's session.
+"examples/*" = ["D"]
+
+# A test documents itself through its name and its assertions, so a missing
+# docstring is not a finding here. The ones that do carry a docstring are
+# still held to the NumPy convention, like the rest of the tree.
+"tests/*" = ["D100", "D101", "D102", "D103", "D104"]
+
 # front.py sets a FutureWarning filter before importing pandas/geopandas so that
 # warnings raised *during* those imports stay hidden from notebook users, and it
 # exposes the singleton's methods at module level after instantiating it. Both
