@@ -36,3 +36,8 @@ paper/pyvoa-softwarex-draft.pdf
 
 # Sphinx build output
 docs/_build/
+
+# The SoftwareX guide for authors, kept in paper/ for reference while the
+# manuscript is written. It is Elsevier copyright: read it, cite it, do not
+# redistribute it from a public repository.
+paper/Guide for authors*.pdf
