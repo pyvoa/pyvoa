@@ -109,6 +109,16 @@ never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
   please match the style of the file you are editing rather than reformatting
   it, and keep formatting changes out of functional pull requests.
 - Use explicit, English identifiers; keep the public API stable and documented.
+- Docstrings follow the [NumPy
+  convention](https://numpydoc.readthedocs.io/en/latest/format.html), enforced
+  by ruff's `D` rules with `convention = "numpy"`: a one-line summary in the
+  imperative mood ("Return the parsed frame.", not "Returns the parsed
+  frame."), a blank line, then the prose and the underlined sections
+  (`Parameters`, `Returns`, `Raises`). Every function and class in `pyvoa/`
+  carries one, and `ruff check .` fails on a docstring that does not.
+  A method whose public signature is produced by decorators — `get`, `plot`,
+  `hist` and `map` in `front.py` — is documented on its innermost definition,
+  because `functools.wraps` is what carries that docstring out to the caller.
 - Type hints are encouraged on new or refactored code
   ([PEP 484](https://peps.python.org/pep-0484/)).
 - Every new dependency must be justified in the pull request: pyvoa is meant to

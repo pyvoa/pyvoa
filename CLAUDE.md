@@ -41,7 +41,11 @@ Two gotchas when adding tests:
 
 ## Lint
 
-`ruff check .` must be clean — it is enforced by CI, and the tree is currently at zero findings. The configuration lives in `[tool.ruff]` in `pyproject.toml`: ruff's own default rule set plus `E4`/`E7`/`E9`, with `*.ipynb` excluded (the example notebooks are documentation, not library code). The ruff version is **pinned** in the `dev` extra and in the workflow, because ruff widens its default selection between releases and an unpinned gate would start failing on its own.
+`ruff check .` must be clean — it is enforced by CI, and the tree is currently at zero findings. The configuration lives in `[tool.ruff]` in `pyproject.toml`: ruff's own default rule set plus `E4`/`E7`/`E9` and `D` (pydocstyle), with `*.ipynb` excluded (the example notebooks are documentation, not library code).
+
+Docstrings follow the **NumPy convention**, set by `convention = "numpy"` under `[tool.ruff.lint.pydocstyle]`. That line matters: it also switches off the `D` rules that contradict the convention, so the `D` selection is coherent rather than self-conflicting. In practice a docstring needs a one-line summary in the imperative mood ("Return the ...", not "Returns the ...") ending with a period, a blank line, then the prose and the underlined sections — `Parameters`, `Returns`, `Raises`, `Notes`. The whole package is at zero `D` findings, so a docstring that drifts fails CI rather than landing.
+
+Two per-file exemptions: `examples/*` is exempt from `D` entirely, being documentation rather than library code like the notebooks; `tests/*` is exempt from `D100`–`D104` only, since a test documents itself through its name and its assertions, but a test docstring that *does* exist is held to the convention like everything else. The ruff version is **pinned** in the `dev` extra and in the workflow, because ruff widens its default selection between releases and an unpinned gate would start failing on its own.
 
 Four exceptions are deliberate, and the reasoning is recorded next to them in `pyproject.toml` — do not "fix" the underlying code to satisfy these rules:
 
