@@ -43,7 +43,7 @@ def tex() -> str:
 
 @pytest.fixture(scope="module")
 def body(tex: str) -> str:
-    """The manuscript with the draft annotations removed.
+    r"""Return the manuscript with the draft annotations removed.
 
     Annotations are French editorial notes wrapped in ``\\attn`` / ``\\attnpar``
     and are not part of the submitted text; they must not be searched for
@@ -198,8 +198,11 @@ def test_listings_use_existing_front_functions(listings: list[str]) -> None:
 
 
 def test_each_listing_selects_its_own_database(listings: list[str]) -> None:
-    """A listing that inherits setwhom() from an earlier one is not runnable
-    on its own, and breaks the moment a reader executes it in a notebook."""
+    """Check that every listing selects its own database.
+
+    A listing that inherits setwhom() from an earlier one is not runnable on
+    its own, and breaks the moment a reader executes it in a notebook.
+    """
     offenders = []
     for n, listing in enumerate(listings, 1):
         queries = re.findall(r"\bpf\.(plot|map|hist|get)\s*\(", listing)
@@ -217,8 +220,11 @@ def test_each_listing_selects_its_own_database(listings: list[str]) -> None:
 
 
 def test_funding_acknowledgement_is_present(body: str) -> None:
-    """AUTHORS makes this sentence a condition of the funding, to be reused
-    verbatim in any publication. It is the one string that must not drift."""
+    """Check the funding acknowledgement is present, word for word.
+
+    AUTHORS makes this sentence a condition of the funding, to be reused
+    verbatim in any publication. It is the one string that must not drift.
+    """
     authors = (ROOT / "AUTHORS").read_text(encoding="utf-8")
     for fragment in (
         "IdEx",
@@ -241,9 +247,12 @@ def test_authors_match_the_citation_file(body: str) -> None:
 
 
 def test_title_agrees_with_the_preferred_citation(body: str) -> None:
-    """CITATION.cff carries a commented preferred-citation block for SoftwareX.
+    """Check the manuscript title against the preferred citation.
+
+    CITATION.cff carries a commented preferred-citation block for SoftwareX.
     Its title is what every downstream citation will use, so it and the
-    manuscript title have to be the same string."""
+    manuscript title have to be the same string.
+    """
     cff = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
     block = re.search(
         r"preferred-citation:(.*?)(?:\n[a-z-]+:|\Z)", cff, re.DOTALL | re.IGNORECASE
@@ -329,9 +338,11 @@ def test_every_citation_resolves(body: str, tex: str) -> None:
 
 
 def _metadata_row(tex: str, field: str) -> str:
-    """Return the text of one row of the code/software metadata tables, with
-    LaTeX escapes undone: ``pycountry\\_convert`` in the source is the package
-    ``pycountry_convert``, and comparing the two must not depend on typesetting.
+    r"""Return the text of one row of the code/software metadata tables.
+
+    LaTeX escapes are undone: ``pycountry\\_convert`` in the source is the
+    package ``pycountry_convert``, and comparing the two must not depend on
+    typesetting.
     """
     m = re.search(rf"^\s*{field}\s*&(.*?)\\\\", tex, re.DOTALL | re.MULTILINE)
     assert m, f"no metadata row {field} in the manuscript"
@@ -339,9 +350,11 @@ def _metadata_row(tex: str, field: str) -> str:
 
 
 def _word_count(body: str) -> int:
-    """Abstract plus sections 1-5, the way SoftwareX counts: running text,
-    captions and footnotes; not the title block, the metadata tables, the
-    listings or the references."""
+    """Count the words the way SoftwareX does.
+
+    Abstract plus sections 1-5: running text, captions and footnotes; not the
+    title block, the metadata tables, the listings or the references.
+    """
     abstract = re.search(r"\\begin\{abstract\}(.*?)\\end\{abstract\}", body, re.DOTALL)
     sections = body.split(r"\section{Motivation and significance}")
     text = (abstract.group(1) if abstract else "") + sections[-1].split(
