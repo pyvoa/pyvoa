@@ -1,18 +1,15 @@
 
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""The matplotlib visualisation backend.
+
+Static charts: the ``date``, ``versus`` and ``yearly`` plots, the three
+histogram kinds, and maps. Every figure is created by the ``decomatplotlib``
+decorator, which also stamps the pyvoa logo on it.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.visu_matplotlib
-
-About :
--------
-
-
 """
 import matplotlib.dates as mdates
 import matplotlib.image as mpimg
@@ -28,13 +25,20 @@ from pyvoa.tools import (
 
 
 class visu_matplotlib:
-    '''
-        MATPLOTLIB chart drawing methods ...
-    '''
+    """MATPLOTLIB chart drawing methods ..."""
+
     def __init__(self,):
+        """Pick the matplotlib backend that suits the environment.
+
+        Chooses the inline backend inside a Jupyter kernel and TkAgg on a plain
+        terminal or an IPython console, falling back to TkAgg if the detection
+        itself fails. Doing this at construction keeps the choice out of the
+        drawing methods.
+        """
         import matplotlib
         self.av = InputOption()
         def set_matplotlib_backend():
+            """Select the backend: inline under a Jupyter kernel, TkAgg otherwise."""
             try:
                 from IPython import get_ipython
                 ipy = get_ipython()
@@ -53,7 +57,15 @@ class visu_matplotlib:
         set_matplotlib_backend()
 
     def decomatplotlib(func):
+        """Decorate creating the figure every matplotlib chart draws on.
+
+        Builds a 10x5 figure and its axes, sets the title, and stamps the pyvoa
+        logo faintly in the background. The figure, its axes and the pyplot
+        module are passed on as the 'fig', 'ax' and 'plt' keyword arguments, so
+        the drawing methods only have to draw.
+        """
         def wrapper(self, **kwargs):
+            """Build the figure, stamp the logo, then call the drawing method."""
             title = kwargs.get('title')
             im = mpimg.imread(kwargs['logo'])
             h, w = im.shape[:2]
@@ -86,6 +98,23 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_date_plot(self,**kwargs):
+        """Draw one or more variables against time.
+
+        One line per location and per variable, the variables told apart by
+        line style and the locations by colour. Location names are shortened
+        for the legend, and the y axis honours the 'scale' option.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what', the
+            'ax' supplied by decomatplotlib, and optionally 'scale' and
+            'legend'.
+
+        Returns
+        -------
+        The matplotlib axes the series were drawn on.
+        """
         input = kwargs.get('input')
         what = kwargs.get('what')
         ax = kwargs['ax']
@@ -121,6 +150,21 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
+        """Plot one variable against another, rather than against time.
+
+        Takes exactly two variables, the first on the x axis and the second on
+        the y axis, one curve per location.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' (two
+            variables) and the 'ax' supplied by decomatplotlib.
+
+        Returns
+        -------
+        The matplotlib axes the curves were drawn on.
+        """
         input = kwargs.get('input')
         what = kwargs.get('what')
         ax = kwargs['ax']
@@ -138,10 +182,11 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_yearly_plot(self,**kwargs):
-        '''
-         matplotlib date yearly plot chart
-         Max display defined by Max_Countries_Default
-        '''
+        """Draw a yearly plot, one curve per calendar year.
+
+        The number of locations displayed at once is capped by
+        Max_Countries_Default.
+        """
         input = kwargs.get('input')
         what = kwargs.get('what')
         # title = kwargs.get('title')
@@ -172,10 +217,11 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_pie(self,**kwargs):
-        '''
-         matplotlib pie chart
-         Max display defined by Max_Countries_Default
-        '''
+        """Draw a pie chart of one variable across locations.
+
+        The number of locations displayed at once is capped by
+        Max_Countries_Default.
+        """
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
@@ -195,9 +241,7 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_horizontal_histo(self,**kwargs):
-        '''
-        matplotlib horizon histo
-        '''
+        """Matplotlib horizon histo."""
         input = kwargs.get('input')
         what = kwargs.get('what')
         title = kwargs.get('title')
@@ -218,6 +262,23 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_histo(self, **kwargs):
+        """Draw a histogram of one variable across locations.
+
+        Bins the values between the smallest and the largest present, labelling
+        the ticks in scientific notation so that the wide ranges epidemiological
+        counts span stay readable.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'which',
+            optionally 'bins' (10 by default), and the 'ax' and 'plt'
+            supplied by decomatplotlib.
+
+        Returns
+        -------
+        The matplotlib axes the histogram was drawn on.
+        """
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         input_df = kwargs.get('input').copy()
@@ -275,6 +336,11 @@ class visu_matplotlib:
         centers = (edges[:-1] + edges[1:]) / 2
 
         def format_sci(x):
+            """Format a positive number as LaTeX scientific notation.
+
+            Returns '' for anything not positive, since the labels are drawn on a
+            log-friendly axis where such a value has no place.
+            """
             if x <= 0:
                 return ""
 
@@ -305,9 +371,7 @@ class visu_matplotlib:
         return ax
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
-        '''
-         matplotlib map display
-        '''
+        """Matplotlib map display."""
         import contextily as cx
         import numpy as np
         from matplotlib.ticker import ScalarFormatter

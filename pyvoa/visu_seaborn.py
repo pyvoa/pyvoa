@@ -1,19 +1,16 @@
 
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""The seaborn visualisation backend.
+
+Static statistical charts: the ``date``, ``versus`` and ``yearly`` plots and
+the three histogram kinds. It has no map, which is why ``AllVisu`` refuses
+``map()`` for this backend. Built on matplotlib, so the figures it returns are
+matplotlib ones.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.visu_seaborn
-
-About :
--------
-
-An interface module to easily plot pyvoa_data with bokeh
-
 """
 from functools import wraps
 
@@ -27,9 +24,24 @@ from pyvoa.tools import PyvoaWarning
 class visu_seaborn:
     ######SEABORN#########
     ######################
+    """The seaborn backend, drawing static statistical charts.
+
+    Offers the 'date', 'versus' and 'yearly' plots and the three histogram
+    kinds; it has no map, which is why AllVisu refuses map() for this
+    backend. Built on matplotlib, so the figures it returns are matplotlib
+    ones.
+    """
+
     def __init__(self,):
+        """Pick the matplotlib backend that suits the environment.
+
+        Chooses the inline backend inside a Jupyter kernel and TkAgg on a plain
+        terminal or an IPython console, falling back to TkAgg if the detection
+        itself fails.
+        """
         import matplotlib
         def set_matplotlib_backend():
+            """Select the backend: inline under a Jupyter kernel, TkAgg otherwise."""
             try:
                 from IPython import get_ipython
                 ipy = get_ipython()
@@ -48,11 +60,14 @@ class visu_seaborn:
         set_matplotlib_backend()
 
     def decoplotseaborn(func):
-        """
-        decorator for seaborn plot
-        """
+        """Decorate seaborn plot."""
         @wraps(func)
         def inner_plot(self, **kwargs):
+            """Build the figure, stamp the logo and title, then call the plot method.
+
+            Passes the pyplot and seaborn modules on as the 'plt' and 'sns' keyword
+            arguments.
+            """
             im = mpimg.imread(kwargs['logo'])
             _h, w = im.shape[:2]
             fig, _ax = plt.subplots(1, 1,figsize=(10, 5))
@@ -68,11 +83,14 @@ class visu_seaborn:
         return inner_plot
 
     def decohistseaborn(func):
-        """
-        decorator for seaborn histogram
-        """
+        """Decorate seaborn histogram."""
         @wraps(func)
         def inner_hist(self,**kwargs):
+            """Reduce the series to one row per location before drawing.
+
+            Keeps each location's most recent value and sorts by decreasing value,
+            so the histogram shows a ranking rather than a time series.
+            """
             input = kwargs.get('input')
             which = kwargs.get('which')
             if isinstance(which, list):
@@ -91,9 +109,7 @@ class visu_seaborn:
     #####SEABORN PLOT#########
     @decoplotseaborn
     def seaborn_date_plot(self, **kwargs):
-        """
-        Create a seaborn line plot with date on x-axis and which on y-axis.
-        """
+        """Create a seaborn line plot with date on x-axis and which on y-axis."""
         input = kwargs['input']
         list(input['where'].unique())
         what = kwargs['what']
@@ -119,6 +135,19 @@ class visu_seaborn:
 
     @decoplotseaborn
     def seaborn_yearly_plot(self, **kwargs):
+        """Draw one curve per calendar year, against the day of the year.
+
+        Superimposes the years so their shapes can be compared directly. The
+        29th of February is dropped, so that a given day number means the same
+        date in a leap year and a common one.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' (a
+            single variable) and the 'plt' and 'sns' supplied by the
+            decorator.
+        """
         input = kwargs['input']
         what = kwargs['what'][0]
         title = kwargs.get('title')
@@ -149,6 +178,17 @@ class visu_seaborn:
 
     @decoplotseaborn
     def seaborn_versus_plot(self, **kwargs):
+        """Plot one variable against another, rather than against time.
+
+        Takes exactly two variables, the first on the x axis and the second on
+        the y axis, one line per location.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' (two
+            variables) and the 'plt' and 'sns' supplied by the decorator.
+        """
         input = kwargs['input']
         what = kwargs['what']
         plt = kwargs.get('plt')
@@ -162,9 +202,7 @@ class visu_seaborn:
     @decoplotseaborn
     @decohistseaborn
     def seaborn_hist_value(self, **kwargs):
-        """
-        Create a seaborn vertical histogram where the x-axis represents a numerical field.
-        """
+        """Create a seaborn vertical histogram where the x-axis represents a numerical field."""
         input = kwargs['input']
         what = kwargs['what']
         sns = kwargs.get('sns')
@@ -178,9 +216,7 @@ class visu_seaborn:
     @decoplotseaborn
     @decohistseaborn
     def seaborn_hist_horizontal(self, **kwargs):
-        """
-        Create a seaborn horizontal histogram with which on x-axis.
-        """
+        """Create a seaborn horizontal histogram with which on x-axis."""
         input = kwargs['input']
         what = kwargs['what']
         # title = kwargs.get('title')
@@ -201,9 +237,7 @@ class visu_seaborn:
     ######SEABORN BOXPLOT#########
     @decoplotseaborn
     def seaborn_pie(self, **kwargs):
-        """
-        Create a seaborn pairplot
-        """
+        """Create a seaborn pairplot."""
         # input = kwargs['input']
         what = kwargs['what']
         plt = kwargs.get('plt')
@@ -216,9 +250,7 @@ class visu_seaborn:
     ######SEABORN heatmap#########
     @decoplotseaborn
     def seaborn_heatmap(self, **kwargs):
-        """
-        Create a seaborn heatmap
-        """
+        """Create a seaborn heatmap."""
         PyvoaWarning("BEWARE !!! THIS visualisation need to be checked !!!")
         input = kwargs.get('input')
         what = kwargs['what']

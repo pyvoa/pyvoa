@@ -1,18 +1,15 @@
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""The folium visualisation backend.
+
+Interactive leaflet maps. Only maps are implemented here, folium having no
+time-series or histogram equivalent, so ``AllVisu`` falls back to another
+backend for plots and histograms. Reached through
+``map(typeofmap='folium')``.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.visu_folium
-
-About :
--------
-
-An interface module to easily plot pyvoa_data with bokeh
-
 """
 import json
 
@@ -23,11 +20,41 @@ from branca.element import Element, Figure
 
 
 class visu_folium:
+    """The folium backend, drawing interactive leaflet maps.
+
+    Only maps are implemented here: folium has no time-series or histogram
+    equivalent, which is why AllVisu falls back to another backend for
+    plot() and hist(). Selected through map(typeofmap='folium').
+    """
+
     def __init__(self,):
+        """Set the size, in pixels, of the figure the maps are drawn in."""
         self.folium_width = 800
         self.folium_height = 400
 
     def folium_map(self, **kwargs):
+        """Draw a choropleth map of one variable with folium.
+
+        Colours each location by its value using a four-stop viridis-like scale
+        between the smallest and the largest value present, greys out the ones
+        with no value, and attaches a tooltip giving the location and its value
+        in scientific notation. The colour bar is relabelled through a snippet
+        of javascript so that its ticks are shown in scientific notation too.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments prepared by AllVisu.
+            - input (gpd.GeoDataFrame): the data to draw, carrying a 'where'
+            column, a geometry and the column named by 'what'.
+            - what (str): the column to colour by.
+            - title (str): the caption of the colour bar.
+
+        Returns
+        -------
+        folium.Map
+            the map, ready to be displayed in a notebook.
+        """
         title=kwargs.get('title')
         input = kwargs.get('input')
         input=input.drop(columns=['date'])
@@ -72,6 +99,11 @@ class visu_folium:
         #    map_dict['FakeCountry'] = 0.
 
         def get_color(feature):
+            """Return the fill colour of one geojson feature.
+
+            Grey (#8c8c8c) when the location has no value, its place on the
+            colour map otherwise.
+            """
             value = map_dict.get(feature['properties']['where'])
             if value is None or np.isnan(value):
                 return '#8c8c8c'  # MISSING -> gray

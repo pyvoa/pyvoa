@@ -1,14 +1,18 @@
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pyvoa_org
-License: See joint LICENSE file
-https://pyvoa.org/
+"""Parsing of the JSON database descriptions.
 
-Module : pyvoa.jsondb_parser
------
-This is the PyCoA rapport module it gives all available information concerning a database key words
+``MetaInfo`` reads the description files shipped under ``pyvoa/data/``, one per
+database, and answers what is available and what each one declares.
+``DataParser`` downloads the datasets a description names, normalises their
+columns to pyvoa's own, resolves their locations against the matching geography
+and concatenates the result into a single long DataFrame.
+
+Adding a database means adding a JSON file here, not writing python.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
+Copyright ©pyvoa_org
+License : see the joint LICENSE file
+https://pyvoa.org/
 """
 import importlib.resources as pkg_resources
 import json
@@ -32,44 +36,55 @@ from pyvoa.tools import (
 
 
 class MetaInfo:
+  """The catalogue of the databases pyvoa ships.
+
+  Reads the JSON description files under pyvoa/data/, one per database,
+  and answers what is available and what a given database declares: its
+  geography, its datasets and their urls, and the columns each of them
+  carries. Adding a database means adding a file here, not writing code.
+  """
+
   def __init__(self):
-        '''
-        For a specific database (call namedb), returns information on the epidemiological variables.
-        Those informations are used later on in covid19.py.
-        It returns a dictionnary with:
-            * key: epidemiological variable
-            * values:
-                - new variable name for pyvoa.purpose, if needed. By default is an empty string ''
-                - desciption of the variable. By default is an empty string '' but it is highly recommended to describe the variable
-                - url of the csv where the epidemiological variable is
-                - url of the master i.e where some general description could be located. By default is an empty string ''
-        '''
+        """Describe the epidemiological variables of a database.
+
+        For the database called namedb, returns a dictionary keyed on the
+        epidemiological variable, whose values are the new variable name for
+        pyvoa's purposes (an empty string by default), a description of the
+        variable (an empty string by default, though describing it is strongly
+        recommended), the url of the csv the variable is read from, and the url of
+        the master page where a general description may be found (an empty string
+        by default).
+        """
         self.dropdb = []
         self.pdjson = MetaInfo.getallmetadata()
 
   @staticmethod
   def parsejson(file):
-    '''
-        Parse the description of the database selected, in json data format.
-        The json file description like this:
+    """Parse the description of the selected database, in json format.
+
+    The json description reads like this::
 
         "header": "Some Header",
         "geoinfo": {
                     "granularity": "country / region / subregion ",
                     "iso3": "World / Europe /country name / ..."
                     },
-        "columns / rows ": [ -> columns / rows : you want to keep from your database
+        "columns / rows ": [
                 {
-                        "name":"XXX", -> name of the variable in Pycoa
-                        "alias":"XXX", -> original name in the db selected
+                        "name":"XXX",
+                        "alias":"XXX",
                         "description":"Some description of the variable",
-                        "url": "https://XXX", -> location of the db
-                        "urlmaster":"https://XXX" -> eventually a master url
+                        "url": "https://XXX",
+                        "urlmaster":"https://XXX"
                 },
                 ...
                 ]
         }
-    '''
+
+    where columns / rows are the ones to keep from the database, 'name' is the
+    name of the variable in pyvoa, 'alias' its original name in the database,
+    'url' the location of the database and 'urlmaster' an optional master url.
+    """
     filename = os.path.basename(file)
     check_file = os.path.isfile(file)
 
@@ -91,12 +106,15 @@ class MetaInfo:
 
   @staticmethod
   def getallmetadata():
-      '''
-      List all the valide json file in the json folder
-      return a dictionnary with db name as a key and the parsing json file as dictionnary or
-      the error if the file do not exist or not valide
-      return only valid json
-      '''
+      """List every valid json file of the json folder.
+
+      Returns
+      -------
+      dict
+          The database name as the key, and the parsed json file as the value,
+          or the error if the file does not exist or is not valid. Only valid
+          json files are returned.
+      """
       #pkg_resources.files(pyvoa).joinpath("data", filename)
       #currentpath=os.getcwd()
       #if os.path.isdir(currentpath+'/json'):
@@ -124,9 +142,7 @@ class MetaInfo:
       return df
 
   def getcurrentmetadata(self,namedb):
-      '''
-        Return current meta information from the json file i.e from "namedb".json
-      '''
+      """Return current meta information from the json file i.e from "namedb".json."""
       if namedb:
           line = self.pdjson.loc[self.pdjson.name == namedb]
           if line.empty:
@@ -144,10 +160,10 @@ class MetaInfo:
           raise PyvoaError("Does a Database has been selected ? 🤔")
 
   def getcurrentmetadatawhich(self,dico):
-      '''
-        from the dictionnary parsed in the json retrieve the "which" values
-        which are defined by name key word in the json fill
-      '''
+      """Retrieve the "which" values from the parsed json.
+
+      They are the ones defined by the 'name' keyword in the json file.
+      """
       which=[]
       for i in dico['datasets']:
         for j in i['columns']:
@@ -163,13 +179,26 @@ class MetaInfo:
 
   @staticmethod
   def checkmetadatastructure(metastructure):
-      '''
-      Some meta data information are mandatory in the JSON file
-      check if all are present in the files
-      Return 2D list : sig (1 Ok, 0 not good) & message
-      '''
+      """Check that the mandatory json metadata keys are present.
+
+      Some metadata are mandatory in the json file; this checks that all of them
+      are there.
+
+      Returns
+      -------
+      list
+          A 2D list: sig (1 ok, 0 not good) and the message.
+      """
 
       def test(dico,lm):
+          """Report whether every key of lm is present in dico.
+
+          Returns
+          -------
+          list
+              [1, 'validated'] if all are there, else [0, a message
+          naming the first one missing].
+          """
           sig = 1
           msg = 'pyvoa.json meta structure is validated'
           for i in lm:
@@ -195,7 +224,36 @@ class MetaInfo:
       return [sig,msg]
 
 class DataParser:
+  """One database, parsed from its JSON description into a DataFrame.
+
+  Downloads the datasets the description declares, normalises their
+  columns to pyvoa's names, resolves their locations against the matching
+  geography, and concatenates the result into a single long DataFrame
+  indexed by date and location. The keyword definitions and source urls
+  are kept alongside, so that a variable can be traced back to the file
+  and the provider it came from.
+  """
+
   def __init__(self, namedb):
+        """Load one database and parse it.
+
+        Reads the JSON description of namedb, picks the geography that matches
+        its declared granularity -- a GeoManager for a world-wide database, a
+        GeoCountry for a national one -- and parses the data straight away, so
+        a DataParser is usable as soon as it is built.
+
+        Parameters
+        ----------
+        namedb : str
+            the database name, as listed by MetaInfo.
+
+        Raises
+        ------
+        PyvoaError
+            if the granularity is not one of country, region or
+            subregion, or if parsing fails, which usually means the
+            upstream file changed shape.
+        """
         self.db = namedb
         self.granu_country = False
         self.metadata = MetaInfo().getcurrentmetadata(namedb)
@@ -221,13 +279,13 @@ class DataParser:
                 "You may contact contact@pyvoa.org . Thanks.") from e
 
   def get_parsing(self,):
-      '''
-        Parse the json file load in the init fonction (self.metadata)
-        it returns a pandas with this structure
-        |date|where|code| var-1 ... var-n| geometry
-        var-i are the variable selected in the json file
-        To assure a good standardization "where" et "code" use geo metho
-      '''
+      """Parse the json file loaded by the init function (self.metadata).
+
+      Returns a pandas with the structure ``|date|where|code|var-1 ... var-n|
+      geometry``, where the var-i are the variables selected in the json file.
+      "where" and "code" go through the geo methods, to assure a good
+      standardization.
+      """
       if 'header' in list(self.metadata.keys()):
           self.dbdescription = self.metadata['header']
       else:
@@ -491,66 +549,85 @@ class DataParser:
       return pandas_db
 
   def get_db(self,):
-     '''
-        Return the current covid19 database selected. See get_available_database() for full list
-     '''
+     """Return the current covid19 database selected. See get_available_database() for full list."""
      return self.db
 
   def get_geo(self,):
+      """Return the geography object this database is resolved against.
+
+      Returns
+      -------
+      A GeoManager for a world-wide database, a GeoCountry otherwise.
+      """
       return self.geo
 
   def get_world_boolean(self,):
+    """Tell whether this database is world-wide rather than national.
+
+    Returns
+    -------
+    bool
+        True when its granularity is 'country'.
+    """
     return self.granu_country
 
   def get_locations(self,):
-      ''' Return available location countries / regions / subregions in the current database
-          Using the geo method standardization
-      '''
+      """Return the locations available in the current database.
+
+      Countries, regions or subregions, standardized through the geo methods.
+      """
       return self.slocation
 
   def get_dates(self,):
-      ''' Return all dates available in the current database as datetime format'''
+      """Return all dates available in the current database as datetime format."""
       return self.dates
 
   def get_available_keywords(self):
-      '''
-           Return all the available keyswords for the database selected
-      '''
+      """Return all the available keyswords for the database selected."""
       firstvalue = next((x for x in self.available_keywords if x.startswith(("tot_", "total_"))),self.available_keywords[0])
       self.available_keywords.insert(0, self.available_keywords.pop(self.available_keywords.index(firstvalue)))
       return self.available_keywords
 
   def get_url(self):
-      '''
-       Return all the url which have been parsed for the database selected
-      '''
+      """Return all the url which have been parsed for the database selected."""
       return self.url
 
   def get_keyword_definition(self,which):
-      '''
-           Return available keywords (originally named original keywords) definition
-      '''
+      """Return available keywords (originally named original keywords) definition."""
       if which and which in self.get_available_keywords():
           return self.keyword_definition[which]
       else:
           raise PyvoaError("Missing which or which not in ",self.get_available_keywords())
 
   def get_keyword_url(self,which):
+      """Return the url the given variable was parsed from.
+
+      Parameters
+      ----------
+      which : str
+          the variable name.
+
+      Returns
+      -------
+      The url of the file this variable comes from.
+
+      Raises
+      ------
+      PyvoaError
+          if which is missing or is not a variable of this
+          database.
+      """
       if which and which in self.get_available_keywords():
           return self.keyword_url[which]
       else:
           raise PyvoaError("Missing which or which not in ",self.get_available_keywords())
 
   def get_dbdescription(self):
-      '''
-           Return available information concerning the db selected
-      '''
+      """Return available information concerning the db selected."""
       return self.dbdescription
 
   def get_maingeopandas(self,):
-      '''
-      return the parsing of the data + the geometry description as a geopandas
-      '''
+      """Return the parsing of the data + the geometry description as a geopandas."""
       col = list(self.mainpandas.columns)
       reorder = ['date','where','code']
       reorder += [ i for i in col if i not in reorder ]

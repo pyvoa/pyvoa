@@ -1,19 +1,16 @@
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
-Copyright ©pyvoa_fr
-License: See joint LICENSE file
+"""Assembly of a parsed database and its geography.
+
+``GPDBuilder`` joins the DataFrame produced by ``pyvoa.jsondb_parser`` to the
+matching geography, applies the statistical options a query asks for -- daily
+and weekly differences, smoothing, cumulative sums, normalisation by population
+-- and hands back one GeoDataFrame together with the visualisation dispatcher
+built for it.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
+Copyright ©pyvoa_org
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.geopd_builder
-
-About :
--------
-
-Main class definitions for geopd_builder dataset access. Currently, we are only using the JHU CSSE data.
-The parser class gives a simplier access through an already filled dict of data
-
 """
 
 import datetime as dt
@@ -41,15 +38,19 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 
 class GPDBuilder:
-   """
-   GPDBuilder class
-   """
+   """GPDBuilder class."""
+
    def __init__(self, db_name = None):
-        """
-            Main pycoa.class:
-            - call the get_parser
-            - call the geo
-            - call the display
+        """Build the GeoDataFrame of one database.
+
+        Calls the parser for the data, the geography for the locations, and
+        the visualisation dispatcher for the charts, so that a GPDBuilder is
+        usable as soon as it is built.
+
+        Parameters
+        ----------
+        db_name : str
+            The database to load. With None, nothing is loaded.
         """
         if db_name is not None:
             verb("Init of geopd_builder.GPDBuilder()")
@@ -102,25 +103,33 @@ class GPDBuilder:
             self.currentdata = None
 
    def getinfodatewhich(self):
+       """Return the parser's summary of the dates and variables available."""
        return self.currentdata.get_echoinfo()
 
    def getwheregeometrydescription(self,):
+        """Return the geometry of each location, as a 'where'/'geometry' frame."""
         return self.where_geodescription
 
    def gettypeofgeometry(self):
+        """Return the geography object backing this database.
+
+        Returns
+        -------
+        A GeoManager for a world-wide database, a GeoCountry otherwise.
+        front reads its type to decide how to draw a map.
+        """
         return self.geo
 
    def get_available_keywords(self):
-       '''
-        return available from the jsondb_parser
-       '''
+       """Return available from the jsondb_parser."""
        return self.currentdata.get_available_keywords()
 
    def factory(self,reload=True):
-       '''
-        Return an instance to GPDBuilder and to Display methods
-        This is recommended to avoid mismatch in labeled figures
-       '''
+       """Return an instance of GPDBuilder and of the display methods.
+
+       Recommended over building them separately, which risks a mismatch in the
+       labels of the figures.
+       """
        f = self.db+'.pkl'
        data,geo=self.split_data_geo(self.get_fulldb())
        if reload:
@@ -131,38 +140,81 @@ class GPDBuilder:
 
    @staticmethod
    def split_data_geo(mypyvoageopd):
+      """Split a geo DataFrame into its data and its geometry.
+
+      The geometry repeats on every date, which is wasteful to carry around
+      and to pickle. Splitting it out leaves one row per location.
+
+      Parameters
+      ----------
+      mypyvoageopd : gpd.GeoDataFrame
+          the full frame.
+
+      Returns
+      -------
+      tuple
+          (data without the geometry column, one 'where'/'geometry'
+      row per location).
+      """
       data=mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
       geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
       return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
-       ''' Set the Display '''
+       """Set the Display."""
        import pyvoa.visualizer as output
        self.codisp = output.AllVisu(db_name, wheregeometrydescription)
 
    def getvisu(self):
-       ''' Return the instance of Display initialized by factory'''
+       """Return the instance of Display initialized by factory."""
        return self.codisp
 
    def setgeo(self,geo):
+       """Set the geography object used to resolve locations."""
        self.geo = geo
 
    def getgeo(self):
+       """Return the geography object used to resolve locations."""
        return self.geo
 
    def get_parserdb(self):
+       """Return the DataParser holding the parsed database."""
        return self.currentdata
 
    def get_fulldb(self):
+      """Return the whole database, geometry included, as one GeoDataFrame."""
       return self.currentdata.get_maingeopandas()
 
    def get_available_GPDBuilder(self):
-        '''
-        Return all the available Covid19 GPDBuilder
-        '''
+        """Return all the available Covid19 GPDBuilder."""
         return self.GPDBuilder_name
 
    def subregions_deployed(self,listloc,typeloc='subregion'):
+        """Expand a list of locations into the individual places it covers.
+
+        A region name is replaced by the subregions it contains, so that a
+        selection such as 'Occitanie' becomes the departements below it. Names
+        already at the requested level are kept as they are.
+
+        Parameters
+        ----------
+        listloc : list
+            the locations to expand.
+        typeloc : str
+            the level to expand to, 'subregion' (default) or
+            'region'.
+
+        Returns
+        -------
+        list
+            the flattened list of locations.
+
+        Raises
+        ------
+        PyvoaError
+            if an entry is neither a region nor a subregion of this
+            database, or if a subregion is asked for at region granularity.
+        """
         exploded = []
         for i in listloc:
             if typeloc == 'subregion':
@@ -195,14 +247,13 @@ class GPDBuilder:
         return flat_list(exploded)
 
    def whereclustered(self,**kwargs):
-        '''
-        Handles the name and geometric behavior of the object
-        Return a pandas after whereclustered
-            - sum of the name location
-            - sum all value or return mean value (depends on the variable considered)
-            - sum all the geometry
-        upper str comparision to be insensitive case
-        '''
+        """Handle the name and the geometry of a cluster of locations.
+
+        Returns a pandas in which the locations of a cluster have been collapsed:
+        their names summed, their values summed or averaged depending on the
+        variable, and their geometries merged. Names are compared upper-cased, so
+        the comparison is case insensitive.
+        """
         input = kwargs.get('input')
         #if 'geometry' not in list(input.columns):
         #    return input
@@ -287,12 +338,12 @@ class GPDBuilder:
         return newpd
 
    def get_stats(self,**kwargs):
-       '''
-            Return a fill kwargs after input arguments applied
-            options:
-             - test all arguments an their values
-             - nonneg redistribute value in order to remove negative value
-       '''
+       """Return the keyword arguments filled in from the input arguments.
+
+       Tests every argument and its values, and applies the options asked for, in
+       particular 'nonneg', which redistributes values so as to remove the
+       negative ones.
+       """
        defaultargs = InputOption().d_batchinput_args
        option = kwargs.get('option',defaultargs['option'][0])
        kwargs_values_testing(option,defaultargs['option'],'option error ... ')
@@ -459,9 +510,10 @@ class GPDBuilder:
        return kwargs
 
    def normbypop(self, pandy , val2norm ,bypop):
-    """
-        Return a pandas with a normalisation column add by population
-        * can normalize by '100', '1k', '10k', '100k' or '1M' and the new which
+    """Return a pandas with a normalisation column added by population.
+
+    Can normalise by '100', '1k', '10k', '100k' or '1M', naming the new
+    variable accordingly.
     """
     dpop = InputOption().dictpop
     if pandy.empty:
@@ -504,13 +556,18 @@ class GPDBuilder:
     return pandy
 
    def saveoutput(self,**kwargs):
-       '''
-       Save a pyvoa pandas as an output file, in the format selected by the saveformat argument.
-       'pandas': the pyvoa pandas to save (mandatory)
-       'saveformat': excel or csv (default excel)
-       'savename': file name without its extension (default pyvoa_out, hence
-                   pyvoa_out.xlsx or pyvoa_out.csv)
-       '''
+       """Save a pyvoa pandas as an output file.
+
+       Parameters
+       ----------
+       pandas : pd.DataFrame
+           The pyvoa pandas to save. Mandatory.
+       saveformat : str
+           'excel' or 'csv'. Default is 'excel'.
+       savename : str
+           The file name, without its extension. Default is 'pyvoa_out', hence
+           pyvoa_out.xlsx or pyvoa_out.csv.
+       """
        possibleformat=['excel','csv']
        saveformat = 'excel'
        savename = 'pyvoa_out'
@@ -535,6 +592,22 @@ class GPDBuilder:
 
    ## https://www.kaggle.com/freealf/estimation-of-rt-from-cases
    def smooth_cases(self,cases):
+        """Smooth a daily series with a centred gaussian window.
+
+        Uses a seven-day gaussian window and drops everything up to the last
+        zero, so that the series starts where the epidemic is actually under
+        way. Used by the Rt estimation below.
+
+        Parameters
+        ----------
+        cases : pd.Series
+            the daily counts.
+
+        Returns
+        -------
+        pd.Series
+            the smoothed counts.
+        """
         new_cases = cases
 
         smoothed = new_cases.rolling(7,
@@ -555,6 +628,29 @@ class GPDBuilder:
         return smoothed
 
    def get_posteriors(self,sr, window=7, min_periods=1):
+        """Estimate the posterior distribution of the reproduction number Rt.
+
+        Bayesian day-by-day update over a grid of possible Rt values, with a
+        gamma prior and a Poisson likelihood whose rate follows from the
+        previous day's count and a serial interval of seven days. Adapted from
+        the kaggle notebook credited above the method.
+
+        Parameters
+        ----------
+        sr : pd.Series
+            the smoothed daily counts.
+        window : int
+            the smoothing window, kept for signature
+            compatibility.
+        min_periods : int
+            likewise.
+
+        Returns
+        -------
+        tuple
+            (posteriors over the Rt grid for each day, the log
+        likelihood of the series).
+        """
         from scipy import stats as sps
         # We create an array for every possible value of Rt
         R_T_MAX = 12

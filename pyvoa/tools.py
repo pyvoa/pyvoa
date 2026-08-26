@@ -1,26 +1,18 @@
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""Utility functions shared across pyvoa.
+
+A swiss knife of helpers, covering verbose and warning mode management, kwargs
+analysis, filling the nan values of a given pandas, date parsing and
+validation, and the automatic file caching system.
+
+The ``_verbose_mode`` variable should be set to 0 if no printing output is
+needed. The default value is 1, printing information to stdout; the value 2
+grants debug level information printing.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.tools
-
-About
------
-This is the PyCoA tools module to be considered as a swiss knife list of functions.
-One find function for
- - verbose or warning mode management.
- - kwargs analysis
- - filling nan values of given pandas
- - date parsing validation
- - automatic file caching system
-
-The _verbose_mode variable should be set to 0 if no printing output needed. The
-default value is 1 (print information to stdout). The 2 value grants a debug level information
-printing.
 """
 
 import datetime
@@ -71,13 +63,11 @@ pklpath=tmpdir
 # --- Usefull functions for pyvoa.--------------------
 # ----------------------------------------------------
 def get_verbose_mode():
-    """Return the verbose mode
-    """
+    """Return the verbose mode."""
     return _verbose_mode
 
 def set_verbose_mode(v):
-    """Set the verbose mode
-    """
+    """Set the verbose mode."""
     global _verbose_mode
     _verbose_mode=v
     if (v < 2) :
@@ -91,8 +81,13 @@ def set_verbose_mode(v):
     return get_verbose_mode()
 
 def get_live_mode():
-    """Return the data source mode, True if live (upstream) sources are used,
-    False if the frozen Zenodo archive is used.
+    """Say whether the live upstream sources are in use.
+
+    Returns
+    -------
+    bool
+        True when the live upstream sources are used, False when the frozen
+        Zenodo archive is.
     """
     return _live_mode
 
@@ -109,24 +104,29 @@ def set_live_mode(live=True):
     return get_live_mode()
 
 def info(*args):
-    """Print to stdout with similar args as the builtin print function,
-    if _verbose_mode > 0
+    """Print to stdout, if the verbosity is 1 or more.
+
+    Takes the same arguments as the builtin print function.
     """
     if _verbose_mode > 0:
         print(*args)
 
 def verb(*args):
-    """Print to stdout with similar args as the builtin print function,
-    if _verbose_mode > 1
+    """Print to stdout, if the verbosity is 2 (debug).
+
+    Takes the same arguments as the builtin print function.
     """
     if _verbose_mode > 1:
         print(*args)
 
 def kwargs_keystesting(given_args, expected_args, error_string):
-    """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaError with error_string.
-    """
+    """Test that the given kwargs keys are the expected ones.
 
+    Raises
+    ------
+    PyvoaError
+        With error_string, if a key is not expected.
+    """
     if not isinstance(given_args,dict):
         raise PyvoaError("kwargs_keystesting error, the given args are not a dict type.")
     if not isinstance(expected_args,list):
@@ -139,15 +139,31 @@ def kwargs_keystesting(given_args, expected_args, error_string):
     return True
 
 def debug(value,message=''):
+    """Print a value between two rules, for debugging at the console.
+
+    Unconditional, unlike verb() and info(): it ignores the verbosity, so it
+    is meant for temporary use while tracking a problem down, not for output
+    the library ships.
+
+    Parameters
+    ----------
+    value
+        whatever is to be shown.
+    message : str
+        a label printed next to it.
+    """
     print("\n------------------------\n")
     print(" ---- " , message ,  " ->>>>>>>>       ",value)
     print("\n------------------------\n")
 
 def kwargs_test(given_args, expected_args, error_string):
-    """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaError with error_string.
-    """
+    """Test that the given kwargs keys are the expected ones.
 
+    Raises
+    ------
+    PyvoaError
+        With error_string, if a key is not expected.
+    """
     if not isinstance(given_args,dict):
         raise PyvoaError("kwargs_test error, the given args are not a dict type.")
     if not isinstance(expected_args,list):
@@ -161,7 +177,6 @@ def kwargs_test(given_args, expected_args, error_string):
 
 def kwargs_values_testing(given_values, expected_values, error_string):
     """Check if values are in allowed list."""
-
     if expected_values is None or given_values is None:
         return
 
@@ -171,6 +186,7 @@ def kwargs_values_testing(given_values, expected_values, error_string):
     allowed = set(expected_values)
 
     def check_one_list(vals):
+        """Raise PyvoaError naming every value of vals outside allowed."""
         bad = [v for v in vals if v not in allowed]
         if bad:
             raise PyvoaError(
@@ -194,8 +210,12 @@ def kwargs_values_testing(given_values, expected_values, error_string):
             )
 
 def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string):
-    """Test that the list of kwargs is compatible with expected args. If not
-    it raises a PyvoaError with error_string.
+    """Test that the given kwargs keys and their values are the expected ones.
+
+    Raises
+    ------
+    PyvoaError
+        With error_string, if a key or one of its values is not expected.
     """
     if not isinstance(given_kargs,dict) or not isinstance(expected_kargs,dict):
         raise PyvoaError("kwargs_fulltest error, the given args are not a dict type.")
@@ -220,13 +240,11 @@ def kwargs_keyvaluestesting(given_kargs, expected_kargs, hiddenkeys,error_string
     return True
 
 def tostdstring(s):
-    """Standardization of string for country,region or subregion tests
-    """
+    """Standardization of string for country,region or subregion tests."""
     return unidecode.unidecode(' '.join(s.replace('-',' ').split())).upper()
 
 def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None):
-    """Filling the input pandas dataframe p with missing dates
-    """
+    """Fill the input pandas dataframe p with missing dates."""
     if not isinstance(p, pd.DataFrame):
         raise PyvoaError("Expecting input p as a pandas dataframe.")
     if date_field not in p.columns:
@@ -264,8 +282,10 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
     return pfill
 
 def check_valid_date(date):
-    """Check if a string is compatible with a valid date under the format day/month/year
-    with 2 digits for day, 2 digits for month and 4 digits for year.
+    """Check that a string is a valid date.
+
+    The format is day/month/year, with 2 digits for the day, 2 for the month
+    and 4 for the year.
     """
     raise_error=False
     if not isinstance(date,str):
@@ -296,12 +316,16 @@ def check_valid_date(date):
             "the month (btw 1 and 12) and the year value.")
 
 def extract_dates(when):
-    """Expecting None or 1 or 2 dates separated by :. The format is a string.
-    If 2 dates are given, they must be ordered.
-    When 1 date is given, assume that's the latest which is given.
-    When None date is give, the oldest date is 01/01/0001, the newest is now.
+    """Extract the date range from a when argument.
 
-    It returns 2 datetime object. If nothing given, the oldest date is 01/01/0001,
+    Expects None, or 1 or 2 dates separated by ':', given as a string. Two
+    dates must be ordered. A single date is taken as the latest one. With
+    None, the oldest date is 01/01/0001 and the newest is today.
+
+    Returns
+    -------
+    tuple of datetime.date
+        The oldest and the newest date.
     """
     #w0=datetime.datetime(1,1,1) # minimal year is 1
     #w1=datetime.datetime.now()
@@ -328,12 +352,10 @@ def extract_dates(when):
     return w0, w1
 
 def week_to_date(whenstr):
-    """
-    convert week to date.
-    2 cases:
-    - Rolling week
-        if format is Y-M-D-Y-M-D: return middle dates
-    - One week data Wnumber: return monday correction to the week number
+    """Convert a week to a date.
+
+    Two cases: a rolling week, in the Y-M-D-Y-M-D format, returns the middle
+    date; a one-week datum, Wnumber, returns the monday of that week number.
     """
     convertion = 0
     if len(whenstr) == 21:
@@ -353,8 +375,12 @@ def week_to_date(whenstr):
     return convertion
 
 def exists_from_url(path):
-    """"Check if url for files responds
-    Boolean return
+    """Check that the url of a file responds.
+
+    Returns
+    -------
+    bool
+        True if the url answers with an ok status.
     """
     r = requests.head(path)
     return r.status_code == requests.codes.ok
@@ -369,7 +395,6 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
 
     One may add a suffix to the local filename if known.
     """
-
     # Archived files never change, so they are downloaded once and for all.
     # In live mode the caller's expiration time is honoured, so that upstream
     # updates are eventually seen.
@@ -438,9 +463,7 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     return local_filename
 
 def testsublist(lst1, lst2):
-    '''
-       test if lst1 is in lst2 list
-    '''
+    """Test if lst1 is in lst2 list."""
     test=False
     extract = [el for el in lst1 if el in lst2]
     if len(extract)==len(lst1):
@@ -448,7 +471,7 @@ def testsublist(lst1, lst2):
     return test
 
 def flat_list(matrix):
-     ''' Flatten list function used in covid19 methods'''
+     """Flatten list function used in covid19 methods."""
      flatten_matrix = []
      for sublist in matrix:
          if isinstance(sublist,list):
@@ -459,14 +482,28 @@ def flat_list(matrix):
 
 def all_or_none_lists(my_list):
     # Vérifie s'il existe au moins une liste dans les éléments
+    """Tell whether the elements of my_list are consistently typed.
+
+    True when none of them is a list, or when all of them are; False when
+    lists and non-lists are mixed. front uses it on 'where' to refuse a
+    selection that mixes single locations and clusters of locations.
+
+    Parameters
+    ----------
+    my_list : list
+        the elements to check.
+
+    Returns
+    -------
+    bool
+        False only for a mixture.
+    """
     has_list = any(isinstance(x, list) for x in my_list)
     # Si oui, vérifie que tous les éléments sont des listes
     return not (has_list and not all(isinstance(x, list) for x in my_list))
 
 def getnonnegfunc(mypd,which):
-    '''
-    From a mypd pandas and a which value return non negative values
-    '''
+    """From a mypd pandas and a which value return non negative values."""
     if isinstance(which,list):
         raise PyvoaError('getnonnegfunc do not accepte a list ...')
     else:
@@ -510,7 +547,7 @@ def getnonnegfunc(mypd,which):
     return reconstructed
 
 def return_nonan_dates_pandas(df = None, field = None):
-   ''' Check if for last date all values are nan, if yes check previous date and loop until false'''
+   """Check if for last date all values are nan, if yes check previous date and loop until false."""
    watchdate = df.date.max()
    boolval = True
    j = 0
@@ -531,14 +568,19 @@ def return_nonan_dates_pandas(df = None, field = None):
 def readpkl(filepkl):
     """Load a pickled object from the pyvoa cache directory.
 
-    Args:
-        filepkl: filename to read (without path)
+    Parameters
+    ----------
+    filepkl
+        filename to read (without path)
 
-    Returns:
-        Unpickled object
+    Returns
+    -------
+    Unpickled object
 
-    Raises:
-        PyvoaError: if file doesn't exist or can't be loaded
+    Raises
+    ------
+    PyvoaError
+        if file doesn't exist or can't be loaded
     """
     if filepkl is None:
         raise PyvoaError("readpkl requires 'filepkl'")
@@ -558,6 +600,20 @@ def readpkl(filepkl):
         raise PyvoaError(f"Failed to load pickle file {filepath}: {e!s}")
 
 def dumppkl(filepkl,whattodump):
+   """Pickle an object into the package cache directory.
+
+   Parameters
+   ----------
+   filepkl : str
+       the file name, created under the cache path.
+   whattodump
+       the object to pickle.
+
+   Raises
+   ------
+   PyvoaError
+       if either argument is None.
+   """
    if filepkl is None or whattodump is None:
         raise PyvoaError("dumppkl requires both 'filepkl' and 'whattodump'")
    if not os.path.exists(pklpath):
@@ -569,9 +625,17 @@ def dumppkl(filepkl,whattodump):
 
 @staticmethod
 def wgs84_to_web_mercator(tuple_xy):
-    """
-    Take a tuple (longitude,latitude) from a coordinate reference system crs=EPSG:4326
-     and converts it to a  longitude/latitude tuple from to Web Mercator format
+    """Convert a WGS84 coordinate to Web Mercator.
+
+    Parameters
+    ----------
+    tuple_xy : tuple
+        A (longitude, latitude) pair in the crs=EPSG:4326 reference system.
+
+    Returns
+    -------
+    tuple
+        The same point in the Web Mercator format.
     """
     k = 6378137
     x = tuple_xy[0] * (k * np.pi / 180.0)
@@ -584,10 +648,11 @@ def wgs84_to_web_mercator(tuple_xy):
 
 @staticmethod
 def convertmercator(gdf):
-    '''
-    trick found by dadoun to solve this problem
-    see https://discourse.bokeh.org/t/bokeh-tile-antimeridian-problem/6978
-    '''
+    """Work around the bokeh antimeridian tile problem.
+
+    Trick found by dadoun, see
+    https://discourse.bokeh.org/t/bokeh-tile-antimeridian-problem/6978.
+    """
     rows = []
     for idx, row in gdf.iterrows():
         new_poly = []
@@ -621,10 +686,16 @@ def convertmercator(gdf):
 
 @staticmethod
 def get_polycoords(geopandasrow):
-    """
-    Take a row of a geopandas as an input (i.e : for index, row in geopdwd.iterrows():...)
-        and returns a tuple (if the geometry is a Polygon) or a list (if the geometry is a multipolygon)
-        of an exterior.coords
+    """Return the exterior coordinates of a geopandas row.
+
+    Takes a row of a geopandas, as given by ``for index, row in
+    geopdwd.iterrows()``.
+
+    Returns
+    -------
+    tuple or list
+        A tuple if the geometry is a Polygon, a list if it is a multipolygon,
+        of its exterior.coords.
     """
     geometry = geopandasrow['geometry']
     all = []
@@ -637,8 +708,9 @@ def get_polycoords(geopandasrow):
 
 @staticmethod
 def min_max_range(a_min, a_max):
-    """ Return a cleverly rounded min and max giving raw min and raw max of data.
-    Usefull for hist range and colormap
+    """Return a cleverly rounded min and max of the data.
+
+    Useful for a histogram range and for a colormap.
     """
     min_p = 0
     max_p = 0
@@ -686,6 +758,27 @@ def min_max_range(a_min, a_max):
 def blinking_centered_text(typemsg, message, blinking=False, text_color="white", bg_color="red"):
 
     # Détecter l'environnement
+    """Display a banner message, centred and coloured.
+
+    Detects the environment and renders accordingly: HTML in a Jupyter
+    notebook or in Colab, ANSI escape codes on a plain terminal. This is
+    what gives PyvoaError, PyvoaWarning and PyvoaInfo their coloured banner.
+
+    Parameters
+    ----------
+    typemsg : str
+        the heading, such as 'PYVOA Error !'.
+    message : str
+        the text below it.
+    blinking : bool
+        whether the banner blinks. Errors do, the rest
+        do not.
+    text_color : str
+        a name from the internal colour map, or a value
+        the display understands.
+    bg_color : str
+        likewise, for the background.
+    """
     try:
         import google.colab  # noqa: F401  -- imported only to detect the Colab runtime
         in_colab = True
@@ -755,6 +848,16 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
         sys.stdout.write(f'{ansi_start}{message.center(columns)}{ansi_reset}\n')
 
 def PyvoaInfo(message):
+    """Print an informational banner, if the verbosity is 2 (debug).
+
+    Not an exception, despite the name: it prints and returns. See
+    PyvoaError for the one type the library raises.
+
+    Parameters
+    ----------
+    message : str
+        the text to show.
+    """
     if get_verbose_mode() > 1:
         blinking_centered_text(
             'PYVOA Info !',
@@ -765,6 +868,16 @@ def PyvoaInfo(message):
         )
 
 def PyvoaWarning(message):
+    """Print a warning banner, if the verbosity is 1 or more.
+
+    Not an exception, despite the name: it prints and returns. See
+    PyvoaError for the one type the library raises.
+
+    Parameters
+    ----------
+    message : str
+        the text to show.
+    """
     if get_verbose_mode() > 0:
         blinking_centered_text(
             'PYVOA Warning !',
@@ -785,6 +898,13 @@ class PyvoaError(Exception):
     """
 
     def __init__(self, *args):
+        """Build the error and show its banner at once.
+
+        Parameters
+        ----------
+        *args
+            the parts of the message, joined with spaces.
+        """
         message = ' '.join(str(a) for a in args)
         super().__init__(message)
         blinking_centered_text(
@@ -797,7 +917,8 @@ class PyvoaError(Exception):
 
 
 class dotdict(dict):
-    """dot.notation access to dictionary attributes"""
+    """dot.notation access to dictionary attributes."""
+
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__

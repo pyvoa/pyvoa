@@ -1,19 +1,17 @@
 
-"""
-Project : PyvoA
-Date :    april 2020 - august 2026
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+"""Dispatch of chart requests to the visualisation backends.
+
+``AllVisu`` holds the drawing settings that do not depend on the backend -- the
+colour cycle, the logos, how many locations a chart shows and how long a name
+may be -- then routes each request to matplotlib, bokeh or seaborn according to
+``vis``, and to the routine matching ``typeofplot``, ``typeofhist`` or
+``typeofmap``. The backends do not all offer the same charts.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : pyvoa.visualizer
-
-About :
--------
-
-An interface module to easily plot pyvoa_data with bokeh
-
 """
 import datetime as dt
 from functools import wraps
@@ -69,10 +67,29 @@ import pyvoa
 
 
 class AllVisu:
+    """Dispatcher routing a chart request to the backend that draws it.
+
+    Every visualisation is implemented here or in one of the backend modules
+    it delegates to.
     """
-        All visualisation should be implemented here !
-    """
+
     def __init__(self, db_name = None, kindgeo = None):
+        """Prepare the dispatcher for one database.
+
+        Reads the geographic metadata of db_name -- its ISO3 code and its
+        granularity -- unless the data is user supplied ('in-house data'),
+        collects the chart methods the class exposes, and settles the drawing
+        defaults: the colour cycle, how many locations a chart shows at most,
+        how long a location name may be before it is cut, and the paths to the
+        two logo files stamped on the figures.
+
+        Parameters
+        ----------
+        db_name : str
+            the database the charts will describe.
+        kindgeo : gpd.GeoDataFrame
+            the geometry to draw the locations with.
+        """
         self.lcolors = ['red', 'blue', 'green', 'orange', 'purple',
                         'brown', 'pink', 'gray', 'yellow', 'cyan']
         self.scolors = self.lcolors[:5]
@@ -107,11 +124,14 @@ class AllVisu:
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
-        """
-        decorator for plot purpose
-        """
+        """Decorate plot purpose."""
         @wraps(func)
         def inner_plot(self ,**kwargs):
+            """Prepare the keyword arguments shared by every time-series plot.
+
+            Adds the title, the logo, the colour cycle and the shortened location
+            labels before handing over to the plotting routine.
+            """
             input = kwargs.get('input')
             # what = kwargs.get('what')
             title = kwargs.get('title')
@@ -141,11 +161,14 @@ class AllVisu:
 
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE & MAP'''
     def decohistomap(func):
-        """
-        Decorator function used for histogram and map
-        """
+        """Decorate histogram and map."""
         @wraps(func)
         def inner_hm(self, **kwargs):
+            """Prepare the keyword arguments shared by histograms and maps.
+
+            Adds the title, the date actually drawn, the logo and the shortened
+            location labels before handing over to the drawing routine.
+            """
             input = kwargs.get('input')
             which = kwargs.get('which')
             which = which[0]
@@ -209,13 +232,18 @@ class AllVisu:
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
     def decohistopie(func):
+        """Decorate preparing the data of a histogram or a pie chart.
+
+        Sorts the locations by decreasing value so the chart is drawn in rank
+        order, and resolves 'what' to the single column the chart needs when a
+        daily or weekly series was asked for.
+        """
         @wraps(func)
         def inner_decohistopie(self, **kwargs):
-            """
-            Decorator for Horizontal histogram & Pie Chart
-            It put in the kwargs:
-            kwargs['geopdwd']-> pandas for which asked (all dates)
-            kwargs['geopdwd_filtered']-> pandas for which asked last dates
+            """Prepare the data of a horizontal histogram or a pie chart.
+
+            Puts into the kwargs ``geopdwd``, the pandas of the variable asked for
+            over all dates, and ``geopdwd_filtered``, the same for the last date only.
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
@@ -234,6 +262,29 @@ class AllVisu:
 
     @decoplot
     def plot(self,**kwargs):
+        """Draw a time series with whichever backend is selected.
+
+        Dispatches to matplotlib, bokeh or seaborn according to 'vis', and
+        within each to the routine matching 'typeofplot'. The backends do not
+        all offer the same plots: 'compare' and 'spiral' exist only in bokeh.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments prepared by front, including
+            'input', 'which', 'what', 'vis' and 'typeofplot'.
+
+        Returns
+        -------
+        The figure built by the backend.
+
+        Raises
+        ------
+        PyvoaError
+            if the selection holds a single date, if 'yearly' or
+            'spiral' is asked for with more than one location or variable,
+            or if 'versus' is not given exactly two variables.
+        """
         input = kwargs.get('input')
         typeofplot = kwargs.get('typeofplot')
         if input.date.max() == input.date.min():
@@ -291,9 +342,7 @@ class AllVisu:
     @decohistomap
     @decohistopie
     def hist(self,**kwargs):
-        '''
-        FILL IT
-        '''
+        """FILL IT."""
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
         which = kwargs.get('which')
@@ -334,9 +383,7 @@ class AllVisu:
     @decohistomap
     @decohistopie
     def map(self,**kwargs):
-        '''
-        FILL IT
-        '''
+        """FILL IT."""
         vis = kwargs.get('vis')
         input = kwargs.get('input')
         which = kwargs.get('which')

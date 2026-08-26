@@ -1,3 +1,15 @@
+"""The command-line help of pyvoa.
+
+Prints the reference of the listing and charting methods, with their main
+options and a few worked examples. Reachable as ``python -m pyvoa.help``, and
+from a session through ``front.help()``.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
+Copyright ©pyvoa_org
+License : see the joint LICENSE file
+https://pyvoa.org/
+"""
 import argparse
 
 # Basic metadata. The version and the author list live in pyvoa/__version__.py,
@@ -16,6 +28,12 @@ RESET = "\033[0m"
 BOLD = "\033[1m"
 
 def display_full_help():
+    """Print the full pyvoa command reference to the terminal.
+
+    Writes a colourised summary of the listing methods, the four chart
+    methods and their main options, followed by a handful of worked
+    examples. Called by main() for the -h/--help switch.
+    """
     print()
     print(f"{RED}{BOLD}=== Welcome to the Pysrc Help System ==={RESET}\n")
 
@@ -95,6 +113,13 @@ def display_full_help():
     print()
 
 def main():
+    """Entry point of the command-line help.
+
+    Parses the -h/--help, -v/--version, -a/--author, -g/--github and -w/--web
+    switches and prints what each of them asks for. With no argument, or with
+    --help, the argparse usage is printed, and --help adds the full reference
+    from display_full_help().
+    """
     parser = argparse.ArgumentParser(
         description="Extended help for Pysrc.",
         add_help=False
