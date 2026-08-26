@@ -217,16 +217,16 @@ class visu_matplotlib:
 
 
     @decomatplotlib
-    def matplotlib_histo(self,**kwargs):
-        # title = kwargs.get('title')
-        # what = kwargs.get('what')
+    def matplotlib_histo(self, **kwargs):
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
         input_df = kwargs.get('input').copy()
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which = kwargs.get('which')
 
+        # -------------------------
         # bins
+        # -------------------------
         min_val = input_df[which].min()
         max_val = input_df[which].max()
 
@@ -234,13 +234,18 @@ class visu_matplotlib:
             bins = 11
 
         edges = np.linspace(min_val, max_val, bins + 1)
+
         # assign bins
-        input_df["bin"] = pd.cut(input_df[which], bins=edges, include_lowest=True)
+        input_df["bin"] = pd.cut(
+            input_df[which],
+            bins=edges,
+            include_lowest=True
+        )
 
         # pivot: bin x country
         pivot = (
             input_df
-            .groupby(["bin", "where"])
+            .groupby(["bin", "where"], observed=False)
             .size()
             .unstack(fill_value=0)
             .sort_index()
@@ -249,6 +254,7 @@ class visu_matplotlib:
         countries = pivot.columns
         colors = plt.cm.tab20(np.linspace(0, 1, len(countries)))
 
+        # Position des barres
         x = np.arange(len(pivot))
         bottom = np.zeros(len(pivot))
 
@@ -264,16 +270,16 @@ class visu_matplotlib:
             bottom += pivot[country].values
 
         # -------------------------
-        # AXE X en LOG (puissance de 10)
+        # Centres des bins
         # -------------------------
+        centers = (edges[:-1] + edges[1:]) / 2
+
         def format_sci(x):
             if x <= 0:
                 return ""
 
             exp = int(np.floor(np.log10(x)))
             mant = x / 10**exp
-
-            # arrondi propre
             mant = np.round(mant, 1)
 
             if mant == 1:
@@ -281,23 +287,22 @@ class visu_matplotlib:
             else:
                 return rf"${mant:g}\times10^{{{exp}}}$"
 
-        centers = np.array([
-            (edges[i] + edges[i+1]) / 2
-            for i in range(len(edges)-1)
-        ])
-
-        x = np.arange(len(centers))
+        # Les positions des ticks correspondent aux positions des barres
+        ax.set_xticks(x)
         ax.set_xticklabels([format_sci(c) for c in centers])
+
         ax.set_xlabel(which)
         ax.set_ylabel("frequency")
+
         ax.legend(
             bbox_to_anchor=(1.05, 1),
             loc="upper left",
             borderaxespad=0
         )
-        ax.grid(True)
-        return ax
 
+        ax.grid(True)
+
+        return ax
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
         '''
