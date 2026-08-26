@@ -1,4 +1,12 @@
 # Unreleased
+- `set_verbose_mode()` and `get_verbose_mode()` are methods of the front class,
+  so `pf.set_verbose_mode(2)` works alongside the rest of the front-level API
+  and both appear in the published reference. They were previously reachable
+  only as a side effect of being imported into `pyvoa/front.py`, which is why
+  the lint pass removed them without anyone noticing. `pyvoa.tools` keeps the
+  functions themselves; the front methods delegate. Front-level values are
+  checked: anything other than 0, 1 or 2 raises a `PyvoaError` naming the three
+  levels, where `pyvoa.tools.set_verbose_mode()` takes whatever it is given.
 - `saveoutput()` writes `pyvoa_out.xlsx` / `pyvoa_out.csv` when no `savename`
   is given. The default used to be `pycoa.ut`, the wreckage of a `pycoa`
   rename that had run through the string itself, so the files came out as
@@ -126,9 +134,15 @@ Errors, warnings and verbosity:
 - `pyvoa/error.py` is gone: the error and warning helpers live in `tools.py`,
   which is also where the geometry helper `wgs84_to_web_mercator` moved, so
   both backends share one copy.
-- `set_verbose_mode()` is exposed on the front module. Warnings are quiet at
-  verbosity 1, and the noise that external modules print when a French map
-  archive or a datetime column is read is swallowed below verbosity 2.
+- Warnings are quiet at verbosity 1, and the noise that external modules print
+  when a French map archive or a datetime column is read is swallowed below
+  verbosity 2. This entry used to say that `set_verbose_mode()` was exposed on
+  the front module as well. It was, on `main`, from `27bb133` (february 2026)
+  until `a7220e0` cleared the lint findings hours before the tag: the name was
+  only ever imported into `front.py`, never used there, so ruff reported it as
+  an unused import and removed it. No released version shipped it, and the
+  claim was written four days after the removal. It is true again from the next
+  release; see the Unreleased entry.
 
 Packaging, tests and process:
 
