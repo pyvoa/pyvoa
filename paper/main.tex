@@ -153,8 +153,10 @@ epidemiological data  \sep geospatial data \sep open data \sep reproducible rese
 %% ============================================================================
 
 \clearpage
-\section*{Metadata}
+\section*{Required Metadata}
 \label{metadata}
+
+\section*{Current code version}
 
 \begin{table}[!ht]
 \small
@@ -164,25 +166,20 @@ epidemiological data  \sep geospatial data \sep open data \sep reproducible rese
 \hline
 C1 & Current code version & v0.5.0 (released 2026-08-06) \\
 \hline
-C2 & Permanent link to code/repository used for this code version &
+C2 & Permanent GitHub link to code/repository used for this code version &
 \url{https://github.com/pyvoa/pyvoa} \newline
 archived release: \url{https://doi.org/10.5281/zenodo.21829902} \newline
 concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \\
 \hline
-C3 & Permanent link to Reproducible Capsule &
-\attn{donner un lien Binder
-(\url{https://mybinder.org/v2/gh/pyvoa/pyvoa/main}), e.g. le 
-notebook \texttt{PyvoaForBeginners.ipynb}. Ne pas laisser la case vide : c'est un motif de renvoi éditorial. } \\
+C3 & Legal Code License & MIT License \\
 \hline
-C4 & Legal Code License & MIT License \\
+C4 & Code versioning system used & git \\
 \hline
-C5 & Code versioning system used & git \\
-\hline
-C6 & Software code languages, tools and services used &
+C5 & Software code languages, tools and services used &
 Python~3; JSON database descriptors; pytest; ruff; GitHub Actions (lint, test
 matrix on Python 3.10--3.13, weekly network tests); PyPI; Zenodo \\
 \hline
-C7 & Compilation requirements, operating environments \& dependencies &
+C6 & Compilation requirements, operating environments \& dependencies &
 Python~$\geq$~3.10. Required, with the lower bound each is tested against:
 pandas~$\geq$~2.1.1, geopandas~$\geq$~1.0, shapely~$\geq$~2.0.2,
 beautifulsoup4~$\geq$~4.11, numpy~$\geq$~1.26, pycountry~$\geq$~22.3.5,
@@ -192,15 +189,17 @@ html5lib~$\geq$~1.1. Plotting backends (matplotlib, bokeh, seaborn) are optional
 detected at run time; \texttt{pip install pyvoa-full} installs them. Runs on
 Linux, macOS and Windows, in a script, a console or a Jupyter notebook. \\
 \hline
-C8 & If available, link to developer documentation/manual &
+C7 & If available, link to developer documentation/manual &
 \url{https://pyvoa.github.io/pyvoa/} \\
 \hline
-C9 & Support email for questions & contact@pyvoa.org \\
+C8 & Support email for questions & contact@pyvoa.org \\
 \hline
 \end{tabular}
-\caption{Code metadata.}
+\caption{Code metadata (mandatory)}
 \label{codeMetadata}
 \end{table}
+
+\section*{Current executable software version}
 
 \begin{table}[!h]
 \small
@@ -214,26 +213,22 @@ S2 & Permanent link to executables of this version &
 \url{https://pypi.org/project/pyvoa/0.5.0/} \newline
 \url{https://pypi.org/project/pyvoa-full/} \\
 \hline
-S3 & Permanent link to Reproducible Capsule & \attn{donner un lien Binder
-(\url{https://mybinder.org/v2/gh/pyvoa/pyvoa/main}), e.g. le 
-notebook \texttt{PyvoaForBeginners.ipynb}. Ne pas laisser la case vide : c'est un motif de renvoi éditorial. } \\
+S3 & Legal Software License & MIT License \\
 \hline
-S4 & Legal Software License & MIT License \\
-\hline
-S5 & Computing platforms/Operating Systems & Linux, macOS, Microsoft Windows;
+S4 & Computing platforms/Operating Systems & Linux, macOS, Microsoft Windows;
 any platform running Python~$\geq$~3.10, including hosted notebook services
 (Google Colaboratory, Binder) \\
 \hline
-S6 & Installation requirements \& dependencies &
+S5 & Installation requirements \& dependencies &
 \texttt{pip install pyvoa} (library) or \texttt{pip install pyvoa-full}
 (library and plotting backends) \\
 \hline
-S7 & If available, link to user manual &
+S6 & If available, link to user manual &
 \url{https://pyvoa.org} \newline
 	\url{https://pyvoa.github.io/pyvoa/} \newline
 example notebooks: \url{https://github.com/pyvoa/pyvoa/tree/main/examples} \\
 \hline
-S8 & Support email for questions & contact@pyvoa.org \\
+S7 & Support email for questions & contact@pyvoa.org \\
 \hline
 \end{tabular}
 \caption{Software metadata.}
@@ -585,7 +580,8 @@ ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on
 The four examples below are drawn from the notebook shipped with the package
 and run in a plain Jupyter session after \texttt{pip install pyvoa-full}.
 
-\subsection*{Example 1 --- comparing countries}
+\subsection{Comparing countries}
+\label{sec:ex-timeseries}
 
 \begin{lstlisting}[style=python]
 import pyvoa.front as pf
@@ -606,12 +602,13 @@ mean, removing the reporting-day artefact visible in every national series
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_weu.pdf}
-\caption{Example 1. Daily COVID-19 deaths in the nine Western European states,
+\caption{Example~\ref{sec:ex-timeseries}. Daily COVID-19 deaths in the nine Western European states,
 seven-day smoothed, from Our World in Data.}
 \label{fig:timeseries}
 \end{figure}
 
-\subsection*{Example 2 --- mapping a grouping}
+\subsection{Mapping a grouping}
+\label{sec:ex-map}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
@@ -627,12 +624,13 @@ in March 2023 (Fig.~\ref{fig:map}).
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig3_map_g20.pdf}
-\caption{Example 2. Daily confirmed COVID-19 cases across the G20 member states
+\caption{Example~\ref{sec:ex-map}. Daily confirmed COVID-19 cases across the G20 member states
 on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 \label{fig:map}
 \end{figure}
 
-\subsection*{Example 3 --- sub-national data, normalised by population}
+\subsection{Sub-national data, normalised by population}
+\label{sec:ex-hist}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
@@ -652,13 +650,14 @@ enclosure.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig4_hist_spf.pdf}
-\caption{Example 3. Patients hospitalised for COVID-19 per million inhabitants
+\caption{Example~\ref{sec:ex-hist}. Patients hospitalised for COVID-19 per million inhabitants
 by French \emph{département} on 31~December 2021, ranked, from Santé publique
 France.}
 \label{fig:hist}
 \end{figure}
 
-\subsection*{Example 4 --- beyond COVID-19}
+\subsection{Beyond COVID-19}
+\label{sec:ex-beyond}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('ebolardc')
@@ -678,7 +677,7 @@ respiratory infections are read on the same terms.
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
-\caption{Example 4. Confirmed cases of the 2026 Bundibugyo ebolavirus outbreak
+\caption{Example~\ref{sec:ex-beyond}. Confirmed cases of the 2026 Bundibugyo ebolavirus outbreak
 by health zone of the Democratic Republic of the Congo, from the situation
 reports of the Institut National de Santé Publique.}
 \label{fig:beyond}
@@ -707,7 +706,7 @@ reporting artefacts rather than assuming them away. Second, retrospective work
 on sources that have ceased. The JHU series used in Section~\ref{sec:examples}
 is no longer published; it is nonetheless fetched, by identifier, in one line.
 The reverse case is served by the same code: an outbreak still under way, such
-as the Ebola epidemic of Example~5, is read from the provider itself, the
+as the Ebola epidemic of Section~\ref{sec:ex-beyond}, is read from the provider itself, the
 archive being consulted only when it holds the file.
 
 \textbf{Existing questions pursued better.} The gain is on reproducibility
