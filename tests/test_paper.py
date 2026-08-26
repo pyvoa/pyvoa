@@ -144,24 +144,29 @@ def test_database_count_matches_the_catalogue(body: str) -> None:
 
 
 def test_python_floor_matches_pyproject(tex: str, pyproject: dict) -> None:
+    """C6 is the compilation-requirements row of the SoftwareX code metadata.
+
+    It was C7 until the table was aligned with the current template, which has
+    no "Permanent link to Reproducible Capsule" row and so is one shorter.
+    """
     declared = pyproject["project"]["requires-python"]          # e.g. '>=3.10'
     floor = declared.lstrip(">=~^ ")
-    row = _metadata_row(tex, "C7")
+    row = _metadata_row(tex, "C6")
     assert floor in row, (
-        f"metadata C7 does not state Python {floor} (pyproject says {declared!r})"
+        f"metadata C6 does not state Python {floor} (pyproject says {declared!r})"
     )
 
 
 def test_declared_dependencies_are_all_listed(tex: str, pyproject: dict) -> None:
-    """SoftwareX asks for the dependency requirements; C7 must not omit one."""
-    row = _metadata_row(tex, "C7").lower()
+    """SoftwareX asks for the dependency requirements; C6 must not omit one."""
+    row = _metadata_row(tex, "C6").lower()
     missing = []
     for spec in pyproject["project"]["dependencies"]:
         name = re.split(r"[<>=!~\[; ]", spec, maxsplit=1)[0].strip().lower()
         # a dependency may be written with either separator in prose
         if name not in row and name.replace("_", "-") not in row:
             missing.append(name)
-    assert not missing, f"metadata C7 omits declared dependencies: {missing}"
+    assert not missing, f"metadata C6 omits declared dependencies: {missing}"
 
 
 # ---------------------------------------------------------------------------
