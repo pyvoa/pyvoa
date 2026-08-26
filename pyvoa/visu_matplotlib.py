@@ -23,7 +23,6 @@ import pandas as pd
 from pyvoa.kwarg_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
-    PyvoaWarning,
     min_max_range,
 )
 
