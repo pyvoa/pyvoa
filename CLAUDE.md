@@ -66,6 +66,12 @@ Dead assignments are commented out rather than deleted, so the original intent s
 - `minimum` — the same offline suite on python 3.10 with every direct dependency pinned to the lower bound declared in `pyproject.toml` (`uv pip install --resolution lowest-direct`). `test` always resolves to the newest release, so without this job the floors would be unverified claims. If you raise a floor, this is what proves it was necessary; if you lower one, this is what proves it works.
 - `network` — the `@pytest.mark.network` tests, restricted to the weekly cron and manual dispatch, so an upstream outage can never block a pull request.
 
+`.github/workflows/docs.yml` is a second workflow, kept apart because publishing needs `pages: write` and `id-token: write`, which the test workflow has no business holding. Its `build` job installs the package and `docs/requirements.txt` and runs `make -C docs html`; the Makefile passes `-W`, so a docstring that stops rendering fails the build rather than degrading the published page. `deploy` runs only on `main` and hands the artefact to GitHub Pages, which serves it at <https://pyvoa.github.io/pyvoa/>. A pull request builds the docs but never publishes them.
+
+The four optional backends (`bokeh`, `seaborn`, `folium`, `branca`) are in `autodoc_mock_imports` in `docs/conf.py`: none of them is a hard dependency, so none is present in the environment the workflow builds from, and mocking is what lets the docs cover every backend without installing them. autodoc still reads the real `pyvoa` modules — only the third-party names they import are stubbed.
+
+`get`, `plot`, `hist` and `map` are defined with the signature of the innermost function of their decorator chain, so autodoc would advertise a `fig` parameter no caller can pass. An `autodoc-process-signature` hook at the foot of `docs/conf.py` rewrites those four to `(**kwargs)`. That correction lives in the docs config on purpose: putting a signature line in the docstring instead would fail the `D` rules.
+
 ## Architecture
 
 ### Database configuration

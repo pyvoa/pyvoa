@@ -1,6 +1,7 @@
 # pyvoa
 
 [![CI](https://github.com/pyvoa/pyvoa/actions/workflows/ci.yml/badge.svg)](https://github.com/pyvoa/pyvoa/actions/workflows/ci.yml)
+[![Docs](https://github.com/pyvoa/pyvoa/actions/workflows/docs.yml/badge.svg)](https://pyvoa.github.io/pyvoa/)
 [![PyPI](https://img.shields.io/pypi/v/pyvoa)](https://pypi.org/project/pyvoa/)
 [![Python](https://img.shields.io/pypi/pyversions/pyvoa)](https://pypi.org/project/pyvoa/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21829901.svg)](https://doi.org/10.5281/zenodo.21829901)
@@ -180,6 +181,16 @@ just as well from a script or a console.
 - **Contributing** — [CONTRIBUTING.md](CONTRIBUTING.md), including the checklist for [adding a new database](CONTRIBUTING.md#6-adding-a-new-database).
 - **Conduct** — participation is covered by our [Code of Conduct](CODE_OF_CONDUCT.md).
 - **Security or privacy concerns** — <contact@pyvoa.org>, rather than a public issue.
+
+## Documentation
+
+The API reference is generated from the docstrings and published at
+<https://pyvoa.github.io/pyvoa/>. To build it locally:
+
+```bash
+pip install -r docs/requirements.txt
+make -C docs html          # then open docs/_build/html/index.html
+```
 
 ## Citation
 
