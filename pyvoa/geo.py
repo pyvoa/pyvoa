@@ -1069,7 +1069,7 @@ class GeoRegion:
             clist=['DEU','CAN','USA','FRA','ITA','JPN','GBR','RUS']
         elif region=='G20':
             clist=['ZAF','SAU','ARG','AUS','BRA','CAN','CHN','KOR','USA',\
-                'IND','IDN','JPN','MEX','GBR','DEU','FRA','ITA','TUR',\
+                'IND','IDN','JPN','GBR','DEU','FRA','ITA','TUR',\
                 'MEX','RUS']
         elif region=='Oecd': # OCDE in french
             clist=['DEU','AUS','AUT','BEL','CAN','CHL','COL','KOR','DNK',\
