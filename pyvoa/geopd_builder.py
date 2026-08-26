@@ -154,7 +154,7 @@ class GPDBuilder:
       -------
       tuple
           (data without the geometry column, one 'where'/'geometry'
-      row per location).
+          row per location).
       """
       data=mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
       geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
@@ -649,7 +649,7 @@ class GPDBuilder:
         -------
         tuple
             (posteriors over the Rt grid for each day, the log
-        likelihood of the series).
+            likelihood of the series).
         """
         from scipy import stats as sps
         # We create an array for every possible value of Rt
