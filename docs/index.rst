@@ -2,9 +2,6 @@
    :alt: Pyvoa logo
    :align: center
 
-pyvoa
-=====
-
 **pyvoa** (Python Virus Open Analysis) is an open-source Python library giving
 unified access to epidemiological databases, a standardised data format,
 transparent joins with geolocation data, and built-in time-series and
