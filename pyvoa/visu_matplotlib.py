@@ -211,6 +211,7 @@ class visu_matplotlib:
 
         ax.set_xticks(month_starts)
         ax.set_xticklabels(month_labels)
+        ax.set_ylabel(what[0], fontsize=10)
         ax.grid(True)
         ax.legend()
         return ax
