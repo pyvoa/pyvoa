@@ -20,7 +20,7 @@ import geopandas as gpd
 import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
-from pyvoa.kwarg_options import InputOption
+from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import PyvoaError, PyvoaInfo, PyvoaWarning, verb
 
 # The four imports below only probe whether an optional backend is installed;
