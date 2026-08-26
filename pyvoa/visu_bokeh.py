@@ -700,6 +700,7 @@ class visu_bokeh:
             s1, li1 = add_line(pyvoa1, uniqloc, uniqloc[0], self.scolors[0])
             s2, li2 = add_line(pyvoa2, uniqloc, uniqloc[1], self.scolors[1])
             fig.add_layout(Legend(items = [li1, li2]))
+            fig.yaxis.axis_label = which
             fig.legend.location = 'top_left'
             layout = row(column(row(s1, s2), row(fig)))
             panel = TabPanel(child=Row(layout,kwargs['watermark']), title = axis_type)
