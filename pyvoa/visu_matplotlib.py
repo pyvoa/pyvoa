@@ -319,7 +319,9 @@ class visu_matplotlib:
         which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
-
+        typeofmap = kwargs.get('typeofmap')
+        if typeofmap == 'dense':
+            tile = None
         # The frames arrive labelled EPSG:4326 whatever their units: the world
         # geometries are in Web Mercator metres, the dense country geometries in
         # degrees. Both the minimum extent below and the CRS handed to contextily
@@ -384,36 +386,37 @@ class visu_matplotlib:
         ax.set_title(title)
 
         # basemap
-        if tile == 'openstreet':
-            cx.add_basemap(
-            ax,
-            crs=data_crs,
-            source=cx.providers.OpenStreetMap.Mapnik,
-            headers={
-                "User-Agent": "pyvoa/<version> (+https://github.com/pyvoa/pyvoa)"
-            },
-            )
-        elif tile == 'esri':
-            cx.add_basemap(
+        if tile is not None:
+            if tile == 'openstreet':
+                cx.add_basemap(
                 ax,
                 crs=data_crs,
-                source=cx.providers.Esri.WorldStreetMap,
-            )
+                source=cx.providers.OpenStreetMap.Mapnik,
+                headers={
+                    "User-Agent": "pyvoa/<version> (+https://github.com/pyvoa/pyvoa)"
+                },
+                )
+            elif tile == 'esri':
+                cx.add_basemap(
+                    ax,
+                    crs=data_crs,
+                    source=cx.providers.Esri.WorldStreetMap,
+                )
 
-        elif tile == 'stamen':
-            cx.add_basemap(
-                ax,
-                crs=data_crs,
-                source=cx.providers.Stamen.TonerLite,
-            )
+            elif tile == 'stamen':
+                cx.add_basemap(
+                    ax,
+                    crs=data_crs,
+                    source=cx.providers.Stamen.TonerLite,
+                )
 
-        elif tile == 'positron':
-            cx.add_basemap(
-                ax,
-                crs=data_crs,
-                source=cx.providers.CartoDB.PositronNoLabels,
-            )
+            elif tile == 'positron':
+                cx.add_basemap(
+                    ax,
+                    crs=data_crs,
+                    source=cx.providers.CartoDB.PositronNoLabels,
+                )
 
-        else:
-            raise PyvoaError("Don't know what kind of tile it is...")
+            else:
+                raise PyvoaError("Don't know what kind of tile it is...")
         return ax
