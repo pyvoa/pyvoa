@@ -905,27 +905,54 @@ class visu_bokeh:
             else:
                 bins = 11
 
-        delta = (max_val - min_val ) / bins
-        interval = [ min_val + i*delta for i in range(bins+1)]
+        delta = (max_val - min_val) / bins
 
-        contributors = {  i : [] for i in range(bins+1)}
+        interval = np.linspace(
+            min_val,
+            max_val,
+            bins + 1
+        )
+
+        contributors = {i: [] for i in range(bins)}
+
         for i in range(len(input)):
-            rank = bisect.bisect_left(interval, input.iloc[i][which])
-            if rank >= bins:
+            value = input.iloc[i][which]
+
+            rank = bisect.bisect_right(interval, value) - 1
+
+            if rank < 0:
+                rank = 0
+            elif rank >= bins:
                 rank = bins - 1
-            contributors[rank].append(input.iloc[i]['where'])
+
+            contributors[rank].append(
+                input.iloc[i]['where']
+            )
 
         lcolors = iter(self.lcolors)
 
         contributors = dict(sorted(contributors.items()))
 
         frame_histo = pd.DataFrame({
-                          'left': [0]+interval[:-1],
-                          'right':interval,
-                          'middle_bin': [format((i+j)/2, ".1f") for i,j in zip([0]+interval[:-1],interval)],
-                          'top': [len(i) for i in list(contributors.values())],
-                          'contributors': [', '.join(i) for i in contributors.values()],
-                          'colors': [next(lcolors) for i in range(len(interval)) ]})
+                'left': interval[:-1],
+                'right': interval[1:],
+                'middle_bin': [
+                    format((i + j) / 2, ".1f")
+                    for i, j in zip(interval[:-1], interval[1:])
+                ],
+                'top': [
+                    len(contributors[i])
+                    for i in range(bins)
+                ],
+                'contributors': [
+                    ', '.join(contributors[i])
+                    for i in range(bins)
+                ],
+                'colors': [
+                    next(lcolors)
+                    for _ in range(bins)
+                ]
+            })
         #tooltips = """
         #<div style="width: 400px">
         #<b>Middle value:</b> @middle_bin <br>
