@@ -1,3 +1,7 @@
+.. figure:: _static/img/logo-pyvoa-x80.png 
+   :alt: Pyvoa logo
+   :align: center
+
 pyvoa
 =====
 
