@@ -505,14 +505,15 @@ class GPDBuilder:
 
    def saveoutput(self,**kwargs):
        '''
-       saveoutput pycoa. pandas as an  output file selected by output argument
-       'pandas': pycoa.pandas
+       Save a pyvoa pandas as an output file, in the format selected by the saveformat argument.
+       'pandas': the pyvoa pandas to save (mandatory)
        'saveformat': excel or csv (default excel)
-       'savename': pycoa.ut (default)
+       'savename': file name without its extension (default pyvoa_out, hence
+                   pyvoa_out.xlsx or pyvoa_out.csv)
        '''
        possibleformat=['excel','csv']
        saveformat = 'excel'
-       savename = 'pycoa.ut'
+       savename = 'pyvoa_out'
        pandyori = ''
        if 'saveformat' in kwargs:
             saveformat = kwargs['saveformat']

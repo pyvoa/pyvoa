@@ -1233,10 +1233,13 @@ class front:
             **kwargs: Keyword arguments that can include:
                 - pandas (pd.DataFrame): The DataFrame to save. This is mandatory.
                 - saveformat (str): The format to save the DataFrame in. Default is 'excel'.
-                - savename (str): The name of the file to save the DataFrame as. Default is an empty string.
+                - savename (str): The file name, without its extension. Left
+                  empty, it defaults to 'pyvoa_out', so the file is written as
+                  pyvoa_out.xlsx or pyvoa_out.csv.
 
         Raises:
-            PyvoaError: If the provided DataFrame is empty or if mandatory arguments are not provided.
+            PyvoaError: If the provided DataFrame is empty, if mandatory arguments are not provided,
+                or if no database has been selected yet with setwhom().
 
         Returns:
             None
@@ -1248,6 +1251,11 @@ class front:
         if pandy.empty:
             raise PyvoaError('Pandas to save is mandatory there is not default !')
         else:
+            # The writer lives on GPDBuilder, which only exists once a database
+            # has been selected. Without this, the call below fails on None with
+            # an AttributeError, which is not the library's exception type.
+            if self.gpdbuilder is None:
+                raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             self.gpdbuilder.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
 
     def merger(self,**kwargs):

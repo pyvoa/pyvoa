@@ -1,4 +1,12 @@
 # Unreleased
+- `saveoutput()` writes `pyvoa_out.xlsx` / `pyvoa_out.csv` when no `savename`
+  is given. The default used to be `pycoa.ut`, the wreckage of a `pycoa`
+  rename that had run through the string itself, so the files came out as
+  `pycoa.ut.xlsx`. An explicit `savename` is unaffected.
+- fix: `saveoutput()` called before any `setwhom()` raised a bare
+  `AttributeError` on `None`, since the writer lives on the `GPDBuilder` that
+  only exists once a database is selected. It raises a `PyvoaError` naming
+  `setwhom()`, like the rest of the library.
 - the distribution now names its authors: `[project] authors` in
   `pyproject.toml` carries the three people, spelled as in `AUTHORS` and
   `CITATION.cff`, instead of the project address, so
