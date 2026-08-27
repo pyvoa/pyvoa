@@ -660,22 +660,23 @@ pdf = pf.get(which='cur_hosp', when='31/12/2021',
         option='normalize:pop1M')
 \end{lstlisting}
 
-\noindent The returned object is a \texttt{GeoDataFrame},
-one row per date and place, carrying both the raw counts, the normalised
-rates and the geometry:
+\noindent The returned object is a \texttt{GeoDataFrame}, one row per date and
+place, carrying the indicator asked for --- here the normalised rate, the
+option having renamed the column after itself --- together with the code of the
+\emph{département} and its geometry:
 
 \begin{lstlisting}[style=pyout]
 >>> type(pdf)
 <class 'geopandas.geodataframe.GeoDataFrame'>
 
 >>> pdf.shape
-(102, 36)
+(102, 5)
 
->>> pdf[['date','where','cur_hosp','cur_hosp normalize:pop1M']].head(3)
-        date                  where  cur_hosp  cur_hosp normalize:pop1M
-0 2021-12-31       Bouches-Du-Rhône    1230.0                604.613645
-1 2021-12-31           Corse-Du-Sud      94.0                595.490741
-2 2021-12-31  Territoire De Belfort      83.0                585.116882
+>>> pdf[['date','where','code','cur_hosp normalize:pop1M']].head(3)
+        date                  where code  cur_hosp normalize:pop1M
+0 2021-12-31       Bouches-Du-Rhône   13                604.613645
+1 2021-12-31           Corse-Du-Sud   2A                595.490741
+2 2021-12-31  Territoire De Belfort   90                585.116882
 \end{lstlisting}
 
 \subsection{Beyond COVID-19}
