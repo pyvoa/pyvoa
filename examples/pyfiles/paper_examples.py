@@ -23,7 +23,9 @@ directory: paper/figures/ inside a checkout, ./figures/ otherwise.
 
 Figures are written as PDF, which is the vector artwork Elsevier asks for and
 what \includegraphics pulls in from the .tex. Examples 1-4 are the manuscript
-listings and produce Figs. 2-5; examples 5 and 6 are not listings and draw
+listings and produce Figs. 2-5; example 3 carries a second listing whose output
+is printed rather than drawn, and is reproduced here as the console session the
+manuscript prints under Fig. 4. Examples 5 and 6 are not listings and draw
 nothing — they support claims made in Sections 2.1 and 4.
 
 Each example is self-contained and prints the exact snippet that appears in the
@@ -120,13 +122,13 @@ def example_1(pf, vis: str) -> None:
 def example_2(pf, vis: str) -> None:
     banner(2, "mapping a grouping", """
         pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
-        pf.map(which='tot_confirmed', where='G20',
-               what='daily', when='31/12/2021')
+        pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
     """)
     pf.setvis(vis)
     pf.setwhom('jhu')
-    pf.map(which='tot_confirmed', where='G20',
-           what='daily', when='31/12/2021')
+    # No what=: for a tot_ variable the cumulative value is what is mapped,
+    # which is what the caption of Fig. 3 now claims.
+    pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
     save(pf, "fig3_map_g20.pdf")
 
 
@@ -137,12 +139,52 @@ def example_2(pf, vis: str) -> None:
 def example_3(pf, vis: str) -> None:
     banner(3, "sub-national data, normalised by population", """
         pf.setwhom('spf')    # Sante Publique France db
-        pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
+        pf.hist(which='cur_hosp',when='31/12/2021',
+                option='normalize:pop1M')
     """)
     pf.setvis(vis)
     pf.setwhom('spf')
     pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
     save(pf, "fig4_hist_spf.pdf")
+
+    # The manuscript follows Fig. 4 with the frame the very same selection
+    # returns, printed as a console session: the figure and the table behind it
+    # are one example, not two. Printed here in the same >>> form so that the
+    # pyout block of the .tex can be diffed against a real run rather than
+    # trusted.
+    banner(3, "the frame behind Fig. 4 (same listing, printed)", """
+        pf.setwhom('spf')    # Sante Publique France db
+        pdf = pf.get(which='cur_hosp', when='31/12/2021',
+                option='normalize:pop1M', what='daily')
+    """)
+    pf.setwhom('spf')
+    pdf = pf.get(which='cur_hosp', when='31/12/2021',
+                 option='normalize:pop1M', what='daily')
+
+    # get() advertises output='pandas' by default, but a database whose
+    # geography pyvoa knows comes back with its geometry attached, hence a
+    # GeoDataFrame. The manuscript prints the type for exactly that reason.
+    #
+    # One indicator column, not three: get() keeps only what was asked for, and
+    # 'what' and 'option' compose its name, so the frame carries
+    # 'cur_hosp daily normalize:pop1M' and neither the count it was derived
+    # from nor the other twenty indicators of the database.
+    #
+    # The option context is what makes the printed frame the frame the paper
+    # shows: pandas sizes its repr on the terminal, and elides every column
+    # between 'date' and 'geometry' when it cannot measure one, which is the
+    # case as soon as the output is redirected to a file.
+    import pandas as pd
+
+    print("    >>> type(pdf)")
+    print(f"    {type(pdf)}")
+    print()
+    print("    >>> pdf.shape")
+    print(f"    {pdf.shape}")
+    print()
+    print("    >>> pdf.head(4)")
+    with pd.option_context('display.width', 80, 'display.max_columns', None):
+        print(textwrap.indent(repr(pdf.head(4)), "    "))
 
 
 # ---------------------------------------------------------------------------
@@ -173,6 +215,7 @@ def example_5(pf, vis: str) -> None:
         gm.to_standard(['fr', 'US', 'china', "cote d'ivoire"], output='list')
         gm.get_GeoRegion().get_countries_from_region('European Union')
         pg.GeoCountry('FRA').get_region_list()
+        pg.GeoCountry('FRA').get_data().plot()
     """)
     import pyvoa.geo as pg
 
@@ -191,6 +234,12 @@ def example_5(pf, vis: str) -> None:
     fra = pg.GeoCountry('FRA')
     regions = fra.get_region_list()
     print(f"    GeoCountry('FRA').get_region_list() -> {len(regions)} rows")
+
+    # get_data() hands back a plain GeoDataFrame, so geopandas draws it with no
+    # pyvoa backend involved — which is the point being made: the layer is
+    # usable on its own. Nothing is saved; this is not a manuscript figure.
+    fra.get_data().plot()
+    print("    GeoCountry('FRA').get_data().plot() -> drawn by geopandas alone")
 
 
 # ---------------------------------------------------------------------------

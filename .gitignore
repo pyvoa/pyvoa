@@ -16,6 +16,13 @@ coverage.xml
 .ipynb_checkpoints/
 *.swp
 
+# stray output of examples/pyfiles/paper_examples.py when it is run from the
+# repository root: it falls back to ./figures when it cannot find the paper.
+# Anchored, so that paper/figures/ --- the tracked artwork of the manuscript ---
+# stays addable: an unanchored `figures/' matches at every level and makes git
+# refuse to add a new figure to the paper.
+/figures/
+
 # per-machine Claude Code notes, not shared with contributors
 CLAUDE.local.md
 
