@@ -155,28 +155,36 @@ def example_3(pf, vis: str) -> None:
     banner(3, "the frame behind Fig. 4 (same listing, printed)", """
         pf.setwhom('spf')    # Sante Publique France db
         pdf = pf.get(which='cur_hosp', when='31/12/2021',
-                option='normalize:pop1M')
+                option='normalize:pop1M', what='daily')
     """)
     pf.setwhom('spf')
     pdf = pf.get(which='cur_hosp', when='31/12/2021',
-                 option='normalize:pop1M')
+                 option='normalize:pop1M', what='daily')
 
     # get() advertises output='pandas' by default, but a database whose
     # geography pyvoa knows comes back with its geometry attached, hence a
     # GeoDataFrame. The manuscript prints the type for exactly that reason.
     #
-    # No 'cur_hosp' column here: get() keeps only the indicator asked for, and
-    # an option renames it after itself, so 'normalize:pop1M' leaves the rate
-    # and not the count it was computed from.
-    columns = ['date', 'where', 'code', 'cur_hosp normalize:pop1M']
+    # One indicator column, not three: get() keeps only what was asked for, and
+    # 'what' and 'option' compose its name, so the frame carries
+    # 'cur_hosp daily normalize:pop1M' and neither the count it was derived
+    # from nor the other twenty indicators of the database.
+    #
+    # The option context is what makes the printed frame the frame the paper
+    # shows: pandas sizes its repr on the terminal, and elides every column
+    # between 'date' and 'geometry' when it cannot measure one, which is the
+    # case as soon as the output is redirected to a file.
+    import pandas as pd
+
     print("    >>> type(pdf)")
     print(f"    {type(pdf)}")
     print()
     print("    >>> pdf.shape")
     print(f"    {pdf.shape}")
     print()
-    print(f"    >>> pdf[{columns}].head(3)")
-    print(textwrap.indent(pdf[columns].head(3).to_string(), "    "))
+    print("    >>> pdf.head(4)")
+    with pd.option_context('display.width', 80, 'display.max_columns', None):
+        print(textwrap.indent(repr(pdf.head(4)), "    "))
 
 
 # ---------------------------------------------------------------------------
