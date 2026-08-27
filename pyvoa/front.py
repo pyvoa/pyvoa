@@ -791,7 +791,7 @@ class front:
         columns=list(kwargs['input'].columns)
         if kwargs['kwargsuser']['what'] != 'current':
             kwargs['which'] = kwargs['what']
-        tokeep = ['date','where','code']+kwargs['which']+['geometry']
+        tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])    
         return kwargs['input'][tokeep]
 
     def decomap(func):
