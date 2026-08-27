@@ -656,14 +656,16 @@ France.}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
-pdf = pf.get(which='cur_hosp', when='31/12/2021', 
-        option='normalize:pop1M')
+pdf = pf.get(which='cur_hosp', when='31/12/2021',
+        option='normalize:pop1M', what='daily')
 \end{lstlisting}
 
 \noindent The returned object is a \texttt{GeoDataFrame}, one row per date and
-place, carrying the indicator asked for --- here the normalised rate, the
-option having renamed the column after itself --- together with the code of the
-\emph{département} and its geometry:
+place. It carries the indicator asked for and nothing else, under a name
+composed of the transformations applied to it --- \texttt{what} and
+\texttt{option} each leave their mark, so the column reads \texttt{cur\_hosp
+daily normalize:pop1M} --- together with the code of the \emph{département} and
+its geometry, which is what a map or a spatial join needs:
 
 \begin{lstlisting}[style=pyout]
 >>> type(pdf)
@@ -672,11 +674,18 @@ option having renamed the column after itself --- together with the code of the
 >>> pdf.shape
 (102, 5)
 
->>> pdf[['date','where','code','cur_hosp normalize:pop1M']].head(3)
-        date                  where code  cur_hosp normalize:pop1M
-0 2021-12-31       Bouches-Du-Rhône   13                604.613645
-1 2021-12-31           Corse-Du-Sud   2A                595.490741
-2 2021-12-31  Territoire De Belfort   90                585.116882
+>>> pdf.head(4)
+        date                  where code  cur_hosp daily normalize:pop1M  \
+0 2021-12-31       Bouches-Du-Rhône   13                        2.457779   
+1 2021-12-31           Corse-Du-Sud   2A                       88.690110   
+2 2021-12-31  Territoire De Belfort   90                      -70.496010   
+3 2021-12-31               Vaucluse   84                        0.000000   
+
+                                            geometry  
+0  POLYGON ((470905.18323 5382327.2226, 477130.57...  
+1  POLYGON ((954375.99062 5218303.80578, 954292.9...  
+2  POLYGON ((759600.52216 6075847.9608, 758232.12...  
+3  MULTIPOLYGON (((544949.0389 5517924.90438, 543...  
 \end{lstlisting}
 
 \subsection{Beyond COVID-19}
