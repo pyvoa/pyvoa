@@ -1794,32 +1794,6 @@ class front:
                 raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
             self.gpdbuilder.saveoutput(pandas=pandy,saveformat=saveformat,savename=savename)
 
-    def merger(self,**kwargs):
-        """Merger function that integrates provided data into the database.
-
-        This function takes keyword arguments and specifically looks for a key
-        named 'coapandas'. It validates the arguments and then calls the
-        database merger function with the provided data.
-
-        Parameters
-        ----------
-        **kwargs
-            Arbitrary keyword arguments. Must include:
-            - 'coapandas' (list): A list of data to be merged into the database.
-
-        Raises
-        ------
-        ValueError
-            If invalid arguments are provided.
-
-        Returns
-        -------
-        The result of the database merger operation.
-        """
-        kwargs_keystesting(kwargs,['coapandas'], 'Bad args used in the pyvoa.merger function.')
-        listpandy = kwargs.get('coapandas',[])
-        return self.gpdbuilder.merger(coapandas = listpandy)
-
     def savefig(self,name):
         """Save the current figure to a file.
 
