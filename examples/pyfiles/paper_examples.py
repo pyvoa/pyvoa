@@ -164,7 +164,11 @@ def example_3(pf, vis: str) -> None:
     # get() advertises output='pandas' by default, but a database whose
     # geography pyvoa knows comes back with its geometry attached, hence a
     # GeoDataFrame. The manuscript prints the type for exactly that reason.
-    columns = ['date', 'where', 'cur_hosp', 'cur_hosp normalize:pop1M']
+    #
+    # No 'cur_hosp' column here: get() keeps only the indicator asked for, and
+    # an option renames it after itself, so 'normalize:pop1M' leaves the rate
+    # and not the count it was computed from.
+    columns = ['date', 'where', 'code', 'cur_hosp normalize:pop1M']
     print("    >>> type(pdf)")
     print(f"    {type(pdf)}")
     print()
