@@ -788,11 +788,10 @@ class front:
         hand the undecorated body the assembled table. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
-        # columns=list(kwargs['input'].columns)  # fed the keepalso list, dropped
-        # when get() started keeping only the indicator that was asked for
+        columns=list(kwargs['input'].columns) 
         if kwargs['kwargsuser']['what'] != 'current':
             kwargs['which'] = kwargs['what']
-        tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])    
+        tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])
         return kwargs['input'][tokeep]
 
     def decomap(func):
