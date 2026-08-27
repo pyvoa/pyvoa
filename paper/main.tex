@@ -580,10 +580,10 @@ ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on
 \section{Illustrative examples}
 \label{sec:examples}
 
-The four examples below are drawn from the notebook or the python file shipped with the package 
-and run after \texttt{pip install pyvoa-full}.
+The four examples below are taken from the notebooks and scripts shipped with
+the package; each runs as printed after \texttt{pip install pyvoa-full}.
 
-\subsection{Comparing countries in time series}
+\subsection{Comparing countries through time series}
 \label{sec:ex-timeseries}
 
 \begin{lstlisting}[style=python]
@@ -594,19 +594,22 @@ pf.plot(which='total_deaths', where='Western Europe',
         what='daily', option='smooth7')
 \end{lstlisting}
 
-\texttt{where='Western Europe'} expands through \texttt{GeoRegion} to the nine
-states according to the United Nations geoscheme subregion (M49 standard)~\cite{geoscheme}; \texttt{what='daily'} differentiates day by day the cumulative series the source publishes; \texttt{option='smooth7'} applies a weekly rolling
-mean, removing the reporting-day artifacts that may occur in national series.
-(Fig.~\ref{fig:timeseries}).
+\texttt{where='Western Europe'} is expanded by \texttt{GeoRegion} into the nine
+states of the corresponding United Nations geoscheme subregion (standard
+M49)~\cite{geoscheme}; \texttt{what='daily'} takes the day-to-day difference of
+the cumulative series the source publishes; and \texttt{option='smooth7'}
+applies a seven-day rolling mean, which suppresses the weekday reporting
+artefacts common in national series (Fig.~\ref{fig:timeseries}).
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_weu.pdf}
-\caption{Daily COVID-19 deaths in the nine Western European states, seven-day smoothed, from Our World in Data.}
+\caption{Daily COVID-19 deaths in the nine
+Western European states, seven-day smoothed, from Our World in Data.}
 \label{fig:timeseries}
 \end{figure}
 
-\subsection{Mapping a grouping}
+\subsection{Mapping a country grouping}
 \label{sec:ex-map}
 
 \begin{lstlisting}[style=python]
@@ -614,16 +617,20 @@ pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
 pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
 \end{lstlisting}
 
-As in the previous example, the \texttt{where} keyword can select a region (geographical, political, economical, if supported), here the G20 member states\cite{g20}, and the geolocation layer supplies
-their geometries; the countries outside the grouping are left unpainted, and the map background is visible. The
-JHU series is read from its Zenodo mirror, the upstream collection having ended
-in March 2023 (Fig.~\ref{fig:map}). For a \texttt{tot\_} variable, without \texttt{what} keyword, the cumulative value is taken into account. 
+As in the previous example, \texttt{where} may designate a region rather than a
+list of countries, be it geographical, political or economic, provided the
+geolocation layer resolves it; here the G20 member states~\cite{g20}, whose
+geometries it supplies. Countries outside the grouping are left unfilled, so
+the map background shows through. The JHU series is read from its Zenodo
+mirror, upstream collection having ended in March~2023
+(Fig.~\ref{fig:map}). In the absence of a \texttt{what} keyword, a
+\texttt{tot\_} variable is taken at its cumulative value.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig3_map_g20.pdf}
-\caption{Example~\ref{sec:ex-map}. Total confirmed COVID-19 cases across the G20 member states
-on 31~December 2021, from the Johns Hopkins CSSE mirror.}
+\caption{Total confirmed COVID-19 cases across the
+G20 member states on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 \label{fig:map}
 \end{figure}
 
@@ -632,40 +639,45 @@ on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
-pf.hist(which='cur_hosp',when='31/12/2021',
+pf.hist(which='cur_hosp', when='31/12/2021',
         option='normalize:pop1M')
 \end{lstlisting}
 
-The same keywords address a French source at \emph{département} granularity. We introduce here a \texttt{option} keyword to illustrate it, \texttt{option='normalize:pop1M'} divides the count by the population the
+The same grammar addresses a French source at \emph{département} granularity.
+It also introduces the \texttt{option} keyword:
+\texttt{option='normalize:pop1M'} divides the count by the population the
 geolocation layer carries, turning patient numbers into a rate per million
 inhabitants, which is what makes \emph{départements} of very different sizes
-comparable at all; the bars are ranked by value rather than by name
-(Fig.~\ref{fig:hist}). The same selection is returned as a pandas
-frame~\cite{mckinney2010} by \texttt{pf.get()}, one row per date and place with
-standardised geographic keys: pyvoa is a starting point for an analysis, not an
-enclosure.
+comparable; the bars are then ranked by value rather than by name
+(Fig.~\ref{fig:hist}).
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig4_hist_spf.pdf}
-\caption{Example~\ref{sec:ex-hist}. Patients hospitalised for COVID-19 per million inhabitants
-by French \emph{département} on 31~December 2021, ranked, from Santé publique
-France.}
+\caption{Patients hospitalised for COVID-19 per
+million inhabitants by French \emph{département} on 31~December 2021, ranked,
+from Santé publique France.}
 \label{fig:hist}
 \end{figure}
+
+The same selection is available as data rather than as a picture. Calling
+\texttt{pf.get()} with identical keywords returns a
+\texttt{GeoDataFrame}~\cite{fleischmann2026}, that is, a pandas
+frame~\cite{mckinney2010} carrying a geometry column: pyvoa is meant to be the
+starting point of an analysis, not its boundary.
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
 pdf = pf.get(which='cur_hosp', when='31/12/2021',
-        option='normalize:pop1M', what='daily')
+             option='normalize:pop1M', what='daily')
 \end{lstlisting}
 
-\noindent The returned object is a \texttt{GeoDataFrame}, one row per date and
-place. It carries the indicator asked for and nothing else, under a name
-composed of the transformations applied to it --- \texttt{what} and
-\texttt{option} each leave their mark, so the column reads \texttt{cur\_hosp
-daily normalize:pop1M} --- together with the code of the \emph{département} and
-its geometry, which is what a map or a spatial join needs:
+\noindent The frame holds one row per date and place. It carries the indicator
+that was asked for and nothing else, under a name that records the
+transformations applied to it: \texttt{what} and \texttt{option} each leave
+their mark, so the column reads \texttt{cur\_hosp daily normalize:pop1M}. Next
+to it sit the code of the \emph{département} and its geometry, which is what a
+map or a spatial join needs:
 
 \begin{lstlisting}[style=pyout]
 >>> type(pdf)
@@ -693,24 +705,26 @@ its geometry, which is what a map or a spatial join needs:
 
 \begin{lstlisting}[style=python]
 pf.setwhom('ebolardc')
-pf.hist(which='tot_confirmed',typeofhist='pie')
+pf.hist(which='tot_confirmed', typeofhist='pie')
 \end{lstlisting}
 
-The grammar does not change with the disease. The situation reports for Bundibugyo ebolavirus of the
-Institut National de Santé Publique de la République Démocratique du Congo 
-are indexed by \emph{zone de santé}, a
-geography the geolocation layer resolves, exactly as it does French \emph{départements} or
-United States states; \texttt{typeofhist='pie'} asks for a
-composition rather than a ranking, the smaller zones being collected into a
-single slice instead of dropped (Fig.~\ref{fig:beyond}). For instance, Measles in the United
-States, MonkeyPox and the IRA (\emph{Infections respiratoires aigües}, acute respiratory infection) from Réseau Sentinelles series in France are read on the same terms.
+The grammar does not change with the disease. The situation reports on
+Bundibugyo ebolavirus issued by the Institut National de Santé Publique of the
+Democratic Republic of the Congo are indexed by \emph{zone de santé}, a
+geography the geolocation layer resolves just as it resolves French
+\emph{départements} or United States states; \texttt{typeofhist='pie'} asks for
+a composition rather than a ranking, the smaller zones being gathered into a
+single slice rather than discarded (Fig.~\ref{fig:beyond}). Measles in the
+United States, mpox, and acute respiratory infections (\emph{infections
+respiratoires aiguës}) from the French Réseau Sentinelles are read on the same
+terms.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
-\caption{Example~\ref{sec:ex-beyond}. Confirmed cases of the 2026 Bundibugyo ebolavirus outbreak
-by health zone of the Democratic Republic of the Congo, from the situation
-reports of the Institut National de Santé Publique.}
+\caption{Confirmed cases of the 2026 Bundibugyo
+ebolavirus outbreak by health zone of the Democratic Republic of the Congo,
+from the situation reports of the Institut National de Santé Publique.}
 \label{fig:beyond}
 \end{figure}
 
