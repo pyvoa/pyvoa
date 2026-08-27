@@ -489,19 +489,6 @@ link. Three ways out, none of them started:
 Whichever is chosen, record it here and put the answer in the code metadata
 table before submission.
 
-## 6. `front.merger()` has never been callable
-
-`pyvoa/front.py:1774` calls `self.gpdbuilder.merger(coapandas=...)`, and no
-`merger` exists on `GPDBuilder` or anywhere else in the package — the method
-raises `AttributeError` on any call. It is a public method with a docstring,
-so it reads as API.
-
-Implement it or remove it. Removing is a breaking change to a documented name
-and belongs in `CHANGELOG.md`; leaving it means the published API reference
-now advertises it, since the docs are generated from the docstrings.
-
----
-
 ## Decisions already taken — do not re-open
 
 - **`ruff format` is deliberately not run.** The tree is not format-clean
