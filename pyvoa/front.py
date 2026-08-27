@@ -789,10 +789,9 @@ class front:
         argument together with the values it accepts.
         """
         columns=list(kwargs['input'].columns)
-        keepalso = [x for x in columns if x.startswith('population_')
-                  or x.endswith(' daily')
-                  or x.endswith(' weekly')]
-        tokeep = ['date','where','code']+kwargs['which']+keepalso+['geometry']
+        if kwargs['kwargsuser']['what'] != 'current':
+            kwargs['which'] = kwargs['what']
+        tokeep = ['date','where','code']+kwargs['which']+['geometry']
         return kwargs['input'][tokeep]
 
     def decomap(func):
