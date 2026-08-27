@@ -62,6 +62,45 @@
   columns=fullflexible
 }
 
+% listings knows nothing about UTF-8: with inputenc under pdflatex, an accented
+% byte inside a listing is an invalid character unless it is declared here. The
+% list has to be written out literally --- the `literate' key reads its argument
+% character by character and never expands a macro, so `literate=\pyaccents'
+% makes pdflatex choke on the \begin{lstlisting} rather than on the accent.
+% Global rather than per style, since both the source listings and the console
+% output can carry French place names (« Bouches-Du-Rhône »).
+\lstset{
+  extendedchars=true,
+  literate=%
+    {é}{{\'e}}1 {è}{{\`e}}1 {ê}{{\^e}}1 {ë}{{\"e}}1
+    {à}{{\`a}}1 {â}{{\^a}}1 {ù}{{\`u}}1 {û}{{\^u}}1
+    {î}{{\^\i}}1 {ï}{{\"\i}}1 {ô}{{\^o}}1 {ç}{{\c c}}1
+    {É}{{\'E}}1 {È}{{\`E}}1 {Ô}{{\^O}}1 {Ç}{{\c C}}1
+    {’}{{'}}1 {–}{{--}}1
+}
+
+% --- Sortie console Python -------------------------------------------
+% The prompt is marked with a *line* delimiter: `moredelim=[l]' styles from
+% `>>>' to the end of the line, which is the whole input line. The pair
+% `[is]{>>>}{ }' does not do that: `i' makes the delimiters invisible, so the
+% prompt itself disappears --- and the closing delimiter being a space, it
+% closed on the very first character following `>>>' anyway.
+% Colour, not \bfseries: cmtt carries no bold at \scriptsize, so a bold prompt
+% silently falls back to the medium weight and only leaves a font warning.
+\lstdefinestyle{pyout}{
+  basicstyle=\ttfamily\scriptsize,
+  columns=fixed,          % préserve l'alignement des colonnes pandas
+  keepspaces=true,
+  showstringspaces=false,
+  breaklines=false,       % on ne casse PAS un tableau
+  frame=leftline,
+  framesep=6pt,
+  rulecolor=\color{black!30},
+  xleftmargin=6pt,
+  aboveskip=6pt, belowskip=6pt,
+  moredelim=[l][\color{blue!40!black}]{>>>}
+}
+
 \journal{SoftwareX}
 
 \begin{document}
@@ -390,7 +429,7 @@ communities --- so that a whole grouping is a single \texttt{where} argument.
 \texttt{GeoCountry} provides sub-national units and their geometries for the
 countries covered at that granularity, in main, dense or exploded variants so
 that overseas territories can be drawn or set aside. \texttt{GPDBuilder} then
-joins the epidemiological frame to the geometries and returns a geopandas
+joins the epidemiological frame to the geometries and returns a geopandas~\cite{geopandas}
 object. Formally, the layer implements
 %
 \begin{equation}
@@ -541,10 +580,10 @@ ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on
 \section{Illustrative examples}
 \label{sec:examples}
 
-The four examples below are drawn from the notebook shipped with the package
-and run in a plain Jupyter session after \texttt{pip install pyvoa-full}.
+The four examples below are taken from the notebooks and scripts shipped with
+the package; each runs as printed after \texttt{pip install pyvoa-full}.
 
-\subsection{Comparing countries}
+\subsection{Comparing countries through time series}
 \label{sec:ex-timeseries}
 
 \begin{lstlisting}[style=python]
@@ -555,41 +594,43 @@ pf.plot(which='total_deaths', where='Western Europe',
         what='daily', option='smooth7')
 \end{lstlisting}
 
-\texttt{where='Western Europe'} expands through \texttt{GeoRegion} to the nine
-states of the United Nations geoscheme subregion --- Switzerland,
-Liechtenstein and Monaco among them, so the grouping is not the European Union
-and does not have to be; \texttt{what='daily'} differentiates the cumulative
-series the source publishes; \texttt{option='smooth7'} applies a weekly rolling
-mean, removing the reporting-day artefact visible in every national series
-(Fig.~\ref{fig:timeseries}).
+\texttt{where='Western Europe'} is expanded by \texttt{GeoRegion} into the nine
+states of the corresponding United Nations geoscheme subregion (standard
+M49)~\cite{geoscheme}; \texttt{what='daily'} takes the day-to-day difference of
+the cumulative series the source publishes; and \texttt{option='smooth7'}
+applies a seven-day rolling mean, which suppresses the weekday reporting
+artefacts common in national series (Fig.~\ref{fig:timeseries}).
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_weu.pdf}
-\caption{Example~\ref{sec:ex-timeseries}. Daily COVID-19 deaths in the nine Western European states,
-seven-day smoothed, from Our World in Data.}
+\caption{Daily COVID-19 deaths in the nine
+Western European states, seven-day smoothed, from Our World in Data.}
 \label{fig:timeseries}
 \end{figure}
 
-\subsection{Mapping a grouping}
+\subsection{Mapping a country grouping}
 \label{sec:ex-map}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
-pf.map(which='tot_confirmed', where='G20',
-       what='daily', when='31/12/2021')
+pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
 \end{lstlisting}
 
-One keyword selects the G20 member states, and the geolocation layer supplies
-their geometries; the countries outside the grouping are left unpainted. The
-JHU series is read from its Zenodo mirror, the upstream collection having ended
-in March 2023 (Fig.~\ref{fig:map}).
+As in the previous example, \texttt{where} may designate a region rather than a
+list of countries, be it geographical, political or economic, provided the
+geolocation layer resolves it; here the G20 member states~\cite{g20}, whose
+geometries it supplies. Countries outside the grouping are left unfilled, so
+the map background shows through. The JHU series is read from its Zenodo
+mirror, upstream collection having ended in March~2023
+(Fig.~\ref{fig:map}). In the absence of a \texttt{what} keyword, a
+\texttt{tot\_} variable is taken at its cumulative value.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig3_map_g20.pdf}
-\caption{Example~\ref{sec:ex-map}. Daily confirmed COVID-19 cases across the G20 member states
-on 31~December 2021, from the Johns Hopkins CSSE mirror.}
+\caption{Total confirmed COVID-19 cases across the
+G20 member states on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 \label{fig:map}
 \end{figure}
 
@@ -598,56 +639,96 @@ on 31~December 2021, from the Johns Hopkins CSSE mirror.}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
-pf.hist(which='cur_hosp',when='31/12/2021',option='normalize:pop1M')
+pf.hist(which='cur_hosp', when='31/12/2021',
+        option='normalize:pop1M')
 \end{lstlisting}
 
-The same keywords address a French source at \emph{département} granularity.
+The same grammar addresses a French source at \emph{département} granularity.
+It also introduces the \texttt{option} keyword:
 \texttt{option='normalize:pop1M'} divides the count by the population the
 geolocation layer carries, turning patient numbers into a rate per million
 inhabitants, which is what makes \emph{départements} of very different sizes
-comparable at all; the bars are ranked by value rather than by name
-(Fig.~\ref{fig:hist}). The same selection is returned as a pandas
-frame~\cite{mckinney2010} by \texttt{pf.get()}, one row per date and place with
-standardised geographic keys: pyvoa is a starting point for an analysis, not an
-enclosure.
+comparable; the bars are then ranked by value rather than by name
+(Fig.~\ref{fig:hist}).
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig4_hist_spf.pdf}
-\caption{Example~\ref{sec:ex-hist}. Patients hospitalised for COVID-19 per million inhabitants
-by French \emph{département} on 31~December 2021, ranked, from Santé publique
-France.}
+\caption{Patients hospitalised for COVID-19 per
+million inhabitants by French \emph{département} on 31~December 2021, ranked,
+from Santé publique France.}
 \label{fig:hist}
 \end{figure}
+
+The same selection is available as data rather than as a picture. Calling
+\texttt{pf.get()} with identical keywords returns a
+\texttt{GeoDataFrame}~\cite{geopandas}, that is, a pandas
+frame~\cite{mckinney2010} carrying a geometry column: pyvoa is meant to be the
+starting point of an analysis, not its boundary.
+
+\begin{lstlisting}[style=python]
+pf.setwhom('spf')    # Sante Publique France db
+pdf = pf.get(which='cur_hosp', when='31/12/2021',
+             option='normalize:pop1M', what='daily')
+\end{lstlisting}
+
+\noindent The frame holds one row per date and place. It carries the indicator
+that was asked for and nothing else, under a name that records the
+transformations applied to it: \texttt{what} and \texttt{option} each leave
+their mark, so the column reads \texttt{cur\_hosp daily normalize:pop1M}. Next
+to it sit the code of the \emph{département} and its geometry, which is what a
+map or a spatial join needs:
+
+\begin{lstlisting}[style=pyout]
+>>> type(pdf)
+<class 'geopandas.geodataframe.GeoDataFrame'>
+
+>>> pdf.shape
+(102, 5)
+
+>>> pdf.head(4)
+        date                  where code  cur_hosp daily normalize:pop1M  \
+0 2021-12-31       Bouches-Du-Rhône   13                        2.457779   
+1 2021-12-31           Corse-Du-Sud   2A                       88.690110   
+2 2021-12-31  Territoire De Belfort   90                      -70.496010   
+3 2021-12-31               Vaucluse   84                        0.000000   
+
+                                            geometry  
+0  POLYGON ((470905.18323 5382327.2226, 477130.57...  
+1  POLYGON ((954375.99062 5218303.80578, 954292.9...  
+2  POLYGON ((759600.52216 6075847.9608, 758232.12...  
+3  MULTIPOLYGON (((544949.0389 5517924.90438, 543...  
+\end{lstlisting}
 
 \subsection{Beyond COVID-19}
 \label{sec:ex-beyond}
 
 \begin{lstlisting}[style=python]
 pf.setwhom('ebolardc')
-pf.hist(which='tot_confirmed',typeofhist='pie')
+pf.hist(which='tot_confirmed', typeofhist='pie')
 \end{lstlisting}
 
-The grammar does not change with the disease. The situation reports of the
-Institut National de Santé Publique are indexed by \emph{zone de santé}, a
-geography the geolocation layer resolves --- and whose provinces it maps to
-their ISO~3166-2 codes --- exactly as it does French \emph{départements} or
-United States states~\cite{bdbv2026}; \texttt{typeofhist='pie'} asks for a
-composition rather than a ranking, the smaller zones being collected into a
-single slice instead of dropped (Fig.~\ref{fig:beyond}). Measles in the United
-States~\cite{ahmadi2025}, mpox and the Réseau Sentinelles series for acute
-respiratory infections are read on the same terms.
+The grammar does not change with the disease. The situation reports on
+Bundibugyo ebolavirus issued by the Institut National de Santé Publique of the
+Democratic Republic of the Congo are indexed by \emph{zone de santé}, a
+geography the geolocation layer resolves just as it resolves French
+\emph{départements} or United States states; \texttt{typeofhist='pie'} asks for
+a composition rather than a ranking, the smaller zones being gathered into a
+single slice rather than discarded (Fig.~\ref{fig:beyond}). Measles in the
+United States, mpox, and acute respiratory infections (\emph{infections
+respiratoires aiguës}) from the French Réseau Sentinelles are read on the same
+terms.
 
 \begin{figure}[!h]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
-\caption{Example~\ref{sec:ex-beyond}. Confirmed cases of the 2026 Bundibugyo ebolavirus outbreak
-by health zone of the Democratic Republic of the Congo, from the situation
-reports of the Institut National de Santé Publique.}
+\caption{Confirmed cases of the 2026 Bundibugyo
+ebolavirus outbreak by health zone of the Democratic Republic of the Congo,
+from the situation reports of the Institut National de Santé Publique.}
 \label{fig:beyond}
 \end{figure}
 
-\attnpar{\textbf{Reste à trancher} : la figure~\ref{fig:beyond} porte la date du
+\attnpar{La figure~\ref{fig:beyond} porte la date du
 17/08/2026, dernier jour couvert par la source --- à figer si la soumission
 tarde. \textbf{À relancer avant soumission} :
 \texttt{python paper\_examples.py -{-}check}, puis
@@ -791,11 +872,6 @@ que si c'est décidé.}
 \textbf{Julien Browaeys:} Conceptualization, Funding acquisition, Supervision, Writing -- original draft, Writing -- review \& editing.
 \textbf{Olivier Dadoun:} Conceptualization, Data curation, Software, Validation, Visualization.
 
-
-\attn{Rôles alignés sur le fichier \texttt{AUTHORS} du dépôt (taxonomie CRediT,
-ANSI/NISO~Z39.104-2022), auxquels j'ai ajouté les rôles de rédaction, absents
-d'\texttt{AUTHORS} puisqu'il décrit le logiciel et non l'article. À répartir réellement.}
-
 \section*{Declaration of competing interest}
 
 The authors declare that they have no known competing financial interests or
@@ -866,7 +942,6 @@ E.~Mathieu, H.~Ritchie, E.~Ortiz-Ospina, et~al., A global database of COVID-19
 vaccinations, Nat.\ Hum.\ Behav.\ 5 (2021) 947--953.
 \url{https://doi.org/10.1038/s41562-021-01122-8}.
 
-
 \bibitem{minciencia}
 Ministerio de Ciencia, Tecnología, Conocimiento e Innovación (Chile),
 Datos-COVID19,
@@ -876,13 +951,11 @@ An archived snapshot of the GitHub repository, dated 3 September 2023, is
 available from the Internet Archive:
 \url{https://web.archive.org/web/20230903082956/https://github.com/MinCiencia/Datos-COVID19/}.
 
-
 \bibitem{ivankovic2021}
 D.~Ivanković, E.~Barbazza, V.~Bos, et~al., Features constituting actionable
 COVID-19 dashboards: descriptive assessment and expert appraisal of 158 public
 web-based COVID-19 dashboards, J.\ Med.\ Internet Res.\ 23~(2) (2021) e25682.
 \url{https://doi.org/10.2196/25682}.
-
 
 \bibitem{covid_pypi}
 covid --- Python package to get information regarding the novel coronavirus,
@@ -901,7 +974,6 @@ COVID-19 indicators, Proc.\ Natl.\ Acad.\ Sci.\ USA 118~(51) (2021) e2111452118.
 M.~Ponce, A.~Sandhel, covid19.analytics: An R package to obtain, analyze and
 visualize data from the 2019 coronavirus disease pandemic, J.\ Open Source
 Softw.\ 6~(60) (2021) 2995. \url{https://doi.org/10.21105/joss.02995}.
-
 
 \bibitem{owid_mpox}
 Our World in Data,
@@ -925,12 +997,12 @@ C.~Judge, B.~Gutierrez, L.H.~Tsui, M.U.G.~Kraemer, et~al., INRB-UMIE/BDBV2026-Da
 data for the 2026 Bundibugyo ebolavirus outbreak, Zenodo (2026).
 \url{https://doi.org/10.5281/zenodo.21223302}.
 
-
-
-\bibitem{mckinney2010}
-W.~McKinney, Data structures for statistical computing in Python, in: Proc.\
-9th Python in Science Conf., 2010, pp.~56--61.
-\url{https://doi.org/10.25080/Majora-92bf1922-00a}.
+\bibitem{geopandas}
+M.~Fleischmann, J.~Van~den~Bossche, K.~Jordahl, M.~J. Richards, J.~McBride,
+J.~Wasserman, B.~Ward, L.~J. Wolf,
+GeoPandas: Fundamental data structures for vector spatial data in Python,
+Computers, Environment and Urban Systems 130 (2026) 102495.
+doi:10.1016/j.compenvurbsys.2026.102495.
 
 \bibitem{hunter2007}
 J.D.~Hunter, Matplotlib: a 2D graphics environment, Comput.\ Sci.\ Eng.\ 9~(3)
@@ -944,14 +1016,24 @@ Bokeh Development Team, Bokeh: Python library for interactive visualization,
 M.L.~Waskom, seaborn: statistical data visualization, J.\ Open Source Softw.\
 6~(60) (2021) 3021. \url{https://doi.org/10.21105/joss.03021}.
 
+\bibitem{geoscheme}
+United Nations geoscheme M49. \url{https://unstats.un.org/unsd/methodology/m49/}
+
+\bibitem{g20}
+About G20. \url{https://www.oecd.org/en/about/oecd-and-g20.html}
+
+\bibitem{mckinney2010}
+W.~McKinney, Data structures for statistical computing in Python, in: Proc.\
+9th Python in Science Conf., 2010, pp.~56--61.
+\url{https://doi.org/10.25080/Majora-92bf1922-00a}.
+
+\bibitem{zenodo_pyvoa}
+pyvoa community on Zenodo, \url{https://zenodo.org/communities/pyvoa}.
 
 \bibitem{modcov19}
 T.~Beau, J.~Browaeys, O.~Dadoun, PyCoa: Python Covid Analysis, MODCOV19
 (CNRS), 2022.
 \url{https://modcov19.math.cnrs.fr/prepublications/2022_03_11_beau/}.
-
-\bibitem{zenodo_pyvoa}
-pyvoa community on Zenodo, \url{https://zenodo.org/communities/pyvoa}.
 
 \bibitem{pyvoa_github}
 T.~Beau, J.~Browaeys, O.~Dadoun, pyvoa: Python Virus Open Analysis, v0.5.0,
