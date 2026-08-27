@@ -788,7 +788,12 @@ class front:
         hand the undecorated body the assembled table. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
-        return kwargs['input']
+        columns=list(kwargs['input'].columns)
+        keepalso = [x for x in columns if x.startswith('population_')
+                  or x.endswith(' daily')
+                  or x.endswith(' weekly')]
+        tokeep = ['date','where','code']+kwargs['which']+keepalso+['geometry']
+        return kwargs['input'][tokeep]
 
     def decomap(func):
         """Decorate preparing the geometry a map is drawn from.
