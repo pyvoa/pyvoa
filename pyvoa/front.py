@@ -863,7 +863,6 @@ class front:
                 else:
                     #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                     kwargs['input'] = input
-            print("-----",kwargs['input']['where'].unique())
             return func(self,**kwargs)
         return inner
 
