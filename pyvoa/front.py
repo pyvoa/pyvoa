@@ -785,8 +785,10 @@ class front:
         argument together with the values it accepts.
         """
         columns=list(kwargs['input'].columns)
+
         if kwargs['kwargsuser']['what'] != 'current':
-            kwargs['which'] = kwargs['what']
+            kwargs['which'] = [kwargs['which'][0]+' '+kwargs['what']]
+
         tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])
         return kwargs['input'][tokeep]
 
