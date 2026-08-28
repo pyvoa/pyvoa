@@ -788,7 +788,7 @@ class front:
         hand the undecorated body the assembled table. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
-        columns=list(kwargs['input'].columns) 
+        columns=list(kwargs['input'].columns)
         if kwargs['kwargsuser']['what'] != 'current':
             kwargs['which'] = kwargs['what']
         tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])
@@ -863,6 +863,7 @@ class front:
                 else:
                     #if not self.gpdbuilder.gettypeofgeometry().is_exploded_geometry():
                     kwargs['input'] = input
+            print("-----",kwargs['input']['where'].unique())
             return func(self,**kwargs)
         return inner
 
@@ -1545,6 +1546,7 @@ class front:
                     else:
                         r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('Europe')
                     r += [self.gpdbuilder.geo.to_standard(c)[0] for c in r]
+                r+=clust()
             else:
                 if granularity == 'subregion':
                     pan = self.gpdbuilder.geo.get_subregion_list()
@@ -1557,7 +1559,7 @@ class front:
                     r.append(code)
                 else:
                     raise PyvoaError('What is the granularity of your DB ?')
-            return sorted(r + clust())
+            return sorted(r)
         else:
             return sorted(clust())
 
