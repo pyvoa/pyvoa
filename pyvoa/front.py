@@ -427,7 +427,6 @@ class front:
             items of 'option'.
             """
             input = kwargs.get('input',pd.DataFrame())
-
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
 
@@ -482,10 +481,8 @@ class front:
             kwargs['what'] = kwargs.get('what',kwargs['what'][0])
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
-            #input = kwargs.get('input',pd.DataFrame())
             kwargs['kwargsuser'] = kwargs.copy()
 
-            # where =  kwargs['where']
             if kwargs['where'][0] == '':
                 if input.empty:
                     if self.gpdbuilderdata is not None:
@@ -505,8 +502,7 @@ class front:
 
                 #if not when:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
-                #input = input.loc[input['where'].isin(kwargs['where'])]
-                #kwargs['input'] = input
+
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 transfo = convertmercator(self.gpdbuildergeo)
@@ -524,6 +520,8 @@ class front:
                 #when = kwargs.get('when')
                 kwargs = coco.GPDBuilder().get_stats(**kwargs)
                 self.db = 'in-house data'
+                input = input.loc[input['where'].isin(kwargs['where'])]
+                kwargs['input'] = input
                 self.allvisu = AllVisu(self.db, kwargs['input'])
 
             found_bypop = None
