@@ -495,6 +495,7 @@ class DataParser:
 
       if granularity == 'country':
           info = coge.GeoInfo()
+
           if locationmode == "name":
               g = coge.GeoManager('name')
               locationdb  = g.to_standard(locationdb,output='list',db = self.db)
@@ -511,14 +512,20 @@ class DataParser:
           geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
           geopd = self.geo.get_subregion_list()
+          geopdbar = geopd.copy()
           if locationmode == "code":
               geopd = geopd.loc[geopd.code_subregion.isin(locationdb)]
+              geopdbar = geopdbar.loc[~geopdbar.code_subregion.isin(locationdb)]
           else:
               geopd = geopd.loc[geopd.name_subregion.isin(locationdb)]
+              geopdbar = geopdbar.loc[~geopdbar.name_subregion.isin(locationdb)]
           geopd['name_subregion'] = geopd['name_subregion'].str.upper()
           geopd['code_subregion'] = geopd['code_subregion'].str.upper()
+
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
-          geopd = geopd.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
+          geopd = geopd.rename(columns=({"code_subregion": "code","name_subregion":"where"}))
+          geopdbar = geopdbar.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
+          geopdbar['date'] = pandas_db['date']
       elif granularity == 'region':
           geopd = self.geo.get_region_list()
           codenamedico = self.geo.get_data().set_index('code_region')['name_region'].to_dict()
@@ -542,6 +549,8 @@ class DataParser:
           pandas_db=pandas_db.drop(columns='where')
 
       pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
+      #add region/subregion according to geo even if not present in the original DB parsed
+      pandas_db = pd.concat([pandas_db, geopdbar],ignore_index=True)
       pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
