@@ -492,7 +492,7 @@ class DataParser:
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}
       geopd = pd.DataFrame()
-
+      geopdbar = pd.DataFrame()
       if granularity == 'country':
           info = coge.GeoInfo()
 
@@ -550,7 +550,8 @@ class DataParser:
 
       pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
       #add region/subregion according to geo even if not present in the original DB parsed
-      pandas_db = pd.concat([pandas_db, geopdbar],ignore_index=True)
+      if not geopdbar.empty:
+          pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)
       pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
