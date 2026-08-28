@@ -156,8 +156,8 @@ class GPDBuilder:
           (data without the geometry column, one 'where'/'geometry'
           row per location).
       """
-      data=mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
-      geo=mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
+      data = mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
+      geo = mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
       return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
@@ -449,6 +449,7 @@ class GPDBuilder:
                         print('The default option nonneg cannot be used with instantaneous data, such as : ' + w)
                    temppd = getnonnegfunc(temppd, w)
                elif o == 'smooth7':
+                    temppd[w] = temppd[w].astype(float)
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
                     inx7 = temppd.groupby('where').head(7).index
                     temppd.loc[inx7, w] = temppd[w].bfill()
