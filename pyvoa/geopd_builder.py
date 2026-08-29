@@ -351,6 +351,8 @@ class GPDBuilder:
        kwargs_values_testing(output,defaultargs['output'],'output error ...')
 
        which = kwargs.get('which')
+       if not isinstance(which,list):
+           which=[which]
        input = kwargs.get('input')
 
        # what  = kwargs.get('what')

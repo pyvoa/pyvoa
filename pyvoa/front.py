@@ -427,6 +427,8 @@ class front:
             items of 'option'.
             """
             input = kwargs.get('input',pd.DataFrame())
+            if not isinstance(input,pd.DataFrame):
+                PyvoaError('input field must be a pd.DataFrame()!')
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
 
@@ -444,16 +446,6 @@ class front:
                     raise PyvoaError("Argument ERROR")
             else:
                 raise PyvoaError("What function is this "+func.__name__)
-
-            if self.db == '' or self.db == 'in-house data':
-                if input is None:
-                    raise PyvoaError('Something went wrong ... does a db has been loaded ? (setwhom)')
-                else:
-                    input = fill_missing_dates(input)
-                    kwargs['input']=input
-                kwargs['which'] =  next(w for w in input.columns if w not in ['date', 'where'])
-            else:
-                kwargs['which'] = kwargs.get('which',self.gpdbuilder.get_available_keywords()[0])
 
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
@@ -490,7 +482,8 @@ class front:
                 else:
                     kwargs['where'] = list(input['where'].unique())
             else:
-                self.test_where(kwargs['where'])
+                if self.db != 'in-house data':
+                    self.test_where(kwargs['where'])
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -502,14 +495,15 @@ class front:
 
                 #if not when:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
+            kwargs['which'] = kwargs.get('which')
+            if kwargs['which']=='':
+                kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
 
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 transfo = convertmercator(self.gpdbuildergeo)
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
-                #if 'sumall' in kwargs['option']:
-                #    print(kwargs['input'])
                 kwargs['input'] = gpd.GeoDataFrame(kwargs['input'],geometry=kwargs['input'].geometry, crs="EPSG:4326")
             else:
                 PyvoaInfo("In your DataFrame : the date must be in pd.to_datetime format !")

@@ -44,7 +44,7 @@ class InputOption:
                         'where':[''],\
                         'option':['','nonneg','smooth7','sumall']+\
                         [f'normalize:{k}' for k in self.dictpop],\
-                        'which':[''],\
+                        'which':'',\
                         'what':['current','daily','weekly'],\
                         'when':'',\
                         'input':pd.DataFrame(),\
