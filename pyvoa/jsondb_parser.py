@@ -495,20 +495,19 @@ class DataParser:
       geopdbar = pd.DataFrame()
       if granularity == 'country':
           info = coge.GeoInfo()
-
           if locationmode == "name":
               g = coge.GeoManager('name')
               locationdb  = g.to_standard(locationdb,output='list',db = self.db)
               g = coge.GeoManager('iso3')
               namecode  = g.to_standard(locationdb,output='dict',db = self.db)
-              codenamedico = {k.upper():v.upper() for k,v in namecode.items()}
+              codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
           elif locationmode == "code":
               g = coge.GeoManager('name')
               namecode  = g.to_standard(locationdb,output='dict',db = self.db)
               codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
           else:
               raise PyvoaError("Geo interpretation wrong ! not code nor name ...")
-          geopd=pd.DataFrame({'where':codenamedico.keys(),'code':codenamedico.values()})
+          geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
           geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
           geopd = self.geo.get_subregion_list()
@@ -521,7 +520,6 @@ class DataParser:
               geopdbar = geopdbar.loc[~geopdbar.name_subregion.isin(locationdb)]
           geopd['name_subregion'] = geopd['name_subregion'].str.upper()
           geopd['code_subregion'] = geopd['code_subregion'].str.upper()
-
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
           geopd = geopd.rename(columns=({"code_subregion": "code","name_subregion":"where"}))
           geopdbar = geopdbar.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
@@ -547,7 +545,6 @@ class DataParser:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
-
       pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
       #add region/subregion according to geo even if not present in the original DB parsed
       if not geopdbar.empty:
