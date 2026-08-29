@@ -501,6 +501,7 @@ class front:
 
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
+                print(self.gpdbuildergeo)
                 transfo = convertmercator(self.gpdbuildergeo)
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
@@ -529,7 +530,8 @@ class front:
                     kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
-                kwargs['what'] = kwargs['which']
+                kwargs['what'] = kwargs['which'][:1]
+            print(kwargs['input'])
             return func(self,**kwargs)
         return wrapper
 
@@ -777,12 +779,6 @@ class front:
         argument together with the values it accepts.
         """
         columns=list(kwargs['input'].columns)
-        if kwargs['kwargsuser']['what'] != 'current':
-            if [s for s in kwargs['kwargsuser']['option'] if 'normalize:' in s]:
-                kwargs['which'] = kwargs['which']+kwargs['what']
-            else:
-                kwargs['which'] = [kwargs['which'][0]+' '+kwargs['what']]
-
         tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])
         return kwargs['input'][tokeep]
 
