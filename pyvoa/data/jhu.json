@@ -3,7 +3,7 @@
     "geoinfo": {
     "granularity": "country",
     "iso3": "WLD",
-    "locationmode":"code"
+    "locationmode":"name"
   },
   "replace":{
           "Turkey":"Türkiye"
