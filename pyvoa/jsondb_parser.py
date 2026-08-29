@@ -503,10 +503,13 @@ class DataParser:
               codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
           elif locationmode == "code":
               g = coge.GeoManager('name')
-              namecode  = g.to_standard(locationdb,output='dict',db = self.db)
-              codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
+              codenamedico  = g.to_standard(locationdb,output='dict',db = self.db)
+              print()
+              #print(namecode)
+              #codenamedico = {k.upper():v.upper() for k,v in namecode.items()}
           else:
               raise PyvoaError("Geo interpretation wrong ! not code nor name ...")
+
           geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
           geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
