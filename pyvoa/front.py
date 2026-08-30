@@ -48,7 +48,6 @@ from pyvoa.tools import (
     PyvoaWarning,
     all_or_none_lists,
     convertmercator,
-    fill_missing_dates,
     get_live_mode,
     info,
     kwargs_keystesting,
@@ -532,7 +531,7 @@ class front:
                         ext = ' '
                     else:
                         ext = ' '+ kwargs['what'] +' '
-                    kwargs['what'] = [i + ext + found_bypop for i in kwargs['which']][0]
+                    kwargs['what'] = next(i + ext + found_bypop for i in kwargs['which'])
                     kwargs['which'] = [i + ' ' + found_bypop for i in kwargs['which']]
             return func(self,**kwargs)
         return wrapper
