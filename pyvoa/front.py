@@ -470,7 +470,7 @@ class front:
 
             kwargs = {**default, **dicovisu}
 
-            kwargs['what'] = kwargs.get('what',kwargs['what'][0])
+            kwargs['what'] = [kwargs.get('what',self.lwhat[0])]
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
@@ -522,14 +522,14 @@ class front:
             for w in kwargs['option']:
                 if w.startswith('normalize:'):
                     found_bypop = w
-                    if kwargs['what'] == 'current':
-                        ext =' '
+                    if 'current' in kwargs['what']:
+                        ext = ' '
                     else:
-                        ext = ' '+kwargs['what']+' '
-                    kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
-                    kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
-            if kwargs['what'] != 'current':
-                kwargs['which'] = [kwargs['which'][0]+' '+kwargs['what']]
+                        ext = ' '+ kwargs['what'][0] +' '
+                    kwargs['what'] = [i + ext + found_bypop for i in kwargs['which']]
+                    kwargs['which'] = [i + ' ' + found_bypop for i in kwargs['which']]
+            if 'current' in kwargs['what']:
+                kwargs['which'] = [ i + ' '+ kwargs['what'][0] for i in kwargs['which']]
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
             return func(self,**kwargs)
         return wrapper
