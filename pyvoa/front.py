@@ -501,7 +501,6 @@ class front:
 
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
-                print(self.gpdbuildergeo)
                 transfo = convertmercator(self.gpdbuildergeo)
                 kwargs['input'] = pd.merge(kwargs['input'],transfo,how='left')
                 kwargs = self.gpdbuilder.get_stats(**kwargs)
@@ -531,7 +530,6 @@ class front:
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
             if kwargs['what'] == 'current':
                 kwargs['what'] = kwargs['which'][:1]
-            print(kwargs['input'])
             return func(self,**kwargs)
         return wrapper
 

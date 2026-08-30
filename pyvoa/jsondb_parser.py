@@ -504,9 +504,6 @@ class DataParser:
           elif locationmode == "code":
               g = coge.GeoManager('name')
               codenamedico  = g.to_standard(locationdb,output='dict',db = self.db)
-              print()
-              #print(namecode)
-              #codenamedico = {k.upper():v.upper() for k,v in namecode.items()}
           else:
               raise PyvoaError("Geo interpretation wrong ! not code nor name ...")
 
