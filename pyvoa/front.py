@@ -448,6 +448,8 @@ class front:
                 raise PyvoaError("What function is this "+func.__name__)
 
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
+            kwargs_values_testing(kwargs['what'],self.av.d_batchinput_args['what'],'Bad what values ...')
+
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
             default['input'] = kwargs.get('input',pd.DataFrame())
@@ -525,15 +527,7 @@ class front:
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
             else:
                 kwargs['what'] = kwargs['which'][0]
-            for w in kwargs['option']:
-                if w.startswith('normalize:'):
-                    found_bypop = w
-                    if kwargs['what'] == 'current':
-                        ext = ' '
-                    else:
-                        ext = ' '+ kwargs['what'] +' '
-                    kwargs['what'] = [i + ext + found_bypop for i in kwargs['which']][0]
-                    kwargs['which'] = [i + ' ' + found_bypop for i in kwargs['which']]
+
             return func(self,**kwargs)
         return wrapper
 
@@ -616,13 +610,10 @@ class front:
                     if isinstance(z['which'],list) and len(z['which'])>1:
                         raise PyvoaError("Histo and map available only for ONE variable ...")
 
-                    #z['input'] = z['input'].sort_values(by=kwargs['which'], ascending=False).reset_index(drop=True)
                     if func.__name__ == 'map':
                             z.pop('typeofhist')
                             z.pop('typeofplot')
                             z.pop('bins')
-                    #shortenwhere = {i:i[:self.maxlettersdisplay] + '...' if len(i)>self.maxlettersdisplay else i for i in z['where']}
-                    #z['input']['where'] = kwargs['input']['where'].replace(shortenwhere)
                 return func(self,**z)
             else:
                 PyvoaWarning("Graphics asked can't be displayed, no visualization has been setted")
@@ -784,10 +775,11 @@ class front:
         """
         columns=list(kwargs['input'].columns)
         which = kwargs['which']
-        if 'smooth7' in kwargs['option']:
-            d = {i:i+' smooth' for i in kwargs['which']}
-            which = list(d.values())
-            kwargs['input']=kwargs['input'].rename(columns=d)
+        ext = ' '.join(kwargs['option'])
+        ext = ' '+ext
+        d = {i:i+ ext for i in kwargs['which']}
+        which = list(d.values())
+        kwargs['input']=kwargs['input'].rename(columns=d)
         tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
         return kwargs['input'][tokeep]
 
