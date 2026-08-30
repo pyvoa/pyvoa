@@ -510,6 +510,7 @@ def getnonnegfunc(mypd,which):
         reconstructed = pd.DataFrame()
         loc = list(mypd['where'].unique())
         for i in loc:
+            mypd[which] = mypd[which].astype(float)
             lpd = mypd.loc[mypd['where']==i]
             whichvalues = lpd[which]
             try:
