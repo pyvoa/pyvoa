@@ -289,10 +289,12 @@ class GPDBuilder:
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
                 if has_normalize:
                     for idx,i in enumerate(dpop.keys()):
+                        if isinstance(which,list):
+                            which=which[0]
                         if idx==0:
-                            temptemp = self.normbypop(temp,which[0],i)
+                            temptemp = self.normbypop(temp,which,i)
                         else:
-                            temptemp = pd.merge(temptemp,self.normbypop(temp,which[0],i),how="outer")
+                            temptemp = pd.merge(temptemp,self.normbypop(temp,which,i),how="outer")
                     temp = temptemp
 
                 temp = gpd.GeoDataFrame(temp, geometry=temp.geometry, crs="EPSG:4326").reset_index(drop=True)
@@ -437,7 +439,6 @@ class GPDBuilder:
            has_sumall = "sumall" in option
 
            if has_sumall and has_normalize:
-                option.remove('sumall')
                 normalize = [x for x in option if x.startswith('normalize:')]
                 option = [x for x in option if not x.startswith('normalize:')]
                 normalize = re.sub(r'normalize:', '', normalize[0])
