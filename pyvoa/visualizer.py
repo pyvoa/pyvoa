@@ -210,11 +210,11 @@ class AllVisu:
 
             if len(kwargs['which'])>1:
                 PyvoaInfo("Only one variable could be displayed, take the first one ...")
+
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-               
-            if (input[kwargs['what']] == 0.0).all():
+            if (input[kwargs['what'][0]] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
             kwargs['legend'] = None
