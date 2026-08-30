@@ -358,17 +358,17 @@ class GPDBuilder:
        # what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
-       remove_all_execept_which = [x for x in self.get_available_keywords() if x not in which]
-       input = input.drop(columns=remove_all_execept_which)
+
+       if kwargs['kwargsuser']['input'].empty:
+           remove_all_execept_which = [x for x in self.get_available_keywords() if x not in which]
+           input = input.drop(columns=remove_all_execept_which)
 
        if input.empty:
             available_keywords = self.get_available_keywords()
             kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
-            remove_all_execept_which = [x for x in available_keywords if x not in which]
-            input = input.drop(columns=remove_all_execept_which)
-            #input = input[which].loc[:,~input.columns.isin(anticolumns)]
-
+            anticolumns = [x for x in available_keywords if x not in which]
+            #input = input[which].loc[:,input.columns.isin(anticolumns)]
        date_max_by_where = input.groupby('where')['date'].max()
        if date_max_by_where.nunique() > 1:
             PyvoaWarning(
