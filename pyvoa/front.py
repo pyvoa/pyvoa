@@ -777,7 +777,12 @@ class front:
         argument together with the values it accepts.
         """
         columns=list(kwargs['input'].columns)
-        tokeep = ['date', 'where', 'code'] + kwargs['which'] + (['geometry'] if 'geometry' in columns else [])
+        which = kwargs['which']
+        if 'smooth7' in kwargs['option']:
+            d = {i:i+' smooth' for i in kwargs['which']}
+            which = list(d.values())
+            kwargs['input']=kwargs['input'].rename(columns=d)
+        tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
         return kwargs['input'][tokeep]
 
     def decomap(func):
