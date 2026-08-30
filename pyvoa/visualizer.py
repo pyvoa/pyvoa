@@ -153,7 +153,7 @@ class AllVisu:
 
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
-            
+
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
             return func(self, **kwargs)
@@ -213,8 +213,7 @@ class AllVisu:
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-            if isinstance(kwargs['what'],list):
-                 kwargs['what'] = kwargs['what'][0]
+               
             if (input[kwargs['what']] == 0.0).all():
                 print("All values seems to be null ... nothing to plot")
                 return
