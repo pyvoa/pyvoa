@@ -153,7 +153,7 @@ class AllVisu:
 
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
-
+            
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
             return func(self, **kwargs)

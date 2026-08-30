@@ -528,8 +528,9 @@ class front:
                         ext = ' '+kwargs['what']+' '
                     kwargs['what'] = [i+ ext +found_bypop for i in kwargs['which']]
                     kwargs['which'] = [i+ ' ' +found_bypop for i in kwargs['which']]
-            if kwargs['what'] == 'current':
-                kwargs['what'] = kwargs['which'][:1]
+            if kwargs['what'] != 'current':
+                kwargs['which'] = [kwargs['which'][0]+' '+kwargs['what']]
+                kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
             return func(self,**kwargs)
         return wrapper
 
@@ -703,7 +704,6 @@ class front:
                 raise PyvoaError('Unknown output.')
 
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
-
             last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
             where_ordered_bylastvalues = last_rows['where'].tolist()
             casted_data['where'] = pd.Categorical(
@@ -1106,8 +1106,6 @@ class front:
             PyvoaError
                 If no visualization has been set up.
             """
-            # input=kwargs['input']
-
             which = kwargs.get('which')
             typeofplot = kwargs.get('typeofplot',self.listplot()[0])
             if kwargs.get('output'):
