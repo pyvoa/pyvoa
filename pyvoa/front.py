@@ -695,10 +695,13 @@ class front:
                     casted_data = pd.merge(pandy, self.gpdbuilder.getwheregeometrydescription(), on='where')
                     casted_data = gpd.GeoDataFrame(casted_data)
             elif output == 'dict':
+                pandy=pandy.drop(columns='geometry')
                 return pandy.to_dict('split')
             elif output == 'array':
+                pandy=pandy.drop(columns='geometry')
                 return pandy.to_numpy()
             elif output == 'list':
+                pandy=pandy.drop(columns='geometry')
                 return pandy.values.tolist()
             else:
                 raise PyvoaError('Unknown output.')
