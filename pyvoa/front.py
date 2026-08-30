@@ -48,7 +48,6 @@ from pyvoa.tools import (
     PyvoaWarning,
     all_or_none_lists,
     convertmercator,
-    fill_missing_dates,
     get_live_mode,
     info,
     kwargs_keystesting,
@@ -448,7 +447,6 @@ class front:
                 raise PyvoaError("What function is this "+func.__name__)
 
             kwargs_keystesting(kwargs,self.largument + self.listviskargskeys,' kwargs keys not recognized ...')
-            kwargs_values_testing(kwargs['what'],self.av.d_batchinput_args['what'],'Bad what values ...')
 
             default = { k:[v[0]] if isinstance(v,list) else v for k,v in self.av.d_batchinput_args.items()}
             default['output'] = default['output'][0]
@@ -473,6 +471,8 @@ class front:
             kwargs = {**default, **dicovisu}
 
             kwargs['what'] = kwargs.get('what',self.lwhat[0])
+            kwargs_values_testing(kwargs['what'],self.av.d_batchinput_args['what'],'Bad what values ...')
+
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
@@ -527,7 +527,6 @@ class front:
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
             else:
                 kwargs['what'] = kwargs['which'][0]
-
             return func(self,**kwargs)
         return wrapper
 
