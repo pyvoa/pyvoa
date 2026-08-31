@@ -156,6 +156,7 @@ class AllVisu:
 
             if kwargs['kwargsuser']['what'] != 'current':
                 kwargs['which'] = kwargs['what']
+            print(kwargs['which'])    
             return func(self, **kwargs)
         return inner_plot
 
@@ -172,6 +173,7 @@ class AllVisu:
             input = kwargs.get('input')
             which = kwargs.get('which')
             which = which[0]
+
             title = kwargs['title']
             drawn = input['date'].max()
             # what = kwargs.get('what')
@@ -195,6 +197,7 @@ class AllVisu:
                         windows_which = [ which.replace(' ',i+' ') for i in windows ]
                     else:
                         windows_which = [ which + i for i in windows ]
+
                     for i in [which]+windows_which:
                         total = others[i].apply(
                             lambda x: x[0] if isinstance(x, list) else x
