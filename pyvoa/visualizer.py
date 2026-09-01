@@ -139,9 +139,7 @@ class AllVisu:
             kwargs['logo'] = self.logosmall
             locunique = kwargs['whereordered']
             input = input.loc[input['where'].isin(locunique)]
-            if kwargs['what'] in ['daily','weekly']:
-               cols = [c for c in input.columns if c.endswith(kwargs['what'])]
-               kwargs['what'] = cols
+
             kwargs['legend'] = None
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
@@ -153,10 +151,6 @@ class AllVisu:
 
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
-
-            if kwargs['kwargsuser']['what'] != 'current':
-                kwargs['which'] = kwargs['what']
-            print(kwargs['which'])    
             return func(self, **kwargs)
         return inner_plot
 
@@ -172,7 +166,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            which = which[0]
+            #which = which[0]
 
             title = kwargs['title']
             drawn = input['date'].max()
@@ -193,12 +187,8 @@ class AllVisu:
                     top = input.iloc[:self.maxcountrydisplay]
                     others = input.iloc[self.maxcountrydisplay:]
                     rest = {col: ['SumOthers'] for col in top.columns}
-                    if 'normalize' in which:
-                        windows_which = [ which.replace(' ',i+' ') for i in windows ]
-                    else:
-                        windows_which = [ which + i for i in windows ]
 
-                    for i in [which]+windows_which:
+                    for i in which:
                         total = others[i].apply(
                             lambda x: x[0] if isinstance(x, list) else x
                             ).sum()
@@ -211,15 +201,10 @@ class AllVisu:
                     input = pd.concat([top, rest], ignore_index=True)
                     input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
 
-            if len(kwargs['which'])>1:
-                PyvoaInfo("Only one variable could be displayed, take the first one ...")
-
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-            if isinstance(kwargs['what'],list):
-                kwargs['what'] = kwargs['what'][0]
-            if (input[kwargs['what']] == 0.0).all():
+            if input[which].empty:
                 print("All values seems to be null ... nothing to plot")
                 return
             kwargs['legend'] = None
@@ -228,8 +213,7 @@ class AllVisu:
                 kwargs['legend'] = 'sum all location'
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             kwargs['input'] = input
-            if kwargs['kwargsuser']['what'] != 'current':
-                kwargs['which'] = kwargs['what']
+
             loc = list(input['where'].unique())
             kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
             return func(self, **kwargs)
@@ -254,12 +238,6 @@ class AllVisu:
             # vis = kwargs.get('vis')
             input['where'].unique()
             input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
-            kwargs['input'] = input
-            if kwargs['what'] in ['daily','weekly']:
-               cols = [c for c in input.columns if c.endswith(kwargs['what'])]
-               kwargs['what'] = cols
-            if isinstance(kwargs['what'],list):
-                 kwargs['what'] = kwargs['what'][0]
             kwargs['input'] = input
             return func(self,**kwargs)
         return inner_decohistopie
@@ -295,6 +273,7 @@ class AllVisu:
             raise PyvoaError("Only one date ! Plot is meaning less here")
         vis = kwargs.get('vis')
         fig = None
+
         if (typeofplot == 'yearly' or typeofplot == 'spiral') and \
            (len(kwargs['input']['where'].unique())>1 or len(kwargs['which'])>1):
             raise PyvoaError('Yearly or spiral plots can display only one country and/or one value.')
