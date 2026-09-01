@@ -116,26 +116,26 @@ class visu_matplotlib:
         The matplotlib axes the series were drawn on.
         """
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
         kwargs['dicodisplayloc']
         ay_type = kwargs.get('scale',self.av.d_graphicsinput_args['scale'][0])
 
         ax.set_xlabel("date", fontsize=10)
-        ax.set_ylabel(what[0], fontsize=10)
+        ax.set_ylabel(which, fontsize=10)
         ax.set_yscale(ay_type)
         ax.grid(True)
         st=['-','--',':']
 
-        for idx, i in enumerate(what):
+        for idx, i in enumerate(which):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
                 if legend:
                     label = legend
                 else:
                     label = f"{kwargs['dicodisplayloc'][where]}"
-                if len(what)>1:
+                if len(which)>1:
                     label =f"{kwargs['dicodisplayloc'][where]} — {i}"
                 ax.plot(
                     df.index,
@@ -143,8 +143,7 @@ class visu_matplotlib:
                     label=label,
                     linestyle=st[idx]
                 )
-
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10,ncol=len(what))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10,ncol=len(which))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
         return ax
 
@@ -166,16 +165,16 @@ class visu_matplotlib:
         The matplotlib axes the curves were drawn on.
         """
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         ax = kwargs['ax']
         loc = list(input['where'].unique())
-        ax.set_xlabel(what[0], fontsize=10)
-        ax.set_ylabel(what[1], fontsize=10)
+        ax.set_xlabel(which[0], fontsize=10)
+        ax.set_ylabel(which[1], fontsize=10)
         ax.grid(True)
         leg=[]
         for col in loc:
             pandy=input.loc[input['where']==col]
-            ax.plot(pandy[what[0]], pandy[what[1]])
+            ax.plot(pandy[which[0]], pandy[which[1]])
             leg.append(col)
         ax.legend(leg)
         return ax
@@ -188,7 +187,7 @@ class visu_matplotlib:
         Max_Countries_Default.
         """
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         # title = kwargs.get('title')
         kwargs['plt']
         ax = kwargs['ax']
@@ -203,7 +202,7 @@ class visu_matplotlib:
 
         d = input.allyears.unique()
         for i in d:
-            df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=what)
+            df = pd.pivot_table(input.loc[input.allyears==i],index='dayofyear', columns='where', values=which)
             ax.plot(df.index,df,label=f'{i} {where}')
         month_starts = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
         month_labels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
@@ -211,7 +210,7 @@ class visu_matplotlib:
 
         ax.set_xticks(month_starts)
         ax.set_xticklabels(month_labels)
-        ax.set_ylabel(what[0], fontsize=10)
+        ax.set_ylabel(which[0], fontsize=10)
         ax.grid(True)
         ax.legend()
         return ax
@@ -224,7 +223,7 @@ class visu_matplotlib:
         Max_Countries_Default.
         """
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         title = kwargs.get('title')
         # plt = kwargs.get('plt')
         ax = kwargs.get('ax')
@@ -233,9 +232,9 @@ class visu_matplotlib:
             input['where'] = 'sum all location'
         input['where']= [kwargs['dicodisplayloc'][w] for w in input['where']]
         input = input.set_index('where')
-        ax =  input.plot(kind="pie",y=what, autopct='%1.1f%%', legend=True,
+        ax =  input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
-        ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=what)
+        ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)
         ax.set_title(title)
         return ax
 
@@ -244,7 +243,7 @@ class visu_matplotlib:
     def matplotlib_horizontal_histo(self,**kwargs):
         """Matplotlib horizon histo."""
         input = kwargs.get('input')
-        what = kwargs.get('what')
+        which = kwargs.get('which')
         title = kwargs.get('title')
         plt = kwargs.get('plt')
         cmap = plt.get_cmap('Paired')
@@ -252,13 +251,13 @@ class visu_matplotlib:
         # fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
 
-        input_sorted = input.sort_values(by=what,ascending=True)
+        input_sorted = input.sort_values(by=which,ascending=True)
         ax.set_title(title)
-        ax.set_xlabel(what)
+        ax.set_xlabel(which)
         ax.grid(True)
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
-        return ax.barh(input_sorted['where'], input_sorted[what],color=cmap.colors,label = legend)
+        return ax.barh(input_sorted['where'], input_sorted[which],color=cmap.colors,label = legend)
 
 
     @decomatplotlib
@@ -384,7 +383,6 @@ class visu_matplotlib:
         ax.axis('off')
 
         input = kwargs.get('input')
-        # what = kwargs.get('what')
         which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
