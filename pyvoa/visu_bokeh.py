@@ -337,7 +337,6 @@ class visu_bokeh:
 
             for loc in input['where'].unique():
                 pandaloc = input.loc[input['where'] == loc].sort_values(by='date', ascending=True)
-                #pandaloc.rename(columns={what[0]: 'casesx', what[1]: 'casesy'}, inplace=True)
                 fig.line(x=which[0], y=which[1],
                                  source=ColumnDataSource(pandaloc), legend_label=f"{loc}",
                                  color=pandaloc.colors.iloc[0], line_width=3, hover_line_width=4)
