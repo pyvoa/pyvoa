@@ -262,15 +262,8 @@ class DataParser:
         if granularity == 'country': # world wide dba
             self.granu_country = True
             self.geo = coge.GeoManager('name')
-            self.geo_all = 'world'
         else: # local db
             self.geo = coge.GeoCountry(code)
-            if granularity == 'region':
-                self.geo_all = self.geo.get_region_list()
-            elif granularity == 'subregion':
-                self.geo_all = self.geo.get_subregion_list()
-            else:
-                raise PyvoaError('Granularity problem: neither country, region or subregion')
         try:
             # specific reading of data according to the db
             self.mainpandas = self.get_parsing()
@@ -495,12 +488,20 @@ class DataParser:
       geopdbar = pd.DataFrame()
 
       if granularity == 'country':
-          info = coge.GeoInfo()
-          g = coge.GeoManager('name')
-          alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('world')
-          codenamedico  = g.to_standard(alllocationsgeocode,output='dict',db = self.db)
-          geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
-          geopd=info.add_field(input=geopd,field='geometry')
+        info = coge.GeoInfo()
+        g = coge.GeoManager('name')
+        if self.metadata['geoinfo']['iso3'] == 'WLD':
+            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('world')
+        elif self.metadata['geoinfo']['iso3'] == 'EUR':
+            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('europe')
+        else:
+            iso=self.metadata['geoinfo']['iso3']
+            name=g.to_standard(iso)
+            alllocationsgeocode = name[0]
+
+        codenamedico  = g.to_standard(alllocationsgeocode,output='dict',db = self.db)
+        geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
+        geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
           geopd = self.geo.get_subregion_list()
           geopdbar = geopd.copy()
@@ -538,8 +539,8 @@ class DataParser:
 
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
-      all_dates = pandas_db['date'].unique()
 
+      all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
             list(itertools.product(all_dates, geopd['code'])),
             columns=['date', 'code']
