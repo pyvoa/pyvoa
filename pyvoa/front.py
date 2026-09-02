@@ -527,6 +527,18 @@ class front:
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
             else:
                 kwargs['what'] = kwargs['which'][0]
+
+            columns=list(kwargs['input'].columns)
+            which = kwargs['which']
+            ext = ' '.join(kwargs['option'])
+            ext = ' '+ext
+            d = {i:i+ ext for i in kwargs['which']}
+            which = list(d.values())
+            kwargs['input']=kwargs['input'].rename(columns=d)
+            tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
+
+            kwargs['input'] = kwargs['input'][tokeep]
+            kwargs['which'] = which
             return func(self,**kwargs)
         return wrapper
 
@@ -700,7 +712,7 @@ class front:
                 raise PyvoaError('Unknown output.')
 
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
-            last_rows = last_rows.sort_values(by=kwargs["which"][0], ascending=False)
+            last_rows = last_rows.sort_values(by=kwargs["which"], ascending=False)
             where_ordered_bylastvalues = last_rows['where'].tolist()
             casted_data['where'] = pd.Categorical(
                 casted_data['where'],
@@ -772,15 +784,7 @@ class front:
         hand the undecorated body the assembled table. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
-        columns=list(kwargs['input'].columns)
-        which = kwargs['which']
-        ext = ' '.join(kwargs['option'])
-        ext = ' '+ext
-        d = {i:i+ ext for i in kwargs['which']}
-        which = list(d.values())
-        kwargs['input']=kwargs['input'].rename(columns=d)
-        tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
-        return kwargs['input'][tokeep]
+        return kwargs['input']
 
     def decomap(func):
         """Decorate preparing the geometry a map is drawn from.
@@ -1196,6 +1200,7 @@ class front:
         hand the undecorated body the figure it has built. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
+
         self.setnamefunction(self.plot)
         ''' show plot '''
         if self.getvis() == 'bokeh':

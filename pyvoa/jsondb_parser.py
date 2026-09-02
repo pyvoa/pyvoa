@@ -33,7 +33,7 @@ from pyvoa.tools import (
     get_local_from_url,
     week_to_date,
 )
-
+import itertools
 
 class MetaInfo:
   """The catalogue of the databases pyvoa ships.
@@ -493,20 +493,12 @@ class DataParser:
       codenamedico = {}
       geopd = pd.DataFrame()
       geopdbar = pd.DataFrame()
+
       if granularity == 'country':
           info = coge.GeoInfo()
-          if locationmode == "name":
-              g = coge.GeoManager('name')
-              locationdb  = g.to_standard(locationdb,output='list',db = self.db)
-              g = coge.GeoManager('iso3')
-              namecode  = g.to_standard(locationdb,output='dict',db = self.db)
-              codenamedico = {v.upper():k.upper() for k,v in namecode.items()}
-          elif locationmode == "code":
-              g = coge.GeoManager('name')
-              codenamedico  = g.to_standard(locationdb,output='dict',db = self.db)
-          else:
-              raise PyvoaError("Geo interpretation wrong ! not code nor name ...")
-
+          g = coge.GeoManager('name')
+          alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('world')
+          codenamedico  = g.to_standard(alllocationsgeocode,output='dict',db = self.db)
           geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
           geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
@@ -540,13 +532,21 @@ class DataParser:
           pandas_db['where'] = pandas_db['where'].str.upper()
           namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
-
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
+
+
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
-      pandas_db = pd.merge(pandas_db,geopd, how = 'inner', on='code')
-      #add region/subregion according to geo even if not present in the original DB parsed
+      all_dates = pandas_db['date'].unique()
+
+      cartesian = pd.DataFrame(
+            list(itertools.product(all_dates, geopd['code'])),
+            columns=['date', 'code']
+        )
+      merged = cartesian.merge(pandas_db, on=['date', 'code'], how='left')
+      pandas_db = merged.merge(geopd, on='code', how='left')
+      pandas_db = pandas_db[pandas_db['where'] != 'Antarctica']
       if not geopdbar.empty:
           pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)
       pandas_db['where']=pandas_db['where'].str.title()
