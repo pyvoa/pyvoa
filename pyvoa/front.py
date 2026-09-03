@@ -527,8 +527,6 @@ class front:
                 kwargs['input'] = input
                 self.allvisu = AllVisu(self.db, kwargs['input'])
 
-            found_bypop = None
-
             if kwargs['what'] != 'current':
                 kwargs['which'] = [ i + ' '+ kwargs['what'] for i in kwargs['which']]
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
@@ -541,11 +539,15 @@ class front:
             ext = ' '+ext
             d = {i:i+ ext for i in kwargs['which']}
             which = list(d.values())
-            kwargs['input']=kwargs['input'].rename(columns=d)
+            cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d.keys()]
+            kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
+            kwargs['input'] = kwargs['input'].rename(columns=d)
+
             tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
 
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
+
             return func(self,**kwargs)
         return wrapper
 
