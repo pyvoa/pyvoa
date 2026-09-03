@@ -1528,6 +1528,9 @@ class front:
                 r.append(code)
                 if code  == 'EUR':
                     r.append('European Union')
+                if code  == 'WLD':
+                    r.remove('WLD')
+                    r.append('World')
                 return r
 
         if granularity == 'country' and code not in ['WLD','EUR']:
