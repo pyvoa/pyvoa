@@ -917,7 +917,7 @@ class GeoRegion:
         # --- filling celac information
         p_celac=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Community_of_Latin_American_and_Caribbean_States'),\
                     match='Country')
-        self._celac = [p_celac[0].Country.to_list()]
+        self._celac = ["Bahamas" if x=="Bahamas, The" else x for x in p_celac[0].Country.to_list()[0:-2] ]
 
         # --- filling cedeao information
         p_cedeao=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Economic_Community_of_West_African_States'))
@@ -925,7 +925,7 @@ class GeoRegion:
 
         # --- filling sadc information
         p_sadc=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Southern_African_Development_Community'))
-        self._sadc=["COD" if x == "Democratic Republic of the Congo" else x for x in [w.split('[')[0] for w in p_sadc[2][p_sadc[2].columns[0]].to_list()]]
+        self._sadc=["COD" if x == "DR Congo" else x for x in [w.split('[')[0] for w in p_sadc[2][p_sadc[2].columns[0]].to_list()]]
 
         # --- filling amu information
         p_amu=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Arab_Maghreb_Union'))
@@ -942,7 +942,7 @@ class GeoRegion:
 
         # --- filling censad information
         p_censad=pd.read_html(get_local_from_url('https://en.wikipedia.org/wiki/Community_of_Sahel%E2%80%93Saharan_States'))
-        self._censad=["Cabo Verde" if x == "Cape Verde" else "CIV" if x == "Ivory Coast" else x.split('[')[0] for x in p_censad[3][p_censad[3].columns[0]].to_list()[0:-1]]
+        self._censad=["Cabo Verde" if x == "Cape Verde" else "CIV" if x == "Ivory Coast" else x.split('[')[0] for x in p_censad[4][p_censad[4].columns[0]].to_list()[0:-1]]
 
         # --- filing comesa information
         p_comesa=pd.read_html(get_local_from_url('https://www.worlddata.info/trade-agreements/comesa.php'))
