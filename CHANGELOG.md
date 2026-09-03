@@ -1,4 +1,7 @@
 # Unreleased
+- Add log scale in Bokeh
+- Remove duplicate columns in the main pandas
+- Fill missing values in maps for JHU and mpox datasets
 - bug fix for 3 regions : Bug fix for regions. SACD, CENSAD and CELAC
 - `set_verbose_mode()` and `get_verbose_mode()` are methods of the front class,
   so `pf.set_verbose_mode(2)` works alongside the rest of the front-level API
