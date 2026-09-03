@@ -380,7 +380,14 @@ class front:
       """
       info('Few information concernant the selected database : ', self.db)
       info('Available key-words, which ∈', sorted(self.listwhich()))
-      info('Example of where : ', random.choices(self.listwhere(), k=min(5,len(self.listwhere()))),' ...')
+      lw = self.listwhere()
+      if isinstance(lw, list):
+            sample = random.choices(lw, k=min(5, len(lw)))
+            suffix = ' ...'
+      else:
+            sample = lw
+            suffix = ''
+      info('Example of where : ', sample, suffix)
       info('Last date data ', self.gpdbuilderdata['date'].max())
       info('First date data ', self.gpdbuilderdata['date'].min())
 
@@ -1533,8 +1540,10 @@ class front:
                 else:
                     if code == 'WLD':
                         r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('World')
-                    else:
+                    elif code == 'EUR':
                         r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('Europe')
+                    else:
+                        r = []
                     r += [self.gpdbuilder.geo.to_standard(c)[0] for c in r]
                 r+=clust()
             else:

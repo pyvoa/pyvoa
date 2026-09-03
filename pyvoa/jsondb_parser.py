@@ -491,14 +491,15 @@ class DataParser:
         info = coge.GeoInfo()
         g = coge.GeoManager('name')
         if self.metadata['geoinfo']['iso3'] == 'WLD':
-            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('world')
+            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('World')
         elif self.metadata['geoinfo']['iso3'] == 'EUR':
-            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('europe')
+            alllocationsgeocode = self.geo.get_GeoRegion().get_countries_from_region('Europe')
         else:
+            g = coge.GeoManager('iso3')
             iso=self.metadata['geoinfo']['iso3']
             name=g.to_standard(iso)
             alllocationsgeocode = name[0]
-
+        g = coge.GeoManager('name')
         codenamedico  = g.to_standard(alllocationsgeocode,output='dict',db = self.db)
         geopd=pd.DataFrame({'where':codenamedico.values(),'code':codenamedico.keys()})
         geopd=info.add_field(input=geopd,field='geometry')
