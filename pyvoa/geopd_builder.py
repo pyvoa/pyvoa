@@ -503,9 +503,6 @@ class GPDBuilder:
            raise PyvoaError('Data seems to be empty for :'+str(where))
 
        uniqwhere=list(input['where'].unique())
-       maxletters=kwargs['maxlettersdisplayed']
-       dshortenwhere = {i:i[:maxletters] + '...' if len(i)>maxletters else i for i in uniqwhere}
-       input['shortenwhere']=input['where'].map(dshortenwhere)
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
