@@ -542,6 +542,9 @@ class front:
             cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d.keys()]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
             kwargs['input'] = kwargs['input'].rename(columns=d)
+
+            if 'from_db' not in columns:
+                kwargs['input']['from_db']=True
             tokeep = ['date', 'where', 'code','from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
