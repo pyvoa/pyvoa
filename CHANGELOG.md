@@ -1,4 +1,5 @@
 # Unreleased
+- Highlight locations absent from the original database in pink on the map.
 - Add log scale in Bokeh
 - Remove duplicate columns in the main pandas
 - Fill missing values in maps for JHU and mpox datasets
