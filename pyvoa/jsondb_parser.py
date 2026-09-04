@@ -223,6 +223,7 @@ class MetaInfo:
                               sig,msg = test(j,columnskeys)
       return [sig,msg]
 
+
 class DataParser:
   """One database, parsed from its JSON description into a DataFrame.
 
@@ -537,7 +538,6 @@ class DataParser:
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
 
-
       if 'where' in pandas_db.columns:
           pandas_db=pandas_db.drop(columns='where')
 
@@ -549,12 +549,13 @@ class DataParser:
       merged = cartesian.merge(pandas_db, on=['date', 'code'], how='left')
       pandas_db = merged.merge(geopd, on='code', how='left')
       pandas_db = pandas_db[pandas_db['where'] != 'Antarctica']
+      pandas_db['from_db'] = pandas_db['where'].isin(locationdb)
       if not geopdbar.empty:
           pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)
       pandas_db['where']=pandas_db['where'].str.title()
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
-      pandas_db=pandas_db.dropna(subset=['geometry'])
+      pandas_db = pandas_db.dropna(subset=['geometry'])
       return pandas_db
 
   def get_db(self,):
