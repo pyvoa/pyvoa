@@ -550,6 +550,7 @@ class front:
             kwargs['which'] = which
             maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
             kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
+
             return func(self,**kwargs)
         return wrapper
 
@@ -725,7 +726,8 @@ class front:
 
             last_rows = casted_data[ casted_data.date == casted_data.date.max() ]
             last_rows = last_rows.sort_values(by=kwargs["which"], ascending=False)
-            where_ordered_bylastvalues = last_rows['where'].tolist()
+            #where_ordered_bylastvalues = last_rows['where'].tolist()
+            where_ordered_bylastvalues = last_rows['where'].drop_duplicates().tolist()
             casted_data['where'] = pd.Categorical(
                 casted_data['where'],
                 categories=where_ordered_bylastvalues,
