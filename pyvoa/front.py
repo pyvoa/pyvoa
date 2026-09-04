@@ -548,7 +548,8 @@ class front:
             tokeep = ['date', 'where', 'code','from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
-
+            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
+            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
             return func(self,**kwargs)
         return wrapper
 
