@@ -65,7 +65,6 @@ import importlib.resources as pkg_resources
 
 import pyvoa
 
-
 class AllVisu:
     """Dispatcher routing a chart request to the backend that draws it.
 
@@ -166,8 +165,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            #which = which[0]
-
+            
             title = kwargs['title']
             drawn = input['date'].max()
             # what = kwargs.get('what')

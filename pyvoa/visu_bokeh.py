@@ -402,7 +402,15 @@ class visu_bokeh:
         dicof={'title':kwargs.get('title')}
         legend = kwargs.get('legend', None)
 
-        for axis_type in  self.av.d_graphicsinput_args['scale']:
+        ay_type = kwargs.get('scale', None)
+        self.av.d_graphicsinput_args['scale']
+
+        if ay_type is None:
+            ay_type = [i for i in self.av.d_graphicsinput_args['scale'] if i]
+        if not isinstance(ay_type,list):
+            ay_type = [ay_type]
+
+        for axis_type in ay_type:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
@@ -826,6 +834,13 @@ class visu_bokeh:
         def inner_decodateslider(self, **kwargs):
             """Attach the slider to the figure, then draw."""
             input = kwargs['input']
+            input_missing = input[
+                input['from_db'] == False
+                ]
+            input = input[
+                input['from_db'] == True
+                ]
+
             which  = kwargs.get('which')
             if isinstance(which,list):
                 which = which[0]
@@ -991,6 +1006,22 @@ class visu_bokeh:
                 bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
                                 line_color = 'black', line_width = 0.25, fill_alpha = 1)
+
+                if not input_missing.empty:
+                    input_missing=input_missing.drop(columns='date')
+                    geo_missing = GeoJSONDataSource(
+                        geojson=input_missing.to_json()
+                    )
+
+                    bokeh_figure_map.patches(
+                        'xs',
+                        'ys',
+                        source=geo_missing,
+                        fill_color='#FCE4EC',
+                        line_color='black',
+                        line_width=0.25
+                    )
+
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
 
             if func.__name__ in lhist:
@@ -1180,7 +1211,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['where']]))
+            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['shortenwhere']]))
 
             #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             #    label_dict = {ytick_loc[0]:'sum all location'}
@@ -1436,6 +1467,7 @@ class visu_bokeh:
         color_mapper = kwargs['color_mapper']
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile')
+
         if kwargs['typeofmap']!='dense':
             tile = visu_bokeh.convert_tile(tile, 'bokeh')
             wmt = WMTSTileSource(url = tile)
@@ -1486,9 +1518,6 @@ class visu_bokeh:
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
-        bokeh_figure.patches('xs', 'ys', source = geocolumndatasrc,
-        fill_color = {'field': which, 'transform': color_mapper},
-        line_color = 'black', line_width = 0.25)
 
         bokeh_figure.add_tools(HoverTool(tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
 
