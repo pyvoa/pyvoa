@@ -424,6 +424,13 @@ class visu_matplotlib:
         input = input.set_crs(data_crs, allow_override=True)
 
         # plot
+        input_missing = input[
+            input['from_db'] == False
+            ]
+        input = input[
+            input['from_db'] == True
+            ]
+
         plot = input.plot(
             column=which,
             ax=ax,
@@ -440,7 +447,11 @@ class visu_matplotlib:
                 'shrink': 0.5
             }
         )
-
+        plot = input_missing.plot(
+            ax=ax,
+            color='#FCE4EC',
+            edgecolor='black',
+        )
         cbar = plot.get_figure().axes[-1]
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
