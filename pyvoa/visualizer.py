@@ -165,7 +165,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            
+
             title = kwargs['title']
             drawn = input['date'].max()
             # what = kwargs.get('what')

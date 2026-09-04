@@ -1009,7 +1009,6 @@ class front:
 
     @input_wrapper
     @input_visuwrapper
-    @decoget
     @decohist
     def hist(self,fig):
         """Draw the selected data as a histogram or a pie chart.
