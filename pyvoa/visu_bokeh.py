@@ -834,6 +834,7 @@ class visu_bokeh:
         def inner_decodateslider(self, **kwargs):
             """Attach the slider to the figure, then draw."""
             input = kwargs['input']
+
             input_missing = input[
                 input['from_db'] == False
                 ]
@@ -1211,7 +1212,7 @@ class visu_bokeh:
 
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
-            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['shortenwhere']]))
+            label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['where']]))
 
             #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             #    label_dict = {ytick_loc[0]:'sum all location'}
