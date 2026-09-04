@@ -542,9 +542,7 @@ class front:
             cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d.keys()]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
             kwargs['input'] = kwargs['input'].rename(columns=d)
-
-            tokeep = ['date', 'where', 'code'] + which + (['geometry'] if 'geometry' in columns else [])
-
+            tokeep = ['date', 'where', 'code','from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
 
@@ -681,7 +679,8 @@ class front:
             """
             output = kwargs.get('output')
             pandy = kwargs.get('input')
-
+            if 'from_db' in pandy.columns:
+                pandy=pandy.drop(columns='from_db')
             if 'geometry' not in list(pandy.columns):
                 output = 'pandas'
             if isinstance(output,list):
@@ -913,7 +912,6 @@ class front:
 
     @input_wrapper
     @input_visuwrapper
-    @decoget
     @decomap
     def map(self,**kwargs):
         """Draw the selected data on a choropleth map.
