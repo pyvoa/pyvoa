@@ -536,8 +536,7 @@ class front:
             columns=list(kwargs['input'].columns)
             which = kwargs['which']
             ext = ' '.join(kwargs['option'])
-            ext = ' '+ext
-            d = {i:i+ ext for i in kwargs['which']}
+            d = {i:i + ext for i in kwargs['which']}
             which = list(d.values())
             cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d.keys()]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
