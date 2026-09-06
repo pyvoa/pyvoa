@@ -53,8 +53,9 @@ from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, min_max_range, verb
+from pyvoa.tools import PyvoaError, min_max_range, verb, PyvoaWarning
 
+from bokeh.models import Title
 
 def safe_output_notebook():
     """Enable bokeh's notebook output, but only inside a notebook.
@@ -838,9 +839,6 @@ class visu_bokeh:
             input_missing = input[
                 input['from_db'] == False
                 ]
-            input = input[
-                input['from_db'] == True
-                ]
 
             which  = kwargs.get('which')
             if isinstance(which,list):
@@ -879,9 +877,32 @@ class visu_bokeh:
                 input_dates = input.copy()
 
             invViridis256 = Viridis256[::-1]
-            color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=max(input_dates[which]), nan_color='#ffffff')
-            ColorBar(color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',\
-                        border_line_color=None, location=(0, 0), orientation='horizontal', ticker=BasicTicker())
+            maxi = float('nan') if input_dates.empty else max(input_dates[which])
+
+            color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=maxi, nan_color='#ffffff')
+            color_bar = ColorBar(title=which,color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
+                             border_line_color=None, location=(0, 0), orientation='horizontal',
+                             ticker=BasicTicker())
+            bokeh_figure_map.add_layout(color_bar, 'below')
+
+
+            #color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
+            max_val = np.nanmax(input[which])
+            if max_val > 0 and not np.isnan(max_val):
+                exp = int(np.floor(np.log10(abs(max_val))))
+                divisor = 10 ** exp
+            else:
+                exp = 0
+                divisor = 1
+
+            color_bar.formatter = CustomJSTickFormatter(
+                args={'divisor': divisor, 'exp': exp},
+                code="""
+                const val = (tick / divisor).toFixed(1);
+                return val + " ×10" + exp.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || d).join('');
+            """)
+            bokeh_figure_map.add_layout(color_bar, 'below')
+
             if dateslider:
                 input_dates = input_dates.sort_values(by=['date', 'where'])
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
@@ -1021,6 +1042,10 @@ class visu_bokeh:
                         fill_color='#FCE4EC',
                         line_color='black',
                         line_width=0.25
+                    )
+                    bokeh_figure_map.add_layout(
+                        Title(text="In pink: no data available", text_color='Pink', text_font_size='12px', align='center'),
+                        'below'
                     )
 
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
@@ -1491,30 +1516,6 @@ class visu_bokeh:
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
 
-        _min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
-
-        color_bar = ColorBar(title=which,color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
-                             border_line_color=None, location=(0, 0), orientation='horizontal',
-                             ticker=BasicTicker())
-        color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
-
-        max_val = np.nanmax(input[which])
-
-        if max_val > 0 and not np.isnan(max_val):
-            exp = int(np.floor(np.log10(abs(max_val))))
-            divisor = 10 ** exp
-        else:
-            exp = 0
-            divisor = 1
-
-        color_bar.formatter = CustomJSTickFormatter(
-            args={'divisor': divisor, 'exp': exp},
-            code="""
-            const val = (tick / divisor).toFixed(1);
-            return val + " ×10" + exp.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || d).join('');
-        """
-        )
-        bokeh_figure.add_layout(color_bar, 'below')
         bokeh_figure.xaxis.visible = False
         bokeh_figure.yaxis.visible = False
         bokeh_figure.xgrid.grid_line_color = None
@@ -1522,7 +1523,6 @@ class visu_bokeh:
 
         bokeh_figure.add_tools(HoverTool(tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
 
-        #bokeh_figure = Row(bokeh_figure,kwargs['watermark'])
         if dateslider:
              layout = column(controls, bokeh_figure)
              return layout
