@@ -514,6 +514,7 @@ class DataParser:
           codenamedico = self.geo.get_data().set_index('code_region')['name_region'].to_dict()
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
+
       else:
           raise PyvoaError('Not a region nors ubregion ... sorry but what is it ?')
 
@@ -521,10 +522,14 @@ class DataParser:
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
           pandas_db['where'] = pandas_db['code'].map(codenamedico)
+          locationdbupper=[i.upper() for i in locationdb]
+          pandas_db['from_db'] = pandas_db['code'].isin(locationdbupper)
       elif locationmode == "name":
           pandas_db['where'] = pandas_db['where'].str.upper()
           namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
+          locationdbupper=[i.upper() for i in locationdb]
+          pandas_db['from_db'] = pandas_db['where'].isin(locationdbupper)
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
 
@@ -540,8 +545,6 @@ class DataParser:
       pandas_db = merged.merge(geopd, on='code', how='left')
       pandas_db = pandas_db[pandas_db['where'] != 'Antarctica']
 
-      locationdbupper=[i.upper() for i in locationdb]
-      pandas_db['from_db'] = pandas_db['where'].isin(locationdb)
       if not geopdbar.empty:
           pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)
       pandas_db['where']=pandas_db['where'].str.title()
