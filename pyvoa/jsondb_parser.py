@@ -506,19 +506,9 @@ class DataParser:
         geopd=info.add_field(input=geopd,field='geometry')
       elif granularity == 'subregion':
           geopd = self.geo.get_subregion_list()
-          geopdbar = geopd.copy()
-          if locationmode == "code":
-              geopd = geopd.loc[geopd.code_subregion.isin(locationdb)]
-              geopdbar = geopdbar.loc[~geopdbar.code_subregion.isin(locationdb)]
-          else:
-              geopd = geopd.loc[geopd.name_subregion.isin(locationdb)]
-              geopdbar = geopdbar.loc[~geopdbar.name_subregion.isin(locationdb)]
-          geopd['name_subregion'] = geopd['name_subregion'].str.upper()
-          geopd['code_subregion'] = geopd['code_subregion'].str.upper()
+          codenamedico = self.geo.get_data().set_index('code_subregion')['name_subregion'].to_dict()
           codenamedico = geopd.set_index('code_subregion')['name_subregion'].to_dict()
           geopd = geopd.rename(columns=({"code_subregion": "code","name_subregion":"where"}))
-          geopdbar = geopdbar.rename(columns=({"code_subregion":"code","name_subregion":"where"}))
-          geopdbar['date'] = pandas_db['date']
       elif granularity == 'region':
           geopd = self.geo.get_region_list()
           codenamedico = self.geo.get_data().set_index('code_region')['name_region'].to_dict()
@@ -549,6 +539,8 @@ class DataParser:
       merged = cartesian.merge(pandas_db, on=['date', 'code'], how='left')
       pandas_db = merged.merge(geopd, on='code', how='left')
       pandas_db = pandas_db[pandas_db['where'] != 'Antarctica']
+
+      locationdbupper=[i.upper() for i in locationdb]
       pandas_db['from_db'] = pandas_db['where'].isin(locationdb)
       if not geopdbar.empty:
           pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)

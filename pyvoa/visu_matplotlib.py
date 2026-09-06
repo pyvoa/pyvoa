@@ -427,9 +427,6 @@ class visu_matplotlib:
         input_missing = input[
             input['from_db'] == False
             ]
-        input = input[
-            input['from_db'] == True
-            ]
 
         plot = input.plot(
             column=which,
@@ -447,11 +444,17 @@ class visu_matplotlib:
                 'shrink': 0.5
             }
         )
-        plot = input_missing.plot(
-            ax=ax,
-            color='#FCE4EC',
-            edgecolor='black',
-        )
+        if not input_missing.empty:
+            plot = input_missing.plot(
+                ax=ax,
+                color='#FCE4EC',
+                edgecolor='black',
+            )
+            ax.text(0.5, -0.05, "In pink: no data available",
+            ha='center', color='#FCE4EC', fontsize=10,
+                transform=ax.transAxes)
+
+
         cbar = plot.get_figure().axes[-1]
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)
