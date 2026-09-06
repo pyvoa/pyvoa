@@ -505,9 +505,9 @@ class front:
                 #if not when:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
             kwargs['which'] = kwargs.get('which')
+
             if kwargs['which']=='':
                 kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
-
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 transfo = convertmercator(self.gpdbuildergeo)
@@ -549,7 +549,6 @@ class front:
             kwargs['which'] = which
             maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
             kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
-
             return func(self,**kwargs)
         return wrapper
 
