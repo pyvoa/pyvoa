@@ -486,7 +486,6 @@ class DataParser:
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}
       geopd = pd.DataFrame()
-      geopdbar = pd.DataFrame()
 
       if granularity == 'country':
         info = coge.GeoInfo()
@@ -514,9 +513,12 @@ class DataParser:
           codenamedico = self.geo.get_data().set_index('code_region')['name_region'].to_dict()
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
-
       else:
           raise PyvoaError('Not a region nors ubregion ... sorry but what is it ?')
+
+      geopd['code'] = geopd['code'].str.upper()
+      codenamedico={k.upper():v.upper() for k,v in codenamedico.items()}
+      namecodedico={v:k for k,v in codenamedico.items()}
 
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
@@ -526,28 +528,28 @@ class DataParser:
           pandas_db['from_db'] = pandas_db['code'].isin(locationdbupper)
       elif locationmode == "name":
           pandas_db['where'] = pandas_db['where'].str.upper()
-          namecodedico={v.upper():k.upper() for k,v in codenamedico.items()}
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
           locationdbupper=[i.upper() for i in locationdb]
           pandas_db['from_db'] = pandas_db['where'].isin(locationdbupper)
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
 
-      if 'where' in pandas_db.columns:
-          pandas_db=pandas_db.drop(columns='where')
-
       all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
-            list(itertools.product(all_dates, geopd['code'])),
-            columns=['date', 'code']
+              list(itertools.product(all_dates, geopd['code'])),
+              columns=['date', 'code']
+          )
+      cartesian = cartesian.merge(geopd[['code', 'geometry']], on='code', how='left')
+      pandas_db = cartesian[['date', 'code', 'geometry']].merge(
+            pandas_db,
+            on=['date', 'code'],
+            how='left'
         )
-      merged = cartesian.merge(pandas_db, on=['date', 'code'], how='left')
-      pandas_db = merged.merge(geopd, on='code', how='left')
-      pandas_db = pandas_db[pandas_db['where'] != 'Antarctica']
 
-      if not geopdbar.empty:
-          pandas_db =  pd.concat([pandas_db, geopdbar],ignore_index=True)
+      pandas_db['where']=pandas_db['code'].map(codenamedico)
+      pandas_db = pandas_db[pandas_db['where'] != 'ANTARCTICA']
       pandas_db['where']=pandas_db['where'].str.title()
+      pandas_db['from_db']=pandas_db['from_db'].fillna(False)
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
       pandas_db = pandas_db.dropna(subset=['geometry'])
