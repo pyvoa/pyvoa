@@ -1,16 +1,18 @@
+import sys
+
+sys.path.append('../..')
+
 import matplotlib
 
-import pyvoa.front as pv
-import pyvoa.tools as pt
+import pyvoa.front as pf
 
 matplotlib.use('Agg')
 
-pt.set_verbose_mode(2)
 def test():
-    pv.setwhom('owid',reload=False)
-    pv.setvis(vis='matplotlib')
-    pv.map(where='Europe')
-    return pv
+    pf.setwhom('owid',reload=False)
+    pf.setvis(vis='matplotlib')
+    pf.map(where='Europe')
+    return pf
 
 pl = test()
-pl.savefig('mapspf.png')
+pl.savefig('mapowid.png')
