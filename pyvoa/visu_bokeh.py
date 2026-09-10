@@ -477,6 +477,16 @@ class visu_bokeh:
             panels.append(panel)
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
+            fig.yaxis.formatter = CustomJSTickFormatter(code="""
+                if (tick === 0) return '0';
+                const exp = Math.floor(Math.log10(Math.abs(tick)));
+                const mantissa = tick / Math.pow(10, exp);
+                const superscripts = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+                const expStr = exp.toString().split('').map(d => superscripts[parseInt(d)] || d).join('');
+                const mant = parseFloat(mantissa.toFixed(1));
+                if (mant === 1) return '10' + expStr;
+                return mant + '×10' + expStr;
+            """)
             visu_bokeh().bokeh_legend(fig)
 
             listfigs.append(fig)

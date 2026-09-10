@@ -11,6 +11,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+from matplotlib.ticker import FuncFormatter
 import matplotlib.dates as mdates
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -145,6 +146,19 @@ class visu_matplotlib:
                 )
         ax.legend(loc="upper right", fontsize=8, title_fontsize=10,ncol=len(which))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
+
+        def sci_formatter(x, pos):
+            if x == 0:
+                return '0'
+            exp = int(np.floor(np.log10(abs(x))))
+            mantissa = x / 10**exp
+            superscripts = str.maketrans('0123456789', '⁰¹²³⁴⁵⁶⁷⁸⁹')
+            exp_str = str(exp).translate(superscripts)
+            mant = round(mantissa, 1)
+            if mant == 1:
+                return f'10{exp_str}'
+            return f'{mant}×10{exp_str}'
+        ax.yaxis.set_major_formatter(FuncFormatter(sci_formatter))
         return ax
 
     @decomatplotlib
