@@ -356,7 +356,6 @@ class GPDBuilder:
        if not isinstance(which,list):
            which=[which]
        input = kwargs.get('input')
-
        # what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
@@ -430,7 +429,6 @@ class GPDBuilder:
                  .reset_index(level=0, drop=True)
                  .fillna(0)
                  )
-
            kwargs['input'] = input
 
            if kwargs['kwargsuser']['input'].empty:
