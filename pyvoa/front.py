@@ -511,7 +511,7 @@ class front:
                     if kwargs['input'].empty:
                         kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
                     else:
-                        kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date'])
+                        kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date','code','geometry'])
                 except:
                     PyvoaError("Don't know which valu can be requested")
 
