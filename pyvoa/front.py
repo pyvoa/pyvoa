@@ -435,6 +435,11 @@ class front:
             input = kwargs.get('input',pd.DataFrame())
             if not isinstance(input,pd.DataFrame):
                 raise PyvoaError('input field must be a pd.DataFrame()!')
+            if not input.empty: 
+                if not 'date' in input or not 'where' in input:
+                    raise PyvoaError('input should have date and where columns')
+                if len(input.columns)<3:
+                    raise PyvoaError('input should have date, where and at least one data column') 
 
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
