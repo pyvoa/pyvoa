@@ -434,7 +434,8 @@ class front:
             """
             input = kwargs.get('input',pd.DataFrame())
             if not isinstance(input,pd.DataFrame):
-                PyvoaError('input field must be a pd.DataFrame()!')
+                raise PyvoaError('input field must be a pd.DataFrame()!')
+
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
 
