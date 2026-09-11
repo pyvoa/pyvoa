@@ -506,7 +506,7 @@ class front:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
             kwargs['which'] = kwargs.get('which')
 
-            if kwargs['which']=='':
+            if kwargs['which'] == '':
                 kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
@@ -523,8 +523,7 @@ class front:
                 #when = kwargs.get('when')
                 kwargs = coco.GPDBuilder().get_stats(**kwargs)
                 self.db = 'in-house data'
-                input = input.loc[input['where'].isin(kwargs['where'])]
-                kwargs['input'] = input
+                kwargs['input'] = kwargs['input'].loc[kwargs['input']['where'].isin(kwargs['where'])]
                 self.allvisu = AllVisu(self.db, kwargs['input'])
 
             if kwargs['what'] != 'current':
