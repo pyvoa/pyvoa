@@ -543,7 +543,7 @@ class front:
 
             if 'from_db' not in columns:
                 kwargs['input']['from_db']=True
-            tokeep = ['date', 'where', 'code','from_db'] + which + (['geometry'] if 'geometry' in columns else [])
+            tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
             maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
