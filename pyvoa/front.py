@@ -507,7 +507,14 @@ class front:
             kwargs['which'] = kwargs.get('which')
 
             if kwargs['which'] == '':
-                kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
+                try:
+                    if kwargs['input'].empty:
+                        kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
+                    else:
+                        kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date'])
+                except:
+                    PyvoaError("Don't know which valu can be requested")
+
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 transfo = convertmercator(self.gpdbuildergeo)
@@ -520,12 +527,9 @@ class front:
                     raise PyvoaError("['date', 'where'] must be in your pandas")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                #when = kwargs.get('when')
                 kwargs = coco.GPDBuilder().get_stats(**kwargs)
                 self.db = 'in-house data'
-                kwargs['input'] = kwargs['input'].loc[kwargs['input']['where'].isin(kwargs['where'])]
-                self.allvisu = AllVisu(self.db, kwargs['input'])
-
+                self.allvisu = AllVisu(self.db, kwargs['input'].copy())
             if kwargs['what'] != 'current':
                 kwargs['which'] = [ i + ' '+ kwargs['what'] for i in kwargs['which']]
                 kwargs['input'] = kwargs['input'].drop(columns=[c for c in kwargs['input'].columns if c.startswith(kwargs['which'][0]) and c ==kwargs['which'][0]+' '+kwargs['what']])
@@ -548,6 +552,7 @@ class front:
             kwargs['which'] = which
             maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
             kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
+
             return func(self,**kwargs)
         return wrapper
 
@@ -1125,9 +1130,8 @@ class front:
             typeofplot = kwargs.get('typeofplot',self.listplot()[0])
             if kwargs.get('output'):
                 kwargs.pop('output')
-
             if typeofplot == 'versus' and len(which)>2:
-                raise PyvoaError(" versu can be used with 2 variables and only 2 !")
+                raise PyvoaError(" versus can be used with 2 variables and only 2 !")
             if kwargs.get('pop'):
                 kwargs.pop('pop')
             if self.getvis():
@@ -1209,7 +1213,6 @@ class front:
         hand the undecorated body the figure it has built. :meth:`whattodo` lists every
         argument together with the values it accepts.
         """
-
         self.setnamefunction(self.plot)
         ''' show plot '''
         if self.getvis() == 'bokeh':
