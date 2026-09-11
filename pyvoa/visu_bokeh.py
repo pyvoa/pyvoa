@@ -404,7 +404,6 @@ class visu_bokeh:
         legend = kwargs.get('legend', None)
 
         ay_type = kwargs.get('scale', None)
-        self.av.d_graphicsinput_args['scale']
 
         if ay_type is None:
             ay_type = [i for i in self.av.d_graphicsinput_args['scale'] if i]
@@ -1502,10 +1501,10 @@ class visu_bokeh:
         which = kwargs.get('which')
         color_mapper = kwargs['color_mapper']
         bokeh_figure = kwargs['bokeh_figure_map']
-        tile = kwargs.get('tile')
+        tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
         if kwargs['typeofmap']!='dense':
-            tile = visu_bokeh.convert_tile(tile, 'bokeh')
+            tile = visu_bokeh.convert_tile(tile)
             wmt = WMTSTileSource(url = tile)
             bokeh_figure.add_tile(wmt, retina=True)
 
@@ -1552,14 +1551,11 @@ class visu_bokeh:
         export_png(fig, filename = name)
 
     @staticmethod
-    def convert_tile(tilename, which = 'bokeh'):
+    def convert_tile(tilename):
         """Return tiles url according to folium or bokeh resquested."""
-        tile = 'openstreet'
+        tile = ''
         if tilename == 'openstreet':
-            if which == 'folium':
-                tile = r'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-            else:
-                tile = r'http://c.tile.openstreetmap.org/{Z}/{X}/{Y}.png'
+            tile = r'http://c.tile.openstreetmap.org/{Z}/{X}/{Y}.png'
         elif tilename == 'positron':
             #print('Problem with positron tile (huge http resquest need to check), esri is then used ...')
             #tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
@@ -1569,5 +1565,5 @@ class visu_bokeh:
         elif tilename == 'stamen':
             tile = r'http://tile.stamen.com/toner/{z}/{x}/{y}.png'
         else:
-            print('Don\'t know you tile ... take default one: ')
+            PyvoaWarning('Don\'t know you tile ...')
         return tile
