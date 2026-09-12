@@ -11,12 +11,12 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
-from matplotlib.ticker import FuncFormatter
 import matplotlib.dates as mdates
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.ticker import FuncFormatter
 
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
@@ -439,7 +439,7 @@ class visu_matplotlib:
 
         # plot
         input_missing = input[
-            input['from_db'] == False
+            ~input['from_db'].astype(bool)
             ]
 
         plot = input.plot(
