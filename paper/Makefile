@@ -5,6 +5,7 @@
 #   make figures re-run the examples that produce figures/
 #   make check   run the paper/code consistency tests alone
 #   make clean   remove build artefacts, keep the PDFs
+#   make clean-figures  remove the generated figures/ (not the drawn ones)
 #
 # Needs a TeX distribution carrying elsarticle (TeX Live: texlive-publishers).
 # latexmk is used when present (texlive-extra-utils), pdflatex otherwise.
@@ -14,13 +15,19 @@ PDFLATEX ?= pdflatex
 PYTHON  ?= python3
 MAIN     = main.tex
 
+# Only the figures paper_examples.py writes. figures/ also holds drawn
+# artwork (the architecture schema), which no rule here may remove: it is
+# not reproducible from the code.
+FIGURES  = figures/fig2_timeseries_weu.pdf figures/fig3_map_g20.pdf \
+           figures/fig4_hist_spf.pdf figures/fig5_ebola_drc.pdf
+
 # latexmk is not in every TeX installation (Debian/Ubuntu ship it in
 # texlive-extra-utils, separately from the class itself). Fall back to three
 # pdflatex passes, which is what latexmk would run here: the bibliography is a
 # manual thebibliography, so there is no bibtex step to get right.
 HAVE_LATEXMK := $(shell command -v $(LATEXMK) 2>/dev/null)
 
-.PHONY: all draft final check clean distclean
+.PHONY: all draft final check figures clean clean-figures distclean
 
 all: draft
 
@@ -67,5 +74,11 @@ else
 endif
 	@rm -f main.bbl main.run.xml
 
-distclean: clean
+# Kept out of clean, which promises to leave the PDFs alone: re-making these
+# means re-running the examples, i.e. re-downloading the data.
+clean-figures:
+	@rm -f $(FIGURES)
+	@echo "-> generated figures removed; make figures rebuilds them"
+
+distclean: clean clean-figures
 	@rm -f pyvoa-softwarex.pdf pyvoa-softwarex-draft.pdf
