@@ -231,7 +231,7 @@ table before submission.
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
 - **`CHANGELOG.md` does not follow Keep a Changelog.** It predates the project;
   `CONTRIBUTING.md` §4.7 documents its actual convention. Do not restructure it.
-- **`requirements.txt` is kept, not deleted.** Since `7e04993` it is a comment
+- **`requirements.txt` is kept, not deleted.** Since `df27b3a` it is a comment
   block plus a single `.`, which installs the project and lets pip resolve
   dependencies from the packaging metadata. It has to stay at the repository root
   because mybinder.org builds its environment from it, and `CONTRIBUTING.md` §3
@@ -246,13 +246,21 @@ table before submission.
 
 ## Two traps in the git history
 
-- **The `v0.1.0`, `v0.2.0`, `v0.2.2` and `v0.3.0` tags are not ancestors of
-  `main`.** The early history was rewritten and `main` carries its own copies
-  under different hashes, so a range like `v0.3.0..v0.4.0` silently includes
-  rewritten duplicates — 397 commits, against 378 for the same span measured from
-  `main`'s own 0.3.0 release commit (`638bce2..v0.4.0`). Use `main`'s release
-  commits as boundaries. Two releases, **0.2.1 and 0.3.1, were published to PyPI
-  but never tagged at all**.
+- **Every tag is an ancestor of `main` again, since 2026-09-12.** It was not so
+  before: the early history had been rewritten, `main` carried its own copies of
+  it under different hashes, and `v0.1.0` to `v0.3.0` pointed into the orphaned
+  line, so a range like `v0.3.0..v0.4.0` silently included duplicates. The two
+  lines differed only by a signature on the root commit, which the
+  history rewrite of that day stripped, and git then saw them as one. Ranges
+  measured from a tag are trustworthy now. Still true: two releases, **0.2.1 and
+  0.3.1, were published to PyPI but never tagged at all**.
+- **Commit hashes before 2026-08-05 are stable; the ones after are not.** That
+  rewrite removed the agent guidance file and the AI attribution trailers from
+  every commit, so everything from `30c950f` onward was given a new hash — the
+  tags included, `v0.5.0` among them. A hash quoted in an issue, a notebook or a
+  reviewer's notes from before that date still resolves; a later one does not.
+  `pyvoa-before-rewrite-20260912.bundle`, kept beside the repository, holds the
+  history as it stood.
 - **Commit subjects do not always match what shipped.** The 0.4.0 rename table in
   `CHANGELOG.md` was built by diffing the front methods and the option vocabulary
   between the two trees, not by transcribing the log, and that caught two errors:
