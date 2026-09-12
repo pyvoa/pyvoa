@@ -1,4 +1,5 @@
 # Unreleased
+- Docstring updates
 - Adding an ASCII banner when loading the front
 - Enhancement and compatibility fixes for notebooks and py file examples
 - Highlight locations absent from the original database in pink on the map.
