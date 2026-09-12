@@ -59,7 +59,10 @@ universally-implemented part of the Jupyter messaging protocol
 rather than on any particular ANSI parser.
 
 Project : pyvoa
-See https://pyvoa.org and https://github.com/pyvoa/pyvoa/
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
+Copyright ©pyvoa_org
+License : see the joint LICENSE file
+https://pyvoa.org/
 """
 
 import html

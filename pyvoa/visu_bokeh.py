@@ -1,4 +1,3 @@
-
 """The bokeh visualisation backend.
 
 The most complete of the three backends: the only one offering the ``compare``
@@ -11,6 +10,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import base64
 import bisect
 import itertools
@@ -282,29 +282,22 @@ class visu_bokeh:
         Parameters
         ----------
         input : pd.DataFrame
-            If None, take the first element. A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds.
         which : list
-            If None, take the second element. It must be a list of dimension 2, and
-            both variables must be present in the DataFrame considered.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
+            Exactly two variables, drawn against each other: the first on the x
+            axis, the second on the y axis.
         title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        mode : str
-            Default is 'mouse'.
-        dateslider : bool
-            Default is None. If True, orientation is horizontal.
-        when : str
-            Default is the min and the max of the input DataFrame. Dates are given
-            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
-            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
-            max date.
+            The title of the figure.
+        mode : {'mouse', 'vline', 'hline'}
+            How the hover tool follows the pointer.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
+        under 'bokeh_figure_linear' and 'bokeh_figure_log'.
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
@@ -363,30 +356,26 @@ class visu_bokeh:
         Parameters
         ----------
         input : pd.DataFrame
-            If None, take the first element. A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds.
         which : list
-            If None, take the second element. It could be a list.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
+            The variable(s) to draw against time, one line per variable and per
+            location.
         title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        mode : str
-            Default is 'mouse'.
+            The title of the figure.
+        mode : {'mouse', 'vline', 'hline'}
+            How the hover tool follows the pointer.
         guideline : bool
-            Default is False.
-        dateslider : bool
-            Default is None. If True, orientation is horizontal.
-        when : str
-            Default is the min and the max of the input DataFrame. Dates are given
-            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
-            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
-            max date.
+            Whether to draw the guide lines.
+        scale : {'linear', 'log'}
+            The axis type the tab of that name carries.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
+        under 'bokeh_figure_linear_date' and 'bokeh_figure_log_date'.
         """
         input = kwargs.get('input')
 
@@ -609,30 +598,22 @@ class visu_bokeh:
         Parameters
         ----------
         input : pd.DataFrame
-            If None, take the first element. A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds.
         which : list
-            If None, take the second element. It could be a list.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
-        title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        mode : str
-            Default is 'mouse'.
+            The variable(s) to draw against time. The menu picks the location.
+        mode : {'mouse', 'vline', 'hline'}
+            How the hover tool follows the pointer.
         guideline : bool
-            Default is False.
-        dateslider : bool
-            Default is None. If True, orientation is horizontal.
-        when : str
-            Default is the min and the max of the input DataFrame. Dates are given
-            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
-            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
-            max date.
+            Whether to draw the guide lines.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type, titles them and
+        passes them in, under 'bokeh_figure_linear_date' and
+        'bokeh_figure_log_date'.
         """
         input = kwargs.get('input')
         which= kwargs.get('which')
@@ -724,33 +705,27 @@ class visu_bokeh:
     def bokeh_yearly_plot(self,**kwargs):
         """Create a yearly plot according to arguments.
 
+        Draws every year of the series on the same twelve-month axis, so that the
+        seasons can be compared.
+
         Parameters
         ----------
         input : pd.DataFrame
-            If None, take the first element. A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds.
         which : list
-            If None, take the second element. It could be a list.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
-        title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        mode : str
-            Default is 'mouse'.
+            The variable(s) to draw, one curve per year.
+        mode : {'mouse', 'vline', 'hline'}
+            How the hover tool follows the pointer.
         guideline : bool
-            Default is False.
-        dateslider : bool
-            Default is None. If True, orientation is horizontal.
-        when : str
-            Default is the min and the max of the input DataFrame. Dates are given
-            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
-            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
-            max date.
+            Whether to draw the guide lines.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type, titles them and
+        passes them in, under 'bokeh_figure_yearly' and 'bokeh_figure_yearly_log'.
         """
         input = kwargs['input']
         which = kwargs['which']
@@ -1075,24 +1050,21 @@ class visu_bokeh:
         Parameters
         ----------
         input : pd.DataFrame
-            A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
-        which : list
-            If None, take the second element. It could be a list.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
-        title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        when : str
-            Default is the min and the max of the input DataFrame. Dates are given
-            under the format dd/mm/yyyy: ``[dd/mm/yyyy : dd/mm/yyyy]`` for a range,
-            ``[:dd/mm/yyyy]`` from the min date up to, ``[dd/mm/yyyy:]`` up to the
-            max date.
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds.
+        which : str
+            The variable whose values are binned. The visualizer has already
+            reduced a list to its single element by this point.
+        bins : int
+            The number of bins. Defaults to the value declared in the keyword
+            catalogue, ten.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
+        under 'bokeh_figure_linear' and 'bokeh_figure_loglog'.
         """
         input = kwargs.get('input')
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
@@ -1395,24 +1367,25 @@ class visu_bokeh:
 
         Parameters
         ----------
-        pyvoafiltered : pd.DataFrame
-            A DataFrame with a pyvoa structure is
-            mandatory: ``|location|date|Variable desired|daily|cumul|weekly|code|
-            clustername|rolloverdisplay|``.
-        which : list
-            If None, take the second element. It could be a list.
-        plot_heigh : int
-            Default is Width_Height_Default[1].
-        graph_width : int
-            Default is Width_Height_Default[0].
-        title : str
-            Default is None.
-        copyright : str
-            Default is the pyvoa copyright.
-        mode : str
-            Default is 'mouse'.
+        columndatasrc : bokeh.models.ColumnDataSource
+            The slices to draw -- one row per location, with its angle, its
+            colour and its share -- as the histogram decorator prepared them.
+            This chart is given that source rather than the table itself.
+        which : str
+            The variable whose share each location takes a slice of. The
+            visualizer has already reduced a list to its single element here.
+        mode : {'mouse', 'vline', 'hline'}
+            How the hover tool follows the pointer.
         dateslider : bool
-            Default is None. If True, orientation is horizontal.
+            Whether a slider over the dates is drawn beside the chart.
+        controls : bokeh widgets, optional
+            The widgets to lay out beside the chart, the date slider among them.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
+        under 'bokeh_figure_linear'.
         """
         columndatasrc = kwargs.get('columndatasrc')
         fig = kwargs.get('bokeh_figure_linear')

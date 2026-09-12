@@ -1,4 +1,3 @@
-
 """The matplotlib visualisation backend.
 
 Static charts: the ``date``, ``versus`` and ``yearly`` plots, the three
@@ -11,6 +10,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import matplotlib.dates as mdates
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -26,7 +26,13 @@ from pyvoa.tools import (
 
 
 class visu_matplotlib:
-    """MATPLOTLIB chart drawing methods ..."""
+    """The matplotlib backend, drawing static charts.
+
+    Offers the 'date', 'versus' and 'yearly' plots, the three histogram kinds and
+    maps. Every figure is created by the ``decomatplotlib`` decorator, which also
+    stamps the pyvoa logo on it, so the methods here receive the axes to draw on
+    rather than making them.
+    """
 
     def __init__(self,):
         """Pick the matplotlib backend that suits the environment.

@@ -11,6 +11,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 from pyvoa.__version__ import __version__
 
 __all__ = ["__version__"]
