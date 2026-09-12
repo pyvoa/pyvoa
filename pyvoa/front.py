@@ -64,6 +64,7 @@ from pyvoa.tools import (
 from pyvoa.tools import get_verbose_mode as _get_verbose_mode
 from pyvoa.tools import set_verbose_mode as _set_verbose_mode
 from pyvoa.visualizer import AllVisu
+from pyvoa._banner import print_banner
 
 
 def getversion():
@@ -84,8 +85,7 @@ def getversion():
     except Exception:
         return "unknown"
 
-print(f"\033[1m\033[92m ✨ Welcome to PyVOA (version {getversion()}) ✨\033[0m")
-print("See https://pyvoa.org")
+print_banner(getversion())
 
 
 class front:
