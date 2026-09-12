@@ -10,6 +10,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import argparse
 
 # Basic metadata. The version and the author list live in pyvoa/__version__.py,

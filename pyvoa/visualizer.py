@@ -1,4 +1,3 @@
-
 """Dispatch of chart requests to the visualisation backends.
 
 ``AllVisu`` holds the drawing settings that do not depend on the backend -- the
@@ -13,6 +12,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import datetime as dt
 from functools import wraps
 

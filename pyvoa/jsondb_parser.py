@@ -14,6 +14,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import importlib.resources as pkg_resources
 import itertools
 import json
