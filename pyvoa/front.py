@@ -436,7 +436,7 @@ class front:
             if not isinstance(input,pd.DataFrame):
                 raise PyvoaError('input field must be a pd.DataFrame()!')
             if not input.empty: 
-                if not 'date' in input or not 'where' in input:
+                if 'date' not in input or 'where' not in input:
                     raise PyvoaError('input should have date and where columns')
                 if len(input.columns)<3:
                     raise PyvoaError('input should have date, where and at least one data column') 
@@ -518,8 +518,8 @@ class front:
                         kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
                     else:
                         kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date','code','geometry'])
-                except:
-                    PyvoaError("Don't know which valu can be requested")
+                except Exception:
+                    raise PyvoaError("Don't know which valu can be requested")
 
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
@@ -547,7 +547,7 @@ class front:
             ext = ' '.join(kwargs['option'])
             d = {i:i + ext for i in kwargs['which']}
             which = list(d.values())
-            cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d.keys()]
+            cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
             kwargs['input'] = kwargs['input'].rename(columns=d)
 

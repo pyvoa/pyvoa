@@ -500,7 +500,7 @@ class GPDBuilder:
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
 
-       uniqwhere=list(input['where'].unique())
+       # uniqwhere=list(input['where'].unique())
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:

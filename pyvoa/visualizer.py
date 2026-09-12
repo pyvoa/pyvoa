@@ -21,7 +21,7 @@ import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, PyvoaInfo, PyvoaWarning, verb
+from pyvoa.tools import PyvoaError, PyvoaWarning, verb
 
 # The four imports below only probe whether an optional backend is installed;
 # the backends themselves are imported lazily, hence the noqa on each of them.
@@ -64,6 +64,7 @@ if FOLIUM_AVAILABLE:
 import importlib.resources as pkg_resources
 
 import pyvoa
+
 
 class AllVisu:
     """Dispatcher routing a chart request to the backend that draws it.
@@ -173,7 +174,7 @@ class AllVisu:
 
             kwargs['logo'] = self.logo
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
-            windows =  InputOption().windows
+            # windows =  InputOption().windows
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
             if not kwargs['dateslider']:

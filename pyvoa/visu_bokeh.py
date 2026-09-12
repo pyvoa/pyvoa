@@ -44,6 +44,7 @@ from bokeh.models import (
     Range1d,
     Row,
     Select,
+    Title,
     Toggle,
     WMTSTileSource,
 )
@@ -53,9 +54,8 @@ from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, min_max_range, verb, PyvoaWarning
+from pyvoa.tools import PyvoaError, PyvoaWarning, min_max_range, verb
 
-from bokeh.models import Title
 
 def safe_output_notebook():
     """Enable bokeh's notebook output, but only inside a notebook.
@@ -846,7 +846,7 @@ class visu_bokeh:
             input = kwargs['input']
 
             input_missing = input[
-                input['from_db'] == False
+                ~input['from_db'].astype(bool)
                 ]
 
             which  = kwargs.get('which')
@@ -1496,10 +1496,10 @@ class visu_bokeh:
         -------
         The bokeh figure holding the map.
         """
-        input = kwargs.get('input')
-        geocolumndatasrc = kwargs.get('geocolumndatasrc')
-        which = kwargs.get('which')
-        color_mapper = kwargs['color_mapper']
+        # input = kwargs.get('input')
+        # geocolumndatasrc = kwargs.get('geocolumndatasrc')
+        # which = kwargs.get('which')
+        # color_mapper = kwargs['color_mapper']
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
