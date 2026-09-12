@@ -40,6 +40,7 @@ import pandas as pd
 import pyvoa.geo as coge
 import pyvoa.geopd_builder as coco
 import pyvoa.help as h
+from pyvoa._banner import print_banner
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
@@ -64,7 +65,6 @@ from pyvoa.tools import (
 from pyvoa.tools import get_verbose_mode as _get_verbose_mode
 from pyvoa.tools import set_verbose_mode as _set_verbose_mode
 from pyvoa.visualizer import AllVisu
-from pyvoa._banner import print_banner
 
 
 def getversion():

@@ -149,52 +149,56 @@ def render_ansi(version: str) -> str:
     return "\n".join(f" {icon}   {cap}" for icon, cap in _rows(_ICON, _CAPTION, version))
 
 
-def _icon_to_html_rows():
-    """Re-emit ``_ICON``'s own SGR codes as inline-styled ``<span>`` HTML.
+def _ansi_line_to_html(line):
+    """Re-emit one SGR-coloured line as inline-styled ``<span>`` HTML.
 
     Parses only the small, fixed vocabulary of codes this module itself
     generates (plain reset, background reset, 24-bit fg/bg) -- not a general
     ANSI-to-HTML converter -- so there is no dependency on how any given
     notebook front-end would otherwise interpret the escapes.
     """
-    rows = []
-    for line in _ICON:
-        spans, fg, bg, pos, buf = [], None, None, 0, ""
+    spans, fg, bg, pos, buf = [], None, None, 0, ""
 
-        def flush():
-            nonlocal buf
-            if buf:
-                style = ";".join(
-                    s for s in (
-                        f"color:rgb({fg[0]},{fg[1]},{fg[2]})" if fg else "",
-                        f"background-color:rgb({bg[0]},{bg[1]},{bg[2]})" if bg else "",
-                    ) if s
-                )
-                attr = f' style="{style}"' if style else ""
-                spans.append(f"<span{attr}>{html.escape(buf)}</span>")
-                buf = ""
+    def flush():
+        nonlocal buf
+        if buf:
+            style = ";".join(
+                s for s in (
+                    f"color:rgb({fg[0]},{fg[1]},{fg[2]})" if fg else "",
+                    f"background-color:rgb({bg[0]},{bg[1]},{bg[2]})" if bg else "",
+                ) if s
+            )
+            attr = f' style="{style}"' if style else ""
+            spans.append(f"<span{attr}>{html.escape(buf)}</span>")
+            buf = ""
 
-        for m in _SGR_RE.finditer(line):
-            buf += line[pos:m.start()]
-            flush()
-            codes = m.group(1).split(";") if m.group(1) else ["0"]
-            i = 0
-            while i < len(codes):
-                c = codes[i]
-                if c in ("", "0"):
-                    fg = bg = None
-                elif c == "49":
-                    bg = None
-                elif c == "38" and codes[i + 1] == "2":
-                    fg = tuple(int(v) for v in codes[i + 2:i + 5]); i += 4
-                elif c == "48" and codes[i + 1] == "2":
-                    bg = tuple(int(v) for v in codes[i + 2:i + 5]); i += 4
-                i += 1
-            pos = m.end()
-        buf += line[pos:]
+    for m in _SGR_RE.finditer(line):
+        buf += line[pos:m.start()]
         flush()
-        rows.append("".join(spans))
-    return rows
+        codes = m.group(1).split(";") if m.group(1) else ["0"]
+        i = 0
+        while i < len(codes):
+            c = codes[i]
+            if c in ("", "0"):
+                fg = bg = None
+            elif c == "49":
+                bg = None
+            elif c == "38" and codes[i + 1] == "2":
+                fg = tuple(int(v) for v in codes[i + 2:i + 5])
+                i += 4
+            elif c == "48" and codes[i + 1] == "2":
+                bg = tuple(int(v) for v in codes[i + 2:i + 5])
+                i += 4
+            i += 1
+        pos = m.end()
+    buf += line[pos:]
+    flush()
+    return "".join(spans)
+
+
+def _icon_to_html_rows():
+    """Return the whole ``_ICON``, one HTML row per icon line."""
+    return [_ansi_line_to_html(line) for line in _ICON]
 
 
 def render_html(version: str) -> str:
@@ -202,8 +206,10 @@ def render_html(version: str) -> str:
     icon_rows = _icon_to_html_rows()
     caption = [
         "",
-        f'<b style="color:rgb(235,40,40)">Pyvoa</b>&nbsp;&nbsp;'
-        f'<span style="opacity:.6">(version {html.escape(version)})</span>',
+        (
+            f'<b style="color:rgb(235,40,40)">Pyvoa</b>&nbsp;&nbsp;'
+            f'<span style="opacity:.6">(version {html.escape(version)})</span>'
+        ),
         '<span style="opacity:.6">Python Virus Open Analysis</span>',
         "",
         '<a href="https://pyvoa.org">https://pyvoa.org</a>',
