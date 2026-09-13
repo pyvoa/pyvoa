@@ -396,11 +396,11 @@ class front:
             input = kwargs.get('input',pd.DataFrame())
             if not isinstance(input,pd.DataFrame):
                 raise PyvoaError('input field must be a pd.DataFrame()!')
-            if not input.empty: 
+            if not input.empty:
                 if 'date' not in input or 'where' not in input:
                     raise PyvoaError('input should have date and where columns')
                 if len(input.columns)<3:
-                    raise PyvoaError('input should have date, where and at least one data column') 
+                    raise PyvoaError('input should have date, where and at least one data column')
 
             if self.gpdbuilderdata is None and input.empty:
                 raise PyvoaError("Does setwhom has been defined ???")
@@ -517,9 +517,6 @@ class front:
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
-            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
-            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
-
             return func(self,**kwargs)
         return wrapper
 
@@ -592,6 +589,8 @@ class front:
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis
+            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
+            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
             if 'get' not in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:
