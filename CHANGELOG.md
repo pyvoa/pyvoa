@@ -61,6 +61,12 @@
   that names the offending entries.
 - Python 3.13 is declared as supported and added to the CI test matrix, which
   now covers 3.10, 3.11, 3.12 and 3.13.
+- Python 3.14 joins them: the classifier is declared in `pyproject.toml`, the
+  runtime is listed in `codemeta.json` and `schemaorg.jsonld`, and the `test`
+  job of the CI matrix now runs the offline suite on 3.10 through 3.14. The
+  manuscript's code-metadata table follows. Nothing in the package needed a
+  change — no module removed in 3.14 is imported — so this is a claim the
+  matrix now verifies rather than a port.
 - fix: the four `GeoInfo` tests built a real `GeoInfo(0)`, which builds a
   `GeoManager` and downloads about ten pages, so they failed on CI and passed
   locally only on a warm cache. They now use `GeoInfo.__new__`, like the
