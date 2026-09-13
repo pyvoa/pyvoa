@@ -144,6 +144,8 @@ class AllVisu:
                 kwargs['legend'] = 'sum all location'
             if func.__name__ == 'plot' and title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database'
+
+            loc=list(input['where'].unique())
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             return func(self, **kwargs)
