@@ -216,7 +216,7 @@ C4 & Code versioning system used & git \\
 \hline
 C5 & Software code languages, tools and services used &
 Python~3; JSON database descriptors; pytest; ruff; GitHub Actions (lint, test
-matrix on Python 3.10--3.13, weekly network tests); PyPI; Zenodo \\
+matrix on Python 3.10--3.14, weekly network tests); PyPI; Zenodo \\
 \hline
 C6 & Compilation requirements, operating environments \& dependencies &
 Python~$\geq$~3.10. Required, with the lower bound each is tested against:
@@ -552,7 +552,7 @@ The catalogue grew from 12 to 25 databases; payloads moved to the Zenodo
 mirrors; packaging moved to PEP~621; an offline test suite was added, in which
 any test needing an upstream server must be marked and is deselected by default,
 so that a test cannot silently start depending on the network; and continuous
-integration on GitHub Actions runs linting, the suite on Python 3.10 to 3.13,
+integration on GitHub Actions runs linting, the suite on Python 3.10 to 3.14,
 and the network tests on a weekly schedule. Releases are published on PyPI and
 archived on Zenodo with a concept DOI. The repository carries
 \texttt{CITATION.cff}, \texttt{codemeta.json}, \texttt{.zenodo.json},
