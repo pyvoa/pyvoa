@@ -38,7 +38,17 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 
 class GPDBuilder:
-   """GPDBuilder class."""
+   """One database, joined to its geography and ready to be queried.
+
+   Built from the name of a database: parses it through
+   ``pyvoa.jsondb_parser``, attaches the geometry of the locations it covers,
+   and keeps the result as a single GeoDataFrame. :meth:`get_stats` then applies
+   to it the statistical options a query asks for -- daily and weekly
+   differences, smoothing, cumulative sums, normalisation by population.
+
+   ``front`` builds one of these per database selected with ``setwhom()``; there
+   is no reason to build one directly.
+   """
 
    def __init__(self, db_name = None):
         """Build the GeoDataFrame of one database.
@@ -500,7 +510,7 @@ class GPDBuilder:
        if input.empty:
            raise PyvoaError('Data seems to be empty for :'+str(where))
 
-       uniqwhere=list(input['where'].unique())
+       # uniqwhere=list(input['where'].unique())
        others = sorted([c for c in input.columns if c not in prefix + suffix])
        new_order = prefix + others + suffix
        if 'geometry' not in input.columns:
@@ -568,6 +578,11 @@ class GPDBuilder:
        savename : str
            The file name, without its extension. Default is 'pyvoa_out', hence
            pyvoa_out.xlsx or pyvoa_out.csv.
+
+       Notes
+       -----
+       The 'date' column is rewritten as dd/mm/yyyy strings in place, on the
+       frame given rather than on a copy of it.
        """
        possibleformat=['excel','csv']
        saveformat = 'excel'

@@ -207,11 +207,31 @@ class _FakeGeoManager:
     def __init__(self, standard="name"):
         self.standard = standard
 
+    def _code(self, item):
+        """Return the iso3 code of a location given by its code or its name."""
+        for code, name in self._NAMES.items():
+            if item.upper() in (code, name.upper()):
+                return code
+        return item.upper()
+
     def to_standard(self, w, output="list", db=None, **kwargs):
-        names = {code: self._NAMES.get(code, code.title()) for code in w}
+        """Standardise a location, or a list of them, as the real one does.
+
+        Two details of GeoManager.to_standard matter to the parser and are
+        reproduced here: a bare string is a single location rather than a
+        sequence of characters, and the dict output is keyed on the input,
+        not on the standardised value.
+        """
+        if isinstance(w, str):
+            w = [w]
+        standard = [
+            self._code(item) if self.standard == "iso3"
+            else self._NAMES.get(self._code(item), item.title())
+            for item in w
+        ]
         if output == "dict":
-            return names
-        return list(names.values())
+            return dict(zip(w, standard))
+        return standard
 
 
 class _FakeGeoInfo:

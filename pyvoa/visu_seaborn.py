@@ -1,4 +1,3 @@
-
 """The seaborn visualisation backend.
 
 Static statistical charts: the ``date``, ``versus`` and ``yearly`` plots and
@@ -12,6 +11,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 from functools import wraps
 
 import matplotlib.image as mpimg
@@ -22,8 +22,6 @@ from pyvoa.tools import PyvoaWarning
 
 
 class visu_seaborn:
-    ######SEABORN#########
-    ######################
     """The seaborn backend, drawing static statistical charts.
 
     Offers the 'date', 'versus' and 'yearly' plots and the three histogram
@@ -106,10 +104,16 @@ class visu_seaborn:
             return func(self, **kwargs)
         return inner_hist
 
-    #####SEABORN PLOT#########
     @decoplotseaborn
     def seaborn_date_plot(self, **kwargs):
-        """Create a seaborn line plot with date on x-axis and which on y-axis."""
+        """Draw one line per location against time.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' and the 'plt' and
+            'sns' supplied by the decorator.
+        """
         input = kwargs['input']
         list(input['where'].unique())
         what = kwargs['what']
@@ -202,7 +206,17 @@ class visu_seaborn:
     @decoplotseaborn
     @decohistseaborn
     def seaborn_hist_value(self, **kwargs):
-        """Create a seaborn vertical histogram where the x-axis represents a numerical field."""
+        """Draw the distribution of a variable's values.
+
+        Bins the values themselves, over every location and date selected, rather
+        than showing one bar per location.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' and the 'plt' and
+            'sns' supplied by the decorator.
+        """
         input = kwargs['input']
         what = kwargs['what']
         sns = kwargs.get('sns')
@@ -212,11 +226,20 @@ class visu_seaborn:
         plt.xlabel(what)
         plt.ylabel('Frequency')
 
-    ######SEABORN HIST HORIZONTALE#########
     @decoplotseaborn
     @decohistseaborn
     def seaborn_hist_horizontal(self, **kwargs):
-        """Create a seaborn horizontal histogram with which on x-axis."""
+        """Draw one horizontal bar per location.
+
+        The bars are the value each location reaches on the last date selected,
+        sorted; with the 'sumall' option every location is summed into one bar.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' and the 'plt' and
+            'sns' supplied by the decorator.
+        """
         input = kwargs['input']
         what = kwargs['what']
         # title = kwargs.get('title')
@@ -234,10 +257,20 @@ class visu_seaborn:
         plt.xticks(rotation=45)
 
 
-    ######SEABORN BOXPLOT#########
     @decoplotseaborn
     def seaborn_pie(self, **kwargs):
-        """Create a seaborn pairplot."""
+        """Draw nothing: the seaborn pie chart is not implemented.
+
+        The method exists so that the dispatch finds a callable for
+        ``typeofhist='pie'`` under this backend, but its body only labels the axes
+        of the empty figure the decorator made. Use bokeh or matplotlib for a pie.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' and the 'plt' and
+            'sns' supplied by the decorator.
+        """
         # input = kwargs['input']
         what = kwargs['what']
         plt = kwargs.get('plt')
@@ -247,10 +280,20 @@ class visu_seaborn:
         plt.ylabel('')
         plt.xticks(rotation=45)
 
-    ######SEABORN heatmap#########
     @decoplotseaborn
     def seaborn_heatmap(self, **kwargs):
-        """Create a seaborn heatmap."""
+        """Draw a month-by-year heatmap of a variable.
+
+        Pivots the series into months against years and annotates each cell, with
+        the total written under the map. It warns on every call that it has not
+        been checked.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments, including 'input', 'what' and the 'plt' and
+            'sns' supplied by the decorator.
+        """
         PyvoaWarning("BEWARE !!! THIS visualisation need to be checked !!!")
         input = kwargs.get('input')
         what = kwargs['what']

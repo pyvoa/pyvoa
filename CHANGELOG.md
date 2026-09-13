@@ -1,4 +1,7 @@
 # Unreleased
+- Docstring updates
+- Adding an ASCII banner when loading the front
+- Enhancement and compatibility fixes for notebooks and py file examples
 - Highlight locations absent from the original database in pink on the map.
 - Add log scale in Bokeh
 - Remove duplicate columns in the main pandas
@@ -143,7 +146,7 @@ Errors, warnings and verbosity:
   when a French map archive or a datetime column is read is swallowed below
   verbosity 2. This entry used to say that `set_verbose_mode()` was exposed on
   the front module as well. It was, on `main`, from `27bb133` (february 2026)
-  until `a7220e0` cleared the lint findings hours before the tag: the name was
+  until `f9088a8` cleared the lint findings hours before the tag: the name was
   only ever imported into `front.py`, never used there, so ruff reported it as
   an unused import and removed it. No released version shipped it, and the
   claim was written four days after the removal. It is true again from the next

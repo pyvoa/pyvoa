@@ -14,7 +14,9 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import importlib.resources as pkg_resources
+import itertools
 import json
 import os.path
 from os import listdir
@@ -26,14 +28,14 @@ import pandas as pd
 import pyvoa
 import pyvoa.geo as coge
 from pyvoa.tools import (
-    PyvoaError,
-    PyvoaWarning,
-    fill_missing_dates,
-    get_live_mode,
-    get_local_from_url,
-    week_to_date,
+  PyvoaError,
+  PyvoaWarning,
+  fill_missing_dates,
+  get_live_mode,
+  get_local_from_url,
+  week_to_date,
 )
-import itertools
+
 
 class MetaInfo:
   """The catalogue of the databases pyvoa ships.

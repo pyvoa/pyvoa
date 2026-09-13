@@ -1,4 +1,3 @@
-
 """The catalogue of keyword arguments pyvoa accepts.
 
 ``InputOption`` holds the data-selection arguments (``where``, ``which``,
@@ -13,6 +12,7 @@ Copyright ©pyvoa_org
 License : see the joint LICENSE file
 https://pyvoa.org/
 """
+
 import importlib
 
 import pandas as pd
@@ -84,7 +84,18 @@ class InputOption:
         self.dicokfront = {}
 
     def test_add_graphics_libraries(self,libraries):
-        """Tests the presence of the specified graphical libraries."""
+        """Report which of the given graphical libraries are installed.
+
+        Parameters
+        ----------
+        libraries : list of str
+            The module names to try to import.
+
+        Returns
+        -------
+        dict
+            One entry per name given, True if importing it succeeded.
+        """
         results = {}
         for lib in libraries:
             try:
