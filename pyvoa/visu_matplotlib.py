@@ -471,14 +471,9 @@ class visu_matplotlib:
                 edgecolor='black',
                 linewidth=0.2,
             )
-            ax.text(
-                0.5, 0.05, "In pink: no data available",
-                ha='center',
-                color='#E91E63',
-                fontsize=10,
-                transform=ax.transAxes,
-                bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.8, 'pad': 3},
-            )
+            ax.text(0.5, 0.05, "In pink: no data available",
+            ha='center', color='#E91E63', fontsize=10, transform=ax.transAxes,
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8, pad=3))
 
 
         cbar = plot.get_figure().axes[-1]
