@@ -151,8 +151,8 @@ Errors, warnings and verbosity:
 - Warnings are quiet at verbosity 1, and the noise that external modules print
   when a French map archive or a datetime column is read is swallowed below
   verbosity 2. This entry used to say that `set_verbose_mode()` was exposed on
-  the front module as well. It was, on `main`, from `27bb133` (february 2026)
-  until `f9088a8` cleared the lint findings hours before the tag: the name was
+  the front module as well. It was, on `main`, from `36e0768` (february 2026)
+  until `5b127de` cleared the lint findings hours before the tag: the name was
   only ever imported into `front.py`, never used there, so ruff reported it as
   an unused import and removed it. No released version shipped it, and the
   claim was written four days after the removal. It is true again from the next
@@ -228,7 +228,7 @@ from pycoa, so nearly every rename a 0.3.x user has to know about is here.
 
 # version 0.3.1
 First full release on PyPI. No git tag was ever pushed for it; the release was
-prepared in `3384862`.
+prepared in `05b3f0c`.
 
 - cosmetic and docstrings
 - version for pip, first full version

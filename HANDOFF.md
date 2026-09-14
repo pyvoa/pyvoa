@@ -231,7 +231,7 @@ table before submission.
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
 - **`CHANGELOG.md` does not follow Keep a Changelog.** It predates the project;
   `CONTRIBUTING.md` §4.7 documents its actual convention. Do not restructure it.
-- **`requirements.txt` is kept, not deleted.** Since `df27b3a` it is a comment
+- **`requirements.txt` is kept, not deleted.** Since `c6a5553` it is a comment
   block plus a single `.`, which installs the project and lets pip resolve
   dependencies from the packaging metadata. It has to stay at the repository root
   because mybinder.org builds its environment from it, and `CONTRIBUTING.md` §3
@@ -256,11 +256,20 @@ table before submission.
   0.3.1, were published to PyPI but never tagged at all**.
 - **Commit hashes before 2026-08-05 are stable; the ones after are not.** That
   rewrite removed the agent guidance file and the AI attribution trailers from
-  every commit, so everything from `30c950f` onward was given a new hash — the
+  every commit, so everything from `5ea0b0f` onward was given a new hash — the
   tags included, `v0.5.0` among them. A hash quoted in an issue, a notebook or a
   reviewer's notes from before that date still resolves; a later one does not.
   `pyvoa-before-rewrite-20260912.bundle`, kept beside the repository, holds the
   history as it stood.
+
+  It had to be done a second time on 2026-09-14. A clone that predated the
+  first rewrite was merged back in, which restored the file and the trailers
+  across 219 commits, so the purge was rerun over every branch and tag. Hashes
+  moved again; `pyvoa-before-rewrite-20260914.bundle` is that backup. The
+  second pass also collapsed the 211 duplicate commits the first one had left,
+  which is why `main` is shorter than the reflogs of older clones suggest. Any
+  clone made before 2026-09-14 has the old lineage and must be re-cloned, not
+  pulled: merging one back is exactly what caused this.
 - **Commit subjects do not always match what shipped.** The 0.4.0 rename table in
   `CHANGELOG.md` was built by diffing the front methods and the option vocabulary
   between the two trees, not by transcribing the log, and that caught two errors:
