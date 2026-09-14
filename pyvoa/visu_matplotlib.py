@@ -456,7 +456,7 @@ class visu_matplotlib:
             vmin=min_col,
             vmax=max_col,
             edgecolor='black',
-            linewidth=0.5,
+            linewidth=0.2,
             legend_kwds={
                 'label': which,
                 'orientation': "horizontal",
@@ -469,6 +469,7 @@ class visu_matplotlib:
                 ax=ax,
                 color='#FCE4EC',
                 edgecolor='black',
+                linewidth=0.2,
             )
             ax.text(0.5, 0.05, "In pink: no data available",
             ha='center', color='#E91E63', fontsize=10, transform=ax.transAxes,

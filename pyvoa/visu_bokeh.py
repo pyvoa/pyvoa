@@ -1011,7 +1011,7 @@ class visu_bokeh:
 
                 bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
-                                line_color = 'black', line_width = 0.25, fill_alpha = 1)
+                                line_color = 'black', line_width = 0.2, fill_alpha = 1)
 
                 if not input_missing.empty:
                     input_missing=input_missing.drop(columns='date')
@@ -1025,7 +1025,7 @@ class visu_bokeh:
                         source=geo_missing,
                         fill_color='#FCE4EC',
                         line_color='black',
-                        line_width=0.25
+                        line_width=0.2
                     )
                     bokeh_figure_map.add_layout(
                         Title(text="In pink: no data available", text_color='Pink', text_font_size='12px', align='center'),
