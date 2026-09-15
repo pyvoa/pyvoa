@@ -589,8 +589,6 @@ class front:
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis
-            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
-            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
             if 'get' not in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:

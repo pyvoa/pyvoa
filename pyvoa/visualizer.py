@@ -227,6 +227,8 @@ class AllVisu:
             Puts into the kwargs ``geopdwd``, the pandas of the variable asked for
             over all dates, and ``geopdwd_filtered``, the same for the last date only.
             """
+            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
+            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
             input = kwargs.get('input')
             which = kwargs.get('which')
             # vis = kwargs.get('vis')
