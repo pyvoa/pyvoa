@@ -892,7 +892,6 @@ class visu_bokeh:
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
                 unique_dates = input_dates['date'].drop_duplicates().tolist()
                 unique_where = input_dates['where'].unique().tolist()
-                #unique_dates = [i.strftime("%d/%m/%Y") for i in unique_dates]
                 frames = []
                 cols = list(input_dates.columns)
                 frames = []

@@ -126,7 +126,6 @@ class visu_matplotlib:
         which = kwargs.get('which')
         ax = kwargs['ax']
         legend = kwargs.get('legend',None)
-        kwargs['dicodisplayloc']
         ay_type = kwargs.get('scale',self.av.d_graphicsinput_args['scale'][0])
 
         ax.set_xlabel("date", fontsize=10)
@@ -138,12 +137,7 @@ class visu_matplotlib:
         for idx, i in enumerate(which):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
-                if legend:
-                    label = legend
-                else:
-                    label = f"{kwargs['dicodisplayloc'][where]}"
-                if len(which)>1:
-                    label =f"{kwargs['dicodisplayloc'][where]} — {i}"
+                label = legend
                 ax.plot(
                     df.index,
                     df[where],
@@ -250,7 +244,6 @@ class visu_matplotlib:
 
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
-        input['where']= [kwargs['dicodisplayloc'][w] for w in input['where']]
         input = input.set_index('where')
         ax =  input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)

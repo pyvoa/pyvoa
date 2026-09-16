@@ -516,7 +516,7 @@ class front:
                 kwargs['input']['from_db']=True
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
-            kwargs['which'] = which
+            kwargs['which'] = which   
             return func(self,**kwargs)
         return wrapper
 
