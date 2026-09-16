@@ -267,7 +267,6 @@ class visu_bokeh:
             """Shorten the location labels and drop the geometry, then draw."""
             input=kwargs['input']
             kwargs['maxlettersdisplay']
-            input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
