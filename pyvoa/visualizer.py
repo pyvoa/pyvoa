@@ -146,7 +146,6 @@ class AllVisu:
                 kwargs['title'] = self.database_name.upper() + ' database'
 
             loc=list(input['where'].unique())
-            kwargs['dicodisplayloc'] = { w:(w[:self.maxlettersdisplay] + '…') if len(w) > self.maxlettersdisplay else w for w in loc }
             kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
             kwargs['maxcountrydisplay'] = self.maxcountrydisplay
             return func(self, **kwargs)

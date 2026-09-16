@@ -123,7 +123,7 @@ class visu_seaborn:
         st={k:i for k,i in  enumerate(['-','--',':'])}
         df = input.copy()
         for idx, i in enumerate(what):
-            df[f"legend_{i}"] = [kwargs['dicodisplayloc'][w] for w in input['where']]
+            df[f"legend_{i}"] = input['where']
             #label_col = f'where_{i}'
             #df[label_col] = df['where']
             sns.lineplot(
@@ -249,7 +249,6 @@ class visu_seaborn:
         sns.set_theme(style="whitegrid")
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
-        input['where'] = [kwargs['dicodisplayloc'][w] for w in input['where']]
         sns.barplot(data=input, x=what, y='where', palette="viridis", errorbar=None)
         #plt.title(title)
         plt.xlabel(what)
