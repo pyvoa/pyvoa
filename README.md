@@ -76,7 +76,7 @@ For a source still publishing, that is not always what you want:
 
 ```python
 pf.setlive(True)            # read the upstream sources instead
-pf.setwhom('ebolardc')      # ... and fetch today's file
+pf.setwhom('owid')          # ... and fetch today's file
 pf.getlive()                # True
 pf.setlive(False)           # back to the archive
 ```
@@ -109,7 +109,7 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 
 ## Supported databases
 
-25 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+24 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
 `pf.setwhom(key)` selects one. Each is described by a JSON file in
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
@@ -146,13 +146,11 @@ reproducible; see [Archived data, live data](#archived-data-live-data).
 | `risklayer` | Europe | subregion | Risklayer, for WHO Europe | both |
 | `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut | both |
 | `sciensano` | Belgium | region | Sciensano | both |
-| `sentinellesIRA` | France | region | Réseau Sentinelles — acute respiratory infections | both |
 | `spf` | France | subregion (*départements*) | Santé publique France | both |
 | `spfnational` | France | country | Santé publique France | both |
 | `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | both |
 
-Most of these are COVID-19 series; `mpoxgh` covers mpox, `sentinellesIRA`
-acute respiratory infections, `ebolardc` the 2026 Bundibugyo ebolavirus
+Most of these are COVID-19 series; `mpoxgh` covers mpox, `ebolardc` the 2026 Bundibugyo ebolavirus
 outbreak in the Democratic Republic of the Congo and `measles-usa` the U.S.
 measles cases. Upstream providers stopped updating several of
 these datasets after the pandemic, so the last available date varies from one
