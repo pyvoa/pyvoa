@@ -522,14 +522,15 @@ class DataParser:
       namecodedico={v:k for k,v in codenamedico.items()}
       pandas_db['date']=pandas_db['date'].apply(lambda x: x.strftime('%d/%m/%Y'))
       if locationmode == "code":
-          namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
           pandas_db['where'] = pandas_db['code'].map(codenamedico)
           pandas_db['from_db'] = True
       elif locationmode == "name":
-          namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
-          pandas_db['where'] = pandas_db['where'].map(namedb_namegeo).str.upper()
+          if granularity == 'country':
+              namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
+              pandas_db['where'] = pandas_db['where'].map(namedb_namegeo)
+          pandas_db['where'] = pandas_db['where'].str.upper()
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
           pandas_db['from_db'] = True
       else:
