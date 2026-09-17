@@ -457,9 +457,6 @@ class front:
                         kwargs['where'] = list(self.gpdbuilderdata['where'].unique())
                 else:
                     kwargs['where'] = list(input['where'].unique())
-            else:
-                if self.db != 'in-house data':
-                    self.test_where(kwargs['where'])
 
             if not all_or_none_lists(kwargs['where']):
                 raise PyvoaError('For coherence all the element in where must have the same type list or not list ...')
@@ -516,44 +513,9 @@ class front:
                 kwargs['input']['from_db']=True
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
-            kwargs['which'] = which   
+            kwargs['which'] = which
             return func(self,**kwargs)
         return wrapper
-
-    def test_where(self, where):
-        """Check that every location asked for exists in the database.
-
-        Flattens clusters of locations, then compares case-insensitively
-        against listwhere().
-
-        Parameters
-        ----------
-        where : list
-            the locations to check, possibly nested.
-
-        Returns
-        -------
-        bool
-            True if all of them are known.
-
-        Raises
-        ------
-        PyvoaError
-            naming the locations that are not.
-        """
-        flat_where = []
-        upwhere = [i.upper() for i in self.listwhere()]
-        for w in where:
-            if isinstance(w, list):
-                flat_where.extend(w)
-            else:
-                flat_where.append(w)
-
-        missing = [w for w in flat_where if w.upper() not in upwhere]
-        if missing:
-            raise PyvoaError('This location do not exit in the DB :' + str(missing))
-        else:
-            return True
 
     def input_visuwrapper(func):
         """Refuse a chart the requested backend cannot draw.
