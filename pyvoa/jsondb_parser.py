@@ -488,7 +488,6 @@ class DataParser:
       granularity = self.metadata['geoinfo']['granularity']
       codenamedico = {}
       geopd = pd.DataFrame()
-
       if granularity == 'country':
         info = coge.GeoInfo()
         g = coge.GeoManager('name')
@@ -516,31 +515,31 @@ class DataParser:
           codenamedico = geopd.set_index('code_region')['name_region'].to_dict()
           geopd = geopd.rename(columns=({"code_region": "code","name_region":"where"}))
       else:
-          raise PyvoaError('Not a region nors ubregion ... sorry but what is it ?')
+          raise PyvoaError('Not a region nor subregion ... sorry but what is it ?')
 
       geopd['code'] = geopd['code'].str.upper()
       codenamedico={k.upper():v.upper() for k,v in codenamedico.items()}
       namecodedico={v:k for k,v in codenamedico.items()}
-
+      pandas_db['date']=pandas_db['date'].apply(lambda x: x.strftime('%d/%m/%Y'))
       if locationmode == "code":
+          namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
           pandas_db['where'] = pandas_db['code'].map(codenamedico)
-          locationdbupper=[i.upper() for i in locationdb]
-          pandas_db['from_db'] = pandas_db['code'].isin(locationdbupper)
+          pandas_db['from_db'] = True
       elif locationmode == "name":
-          pandas_db['where'] = pandas_db['where'].str.upper()
+          namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
+          pandas_db['where'] = pandas_db['where'].map(namedb_namegeo).str.upper()
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
-          locationdbupper=[i.upper() for i in locationdb]
-          pandas_db['from_db'] = pandas_db['where'].isin(locationdbupper)
+          pandas_db['from_db'] = True
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
-
       all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),
               columns=['date', 'code']
           )
+
       cartesian = cartesian.merge(geopd[['code', 'geometry']], on='code', how='left')
       pandas_db = cartesian[['date', 'code', 'geometry']].merge(
             pandas_db,
