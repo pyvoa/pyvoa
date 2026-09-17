@@ -76,7 +76,7 @@ For a source still publishing, that is not always what you want:
 
 ```python
 pf.setlive(True)            # read the upstream sources instead
-pf.setwhom('ebolardc')      # ... and fetch today's file
+pf.setwhom('owid')          # ... and fetch today's file
 pf.getlive()                # True
 pf.setlive(False)           # back to the archive
 ```
