@@ -109,7 +109,7 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 
 ## Supported databases
 
-25 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+24 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
 `pf.setwhom(key)` selects one. Each is described by a JSON file in
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
