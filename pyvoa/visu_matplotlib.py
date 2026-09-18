@@ -440,6 +440,19 @@ class visu_matplotlib:
         input_missing = input[
             ~input['from_db'].astype(bool)
             ]
+        input = input[
+            input['from_db'].astype(bool)
+            ]
+        if not input_missing.empty:
+            plot = input_missing.plot(
+                ax=ax,
+                color='#FCE4EC',
+                edgecolor='black',
+                linewidth=0.2,
+            )
+            ax.text(0.5, 0.05, "In pink: no data available",
+            ha='center', color='#E91E63', fontsize=10, transform=ax.transAxes,
+            bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.8, 'pad': 3})
 
         plot = input.plot(
             column=which,
@@ -457,16 +470,6 @@ class visu_matplotlib:
                 'shrink': 0.5
             }
         )
-        if not input_missing.empty:
-            plot = input_missing.plot(
-                ax=ax,
-                color='#FCE4EC',
-                edgecolor='black',
-                linewidth=0.2,
-            )
-            ax.text(0.5, 0.05, "In pink: no data available",
-            ha='center', color='#E91E63', fontsize=10, transform=ax.transAxes,
-            bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.8, 'pad': 3})
 
 
         cbar = plot.get_figure().axes[-1]

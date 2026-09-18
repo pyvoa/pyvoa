@@ -237,11 +237,12 @@ class GPDBuilder:
                     raise PyvoaError(i + ': not subregion nor region ... what is it ?')
             elif typeloc == 'region':
                 tmp = self.geo.get_region_list()
+
                 if i.isdigit():
                     tmp = list(tmp.loc[tmp.code_region==i]['name_region'])
                 elif self.geo.is_region(i):
                     tmp = self.geo.get_regions_from_macroregion(name=i,output='name')
-                    if self.currentmetadata['geoinfo']['iso3'] in ['USA, FRA, ESP, PRT']:
+                    if self.currentmetadata['geoinfo']['iso3'] in ['USA', 'FRA', 'ESP', 'PRT']:
                         tmp = tmp[:-1]
                 else:
                     if self.geo.is_subregion(i):
@@ -331,7 +332,7 @@ class GPDBuilder:
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
 
-                self.test_where(w_s)    
+                self.test_where(w_s)
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
                 if has_normalize:
                     for idx,i in enumerate(dpop.keys()):
@@ -382,7 +383,6 @@ class GPDBuilder:
         if where_geometry_none.size>0:
             PyvoaWarning('Those localisation have None geometry, remove them ...:'+str(where_geometry_none))
         newpd = newpd.dropna(subset=['geometry'])
-
         return newpd
 
    def get_stats(self,**kwargs):
@@ -405,7 +405,6 @@ class GPDBuilder:
        # what  = kwargs.get('what')
        when  = kwargs.get('when')
        where = kwargs.get('where')
-
        if kwargs['kwargsuser']['input'].empty:
            remove_all_execept_which = [x for x in self.get_available_keywords() if x not in which]
            input = input.drop(columns=remove_all_execept_which)
@@ -416,6 +415,7 @@ class GPDBuilder:
             input = self.currentdata.get_maingeopandas()
             #anticolumns = [x for x in available_keywords if x not in which]
             #input = input[which].loc[:,input.columns.isin(anticolumns)]
+
        date_max_by_where = input.groupby('where')['date'].max()
        if date_max_by_where.nunique() > 1:
             PyvoaWarning(
@@ -464,6 +464,10 @@ class GPDBuilder:
 
        bypopvalue = None
        #datesunique = list(input.date.unique())
+       kwargs['input'] = input
+
+       if kwargs['kwargsuser']['input'].empty:
+          input = self.whereclustered(**kwargs)
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']
@@ -475,10 +479,10 @@ class GPDBuilder:
                  .reset_index(level=0, drop=True)
                  .fillna(0)
                  )
-           kwargs['input'] = input
+           #kwargs['input'] = input
+           #if kwargs['kwargsuser']['input'].empty:
+           #       input = self.whereclustered(**kwargs)
 
-           if kwargs['kwargsuser']['input'].empty:
-               input = self.whereclustered(**kwargs)
            has_normalize = any(o.startswith("normalize:") for o in option)
            has_sumall = "sumall" in option
 
@@ -490,7 +494,6 @@ class GPDBuilder:
 
            concatpd = pd.DataFrame()
            basecolumns=list(input.columns)
-
            for o in option:
                temppd = input
                if o == 'nonneg':

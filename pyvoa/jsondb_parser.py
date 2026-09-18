@@ -369,7 +369,6 @@ class DataParser:
             rename_columns = pdatatemp.set_index('alias')['name'].to_dict()
 
           kd = pdatatemp.loc[~pdatatemp.name.isin(['where','date'])].set_index('name')['description'].to_dict()
-
           for k,v in kd.items():
               self.keyword_definition[k]=v
               self.keyword_url[k]=url
@@ -535,6 +534,7 @@ class DataParser:
           pandas_db['from_db'] = True
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
+
       all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),
@@ -547,8 +547,8 @@ class DataParser:
             on=['date', 'code'],
             how='left'
         )
-
       pandas_db['where']=pandas_db['code'].map(codenamedico)
+
       pandas_db = pandas_db[pandas_db['where'] != 'ANTARCTICA']
       pandas_db['where']=pandas_db['where'].str.title()
       pandas_db['from_db']=pandas_db['from_db'].fillna(False)

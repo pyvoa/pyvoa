@@ -822,7 +822,9 @@ class visu_bokeh:
             input_missing = input[
                 ~input['from_db'].astype(bool)
                 ]
-
+            input = input[
+                input['from_db'].astype(bool)
+                ]
             which  = kwargs.get('which')
             if isinstance(which,list):
                 which = which[0]
@@ -923,6 +925,7 @@ class visu_bokeh:
                     input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplay)
                     input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
+
                 columndatasrc = ColumnDataSource(data = input_dates)
 
                 from bokeh.models import CustomJS, Div, Slider
@@ -1006,18 +1009,13 @@ class visu_bokeh:
                 bokeh_figure_map.y_range.end   = ymax + pad_y
 
                 _min_col, _max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
-
-                bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
-                                fill_color = {'field': 'cases', 'transform': color_mapper},
-                                line_color = 'black', line_width = 0.2, fill_alpha = 1)
-
                 if not input_missing.empty:
                     input_missing=input_missing.drop(columns='date')
                     geo_missing = GeoJSONDataSource(
                         geojson=input_missing.to_json()
                     )
 
-                    bokeh_figure_map.patches(
+                    missing_renderer = bokeh_figure_map.patches(
                         'xs',
                         'ys',
                         source=geo_missing,
@@ -1029,6 +1027,11 @@ class visu_bokeh:
                         Title(text="In pink: no data available", text_color='Pink', text_font_size='12px', align='center'),
                         'below'
                     )
+                main_renderer = bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
+                                fill_color = {'field': 'cases', 'transform': color_mapper},
+                                line_color = 'black', line_width = 0.2, fill_alpha = 1)
+
+
 
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
 
@@ -1038,6 +1041,7 @@ class visu_bokeh:
             kwargs['columndatasrc'] = columndatasrc
             kwargs['color_mapper'] = color_mapper
             kwargs['input'] = input
+            kwargs['main_renderer'] = main_renderer
             return func(self, **kwargs)
         return inner_decodateslider
 
@@ -1467,10 +1471,6 @@ class visu_bokeh:
         -------
         The bokeh figure holding the map.
         """
-        # input = kwargs.get('input')
-        # geocolumndatasrc = kwargs.get('geocolumndatasrc')
-        # which = kwargs.get('which')
-        # color_mapper = kwargs['color_mapper']
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
@@ -1501,7 +1501,7 @@ class visu_bokeh:
         bokeh_figure.xgrid.grid_line_color = None
         bokeh_figure.ygrid.grid_line_color = None
 
-        bokeh_figure.add_tools(HoverTool(tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
+        bokeh_figure.add_tools(HoverTool(renderers=[kwargs['main_renderer']],tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
 
         if dateslider:
              layout = column(controls, bokeh_figure)
