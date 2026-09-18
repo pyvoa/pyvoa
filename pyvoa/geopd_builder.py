@@ -167,7 +167,7 @@ class GPDBuilder:
           row per location).
       """
       data = mypyvoageopd.drop(columns='geometry').reset_index(drop=True)
-      geo = mypyvoageopd[['where','geometry']].drop_duplicates().reset_index(drop=True)
+      geo = mypyvoageopd[['where','geometry']].drop_duplicates(subset=['where']).reset_index(drop=True)
       return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
