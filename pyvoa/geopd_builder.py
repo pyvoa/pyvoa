@@ -591,14 +591,14 @@ class GPDBuilder:
           input['date'] = pd.to_datetime(input['date'], errors='coerce')
 
        when_beg_data, when_end_data = input.date.min(), input.date.max()
-       when_beg, when_end = dt.date(1,1,1), dt.date.today()
+       when_beg, when_end = dt.date(1, 1, 1), dt.date.today()
 
        if when:
            when_beg, when_end = extract_dates(when)
-           if when_beg < when_beg_data:
+           if when_beg < when_beg_data.date():
                 when_beg = when_beg_data
                 PyvoaWarning("No available data before "+str(when_beg_data) + ' - ' + str(when_beg) + ' is considered')
-           if when_end > when_end_data:
+           if when_end > when_beg_data.date():
                 when_end = when_end_data
                 PyvoaWarning("No available data after "+str(when_end_data) + ' - ' + str(when_end) + ' is considered')
        else:
