@@ -1032,7 +1032,7 @@ class visu_bokeh:
                                 line_color = 'black', line_width = 0.2, fill_alpha = 1)
 
 
-
+                kwargs['main_renderer'] = main_renderer                
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
 
             if func.__name__ in lhist:
@@ -1041,7 +1041,7 @@ class visu_bokeh:
             kwargs['columndatasrc'] = columndatasrc
             kwargs['color_mapper'] = color_mapper
             kwargs['input'] = input
-            kwargs['main_renderer'] = main_renderer
+
             return func(self, **kwargs)
         return inner_decodateslider
 

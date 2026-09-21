@@ -32,6 +32,7 @@ from pyvoa.tools import (
    getnonnegfunc,
    kwargs_values_testing,
    verb,
+   info
 )
 
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -67,7 +68,6 @@ class GPDBuilder:
             self.db = db_name
             self.currentmetadata = parser.MetaInfo().getcurrentmetadata(db_name)
             self.currentdata = parser.DataParser(db_name)
-
             self.slocation = self.currentdata.get_locations()
             #self.geo = self.currentdata.get_geo()
             self.db_world = self.currentdata.get_world_boolean()
@@ -76,6 +76,9 @@ class GPDBuilder:
             self.granularity = self.currentmetadata['geoinfo']['granularity']
             self.namecountry = self.currentmetadata['geoinfo']['iso3']
             self._gi = coge.GeoInfo()
+            self.namepkldata = None
+            self.namepklgeo = None
+            self.reload  = False
             try:
                 if self.granularity == 'country':
                        self.geo = coge.GeoManager('name')
@@ -112,10 +115,6 @@ class GPDBuilder:
             self.db = 'in-house data'
             self.currentdata = None
 
-   def getinfodatewhich(self):
-       """Return the parser's summary of the dates and variables available."""
-       return self.currentdata.get_echoinfo()
-
    def getwheregeometrydescription(self,):
         """Return the geometry of each location, as a 'where'/'geometry' frame."""
         return self.where_geodescription
@@ -141,12 +140,48 @@ class GPDBuilder:
        labels of the figures.
        """
        f = self.db+'.pkl'
-       data,geo=self.split_data_geo(self.get_fulldb())
        if reload:
-          dumppkl('data'+f,data)
-          dumppkl('geo'+f,geo)
+          data, geo=self.split_data_geo(self.currentdata.get_maingeopandas())
+          self.namepkldata = 'data'+f
+          datadata = {}
+          datadata['listwhich'] = self.listwhich(self.db)
+          datadata['listwhere'] = self.listwhere()
+          datadata['data'] = data
+          dumppkl(self.namepkldata, datadata)
+          self.namepklgeo  = 'geo'+f
+          geodata = {}
+          geodata['geo'] = geo
+          geodata['geodescription'] = self.where_geodescription
+          dumppkl(self.namepklgeo,geodata)
+
        self.setvisu(self.db,geo)
+       self.reload = reload
        return data,geo,self.getvisu()
+
+   def getpklname(self,geoordata='geo'):
+        if geoordata == 'geo':
+            return self.namepklgeo
+        elif geoordata == 'data':
+            return self.namepkldata
+        else:
+            PyvoaError("No geo nor data ... crashed")
+
+   def getdatabase(self):
+        """Return the whole database, as parsed, for every location and variable.
+
+        The table :meth:`get` selects from, before any selection: this is the raw
+        material, not a query. Its size is reported through info().
+
+        Returns
+        -------
+        pandas.DataFrame
+            Every variable of the current database, for every location and date.
+        """
+        col = list(self.currentdata.get_maingeopandas().columns)
+        mem=f'{self.currentdata.get_maingeopandas()[col].memory_usage(deep=True).sum():,}'
+        info('Memory usage of all columns: ' + mem + ' bytes')
+        df = self.currentdata.get_maingeopandas()
+        return df
 
    @staticmethod
    def split_data_geo(mypyvoageopd):
@@ -191,9 +226,6 @@ class GPDBuilder:
        """Return the DataParser holding the parsed database."""
        return self.currentdata
 
-   def get_fulldb(self):
-      """Return the whole database, geometry included, as one GeoDataFrame."""
-      return self.currentdata.get_maingeopandas()
 
    def get_available_GPDBuilder(self):
         """Return all the available Covid19 GPDBuilder."""
@@ -257,6 +289,124 @@ class GPDBuilder:
                 exploded=[tmp]
         return flat_list(exploded)
 
+   def listwhich(self,dbname=None):
+       """List the variables a database offers.
+
+       Parameters
+       ----------
+       dbname : str, optional
+           The database to ask about. Defaults to the one selected with
+           :meth:`setwhom`.
+
+       Returns
+       -------
+       list of str
+           The values 'which' accepts, sorted alphabetically. Beware that the
+           default of 'which' is not this first entry but the first cumulative
+           variable the database declares, as :meth:`get` describes.
+
+       Raises
+       ------
+       PyvoaError
+           If no database was named and none has been selected.
+       """
+       if dbname:
+           dic = parser.MetaInfo().getcurrentmetadata(dbname)
+
+       elif self.db:
+           dic = parser.MetaInfo().getcurrentmetadata(self.db)
+       else:
+           raise PyvoaError('listwhich for which database ? I am lost ... are you ?')
+       return sorted(parser.MetaInfo().getcurrentmetadatawhich(dic))
+
+
+   def listwhere(self, cluster_and_not = True):
+        """List the locations the current database can be asked for.
+
+        What a location is depends on the granularity of the database: the
+        countries of a world-wide or European one, the regions or the subregions
+        of a national one. Clusters -- the names standing for a group of
+        locations, such as a continent, 'European Union' or 'World' -- are
+        listed alongside them.
+
+        Parameters
+        ----------
+        cluster_and_not : bool
+            If True, the default, return the individual locations *and* the
+            clusters. If False, return the clusters only.
+
+        Returns
+        -------
+        list of str or str
+            The locations, sorted. A database covering a single country is the
+            exception: it returns that country's ISO3 code alone, whatever this
+            flag says, since there is nothing to choose from.
+
+        Raises
+        ------
+        PyvoaError
+            If no database has been selected, if the selection is a table of your
+            own ('in-house data', whose locations are yours to know), or if the
+            granularity of the database is not one pyvoa knows.
+        """
+        if self.db is None or self.db=='in-house data':
+            raise PyvoaError("listwhere not available use your on where ... ")
+        granularity = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['granularity']
+        code = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['iso3']
+        coge.GeoManager('name')
+        #self.gpdbuilder.geo.GeoManager('iso3')
+        def clust():
+            """List the clusters of locations this database offers.
+
+            For a single country, the country itself; for a world-wide or European
+            database, its regions, plus 'European Union' for the European one.
+            """
+            if granularity == 'country' and code not in ['WLD','EUR']:
+                return  self.gettypeofgeometry().to_standard(code)
+            else:
+                r = self.gettypeofgeometry().get_region_list()
+                if not isinstance(r, list):
+                    r=sorted(r['name_region'].to_list())
+                r.append(code)
+                if code  == 'EUR':
+                    r.append('European Union')
+                if code  == 'WLD':
+                    r.remove('WLD')
+                    r.append('World')
+                return r
+
+        if granularity == 'country' and code not in ['WLD','EUR']:
+            return code
+
+        if cluster_and_not:
+            if self.db_world:
+                if granularity == 'country' and code not in ['WLD','EUR'] :
+                    r =  self.gettypeofgeometry().to_standard(code)
+                else:
+                    if code == 'WLD':
+                        r = self.gettypeofgeometry().get_GeoRegion().get_countries_from_region('World')
+                    elif code == 'EUR':
+                        r = self.gettypeofgeometry().get_GeoRegion().get_countries_from_region('Europe')
+                    else:
+                        r = []
+                    r += [self.gettypeofgeometry().to_standard(c)[0] for c in r]
+                r+=clust()
+            else:
+                r = clust()
+                if granularity == 'subregion':
+                    pan = self.gettypeofgeometry().get_subregion_list()
+                    r += list(pan.name_subregion.unique())
+                elif granularity == 'region':
+                    pan = self.gettypeofgeometry().get_region_list()
+                    r += list(pan.name_region.unique())
+                elif granularity == 'country':
+                    r.append(code)
+                else:
+                    raise PyvoaError('What is the granularity of your DB ?')
+            return sorted(r)
+        else:
+            return sorted(clust())
+
    def test_where(self, where):
       """Check that every location asked for exists in the database.
 
@@ -306,6 +456,7 @@ class GPDBuilder:
 
         which = kwargs['which']
         where = kwargs['where']
+        self.test_where(where)
         option=kwargs.get('option')
         dpop = InputOption().dictpop
 
@@ -332,7 +483,7 @@ class GPDBuilder:
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
 
-                self.test_where(w_s)
+
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
                 if has_normalize:
                     for idx,i in enumerate(dpop.keys()):
@@ -406,7 +557,7 @@ class GPDBuilder:
        when  = kwargs.get('when')
        where = kwargs.get('where')
        if kwargs['kwargsuser']['input'].empty:
-           remove_all_execept_which = [x for x in self.get_available_keywords() if x not in which]
+           remove_all_execept_which = [x for x in self.listwhich(self.db) if x not in which]
            input = input.drop(columns=remove_all_execept_which)
 
        if input.empty:
@@ -437,11 +588,9 @@ class GPDBuilder:
             )
 
        if not pd.api.types.is_datetime64_any_dtype(input['date']):
-           input['date'] = pd.to_datetime(input['date'], errors='coerce')
+          input['date'] = pd.to_datetime(input['date'], errors='coerce')
 
        when_beg_data, when_end_data = input.date.min(), input.date.max()
-       when_beg_data, when_end_data = when_beg_data.date(), when_end_data.date()
-
        when_beg, when_end = dt.date(1,1,1), dt.date.today()
 
        if when:

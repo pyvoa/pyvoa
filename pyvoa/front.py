@@ -28,7 +28,6 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
 import ast
-import random
 from functools import wraps
 from importlib import import_module
 
@@ -54,8 +53,9 @@ from pyvoa.tools import (
     kwargs_values_testing,
     readpkl,
     set_live_mode,
+    prioritize_keyword
 )
-
+import random
 # Aliased, and deliberately so. The loop at the foot of this module copies every
 # public method of the singleton onto the module, which overwrites a module
 # global of the same name: were these imported under their own names, the
@@ -143,6 +143,7 @@ class front:
         self._setkwargsvisu = None
         self.batch = False
         self.outcome = None
+        self.reload = False
 
     def whattodo(self,):
         """Return the table of every argument pyvoa accepts, and of its values.
@@ -309,48 +310,73 @@ class front:
             pyvoa knows.
         """
         reload = kwargs.get('reload', True)
+        self.reload = reload
+        self.db = base
         if reload not in [0,1]:
             raise PyvoaError('reload must be a boolean ... ')
         if base not in self.listwhom():
             raise PyvoaError(base + ' is not a supported GPDBuilder. '
                                     'See pyvoa.fron.listwhom() for the full list.')
-        # Check if the current base is already set to the requested base
-        # visu = self.getvis()
 
-        if self.db == base:
-            info(f"The GPDBuilder '{base}' is already set as the current database")
-            print('Available key-words, which ∈', self.listwhich())
-            return
-        else:
-            self.gpdbuilder  = coco.GPDBuilder(db_name=base)
+        echokwargs = {}
+        self.gpdbuilder  = coco.GPDBuilder(db_name=base)
+        if reload:
             self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
-            if not reload:
-                self.gpdbuilderdata = readpkl('data'+base + '.pkl')
-                self.gpdbuildergeo = readpkl('geo'+base + '.pkl')
-                pandy = self.gpdbuilder.getwheregeometrydescription()
-                self.allvisu = AllVisu(base, pandy)
-        self.db = base
-        self.get_echoinfo()
+            echokwargs['reload'] = True
+            echokwargs['lwhere'] = self.listwhere()
+            echokwargs['lwhich'] = self.listwhich()
+        else:
+            datapkl = readpkl('data'+base + '.pkl')
+            self.gpdbuilderdata = datapkl['data']
+            self.lwhere = datapkl['listwhere']
+            self.lwhich = datapkl['listwhich']
+            datapkl = readpkl('geo'+base + '.pkl')
+            self.gpdbuildergeo = datapkl['geo']
+            pandy = datapkl['geodescription']
+            self.allvisu = AllVisu(base, pandy)
+            echokwargs['reload'] = False
+            echokwargs['lwhere'] = self.lwhere
+            echokwargs['lwhich'] = self.lwhich
 
-    def get_echoinfo(self):
-      """Print a summary of the selected database.
+        echokwargs['mypd']   = self.gpdbuilderdata
+        self.get_echoinfo(echokwargs)
 
-      Reports the variables it offers, a handful of example locations, and
-      the first and last dates it covers. Output goes through info(), so it
-      is silent unless the verbosity allows it.
-      """
-      info('Few information concernant the selected database : ', self.db)
-      info('Available key-words, which ∈', sorted(self.listwhich()))
-      lw = self.listwhere()
-      if isinstance(lw, list):
-            sample = random.choices(lw, k=min(5, len(lw)))
-            suffix = ' ...'
-      else:
-            sample = lw
-            suffix = ''
-      info('Example of where : ', sample, suffix)
-      info('Last date data ', self.gpdbuilderdata['date'].max())
-      info('First date data ', self.gpdbuilderdata['date'].min())
+    def get_echoinfo(self, dico = None):
+         """Print a summary of the selected database.
+
+         Reports the variables it offers, a handful of example locations, and
+         the first and last dates it covers. Output goes through info(), so it
+         is silent unless the verbosity allows it.
+         """
+         reload  = dico['reload']
+         lwhich  = dico['lwhich']
+         lwhere  = dico['lwhere']
+         mypd    = dico['mypd']
+
+         info('Few information concernant the selected database : ', self.db)
+         info('Available key-words, which ∈', sorted(lwhich))
+         if isinstance(lwhere, list):
+               sample = random.choices(lwhere, k=min(5, len(lwhere)))
+               suffix = ' ...'
+         else:
+               sample = lwhere
+               suffix = ''
+         info('Example of where : ', sample, suffix)
+         def returndate(mydate):
+             d = mydate
+             day = d.day
+             month = d.month
+             year = d.year
+             return str(day)+'/'+str(month)+'/'+str(year)
+         info('Last date data ',returndate(mypd['date'].max()))
+         info('First date data ',returndate(mypd['date'].min()))
+
+
+    def listwhere(self, cluster_and_not = True):
+        if self.reload:
+            return self.gpdbuilder.listwhere(cluster_and_not)
+        else:
+            return self.lwhere
 
     def help(self,):
         """Print the full pyvoa command reference to the terminal.
@@ -473,11 +499,11 @@ class front:
             if kwargs['which'] == '':
                 try:
                     if kwargs['input'].empty:
-                        kwargs['which'] = self.gpdbuilder.get_available_keywords()[0]
+                        kwargs['which'] = prioritize_keyword(self.listwhich())[0]
                     else:
                         kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date','code','geometry'])
                 except Exception:
-                    raise PyvoaError("Don't know which valu can be requested")
+                    raise PyvoaError("Don't know which value can be requested")
 
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
@@ -502,8 +528,8 @@ class front:
 
             columns=list(kwargs['input'].columns)
             which = kwargs['which']
-            ext = ' '.join(kwargs['option'])
-            d = {i: i + ' ' + ext for i in kwargs['which']}
+            ext = ' '.join(kwargs['option']).strip()
+            d = {i: f"{i} {ext}".strip() for i in kwargs['which']}
             which = list(d.values())
             cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
@@ -514,7 +540,6 @@ class front:
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
-
             return func(self,**kwargs)
         return wrapper
 
@@ -636,12 +661,10 @@ class front:
             where_ordered_bylastvalues = last_rows['where'].drop_duplicates().tolist()
             casted_data['where'] = pd.Categorical(
                 casted_data['where'],
-                categories=where_ordered_bylastvalues,
+                categories = where_ordered_bylastvalues,
                 ordered=True
             )
-            kwargs['whereordered'] = where_ordered_bylastvalues
             casted_data = casted_data.sort_values(['where','date']).reset_index(drop=True)
-
             kwargs['input'] = casted_data.copy()
             return func(self,**kwargs)
         return inner
@@ -1370,122 +1393,11 @@ class front:
         else:
             raise PyvoaError(self.vis+ ' : has not map function !')
 
-    def listwhich(self,dbname=None):
-        """List the variables a database offers.
-
-        Parameters
-        ----------
-        dbname : str, optional
-            The database to ask about. Defaults to the one selected with
-            :meth:`setwhom`.
-
-        Returns
-        -------
-        list of str
-            The values 'which' accepts, sorted alphabetically. Beware that the
-            default of 'which' is not this first entry but the first cumulative
-            variable the database declares, as :meth:`get` describes.
-
-        Raises
-        ------
-        PyvoaError
-            If no database was named and none has been selected.
-        """
-        if dbname:
-            dic = self.meta.getcurrentmetadata(dbname)
-
-        elif self.db:
-            dic = self.meta.getcurrentmetadata(self.db)
+    def listwhich(self):
+        if self.reload:
+            return self.gpdbuilder.listwhich()
         else:
-            raise PyvoaError('listwhich for which database ? I am lost ... are you ?')
-        return sorted(self.meta.getcurrentmetadatawhich(dic))
-
-    def listwhere(self, cluster_and_not = True):
-        """List the locations the current database can be asked for.
-
-        What a location is depends on the granularity of the database: the
-        countries of a world-wide or European one, the regions or the subregions
-        of a national one. Clusters -- the names standing for a group of
-        locations, such as a continent, 'European Union' or 'World' -- are
-        listed alongside them.
-
-        Parameters
-        ----------
-        cluster_and_not : bool
-            If True, the default, return the individual locations *and* the
-            clusters. If False, return the clusters only.
-
-        Returns
-        -------
-        list of str or str
-            The locations, sorted. A database covering a single country is the
-            exception: it returns that country's ISO3 code alone, whatever this
-            flag says, since there is nothing to choose from.
-
-        Raises
-        ------
-        PyvoaError
-            If no database has been selected, if the selection is a table of your
-            own ('in-house data', whose locations are yours to know), or if the
-            granularity of the database is not one pyvoa knows.
-        """
-        if self.db is None or self.db=='in-house data':
-            raise PyvoaError("listwhere not available use your on where ... ")
-        granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
-        code = self.meta.getcurrentmetadata(self.db)['geoinfo']['iso3']
-        coge.GeoManager('name')
-        #self.gpdbuilder.geo.GeoManager('iso3')
-        def clust():
-            """List the clusters of locations this database offers.
-
-            For a single country, the country itself; for a world-wide or European
-            database, its regions, plus 'European Union' for the European one.
-            """
-            if granularity == 'country' and code not in ['WLD','EUR']:
-                return  self.gpdbuilder.geo.to_standard(code)
-            else:
-                r = self.gpdbuilder.geo.get_region_list()
-                if not isinstance(r, list):
-                    r=sorted(r['name_region'].to_list())
-                r.append(code)
-                if code  == 'EUR':
-                    r.append('European Union')
-                if code  == 'WLD':
-                    r.remove('WLD')
-                    r.append('World')
-                return r
-
-        if granularity == 'country' and code not in ['WLD','EUR']:
-            return code
-
-        if cluster_and_not:
-            if self.gpdbuilder.db_world:
-                if granularity == 'country' and code not in ['WLD','EUR'] :
-                    r =  self.gpdbuilder.to_standard(code)
-                else:
-                    if code == 'WLD':
-                        r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('World')
-                    elif code == 'EUR':
-                        r = self.gpdbuilder.geo.get_GeoRegion().get_countries_from_region('Europe')
-                    else:
-                        r = []
-                    r += [self.gpdbuilder.geo.to_standard(c)[0] for c in r]
-                r+=clust()
-            else:
-                r = clust()
-                if granularity == 'subregion':
-                    pan = self.gpdbuilder.geo.get_subregion_list()
-                    r += list(pan.name_subregion.unique())
-                elif granularity == 'region':
-                    pan = self.gpdbuilder.geo.get_region_list()
-                    r += list(pan.name_region.unique())
-                elif granularity == 'country':
-                    r.append(code)
-                else:
-                    raise PyvoaError('What is the granularity of your DB ?')
-            return sorted(r)
-        else:
-            return sorted(clust())
+            return self.lwhich
 
 
     def listpop(self):
@@ -1602,22 +1514,12 @@ class front:
             df = self.gpdbuilder.get_parserdb().get_dbdescription()
             return df
 
-    def getdatabase(self):
-        """Return the whole database, as parsed, for every location and variable.
-
-        The table :meth:`get` selects from, before any selection: this is the raw
-        material, not a query. Its size is reported through info().
-
-        Returns
-        -------
-        pandas.DataFrame
-            Every variable of the current database, for every location and date.
-        """
-        col = list(self.gpdbuilder.get_fulldb().columns)
-        mem=f'{self.gpdbuilder.get_fulldb()[col].memory_usage(deep=True).sum():,}'
-        info('Memory usage of all columns: ' + mem + ' bytes')
-        df = self.gpdbuilder.get_fulldb()
-        return df
+    def getdatabase(self,):
+        if self.reload:
+            return self.gpdbuilder.getdatabase()
+        else:
+            PyvoaWarning("Pandas pyvoa postprocessing can only be requested when a reload is False")
+            return self.gpdbuilderdata
 
     def setkwargsvisu(self,**kwargs):
         """Keep drawing options to apply to the charts that follow.

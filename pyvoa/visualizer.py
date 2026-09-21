@@ -137,8 +137,8 @@ class AllVisu:
             title = kwargs.get('title')
             kwargs['maxlettersdisplay'] = self.maxlettersdisplay
             kwargs['logo'] = self.logosmall
-            locunique = kwargs['whereordered']
-            input = input.loc[input['where'].isin(locunique)]
+
+            #input = input.loc[input['where'].isin(locunique)]
             kwargs['legend'] = None
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'

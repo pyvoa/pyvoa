@@ -34,6 +34,7 @@ from pyvoa.tools import (
   get_live_mode,
   get_local_from_url,
   week_to_date,
+  prioritize_keyword
 )
 
 
@@ -301,6 +302,7 @@ class DataParser:
       self.keyword_definition = {}
       self.keyword_url = {}
       pdata = pd.DataFrame()
+
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
           if get_live_mode():
@@ -382,13 +384,12 @@ class DataParser:
                           cast.update({thewhere[0]:'str'})
                       else:
                           cast={thewhere[0]:'str'}
-              #pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
-              pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
+              pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
+              #pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
                             keep_default_na = False, na_values = na_values ,
                             header = 0 if names is None else None, names = names,
                             dtype = cast, decimal = decimal,
                             low_memory = False, nrows = debug, comment='#')
-              
               if pdata.empty:
                  pdata = pdatatemp.copy()
               else:
@@ -439,7 +440,7 @@ class DataParser:
                  #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
                  #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
 
-          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format="mixed").dt.date
+          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format="mixed")
 
           if granularity == 'country' and 'where' not in list(pdata.name):
               pandas_temp['where'] = place
@@ -556,6 +557,7 @@ class DataParser:
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
       pandas_db = pandas_db.dropna(subset=['geometry'])
+      pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       return pandas_db
 
   def get_db(self,):
@@ -594,9 +596,7 @@ class DataParser:
 
   def get_available_keywords(self):
       """Return all the available keyswords for the database selected."""
-      firstvalue = next((x for x in self.available_keywords if x.startswith(("tot_", "total_"))),self.available_keywords[0])
-      self.available_keywords.insert(0, self.available_keywords.pop(self.available_keywords.index(firstvalue)))
-      return self.available_keywords
+      return prioritize_keyword(self.available_keywords)
 
   def get_url(self):
       """Return all the url which have been parsed for the database selected."""
