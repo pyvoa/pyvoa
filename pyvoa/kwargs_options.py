@@ -68,7 +68,8 @@ class InputOption:
                         'guideline':[False,True],\
                          #does None need here 'scale':[None,'linear','log']
                         'scale':['linear','log'],\
-                        'maxlettersdisplayed':10
+                        'maxlettersdisplayed':10,\
+                        'pyvoalogo':[False,True],\
                         }
 
         self.pdcharts = pd.DataFrame({

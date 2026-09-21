@@ -47,6 +47,7 @@ from bokeh.models import (
     Title,
     Toggle,
     WMTSTileSource,
+    Spacer
 )
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.palettes import Category10, Category20, Viridis256
@@ -172,6 +173,7 @@ class visu_bokeh:
             dicfig['bokeh_figure_yearly_log']  = figure(x_axis_type='linear', y_axis_type='log',  width=width, height=height)
 
             logo_url = visu_bokeh.pyvoalogo(logo)
+
             for key, fig in dicfig.items():
                 fig.title = title
                 #if (key == "bokeh_figure_map" or func.__name__ == 'bokeh_horizonhisto' or func.__name__ == 'bokeh_pie') and kwargs['dateslider']:
@@ -181,7 +183,9 @@ class visu_bokeh:
                 dicfig[key]=fig
             d = Div(text = '<div style="position: absolute; left:-300px; top:100px"><img src=' + logo_url + ' style="width:100px; height:40px; opacity: 0.1"></div>')
             #d = Div(text = '<div style="position: absolute; left:-400px; top:100px"> <p style="background-image: url("+img_girl.jpg+");"> </div>')
-            kwargs['watermark'] = d
+            if not kwargs['pyvoalogo']:
+                d =  None
+            kwargs['watermark'] = d if d is not None else Spacer(width=0, height=0)
             kwargs = { **kwargs, **dicfig }
             return func(self, **kwargs)
         return innerdeco_bokeh
@@ -1032,7 +1036,7 @@ class visu_bokeh:
                                 line_color = 'black', line_width = 0.2, fill_alpha = 1)
 
 
-                kwargs['main_renderer'] = main_renderer                
+                kwargs['main_renderer'] = main_renderer
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
 
             if func.__name__ in lhist:

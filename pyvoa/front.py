@@ -452,7 +452,6 @@ class front:
             default['output'] = default['output'][0]
             default['input'] = kwargs.get('input',pd.DataFrame())
             dicovisu = {k:kwargs.get(k,v[0]) if isinstance(v,list) else kwargs.get(k,v) for k,v in self.av.d_graphicsinput_args.items()}
-
             for i in self.av.d_graphicsinput_args:
                 kwargs_values_testing(
                     dicovisu[i],
