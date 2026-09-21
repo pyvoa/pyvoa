@@ -23,7 +23,7 @@ from pyvoa.tools import (
     PyvoaError,
     min_max_range,
 )
-
+from PIL import Image
 
 class visu_matplotlib:
     """The matplotlib backend, drawing static charts.
@@ -74,28 +74,22 @@ class visu_matplotlib:
         def wrapper(self, **kwargs):
             """Build the figure, stamp the logo, then call the drawing method."""
             title = kwargs.get('title')
-            im = mpimg.imread(kwargs['logo'])
-            h, w = im.shape[:2]
-
             fig, ax = plt.subplots(1, 1, figsize=(10, 5))
             ax.set_title(title)
             #ax.grid(True)
-
             # Scale logo to ~15% of figure width
-            logo_width = int(0.40 * fig.get_figwidth() * fig.dpi)
-            logo_height = int(logo_width * h / w)  # Maintain aspect ratio
-
-            fig_w, fig_h = fig.get_size_inches() * fig.dpi
-            int(fig_w - logo_width - 20)    # 20px margin from right
-            yo = int(fig_h - logo_height - 20)   # 20px margin from top
-
-            # Resize the image to match calculated dimensions
-            from PIL import Image
-            pil_im = Image.fromarray((im * 255).astype('uint8'))
-            im_resized = pil_im.resize((logo_width, logo_height))
-            im_resized = np.array(im_resized) / 255.0
-
-            fig.figimage(im_resized, xo=0, yo=0.5*yo, alpha=0.1)
+            if kwargs['pyvoalogo']:
+                im = mpimg.imread(kwargs['logo'])
+                h, w = im.shape[:2]
+                logo_width = int(0.40 * fig.get_figwidth() * fig.dpi)
+                logo_height = int(logo_width * h / w)  # Maintain aspect ratio
+                fig_w, fig_h = fig.get_size_inches() * fig.dpi
+                int(fig_w - logo_width - 20)    # 20px margin from right
+                yo = int(fig_h - logo_height - 20)   # 20px margin from top
+                pil_im = Image.fromarray((im * 255).astype('uint8'))
+                im_resized = pil_im.resize((logo_width, logo_height))
+                im_resized = np.array(im_resized) / 255.0
+                fig.figimage(im_resized, xo=0, yo=0.5*yo, alpha=0.1)
 
             kwargs['fig'] = fig
             kwargs['ax'] = ax
