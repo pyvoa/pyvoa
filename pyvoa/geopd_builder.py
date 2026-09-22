@@ -447,7 +447,6 @@ class GPDBuilder:
                 else:
                     w_s = self.subregions_deployed(w,self.granularity)
 
-
                 temp = input.loc[input['where'].str.upper().isin([x.upper() for x in w_s])].reset_index(drop=True)
                 if has_normalize:
                     for idx,i in enumerate(dpop.keys()):
@@ -621,11 +620,8 @@ class GPDBuilder:
                     temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if 'geometry' in list(temppd.columns):
-
                         if w.startswith(('cur_idx_', 'cur_tx_')):
                             temppd = temppd.groupby(prefix+suffix).mean().reset_index()
-                        else:
-                            temppd = temppd.groupby(prefix+suffix).sum(numeric_only=True).reset_index()
                     else:
                         temppd = temppd.groupby('date').agg(
                             where=('where', lambda x: ','.join(x)), **{w: (w, 'sum')}).reset_index()
