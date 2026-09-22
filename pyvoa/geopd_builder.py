@@ -510,8 +510,7 @@ class GPDBuilder:
                 # buffer(0) fixe the problem.
                 temp["geometry"] = temp["geometry"].buffer(0)
                 geometryjoined = temp.loc[temp.date == temp.date.max()]["geometry"].unary_union
-                temp = temp.groupby(['date'])[which].sum().reset_index()
-
+                temp = temp.groupby(['date'])[which].sum(min_count=1).reset_index()
                 temp['where'] = len(temp)*[wherejoined]
                 temp['code'] = len(temp)*[codejoined]
                 temp['geometry'] = len(temp)*[geometryjoined]
@@ -644,6 +643,7 @@ class GPDBuilder:
 
            concatpd = pd.DataFrame()
            basecolumns=list(input.columns)
+
            for o in option:
                temppd = input
                if o == 'nonneg':
@@ -657,6 +657,7 @@ class GPDBuilder:
                     temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if 'geometry' in list(temppd.columns):
+
                         if w.startswith(('cur_idx_', 'cur_tx_')):
                             temppd = temppd.groupby(prefix+suffix).mean().reset_index()
                         else:

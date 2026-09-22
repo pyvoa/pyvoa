@@ -145,7 +145,7 @@ class visu_matplotlib:
                     label=label,
                     linestyle=st[idx]
                 )
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, ncol=len(which))        
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, ncol=len(which))
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
 
         def sci_formatter(x, pos):
