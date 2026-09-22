@@ -407,41 +407,6 @@ class GPDBuilder:
         else:
             return sorted(clust())
 
-   def test_where(self, where):
-      """Check that every location asked for exists in the database.
-
-      Flattens clusters of locations, then compares case-insensitively
-      against listwhere().
-
-      Parameters
-      ----------
-      where : list
-          the locations to check, possibly nested.
-
-      Returns
-      -------
-      bool
-          True if all of them are known.
-
-      Raises
-      ------
-      PyvoaError
-          naming the locations that are not.
-      """
-      flat_where = []
-      upwhere = [i.upper() for i in self.listwhere()]
-      for w in where:
-          if isinstance(w, list):
-              flat_where.extend(w)
-          else:
-              flat_where.append(w)
-
-      missing = [w for w in flat_where if w.upper() not in upwhere]
-      if missing:
-          raise PyvoaError('This location do not exit in the DB :' + str(missing))
-      else:
-          return True
-
    def whereclustered(self,**kwargs):
         """Handle the name and the geometry of a cluster of locations.
 
@@ -456,7 +421,6 @@ class GPDBuilder:
 
         which = kwargs['which']
         where = kwargs['where']
-        self.test_where(where)
         option=kwargs.get('option')
         dpop = InputOption().dictpop
 
