@@ -460,6 +460,7 @@ class DataParser:
 
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
+
       # a source reporting increments says nothing on a day with no new count :
       # such a day is a zero, and filling it here keeps the cumulative sum below
       # from stopping at the first gap
@@ -536,9 +537,10 @@ class DataParser:
           pandas_db['from_db'] = True
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
+
       numeric_cols = pandas_db.select_dtypes(include='number').columns.tolist()
       non_numeric_cols = [i for i in pandas_db.columns if i not in numeric_cols]
-      pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False)[numeric_cols].sum()
+      pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False,dropna=False)[numeric_cols].sum(skipna=False)
       all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),

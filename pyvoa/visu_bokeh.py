@@ -270,7 +270,6 @@ class visu_bokeh:
         def inner_bokeh_plot(self, **kwargs):
             """Shorten the location labels and drop the geometry, then draw."""
             input=kwargs['input']
-            kwargs['maxlettersdisplay']
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
             return func(self, **kwargs)
@@ -304,9 +303,7 @@ class visu_bokeh:
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
-        # copyright = kwargs.get('copyright')
         mode = kwargs.get('mode')
-        # bokeh_figure = kwargs.get('bokeh_figure')
         panels = []
         cases_custom = visu_bokeh().rollerJS()
         if self.get_listfigures():
@@ -381,7 +378,6 @@ class visu_bokeh:
         under 'bokeh_figure_linear_date' and 'bokeh_figure_log_date'.
         """
         input = kwargs.get('input')
-
         which = kwargs.get('which')
         mode = kwargs.get('mode')
         guideline = kwargs.get('guideline')

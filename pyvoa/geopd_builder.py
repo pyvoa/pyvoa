@@ -564,9 +564,9 @@ class GPDBuilder:
             available_keywords = self.get_available_keywords()
             kwargs_values_testing(which,available_keywords,'which error ...')
             input = self.currentdata.get_maingeopandas()
+
             #anticolumns = [x for x in available_keywords if x not in which]
             #input = input[which].loc[:,input.columns.isin(anticolumns)]
-
        date_max_by_where = input.groupby('where')['date'].max()
        if date_max_by_where.nunique() > 1:
             PyvoaWarning(
@@ -628,6 +628,7 @@ class GPDBuilder:
                  .reset_index(level=0, drop=True)
                  .fillna(0)
                  )
+
            #kwargs['input'] = input
            #if kwargs['kwargsuser']['input'].empty:
            #       input = self.whereclustered(**kwargs)
