@@ -627,8 +627,11 @@ def dumppkl(filepkl,whattodump):
 def prioritize_keyword(listwhich):
     """Return all the available keywords for the database selected."""
     listwhich = listwhich.copy()
-    priority_keys = ['total_deaths', 'tot_dchosp']
-    firstvalue = next((x for x in priority_keys if x in listwhich), listwhich[0])
+    priority_keys = ['total_deaths','tot_deaths','tot_dchosp']
+    firstvalue = next(
+        (x for x in priority_keys if x in listwhich),
+        listwhich[0]
+    )
     listwhich.insert(0, listwhich.pop(listwhich.index(firstvalue)))
     return listwhich
 
