@@ -459,7 +459,7 @@ class DataParser:
           self.url += [url]
 
       pandas_db = fill_missing_dates(pandas_db)
-
+      pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       # a source reporting increments says nothing on a day with no new count :
       # such a day is a zero, and filling it here keeps the cumulative sum below
       # from stopping at the first gap
@@ -480,6 +480,7 @@ class DataParser:
               pandas_db[coltocumul] = pandas_db[coltocumul].cumsum()
 
       pandas_db = pandas_db.sort_values(['where','date'])
+
       self.available_keywords = list(pandas_db.columns)
       if 'date' in self.available_keywords:
           self.available_keywords.remove('date')
@@ -521,7 +522,6 @@ class DataParser:
       geopd['code'] = geopd['code'].str.upper()
       codenamedico={k.upper():v.upper() for k,v in codenamedico.items()}
       namecodedico={v:k for k,v in codenamedico.items()}
-      pandas_db['date']=pandas_db['date'].apply(lambda x: x.strftime('%d/%m/%Y'))
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
@@ -531,12 +531,14 @@ class DataParser:
           if granularity == 'country':
               namedb_namegeo = g.to_standard(locationdb,output='dict',db = self.db)
               pandas_db['where'] = pandas_db['where'].map(namedb_namegeo)
-          pandas_db['where'] = pandas_db['where'].str.upper()
+          pandas_db['where'] = pandas_db['where'].str.upper().str.strip()
           pandas_db['code'] = pandas_db['where'].map(namecodedico)
           pandas_db['from_db'] = True
       else:
           raise PyvoaError("what locationmode in your json file is supposed to be ?")
-
+      numeric_cols = pandas_db.select_dtypes(include='number').columns.tolist()
+      non_numeric_cols = [i for i in pandas_db.columns if i not in numeric_cols]
+      pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False)[numeric_cols].sum()
       all_dates = pandas_db['date'].unique()
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),
@@ -544,11 +546,13 @@ class DataParser:
           )
 
       cartesian = cartesian.merge(geopd[['code', 'geometry']], on='code', how='left')
+
       pandas_db = cartesian[['date', 'code', 'geometry']].merge(
             pandas_db,
             on=['date', 'code'],
             how='left'
         )
+      print(pandas_db.head(n=20))
       pandas_db['where']=pandas_db['code'].map(codenamedico)
 
       pandas_db = pandas_db[pandas_db['where'] != 'ANTARCTICA']
@@ -557,7 +561,6 @@ class DataParser:
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
       pandas_db = pandas_db.dropna(subset=['geometry'])
-      pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       return pandas_db
 
   def get_db(self,):
