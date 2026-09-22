@@ -493,8 +493,6 @@ class front:
 
                 #if not when:
                 #    kwargs['when'] = input.date.min().strftime("%d/%m/%Y")+':'+input.date.max().strftime("%d/%m/%Y")
-            kwargs['which'] = kwargs.get('which')
-
             if kwargs['which'] == '':
                 try:
                     if kwargs['input'].empty:
