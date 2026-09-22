@@ -552,7 +552,6 @@ class DataParser:
             on=['date', 'code'],
             how='left'
         )
-      print(pandas_db.head(n=20))
       pandas_db['where']=pandas_db['code'].map(codenamedico)
 
       pandas_db = pandas_db[pandas_db['where'] != 'ANTARCTICA']
