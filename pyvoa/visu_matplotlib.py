@@ -119,6 +119,7 @@ class visu_matplotlib:
         input = kwargs.get('input')
         which = kwargs.get('which')
         ax = kwargs['ax']
+        where = list(input['where'].unique())
         legend = kwargs.get('legend',None)
         ay_type = kwargs.get('scale',self.av.d_graphicsinput_args['scale'][0])
 
@@ -131,14 +132,20 @@ class visu_matplotlib:
         for idx, i in enumerate(which):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
-                label = legend
+                if legend:
+                    label = legend
+                else:
+                    label = f"{where}"
+                if len(which)>1:
+                    label =f"{where} — {i}"
+
                 ax.plot(
                     df.index,
                     df[where],
                     label=label,
                     linestyle=st[idx]
                 )
-        ax.legend(loc="upper right", fontsize=8, title_fontsize=10,ncol=len(which))
+        ax.legend(loc="upper right", fontsize=8, title_fontsize=10, ncol=len(which))        
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%d/%m/%y'))
 
         def sci_formatter(x, pos):
