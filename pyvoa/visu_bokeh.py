@@ -398,11 +398,11 @@ class visu_bokeh:
         if not isinstance(ay_type,list):
             ay_type = [ay_type]
 
-        for axis_type in ay_type:
+        for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
             dicof['x_axis_type'] = 'datetime'
             dicof['y_axis_type'] = axis_type
-            # i = 0
+
             r_list=[]
             maxi=-1000
             line_style = ['solid', 'dashed', 'dotted', 'dotdash','dashdot']
