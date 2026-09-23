@@ -617,6 +617,7 @@ class GPDBuilder:
                     temppd[w] = temppd[w].astype(float)
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
                     inx7 = temppd.groupby('where').head(7).index
+                    temppd = temppd.reset_index(drop=True)
                     temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if 'geometry' in list(temppd.columns):
