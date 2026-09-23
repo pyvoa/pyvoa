@@ -129,6 +129,7 @@ class visu_matplotlib:
         ax.grid(True)
         st=['-','--',':']
 
+
         for idx, i in enumerate(which):
             df = pd.pivot_table(input, index='date', columns='where', values=i)
             for where in df.columns:
@@ -138,7 +139,8 @@ class visu_matplotlib:
                     label = f"{where}"
                 if len(which)>1:
                     label =f"{where} — {i}"
-
+                if len(label)>10:
+                        label=label[:10]+'...'
                 ax.plot(
                     df.index,
                     df[where],
