@@ -830,7 +830,7 @@ class front:
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
                 if self.getvis() not in ['bokeh','seaborn'] and typeofhist == 'location' :
-                    return func(self,self.allvisu.hist(**z)[0])
+                    return func(self,self.allvisu.hist(**z))
                 else:
                     return func(self,self.allvisu.hist(**z))
             else:

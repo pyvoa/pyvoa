@@ -160,7 +160,7 @@ class visu_matplotlib:
                 return f'10{exp_str}'
             return f'{mant}×10{exp_str}'
         ax.yaxis.set_major_formatter(FuncFormatter(sci_formatter))
-        return ax
+        #return ax
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
@@ -192,7 +192,7 @@ class visu_matplotlib:
             ax.plot(pandy[which[0]], pandy[which[1]])
             leg.append(col)
         ax.legend(leg)
-        return ax
+        #return ax
 
     @decomatplotlib
     def matplotlib_yearly_plot(self,**kwargs):
@@ -228,7 +228,7 @@ class visu_matplotlib:
         ax.set_ylabel(which[0], fontsize=10)
         ax.grid(True)
         ax.legend()
-        return ax
+        #return ax
 
     @decomatplotlib
     def matplotlib_pie(self,**kwargs):
@@ -250,7 +250,7 @@ class visu_matplotlib:
         title=title, ylabel='', labeldistance=None,ax=ax)
         ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)
         ax.set_title(title)
-        return ax
+        #return ax
 
 
     @decomatplotlib
@@ -266,12 +266,14 @@ class visu_matplotlib:
         legend = kwargs.get('legend',None)
 
         input_sorted = input.sort_values(by=which,ascending=True)
+
+        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
+            input_sorted['where'] = 'sum all location'
+        ax.barh(input_sorted['where'], input_sorted[which],color=cmap.colors,label = legend)
         ax.set_title(title)
         ax.set_xlabel(which)
         ax.grid(True)
-        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
-            input_sorted['where'] = 'sum all location'
-        return ax.barh(input_sorted['where'], input_sorted[which],color=cmap.colors,label = legend)
+        #return
 
 
     @decomatplotlib
@@ -381,8 +383,8 @@ class visu_matplotlib:
         )
 
         ax.grid(True)
+        #return ax
 
-        return ax
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
         """Matplotlib map display."""
@@ -518,4 +520,4 @@ class visu_matplotlib:
 
             else:
                 raise PyvoaError("Don't know what kind of tile it is...")
-        return ax
+        #return ax
