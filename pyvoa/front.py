@@ -1255,7 +1255,7 @@ class front:
                     grls.append(gr)
                     # for datasets in mypd.parsingjson.values[0]['datasets']:
                     #     pdata = pd.DataFrame(datasets['columns'])
-                    varls.append(self.listwhich(i))
+                    varls.append(self.listwhich())
 
             dico.update({'dbname': namels})
             dico.update({'iso3': iso3ls})
