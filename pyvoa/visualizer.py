@@ -116,8 +116,8 @@ class AllVisu:
         self.dchartkargs = {}
         self.dvisukargs = {}
         self.uptitle, self.subtitle = ' ',' '
-        self.maxcountrydisplay  = 12
-        self.maxlettersdisplay = 20
+        self.maxcountrydisplayed  = InputOption().d_graphicsinput_args['maxcountrydisplayed']
+        self.maxlettersdisplayed = InputOption().d_graphicsinput_args['maxlettersdisplayed']
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
         self.logosmall = pathmetadb+'/logo-pyvoa_small.png'
@@ -135,7 +135,7 @@ class AllVisu:
             input = kwargs.get('input')
             # what = kwargs.get('what')
             title = kwargs.get('title')
-            kwargs['maxlettersdisplay'] = self.maxlettersdisplay
+            kwargs['maxlettersdisplay'] = self.maxlettersdisplayed
             kwargs['logo'] = self.logosmall
 
             #input = input.loc[input['where'].isin(locunique)]
@@ -146,8 +146,8 @@ class AllVisu:
                 kwargs['title'] = self.database_name.upper() + ' database'
 
             loc=list(input['where'].unique())
-            kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplay])]
-            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
+            kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplayed])]
+            kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
             return func(self, **kwargs)
         return inner_plot
 
@@ -171,17 +171,17 @@ class AllVisu:
             typeofhist = kwargs.get('typeofhist')
 
             kwargs['logo'] = self.logo
-            kwargs['maxlettersdisplay'] = self.maxlettersdisplay
+            kwargs['maxlettersdisplay'] = self.maxlettersdisplayed
             # windows =  InputOption().windows
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
-                    input = input.head(self.maxcountrydisplay)
+                    input = input.head(self.maxcountrydisplayed)
                 if typeofhist == 'value' or typeofhist == 'pie':
-                    top = input.iloc[:self.maxcountrydisplay]
-                    others = input.iloc[self.maxcountrydisplay:]
+                    top = input.iloc[:self.maxcountrydisplayed]
+                    others = input.iloc[self.maxcountrydisplayed:]
                     rest = {col: ['SumOthers'] for col in top.columns}
 
                     for i in which:
@@ -207,7 +207,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['maxcountrydisplay'] = self.maxcountrydisplay
+            kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
             kwargs['input'] = input
             return func(self, **kwargs)
         return inner_hm
