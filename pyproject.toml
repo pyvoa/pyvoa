@@ -79,7 +79,7 @@ version = { attr = "pyvoa.__version__.__version__" }
 include = ["pyvoa*"]
 
 [tool.setuptools.package-data]
-pyvoa = ["data/*.json", "data/*.png", "data/*.csv"]
+pyvoa = ["data/*.json", "data/*.png"]
 
 [tool.ruff]
 target-version = "py310"

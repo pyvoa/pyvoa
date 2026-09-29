@@ -81,8 +81,8 @@
   `1010` instead of `10101` to `10109`, and 346 comunas collapsed onto 254
   distinct values. Only 206 of them matched the `minciencia` join key, the
   other 140 dropping out of every map and series without a word. The code is
-  now resolved from the comuna name through the CUT table shipped as
-  `pyvoa/data/chl_comuna_codes.csv`, so all 346 codes are distinct and 345 of
+  now resolved from the comuna name through a CUT table archived on Zenodo
+  (record 23047588, `chl_comuna_codes.csv`), so all 346 codes are distinct and 345 of
   them match the database — the one gap being Antártica (`12202`), which the
   shapefile has no geometry for. `Zona sin demarcar`, the undelimited Campo de
   Hielo Sur, is no comuna and keeps the `00000` the truncated field gave it.

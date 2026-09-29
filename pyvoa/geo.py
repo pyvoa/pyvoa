@@ -18,7 +18,6 @@ import io
 import math
 import sys
 import warnings
-from pathlib import Path
 from typing import ClassVar
 
 import bs4
@@ -1466,8 +1465,8 @@ class GeoCountry:
             # digit CUT codes of the regions numbered 10 and above lost their last digit:
             # the nine comunas of the Llanquihue province all read 1010 instead of 10101
             # to 10109, which made code_subregion far from unique. The code is therefore
-            # resolved from the comuna name through the CUT table shipped in pyvoa/data.
-            cut=pd.read_csv(Path(__file__).parent / 'data/chl_comuna_codes.csv',dtype=str)
+            # resolved from the comuna name through the CUT table shipped in zenodo geo.
+            cut=pd.read_csv(get_local_from_url('https://zenodo.org/records/23047588/files/chl_comuna_codes.csv?content'),dtype=str)
             cut=dict(zip(cut.name_subregion.map(tostdstring),cut.code_subregion,strict=True))
             # 'Zona sin demarcar', the undelimited Campo de Hielo Sur, is no comuna and
             # has no CUT code; it keeps the '00000' the truncated field gave it.
