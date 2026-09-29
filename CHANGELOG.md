@@ -74,6 +74,23 @@
 - `README.md` now documents installation (`pip install pyvoa`, `pyvoa-full`), a
   first example, and a table of the 23 supported databases with their coverage,
   granularity and source.
+- fix: `GeoCountry('CHL')` gives every comuna its own `code_subregion`.
+  The `COD_COMUNA` field of the meteochile shapefile is four characters wide,
+  so the five-digit CUT codes of the regions numbered 10 and above lost their
+  last digit upstream: the nine comunas of the Llanquihue province all read
+  `1010` instead of `10101` to `10109`, and 346 comunas collapsed onto 254
+  distinct values. Only 206 of them matched the `minciencia` join key, the
+  other 140 dropping out of every map and series without a word. The code is
+  now resolved from the comuna name through the CUT table shipped as
+  `pyvoa/data/chl_comuna_codes.csv`, so all 346 codes are distinct and 345 of
+  them match the database — the one gap being Antártica (`12202`), which the
+  shapefile has no geometry for. `Zona sin demarcar`, the undelimited Campo de
+  Hielo Sur, is no comuna and keeps the `00000` the truncated field gave it.
+  Ñuble comes with it: the CUT codes postdate its 2018 split out of Bío-Bío
+  while the shapefile predates it, so `get_data(True)` would otherwise have
+  returned two regions both named `Región del Bío-Bío`. It is named `Región de
+  Ñuble` wherever `code_region` is `16`, and the region list is the sixteen
+  official regions plus the undelimited zone.
 
 # version 0.5.0
 Eight months and 236 commits since 0.4.2 (2025-12-12 to 2026-08-06), in two

@@ -18,6 +18,7 @@ import io
 import math
 import sys
 import warnings
+from pathlib import Path
 from typing import ClassVar
 
 import bs4
@@ -1455,13 +1456,26 @@ class GeoCountry:
             self._country_data.rename(columns={\
                 'NOM_REG':'name_region',\
                 'NOM_COM':'name_subregion'},inplace=True)
-            self._country_data['code_subregion']=[str(c).zfill(5) for c in self._country_data.COD_COMUNA]
-            self._country_data['code_region']=self._country_data.code_subregion.str.slice(stop=2)
+            # to help the join procedure with current covid data, some translation
             self._country_data['name_subregion'] = self._country_data['name_subregion'].replace({
                 'Marchigüe':'Marchihue',
                 "O'Higgins":'Ohiggins',
                 'Paihuano':'Paiguano'
                 })
+            # The COD_COMUNA field of the shapefile is four characters wide, so the five
+            # digit CUT codes of the regions numbered 10 and above lost their last digit:
+            # the nine comunas of the Llanquihue province all read 1010 instead of 10101
+            # to 10109, which made code_subregion far from unique. The code is therefore
+            # resolved from the comuna name through the CUT table shipped in pyvoa/data.
+            cut=pd.read_csv(Path(__file__).parent / 'data/chl_comuna_codes.csv',dtype=str)
+            cut=dict(zip(cut.name_subregion.map(tostdstring),cut.code_subregion,strict=True))
+            # 'Zona sin demarcar', the undelimited Campo de Hielo Sur, is no comuna and
+            # has no CUT code; it keeps the '00000' the truncated field gave it.
+            self._country_data['code_subregion']=[cut.get(tostdstring(n),'00000') for n in self._country_data.name_subregion]
+            self._country_data['code_region']=self._country_data.code_subregion.str.slice(stop=2)
+            # the shapefile predates the 2018 split of Ñuble out of the Bío-Bío region,
+            # which the CUT codes above do take into account
+            self._country_data.loc[self._country_data.code_region=='16','name_region']='Región de Ñuble'
             self._country_data=self._country_data[['name_subregion','code_subregion','name_region','code_region','geometry']]
 
         # --- 'EUR' case, which is a pseudo country for Europe ---------------------------------------------------------
