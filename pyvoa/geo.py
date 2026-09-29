@@ -1457,6 +1457,11 @@ class GeoCountry:
                 'NOM_COM':'name_subregion'},inplace=True)
             self._country_data['code_subregion']=[str(c).zfill(5) for c in self._country_data.COD_COMUNA]
             self._country_data['code_region']=self._country_data.code_subregion.str.slice(stop=2)
+            self._country_data['name_subregion'] = self._country_data['name_subregion'].replace({
+                'Marchigüe':'Marchihue',
+                "O'Higgins":'Ohiggins',
+                'Paihuano':'Paiguano'
+                })
             self._country_data=self._country_data[['name_subregion','code_subregion','name_region','code_region','geometry']]
 
         # --- 'EUR' case, which is a pseudo country for Europe ---------------------------------------------------------
