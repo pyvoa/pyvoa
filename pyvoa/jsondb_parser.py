@@ -456,7 +456,7 @@ class DataParser:
           else:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
-
+               
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       # a source reporting increments says nothing on a day with no new count :
@@ -541,7 +541,7 @@ class DataParser:
       non_numeric_cols = [i for i in pandas_db.columns if i not in numeric_cols]
       pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False,dropna=False)[numeric_cols].sum(skipna=False)
       all_dates = pandas_db['date'].unique()
-      
+
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),
               columns=['date', 'code']

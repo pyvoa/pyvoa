@@ -122,7 +122,7 @@ class visu_matplotlib:
         where = list(input['where'].unique())
         legend = kwargs.get('legend',None)
         ay_type = kwargs.get('scale',self.av.d_graphicsinput_args['scale'][0])
-
+        return_pltaxis = kwargs.get('return_pltaxis')
         ax.set_xlabel("date", fontsize=10)
         ax.set_ylabel(which, fontsize=10)
         ax.set_yscale(ay_type)
@@ -162,7 +162,8 @@ class visu_matplotlib:
                 return f'10{exp_str}'
             return f'{mant}×10{exp_str}'
         ax.yaxis.set_major_formatter(FuncFormatter(sci_formatter))
-        #return ax
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_versus_plot(self,**kwargs):
@@ -184,6 +185,7 @@ class visu_matplotlib:
         input = kwargs.get('input')
         which = kwargs.get('which')
         ax = kwargs['ax']
+        return_pltaxis = kwargs.get('return_pltaxis')
         loc = list(input['where'].unique())
         ax.set_xlabel(which[0], fontsize=10)
         ax.set_ylabel(which[1], fontsize=10)
@@ -194,7 +196,8 @@ class visu_matplotlib:
             ax.plot(pandy[which[0]], pandy[which[1]])
             leg.append(col)
         ax.legend(leg)
-        #return ax
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_yearly_plot(self,**kwargs):
@@ -208,6 +211,7 @@ class visu_matplotlib:
         # title = kwargs.get('title')
         kwargs['plt']
         ax = kwargs['ax']
+        return_pltaxis = kwargs.get('return_pltaxis')
         #drop bissextile fine tuning in needed in the future
         input = input.loc[~(input['date'].dt.month.eq(2) & input['date'].dt.day.eq(29))].reset_index(drop=True)
         input = input.copy()
@@ -230,7 +234,8 @@ class visu_matplotlib:
         ax.set_ylabel(which[0], fontsize=10)
         ax.grid(True)
         ax.legend()
-        #return ax
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_pie(self,**kwargs):
@@ -243,6 +248,7 @@ class visu_matplotlib:
         which = kwargs.get('which')
         title = kwargs.get('title')
         ax = kwargs.get('ax')
+        return_pltaxis = kwargs.get('return_pltaxis')
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
         input = input.set_index('where')
@@ -254,8 +260,8 @@ class visu_matplotlib:
         title=title, ylabel='', labeldistance=None,ax=ax)
         ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)
         ax.set_title(title)
-        #return ax
-
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_horizontal_histo(self,**kwargs):
@@ -268,6 +274,7 @@ class visu_matplotlib:
         ax = kwargs.get('ax')
         # fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
+        return_pltaxis = kwargs.get('return_pltaxis')
 
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
@@ -279,8 +286,8 @@ class visu_matplotlib:
         ax.set_title(title)
         ax.set_xlabel(which)
         ax.grid(True)
-        #return
-
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_histo(self, **kwargs):
@@ -306,7 +313,7 @@ class visu_matplotlib:
         input_df = kwargs.get('input').copy()
         bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
         which = kwargs.get('which')
-
+        return_pltaxis = kwargs.get('return_pltaxis')
         # -------------------------
         # bins
         # -------------------------
@@ -389,7 +396,8 @@ class visu_matplotlib:
         )
 
         ax.grid(True)
-        #return ax
+        if return_pltaxis:
+            return ax
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
@@ -526,4 +534,6 @@ class visu_matplotlib:
 
             else:
                 raise PyvoaError("Don't know what kind of tile it is...")
+        if return_pltaxis:
+            return ax
         #return ax

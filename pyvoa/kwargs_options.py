@@ -71,7 +71,7 @@ class InputOption:
                         'maxlettersdisplayed':20,\
                         'maxcountrydisplayed':12,\
                         'pyvoalogo':[False,True],\
-
+                        'return_pltaxis':[False,True]
                         }
 
         self.pdcharts = pd.DataFrame({

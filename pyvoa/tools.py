@@ -258,27 +258,24 @@ def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None
         d2=p[date_field].max()
     if d1 is None:
         d1=p[date_field].min()
-
     if not all(isinstance(d, datetime.date) for d in [d1,d2]):
         raise PyvoaError("Waiting for dates as datetime.date.")
     if d1 > d2:
         raise PyvoaError("Dates should be ordered as d1<d2.")
 
     idx = pd.date_range(d1, d2, freq = "D")
-    idx = idx.date
+    #idx = idx.date
     all_loc=list(p[loc_field].unique())
-
     pfill=pd.DataFrame()
     for loc in all_loc:
         pp=p.loc[p[loc_field]==loc]
         pp2=pp.set_index([date_field])
         pp2.index = pd.DatetimeIndex(pp2.index)
         pp3 = pp2.reindex(idx,fill_value=pd.NA)#numpy.nan)#
-        pp3[loc_field] = pp3[loc_field].fillna(loc)  #pp3['location'].fillna(method='bfill')
-        #pp3['isowhere'] = pp3['isowhere'].fillna(method='bfill')
-        #pp3['isowhere'] = pp3['isowhere'].fillna(method='ffill')
+        pp3[loc_field] = pp3[loc_field].fillna(loc)
         pfill=pd.concat([pfill, pp3])
-    pfill.reset_index(inplace=True)
+    pfill = pfill.reset_index().rename(columns={'index': date_field})
+    #pfill.reset_index(inplace=True)
     return pfill
 
 def check_valid_date(date):
