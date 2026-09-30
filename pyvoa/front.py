@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 
 import pyvoa.geo as coge
-import pyvoa.geopd_builder as coco
+import pyvoa.geopd_builder as builder
 import pyvoa.help as h
 from pyvoa._banner import print_banner
 from pyvoa.jsondb_parser import MetaInfo
@@ -319,7 +319,7 @@ class front:
                                     'See pyvoa.fron.listwhom() for the full list.')
 
         echokwargs = {}
-        self.gpdbuilder  = coco.GPDBuilder(db_name=base)
+        self.gpdbuilder  = builder.GPDBuilder(db_name=base)
         if reload:
             self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
             echokwargs['reload'] = True
@@ -515,7 +515,7 @@ class front:
                     raise PyvoaError("['date', 'where'] must be in your pandas")
                 if not all(i in input.columns for i in ['where', 'date']):
                     raise PyvoaError("Minimal requierement for your input pandas : 'where' AND 'date'  must be in the columns name")
-                kwargs = coco.GPDBuilder().get_stats(**kwargs)
+                kwargs = builder.GPDBuilder().get_stats(**kwargs)
                 self.db = 'in-house data'
                 self.allvisu = AllVisu(self.db, kwargs['input'].copy())
             if kwargs['what'] != 'current':
