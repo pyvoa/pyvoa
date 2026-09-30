@@ -320,7 +320,7 @@ class GPDBuilder:
        return sorted(parser.MetaInfo().getcurrentmetadatawhich(dic))
 
 
-   def listwhere(self, cluster_and_not = True):
+   def listwhere(self, cluster_and_not = False):
         """List the locations the current database can be asked for.
 
         What a location is depends on the granularity of the database: the
@@ -354,6 +354,7 @@ class GPDBuilder:
         granularity = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['iso3']
         coge.GeoManager('name')
+
         #self.gpdbuilder.geo.GeoManager('iso3')
         def clust():
             """List the clusters of locations this database offers.
@@ -377,7 +378,7 @@ class GPDBuilder:
 
         if granularity == 'country' and code not in ['WLD','EUR']:
             return code
-
+        r=[]
         if cluster_and_not:
             if self.db_world:
                 if granularity == 'country' and code not in ['WLD','EUR'] :
@@ -395,10 +396,10 @@ class GPDBuilder:
                 r = clust()
                 if granularity == 'subregion':
                     pan = self.gettypeofgeometry().get_subregion_list()
-                    r += list(pan.name_subregion.unique())
+                    r += [x for x in pan.name_subregion.unique() if x not in r]
                 elif granularity == 'region':
                     pan = self.gettypeofgeometry().get_region_list()
-                    r += list(pan.name_region.unique())
+                    r += [x for x in pan.name_region.unique() if x not in r]
                 elif granularity == 'country':
                     r.append(code)
                 else:
@@ -552,30 +553,33 @@ class GPDBuilder:
        if not pd.api.types.is_datetime64_any_dtype(input['date']):
           input['date'] = pd.to_datetime(input['date'], errors='coerce')
 
-       when_beg_data, when_end_data = input.date.min(), input.date.max()
+       when_beg_data, when_end_data = input.date.min().date(), input.date.max().date()
        when_beg, when_end = dt.date(1, 1, 1), dt.date.today()
 
        if when:
            when_beg, when_end = extract_dates(when)
-           if when_beg < when_beg_data.date():
+           if when_beg < when_beg_data:
                 when_beg = when_beg_data
                 PyvoaWarning("No available data before "+str(when_beg_data) + ' - ' + str(when_beg) + ' is considered')
-           if when_end > when_beg_data.date():
+           if when_end > when_end_data:
                 when_end = when_end_data
                 PyvoaWarning("No available data after "+str(when_end_data) + ' - ' + str(when_end) + ' is considered')
        else:
             when_beg, when_end = input.date.min(), input.date.max()
-       if when_beg != when_end:
-           input = input[(input.date >= pd.to_datetime(when_beg)) & (input.date <= pd.to_datetime(when_end))]
-           kwargs['input'] = input
-           when_beg_data,when_end_data = when_beg, when_end
+       when_beg = pd.Timestamp(when_beg)
+       when_end = pd.Timestamp(when_end)
 
-       #kwargs['when'] = [str(when_beg_data)+':'+str(when_end_data)]
+       kwargs['input'] = input.loc[
+            (input['date'] >= when_beg) &
+            (input['date'] <= when_end)
+       ]
+       when_beg_data, when_end_data = when_beg, when_end
+
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
 
        bypopvalue = None
        #datesunique = list(input.date.unique())
-       kwargs['input'] = input
+       kwargs['input'] = input.loc[(input.date>=when_beg)&(input.date<=when_end)]
 
        if kwargs['kwargsuser']['input'].empty:
           input = self.whereclustered(**kwargs)

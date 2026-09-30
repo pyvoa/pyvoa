@@ -419,7 +419,6 @@ class DataParser:
                     replace_field[k]=np.nan
              pandas_temp = pandas_temp.replace(replace_field)
           pandas_temp = pandas_temp.rename(columns = rename_columns)
-
           if splitwhere and 'where' in list(pandas_temp.columns):
               pandas_temp['where'] = pandas_temp['where'].astype(str).\
                   str.split(splitwhere.get('separator',',')).\
@@ -460,7 +459,6 @@ class DataParser:
 
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
-
       # a source reporting increments says nothing on a day with no new count :
       # such a day is a zero, and filling it here keeps the cumulative sum below
       # from stopping at the first gap
@@ -523,6 +521,7 @@ class DataParser:
       geopd['code'] = geopd['code'].str.upper()
       codenamedico={k.upper():v.upper() for k,v in codenamedico.items()}
       namecodedico={v:k for k,v in codenamedico.items()}
+
       if locationmode == "code":
           pandas_db = pandas_db.rename(columns={"where": "code"})
           pandas_db['code'] = pandas_db['code'].str.upper()
@@ -542,11 +541,11 @@ class DataParser:
       non_numeric_cols = [i for i in pandas_db.columns if i not in numeric_cols]
       pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False,dropna=False)[numeric_cols].sum(skipna=False)
       all_dates = pandas_db['date'].unique()
+      
       cartesian = pd.DataFrame(
               list(itertools.product(all_dates, geopd['code'])),
               columns=['date', 'code']
           )
-
       cartesian = cartesian.merge(geopd[['code', 'geometry']], on='code', how='left')
 
       pandas_db = cartesian[['date', 'code', 'geometry']].merge(

@@ -22,7 +22,8 @@ import pandas as pd
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import PyvoaError, PyvoaWarning, verb
-
+import matplotlib.pyplot as plt
+import numpy as np
 # The four imports below only probe whether an optional backend is installed;
 # the backends themselves are imported lazily, hence the noqa on each of them.
 try:
@@ -90,9 +91,6 @@ class AllVisu:
         kindgeo : gpd.GeoDataFrame
             the geometry to draw the locations with.
         """
-        self.lcolors = ['red', 'blue', 'green', 'orange', 'purple',
-                        'brown', 'pink', 'gray', 'yellow', 'cyan']
-        self.scolors = self.lcolors[:5]
 
         if kindgeo is None:
             pass
@@ -117,6 +115,8 @@ class AllVisu:
         self.dvisukargs = {}
         self.uptitle, self.subtitle = ' ',' '
         self.maxcountrydisplayed  = InputOption().d_graphicsinput_args['maxcountrydisplayed']
+        self.colors = plt.cm.tab20(np.linspace(0, 1,self.maxcountrydisplayed))
+
         self.maxlettersdisplayed = InputOption().d_graphicsinput_args['maxlettersdisplayed']
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
@@ -163,7 +163,11 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-
+            if isinstance(which, list):
+                which = which[0]
+                kwargs['which'] = which
+            if kwargs['input'][which].values.sum()==0.:
+                raise PyvoaError('All value are null for '+str(which)+ 'at the date of ' +str(kwargs['when']))
             title = kwargs['title']
             drawn = input['date'].max()
             # what = kwargs.get('what')
@@ -179,16 +183,17 @@ class AllVisu:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
                     input = input.head(self.maxcountrydisplayed)
+
                 if typeofhist == 'value' or typeofhist == 'pie':
                     top = input.iloc[:self.maxcountrydisplayed]
+                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in self.colors]
                     others = input.iloc[self.maxcountrydisplayed:]
                     rest = {col: ['SumOthers'] for col in top.columns}
 
-                    for i in which:
-                        total = others[i].apply(
-                            lambda x: x[0] if isinstance(x, list) else x
-                            ).sum()
-                        rest[i] = [total]
+                    total = others[which].apply(
+                        lambda x: x[0] if isinstance(x, list) else x
+                        ).sum()
+                    rest[which] = [total]
                     if kwargs['kwargsuser']['vis'] == 'bokeh':
                         rest["where"] = ["_".join(others["where"].astype(str).unique())]
                     rest['date'] = [input['date'].iloc[0]]
@@ -200,15 +205,13 @@ class AllVisu:
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
-            if input[which].empty:
-                print("All values seems to be null ... nothing to plot")
-                return
             kwargs['legend'] = None
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
             kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
             kwargs['input'] = input
+
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''
@@ -323,10 +326,6 @@ class AllVisu:
         """FILL IT."""
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
-        which = kwargs.get('which')
-        if isinstance(which, list):
-            which = which[0]
-            kwargs['which'] = which
         if vis == 'matplotlib':
             if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)

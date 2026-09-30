@@ -67,13 +67,13 @@ const total = limited
     .map(r => Number(r[which]) || 0)
     .reduce((a, b) => a + b, 0);
 
-for (let j = 0; j < maxcountrydisplay; j++) {
+for (let j = 0; j < maxcountrydisplayed; j++) {
     const value = Number(limited[j][which]) || 0;
     const w = String(limited[j]["shortenwhere"] || "");
 
-    const top_pos    = ymax * (maxcountrydisplay - j) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay;
-    const bottom_pos = ymax * (maxcountrydisplay - j) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay;
-    const tick_pos   = parseInt(bottom_pos + 0.5 * ymax / maxcountrydisplay);  // = ymax * (maxcountrydisplay - j) / maxcountrydisplay
+    const top_pos    = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed + 0.5 * ymax / maxcountrydisplayed;
+    const bottom_pos = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed - 0.5 * ymax / maxcountrydisplayed;
+    const tick_pos   = parseInt(bottom_pos + 0.5 * ymax / maxcountrydisplayed);  // = ymax * (maxcountrydisplay - j) / maxcountrydisplay
 
     sourcehisto.data["top"][j]            = top_pos;
     sourcehisto.data["bottom"][j]         = bottom_pos;

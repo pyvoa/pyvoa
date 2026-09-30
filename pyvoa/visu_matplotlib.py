@@ -242,13 +242,15 @@ class visu_matplotlib:
         input = kwargs.get('input')
         which = kwargs.get('which')
         title = kwargs.get('title')
-        # plt = kwargs.get('plt')
         ax = kwargs.get('ax')
-
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input['where'] = 'sum all location'
         input = input.set_index('where')
-        ax =  input.plot(kind="pie",y=which, autopct='%1.1f%%', legend=True,
+        if 'colors' in  input.columns:
+            color=input['colors']
+        else:
+            color=cmap.colors
+        ax =  input.plot(kind="pie",y=which, color=color, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
         ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)
         ax.set_title(title)
@@ -267,11 +269,13 @@ class visu_matplotlib:
         # fig = kwargs.get('fig')
         legend = kwargs.get('legend',None)
 
-        input_sorted = input.sort_values(by=which,ascending=True)
-
         if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
             input_sorted['where'] = 'sum all location'
-        ax.barh(input_sorted['where'], input_sorted[which],color=cmap.colors,label = legend)
+        if 'colors' in  input.columns:
+            color=input['colors']
+        else:
+            color=cmap.colors
+        ax.barh(input['where'], input[which],color=color,label = legend)
         ax.set_title(title)
         ax.set_xlabel(which)
         ax.grid(True)

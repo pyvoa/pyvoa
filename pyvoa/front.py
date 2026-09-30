@@ -373,10 +373,12 @@ class front:
 
 
     def listwhere(self, cluster_and_not = True):
+        lwhere = None
         if self.reload:
-            return self.gpdbuilder.listwhere(cluster_and_not)
+            lwhere = self.gpdbuilder.listwhere(cluster_and_not)
         else:
-            return self.lwhere
+            lwhere = self.lwhere
+        return lwhere
 
     def help(self,):
         """Print the full pyvoa command reference to the terminal.
@@ -468,7 +470,6 @@ class front:
                 default['when'] = kwargs.get('when')
 
             kwargs = {**default, **dicovisu}
-
             kwargs['what'] = kwargs.get('what',self.lwhat[0])
             kwargs_values_testing(kwargs['what'],self.av.d_batchinput_args['what'],'Bad what values ...')
 

@@ -818,6 +818,12 @@ class visu_bokeh:
         def inner_decodateslider(self, **kwargs):
             """Attach the slider to the figure, then draw."""
             input = kwargs['input']
+            dateslider = kwargs.get('dateslider')
+            maxcountrydisplayed= kwargs['maxcountrydisplayed']
+            which  = kwargs.get('which')
+            bokeh_figure_linear = kwargs.get('bokeh_figure_linear')
+            bokeh_figure_log = kwargs.get('bokeh_figure_log')
+            bokeh_figure_map = kwargs.get('bokeh_figure_map')
 
             input_missing = input[
                 ~input['from_db'].astype(bool)
@@ -825,39 +831,25 @@ class visu_bokeh:
             input = input[
                 input['from_db'].astype(bool)
                 ]
-            which  = kwargs.get('which')
+
             if isinstance(which,list):
                 which = which[0]
                 kwargs['which'] = which
-
-            bokeh_figure_linear = kwargs.get('bokeh_figure_linear')
-            bokeh_figure_log = kwargs.get('bokeh_figure_log')
-            bokeh_figure_map = kwargs.get('bokeh_figure_map')
-
-            dateslider = kwargs.get('dateslider')
-            if func.__name__ == 'bokeh_histo' and dateslider:
-                print('dateslider not implemented in this current version ...')
-                dateslider = False
-
-            maxcountrydisplay = kwargs['maxcountrydisplay']
 
             lhist = ['bokeh_pie','bokeh_horizonhisto']
 
             ymax = self.figure_height
 
             if func.__name__ in lhist:
-                input = self.addcolumnshisto(input,which,maxcountrydisplay)
+                input = self.addcolumnshisto(input,which,maxcountrydisplayed)
                 yrange = Range1d(min(input['bottom']), max(input['top']))
 
-            input_uniquecountries = input.loc[input.date==input.date.max()].drop(columns=['date']).reset_index(drop=True)
-            input_uniquecountries['right'] = len(input_uniquecountries.index)*[0.]
-
             if func.__name__ == 'bokeh_map':
-                if func.__name__ in lhist:
-                    input_uniquecountries = input_uniquecountries.head(maxcountrydisplay)
-                input_uniquecountries['cases']=input_uniquecountries[which]
-                geocolumndatasrc = GeoJSONDataSource(geojson = input_uniquecountries.to_json())
+                input['cases']=input[which]
                 input_dates = input.drop(columns='geometry').copy()
+                if 'date' in input.columns:
+                    input = input.drop(columns='date')
+                geocolumndatasrc = GeoJSONDataSource(geojson = input.to_json())
             else:
                 input_dates = input.copy()
 
@@ -869,7 +861,6 @@ class visu_bokeh:
                              border_line_color=None, location=(0, 0), orientation='horizontal',
                              ticker=BasicTicker())
             bokeh_figure_map.add_layout(color_bar, 'below')
-
 
             #color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
             max_val = np.nanmax(input[which])
@@ -900,12 +891,7 @@ class visu_bokeh:
 
                 for d in unique_dates:
                     df_d = input_dates[input_dates['date'] == d].copy()
-                    df_d['where'] = pd.Categorical(
-                        df_d['where'],
-                        categories=unique_where,
-                        ordered=True
-                    )
-                    df_d = df_d.sort_values('where')
+                    df_d=df_d.sort_values(by=which,ascending=False)
                     df_d = df_d[cols]
                     if df_d.empty:
                         frame = {c: [] for c in cols}
@@ -920,9 +906,9 @@ class visu_bokeh:
                             frame[c] = []
                     frames.append(frame)
 
-                input_dates =  input_dates.loc[input_dates.date==input_dates.date.max()].head(maxcountrydisplay).reset_index(drop=True)
+                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
                 if func.__name__ in lhist:
-                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplay)
+                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
                     input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
 
@@ -944,7 +930,7 @@ class visu_bokeh:
                             'which': which,
                             'dates': unique_dates,
                             'div': date_display,
-                            'maxcountrydisplay': maxcountrydisplay,
+                            'maxcountrydisplayed': maxcountrydisplayed,
                             'ylabellinear': bokeh_figure_linear.yaxis[0],
                             'ylabellog': bokeh_figure_log.yaxis[0],
                             'ymax': ymax,
@@ -966,8 +952,9 @@ class visu_bokeh:
                 # Mettre à jour le Div depuis le slider (JS)
                 slider_date_div_cb = CustomJS(args={'div': date_display, 'dates': unique_dates},
                 code="""
-                  const i = cb_obj.value;      // index choisi
+                  const i = cb_obj.value;
                   div.text = "<b>" + dates[i] + "</b>";
+                  console.log(frames[i])
                   """)
 
                 slider.js_on_change('value', slider_date_div_cb)
@@ -1185,7 +1172,7 @@ class visu_bokeh:
         # input = kwargs.get('input')
         """Draw a horizontal bar chart, one bar per location.
 
-        Bars are ranked by value and labelled with it. Only maxcountrydisplay
+        Bars are ranked by value and labelled with it. Only maxcountrydisplayed
         locations are shown at a time, the rest reachable through the widget.
 
         Parameters
@@ -1274,7 +1261,7 @@ class visu_bokeh:
             tabs = layout
         return tabs
 
-    def addcolumnshisto(self,mypd,which,maxcountrydisplay):
+    def addcolumnshisto(self,mypd,which,maxcountrydisplayed):
         """Add the geometry columns a horizontal bar chart needs.
 
         Computes each bar's left, right, top and bottom edges, and the position
@@ -1286,7 +1273,7 @@ class visu_bokeh:
             one row per location.
         which : str
             the column holding the value.
-        maxcountrydisplay : int
+        maxcountrydisplayed : int
             how many bars fit on screen at once.
 
         Returns
@@ -1315,10 +1302,10 @@ class visu_bokeh:
         mypd['left'] = mypd['left'].apply(lambda x: min(x, 0))
         mypd['right'] = mypd['right'].apply(lambda x: max(x, 0))
         mypd['horihistotextx'] = mypd['right']
-        indices = [i % maxcountrydisplay for i in range(len(mypd))]
-        mypd['top'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay + 0.5 * ymax / maxcountrydisplay for i in indices]
-        mypd['bottom'] = [ymax * (maxcountrydisplay - i) / maxcountrydisplay - 0.5 * ymax / maxcountrydisplay for i in indices]
-        mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplay
+        indices = [i % maxcountrydisplayed for i in range(len(mypd))]
+        mypd['top'] = [ymax * (maxcountrydisplayed - i) / maxcountrydisplayed + 0.5 * ymax / maxcountrydisplayed for i in indices]
+        mypd['bottom'] = [ymax * (maxcountrydisplayed- i) / maxcountrydisplayed- 0.5 * ymax / maxcountrydisplayed for i in indices]
+        mypd['horihistotexty'] = mypd['bottom'] + 0.5*ymax/maxcountrydisplayed
         mypd['horihistotextx'] = mypd['right']
         return mypd
 
