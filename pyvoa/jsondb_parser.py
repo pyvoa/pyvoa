@@ -173,7 +173,7 @@ class MetaInfo:
             if j['name']:
                 which.append(j['name'])
         if 'namedata' in i:
-                which.append(i['namedata'])
+                which.append(i['renamedata'])
       if 'date' in which:
             which = list(filter(('date').__ne__, which))
       if 'where' in which:
@@ -433,6 +433,8 @@ class DataParser:
                    pandas_temp = pandas_temp.melt(id_vars='date',var_name='where',value_name=value_name)
               else:
                   pandas_temp = pandas_temp.melt(id_vars='where',var_name='date',value_name=value_name)
+              if "renamedata" in list(datasets.keys()):
+                  pandas_temp = pandas_temp.rename(columns={value_name:datasets['renamedata']})
 
           if usecols and ('semaine' in usecols or 'week' in usecols):
                  pandas_temp['date'] = [ week_to_date(i) for i in pandas_temp['date']]
@@ -456,7 +458,7 @@ class DataParser:
           else:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
-               
+
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       # a source reporting increments says nothing on a day with no new count :
