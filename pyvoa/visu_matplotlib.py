@@ -417,6 +417,7 @@ class visu_matplotlib:
         title = kwargs.get('title')
         tile = kwargs.get('tile')
         typeofmap = kwargs.get('typeofmap')
+        return_pltaxis= kwargs.get('return_pltaxis')
         if typeofmap == 'dense':
             tile = None
         # The frames arrive labelled EPSG:4326 whatever their units: the world
