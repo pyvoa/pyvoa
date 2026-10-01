@@ -276,16 +276,16 @@ class visu_matplotlib:
         legend = kwargs.get('legend',None)
         return_pltaxis = kwargs.get('return_pltaxis')
 
-        if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
-            input_sorted['where'] = 'sum all location'
-        if 'colors' in  input.columns:
-            color=input['colors']
+        if 'color' in  input.columns:
+            color=input['color']
         else:
             color=cmap.colors
         ax.barh(input['where'], input[which],color=color,label = legend)
         ax.set_title(title)
         ax.set_xlabel(which)
         ax.grid(True)
+        ax.invert_yaxis()
+        print(input)
         if return_pltaxis:
             return ax
 
