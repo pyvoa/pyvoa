@@ -848,7 +848,7 @@ class visu_bokeh:
                 input['cases']=input[which]
                 input_dates = input.drop(columns='geometry').copy()
                 if 'date' in input.columns:
-                    input = input.drop(columns='date')    
+                    input = input.drop(columns='date')
                 geocolumndatasrc = GeoJSONDataSource(geojson = input.to_json())
             else:
                 input_dates = input.copy()
@@ -1006,7 +1006,7 @@ class visu_bokeh:
                         'xs',
                         'ys',
                         source=geo_missing,
-                        fill_color='#FCE4EC',
+                        fill_color = '#FCE4EC',
                         line_color='black',
                         line_width=0.2
                     )
@@ -1014,6 +1014,16 @@ class visu_bokeh:
                         Title(text="In pink: no data available", text_color='Pink', text_font_size='12px', align='center'),
                         'below'
                     )
+                    hover_missing = HoverTool(
+                    renderers=[missing_renderer],
+                    tooltips=[
+                        ("location", "@where"),         
+                        ("Statut", "No data available"),
+                    ],
+                    point_policy='follow_mouse',    # recommandé pour les patches
+                    )
+                bokeh_figure_map.add_tools(hover_missing)
+
                 main_renderer = bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
                                 line_color = 'black', line_width = 0.2, fill_alpha = 1)
@@ -1101,8 +1111,6 @@ class visu_bokeh:
             contributors[rank].append(
                 input.iloc[i]['where']
             )
-
-        lcolors = iter(self.lcolors)
 
         contributors = dict(sorted(contributors.items()))
 
