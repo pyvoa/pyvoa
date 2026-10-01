@@ -848,7 +848,7 @@ class visu_bokeh:
                 input['cases']=input[which]
                 input_dates = input.drop(columns='geometry').copy()
                 if 'date' in input.columns:
-                    input = input.drop(columns='date')
+                    input = input.drop(columns='date')    
                 geocolumndatasrc = GeoJSONDataSource(geojson = input.to_json())
             else:
                 input_dates = input.copy()

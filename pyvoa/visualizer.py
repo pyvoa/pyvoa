@@ -163,6 +163,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
+            kwargs['input']['where']=kwargs['input']['where'].str[:kwargs['maxlettersdisplayed']]
             if isinstance(which, list):
                 which = which[0]
                 kwargs['which'] = which
@@ -326,8 +327,6 @@ class AllVisu:
         """FILL IT."""
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
-        print(kwargs['maxlettersdisplayed'])
-        kwargs['input']['where']=kwargs['input']['where'].str[:kwargs['maxlettersdisplayed']]
         if vis == 'matplotlib':
             if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)
