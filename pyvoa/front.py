@@ -1254,14 +1254,10 @@ class front:
                     iso3ls.append(iso3)
                     gr = mypd.parsingjson.values[0]['geoinfo']['granularity']
                     grls.append(gr)
-                    # for datasets in mypd.parsingjson.values[0]['datasets']:
-                    #     pdata = pd.DataFrame(datasets['columns'])
-                    varls.append(self.listwhich())
 
             dico.update({'dbname': namels})
             dico.update({'iso3': iso3ls})
             dico.update({'granularity': grls})
-            dico.update({'variables': varls})
             return pd.DataFrame.from_dict(dico, orient='index').T.reset_index(drop=True).set_index('dbname')
         else:
             return namedb
