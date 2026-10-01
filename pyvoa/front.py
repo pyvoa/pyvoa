@@ -41,6 +41,8 @@ import pyvoa.help as h
 from pyvoa._banner import print_banner
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
+import matplotlib.pyplot as plt
+
 from pyvoa.tools import (
     PyvoaError,
     PyvoaInfo,
@@ -572,6 +574,9 @@ class front:
             Checks that a backend is set, that a date slider is asked for only in
             bokeh, and that hist() and map() are given a single variable.
             """
+            wheres = kwargs['input']['where'].unique()
+            colors = {w: plt.cm.tab20(i % 20) for i, w in enumerate(wheres)}
+            kwargs['input']['color'] = kwargs['input']['where'].map(colors)
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis

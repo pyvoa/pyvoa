@@ -285,7 +285,6 @@ class visu_matplotlib:
         ax.set_xlabel(which)
         ax.grid(True)
         ax.invert_yaxis()
-        print(input)
         if return_pltaxis:
             return ax
 
