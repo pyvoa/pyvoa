@@ -135,7 +135,7 @@ class AllVisu:
             input = kwargs.get('input')
             # what = kwargs.get('what')
             title = kwargs.get('title')
-            kwargs['maxlettersdisplay'] = self.maxlettersdisplayed
+            kwargs['maxlettersdisplayed'] = kwargs.get('maxlettersdisplayed',self.maxlettersdisplayed)
             kwargs['logo'] = self.logosmall
 
             #input = input.loc[input['where'].isin(locunique)]
@@ -175,7 +175,7 @@ class AllVisu:
             typeofhist = kwargs.get('typeofhist')
 
             kwargs['logo'] = self.logo
-            kwargs['maxlettersdisplay'] = self.maxlettersdisplayed
+            kwargs['maxlettersdisplayed'] = kwargs.get('maxlettersdisplayed',self.maxlettersdisplayed)
             # windows =  InputOption().windows
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
@@ -326,6 +326,8 @@ class AllVisu:
         """FILL IT."""
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
+        print(kwargs['maxlettersdisplayed'])
+        kwargs['input']['where']=kwargs['input']['where'].str[:kwargs['maxlettersdisplayed']]
         if vis == 'matplotlib':
             if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)
