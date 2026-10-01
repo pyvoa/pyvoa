@@ -350,7 +350,7 @@ class GPDBuilder:
             granularity of the database is not one pyvoa knows.
         """
         if self.db is None or self.db=='in-house data':
-            raise PyvoaError("listwhere not available use your on where ... ")
+            raise PyvoaError("listwhere not available use your own where ... ")
         granularity = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['granularity']
         code = parser.MetaInfo().getcurrentmetadata(self.db)['geoinfo']['iso3']
         coge.GeoManager('name')
@@ -378,6 +378,7 @@ class GPDBuilder:
 
         if granularity == 'country' and code not in ['WLD','EUR']:
             return code
+
         r=[]
         if cluster_and_not:
             if self.db_world:
@@ -404,6 +405,7 @@ class GPDBuilder:
                     r.append(code)
                 else:
                     raise PyvoaError('What is the granularity of your DB ?')
+            r.remove(code)       
             return sorted(r)
         else:
             return sorted(clust())
