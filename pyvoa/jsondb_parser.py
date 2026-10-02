@@ -173,6 +173,9 @@ class MetaInfo:
             if j['name']:
                 which.append(j['name'])
         if 'namedata' in i:
+                which.append(i['namedata'])
+        if 'renamedata' in i:
+                which.remove(i['namedata'])
                 which.append(i['renamedata'])
       if 'date' in which:
             which = list(filter(('date').__ne__, which))

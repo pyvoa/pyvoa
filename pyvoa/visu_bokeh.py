@@ -1017,12 +1017,13 @@ class visu_bokeh:
                     hover_missing = HoverTool(
                     renderers=[missing_renderer],
                     tooltips=[
-                        ("location", "@where"),         
+                        ("location", "@where"),
                         ("Statut", "No data available"),
                     ],
                     point_policy='follow_mouse',    # recommandé pour les patches
                     )
-                bokeh_figure_map.add_tools(hover_missing)
+                
+                    bokeh_figure_map.add_tools(hover_missing)
 
                 main_renderer = bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
                                 fill_color = {'field': 'cases', 'transform': color_mapper},
