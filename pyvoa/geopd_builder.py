@@ -405,7 +405,7 @@ class GPDBuilder:
                     r.append(code)
                 else:
                     raise PyvoaError('What is the granularity of your DB ?')
-            r.remove(code)       
+                r.remove(code)       
             return sorted(r)
         else:
             return sorted(clust())
