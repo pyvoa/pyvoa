@@ -462,6 +462,7 @@ class front:
                     self.av.d_graphicsinput_args[i],
                     f"value of {i} not correct"
                 )
+            kwargs['maxlettersdisplayed']=kwargs.get('maxlettersdisplayed',InputOption().d_graphicsinput_args['maxlettersdisplayed'])
 
             for k in default:
                 if k in kwargs and k not in ['when','input']:
@@ -474,7 +475,6 @@ class front:
             kwargs = {**default, **dicovisu}
             kwargs['what'] = kwargs.get('what',self.lwhat[0])
             kwargs_values_testing(kwargs['what'],self.av.d_batchinput_args['what'],'Bad what values ...')
-
             if isinstance(kwargs['what'],list):
                 kwargs['what'] = kwargs['what'][0]
             kwargs['kwargsuser'] = kwargs.copy()
@@ -540,6 +540,12 @@ class front:
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
+            n = kwargs['maxlettersdisplayed']
+            if n<5:
+              PyvoaWarning('Min letter is 5 ...')
+              n = 5
+            where = kwargs['input']['where']
+            kwargs['input']['where'] = where.where(where.str.len() <= n, where.str[:n] + '...')
             return func(self,**kwargs)
         return wrapper
 

@@ -117,7 +117,6 @@ class AllVisu:
         self.maxcountrydisplayed  = InputOption().d_graphicsinput_args['maxcountrydisplayed']
         self.colors = plt.cm.tab20(np.linspace(0, 1,self.maxcountrydisplayed))
 
-        self.maxlettersdisplayed = InputOption().d_graphicsinput_args['maxlettersdisplayed']
         pathmetadb = str(pkg_resources.files(pyvoa).joinpath("data"))
         self.logo = pathmetadb+'/logo-pyvoa.png'
         self.logosmall = pathmetadb+'/logo-pyvoa_small.png'
@@ -135,7 +134,6 @@ class AllVisu:
             input = kwargs.get('input')
             # what = kwargs.get('what')
             title = kwargs.get('title')
-            kwargs['maxlettersdisplayed'] = kwargs.get('maxlettersdisplayed',self.maxlettersdisplayed)
             kwargs['logo'] = self.logosmall
 
             #input = input.loc[input['where'].isin(locunique)]
@@ -163,9 +161,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            n = kwargs['maxlettersdisplayed']
             where = kwargs['input']['where']
-            kwargs['input']['where'] = where.where(where.str.len() <= n, where.str[:n] + '...')
             if isinstance(which, list):
                 which = which[0]
                 kwargs['which'] = which
@@ -178,7 +174,6 @@ class AllVisu:
             typeofhist = kwargs.get('typeofhist')
 
             kwargs['logo'] = self.logo
-            kwargs['maxlettersdisplayed'] = kwargs.get('maxlettersdisplayed',self.maxlettersdisplayed)
             # windows =  InputOption().windows
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
@@ -232,8 +227,6 @@ class AllVisu:
             Puts into the kwargs ``geopdwd``, the pandas of the variable asked for
             over all dates, and ``geopdwd_filtered``, the same for the last date only.
             """
-            maxlettersdisplayed=InputOption().d_graphicsinput_args['maxlettersdisplayed']
-            kwargs['input']['where'] = kwargs['input']['where'].apply(lambda x: x[:maxlettersdisplayed] + '...' if len(str(x)) > maxlettersdisplayed else x)
             input = kwargs.get('input')
             which = kwargs.get('which')
             # vis = kwargs.get('vis')
