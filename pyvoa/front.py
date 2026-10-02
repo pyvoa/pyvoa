@@ -504,7 +504,6 @@ class front:
                         kwargs['which'] =  next(c for c in kwargs['input'].columns if c not in ['where', 'date','code','geometry'])
                 except Exception:
                     raise PyvoaError("Don't know which value can be requested")
-            print("kwargs['which']",kwargs['which'],self.listwhich())        
             if kwargs['input'].empty:
                 kwargs['input'] = self.gpdbuilderdata
                 transfo = convertmercator(self.gpdbuildergeo)
