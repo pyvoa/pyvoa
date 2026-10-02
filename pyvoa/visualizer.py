@@ -163,7 +163,9 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            kwargs['input']['where']=kwargs['input']['where'].str[:kwargs['maxlettersdisplayed']]
+            n = kwargs['maxlettersdisplayed']
+            where = kwargs['input']['where']
+            kwargs['input']['where'] = where.where(where.str.len() <= n, where.str[:n] + '...')
             if isinstance(which, list):
                 which = which[0]
                 kwargs['which'] = which
