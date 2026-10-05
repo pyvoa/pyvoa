@@ -7,7 +7,7 @@
   },
   "datasets": [
     {
-      "urldata": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
+      "urldata": "https://zenodo.org/records/23165146/files/measles_county_all_updates.csv?content",
       "urlparent": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
       "urlmaster": "https://github.com/CSSEGISandData/measles_data",
       "separator": ",",
