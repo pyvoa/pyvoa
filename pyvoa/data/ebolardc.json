@@ -14,7 +14,7 @@
   },
   "datasets": [
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_confirmed_cases.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -43,7 +43,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_confirmed_deaths.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -72,7 +72,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_suspected_cases.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -101,7 +101,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_suspected_deaths.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -130,7 +130,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_contacts_traced.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -159,7 +159,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_confirmed_cases.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -188,7 +188,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_suspected_cases.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -217,7 +217,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_suspected_deaths.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -246,7 +246,7 @@
       ]
     },
     {
-      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
+      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__hospitalised.csv?content",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
