@@ -31,31 +31,6 @@
           "cumulative": true
         }
       ]
-    },
-    {
-      "urldata": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
-      "urlparent": "https://raw.githubusercontent.com/CSSEGISandData/measles_data/main/measles_county_all_updates.csv",
-      "urlmaster": "https://github.com/CSSEGISandData/measles_data",
-      "separator": ",",
-      "splitwhere": {
-        "separator": ",",
-        "keep": -1
-      },
-      "columns": [
-        {
-          "name": "where",
-          "alias": "location_name"
-        },
-        {
-          "name": "date"
-        },
-        {
-          "name": "cur_cases",
-          "alias": "value",
-          "description": "Number of laboratory-confirmed measles cases reported by the counties of the state on that day",
-          "fillmissing": true
-        }
-      ]
     }
   ]
 }
