@@ -129,7 +129,7 @@ reproducible; see [Archived data, live data](#archived-data-live-data).
 | `covidtracking` | United States | subregion (states) | The COVID Tracking Project | both |
 | `dgs` | Portugal | region | Direção-Geral da Saúde | both |
 | `dpc` | Italy | region | Dipartimento della Protezione Civile | both |
-| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | live only |
+| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | both (prefer live) |
 | `escovid19data` | Spain | subregion (provinces) | escovid19data | both |
 | `europa` | worldwide | country | European Commission, Joint Research Centre | both |
 | `govcy` | Cyprus | country | Government of Cyprus | both |
@@ -137,7 +137,7 @@ reproducible; see [Archived data, live data](#archived-data-live-data).
 | `jhu` | worldwide | country | Johns Hopkins University CSSE | both |
 | `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE | both |
 | `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare | both |
-| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team | live only |
+| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team | both (prefer live) |
 | `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación | archive only |
 | `moh` | Malaysia | subregion (states) | Ministry of Health | archive only |
 | `mpoxgh` | worldwide | country | Global.health, via Our World in Data | both |
