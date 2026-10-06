@@ -243,39 +243,56 @@ def tostdstring(s):
     """Standardization of string for country,region or subregion tests."""
     return unidecode.unidecode(' '.join(s.replace('-',' ').split())).upper()
 
-def fill_missing_dates(p, date_field='date', loc_field='where', d1=None, d2=None):
+def fill_missing_dates(p, date_field='date', loc_field='where',
+                       d1=None, d2=None):
     """Fill the input pandas dataframe p with missing dates."""
+
     if not isinstance(p, pd.DataFrame):
         raise PyvoaError("Expecting input p as a pandas dataframe.")
-    if date_field not in p.columns:
-        raise PyvoaError("The date_field is not a proper column of input pandas dataframe.")
-    if loc_field not in p.columns:
-        raise PyvoaError("The loc_field is not a proper column of input pandas dataframe.")
-    # datatoilettage :)
-    p = p.loc[~p[loc_field].isin([''])]
 
+    if date_field not in p.columns:
+        raise PyvoaError(
+            "The date_field is not a proper column of input pandas dataframe."
+        )
+
+    if loc_field not in p.columns:
+        raise PyvoaError(
+            "The loc_field is not a proper column of input pandas dataframe."
+        )
+
+    # Nettoyage
+    p = p.loc[~p[loc_field].isin([''])].copy()
+
+    # Dates au format datetime
+    p[date_field] = pd.to_datetime(p[date_field]).dt.normalize()
     if d2 is None:
-        d2=p[date_field].max()
+        d2 = p[date_field].max().date()
+
     if d1 is None:
-        d1=p[date_field].min()
-    if not all(isinstance(d, datetime.date) for d in [d1,d2]):
+        d1 = p[date_field].min().date()
+
+    if not all(isinstance(d, datetime.date) for d in [d1, d2]):
         raise PyvoaError("Waiting for dates as datetime.date.")
+
     if d1 > d2:
         raise PyvoaError("Dates should be ordered as d1<d2.")
 
-    idx = pd.date_range(d1, d2, freq = "D")
-    #idx = idx.date
-    all_loc=list(p[loc_field].unique())
-    pfill=pd.DataFrame()
-    for loc in all_loc:
-        pp=p.loc[p[loc_field]==loc]
-        pp2=pp.set_index([date_field])
-        pp2.index = pd.DatetimeIndex(pp2.index)
-        pp3 = pp2.reindex(idx,fill_value=pd.NA)#numpy.nan)#
-        pp3[loc_field] = pp3[loc_field].fillna(loc)
-        pfill=pd.concat([pfill, pp3])
-    pfill = pfill.reset_index().rename(columns={'index': date_field})
-    #pfill.reset_index(inplace=True)
+    idx = pd.date_range(d1, d2, freq="D")
+    pfill = []
+    for loc in p[loc_field].unique():
+        pp = p.loc[p[loc_field] == loc].copy()
+        pp = pp.set_index(date_field)
+        pp.index = pd.DatetimeIndex(pp.index)
+        pp = pp.reindex(idx)
+        pp = pp.ffill().bfill()
+        pp[loc_field] = pp[loc_field].fillna(loc)
+        pfill.append(pp)
+    pfill = pd.concat(pfill)
+    pfill = (
+        pfill
+        .reset_index()
+        .rename(columns={'index': date_field})
+    )
     return pfill
 
 def check_valid_date(date):
