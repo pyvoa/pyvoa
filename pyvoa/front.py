@@ -924,9 +924,9 @@ class front:
         typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
             How the geography is drawn; :meth:`listmap` lists them.
         tile : {'openstreet', 'esri', 'positron', 'stamen'}, optional
-            The background tiles; :meth:`listtile` lists them. Bokeh defaults to
-            'openstreet'; matplotlib draws no tiles unless one is named. A dense
-            map is drawn without tiles.
+            The background tiles; :meth:`listtile` lists them. Defaults to
+            'openstreet' (OpenStreetMap), the first of them, under bokeh and
+            matplotlib alike. A dense map is drawn without tiles.
         vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.

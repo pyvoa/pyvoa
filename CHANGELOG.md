@@ -36,9 +36,11 @@
   `'lwhere'`, `'mypd'`) and fails when called without it.
 - `listwhom(detailed=True)` no longer lists the variables of each database,
   which are only known once a database is parsed: see `listwhich()`.
-- maps: bokeh draws them on `'openstreet'` tiles unless another one is named,
-  and matplotlib on none; `None` is no longer a value of `tile`. A dense map
-  is drawn without tiles.
+- maps are drawn on OpenStreetMap tiles (`'openstreet'`) unless another one is
+  named, by bokeh and matplotlib alike: `'openstreet'` now heads
+  `listtile()`, whose first entry is the default, and `None` is no longer a
+  value of `tile`. matplotlib fetches the tiles with a pyvoa User-Agent, which
+  OpenStreetMap requires. A dense map is drawn without tiles.
 - every docstring was checked against the code changed since the last such
   pass (2026-09-12) and corrected where it had drifted: the default of
   `which`, the chart keywords, what `plot()`, `hist()` and `map()` return,

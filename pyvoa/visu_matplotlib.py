@@ -19,6 +19,7 @@ import pandas as pd
 from matplotlib.ticker import FuncFormatter
 from PIL import Image
 
+from pyvoa.__version__ import __version__
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
@@ -427,8 +428,10 @@ class visu_matplotlib:
 
         Colours each location by its value on a reversed viridis scale. The
         locations of the geography the source says nothing about ('from_db'
-        False) are drawn in pink, with a note saying so. Background tiles are
-        added only when 'tile' names one, and never on a dense map; a location
+        False) are drawn in pink, with a note saying so. The background tiles
+        are those 'tile' names, OpenStreetMap ('openstreet') unless another one
+        is asked for, fetched with a pyvoa User-Agent, which OpenStreetMap
+        requires; a dense map has none. A location
         without a geometry of its own is counted but not drawn.
 
         Returns
@@ -542,7 +545,9 @@ class visu_matplotlib:
                 crs=data_crs,
                 source=cx.providers.OpenStreetMap.Mapnik,
                 headers={
-                    "User-Agent": "pyvoa/<version> (+https://github.com/pyvoa/pyvoa)"
+                    # OpenStreetMap serves a blocked image to a client that
+                    # does not identify itself
+                    "User-Agent": f"pyvoa/{__version__} (+https://github.com/pyvoa/pyvoa)"
                 },
                 )
             elif tile == 'esri':

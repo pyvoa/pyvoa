@@ -309,10 +309,15 @@ the repository root; `essai_govcy.py` next to it is the single-database version.
   a geometry of their own. They are French overseas territories, not independent
   countries, and the merge is what gives France a correct total. What the merge
   does to rates is §5, a separate problem: fix the merge, do not remove it.
-- **`tile='openstreet'` is not the default** and never was. `listtile()` is
-  `['esri', 'positron', 'stamen', 'openstreet', None]`, first entry first, so
-  maps are drawn on Esri tiles. OpenStreetMap returns "Access blocked" 403 images
-  when asked for by name; that is a decision of theirs, not a bug here.
+- **`tile='openstreet'` is the default**, for bokeh and matplotlib alike, since
+  `6e0cea6` (2026-08-26) and `9ff2988` (2026-09-05). `listtile()` is
+  `['openstreet', 'esri', 'positron', 'stamen']`, and `input_wrapper` gives every
+  chart keyword left out the first value of its list. This entry said the
+  opposite until 2026-10-06, written when Esri came first. OpenStreetMap does
+  serve an "Access blocked" image to a client that does not identify itself:
+  matplotlib fetches the tiles with a pyvoa User-Agent (checked 2026-10-06: a
+  real tile with it, the blocked image without), and bokeh fetches them from the
+  reader's browser. Keep that header if the basemap code is touched.
 
 ## Two traps in the git history
 
