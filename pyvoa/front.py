@@ -126,6 +126,7 @@ class front:
         self.loption = list(self.av.d_batchinput_args['option'])
 
         self.ltiles = list(self.av.d_graphicsinput_args['tile'])
+        self.lprojections = list(self.av.d_graphicsinput_args['projection'])
 
         self.largument = self.av.listargument
         self.largumentvalue = self.av.listargumentvalue
@@ -928,6 +929,14 @@ class front:
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
             matplotlib alike. A dense map is drawn without tiles.
+        projection : {'eckert4', 'mercator'}, optional
+            :meth:`listprojection` lists them. Under matplotlib, the
+            projection of the map: 'eckert4', the
+            default, is equal-area, so that a surface reads as what it is, and
+            centred on the data for a national map; the tiles are reprojected
+            onto it, and stop at the 180th meridian, beyond which they do not
+            exist. 'mercator' is Web Mercator. Bokeh, whose tiles exist in Web
+            Mercator only, always draws Mercator and ignores it.
         vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.
@@ -1491,6 +1500,29 @@ class front:
         """
         if self.av.pdcharts[self.vis]['map']:
             return self.ltiles
+        else:
+            raise PyvoaError(self.vis+ ' : has not map function !')
+
+    def listprojection(self,):
+        """List the projections a map can be drawn in.
+
+        Returns
+        -------
+        list of str
+            The values 'projection' accepts, the default first: 'eckert4', an
+            equal-area projection, then 'mercator'. Under bokeh, whose tiles
+            exist in Web Mercator only, a map is always drawn in Mercator, and
+            the list is ['mercator'].
+
+        Raises
+        ------
+        PyvoaError
+            If the current backend draws no map at all.
+        """
+        if self.av.pdcharts[self.vis]['map']:
+            if self.vis == 'bokeh':
+                return ['mercator']
+            return self.lprojections
         else:
             raise PyvoaError(self.vis+ ' : has not map function !')
 

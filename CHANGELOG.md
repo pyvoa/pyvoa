@@ -1,4 +1,18 @@
 # Unreleased
+- matplotlib maps are drawn on an equal-area projection, Eckert IV, so that
+  a surface reads as what it is; the new `projection` keyword ('eckert4' by
+  default, 'mercator') brings Web Mercator back. A national map is centred on
+  its data, a world map on 0, and the OpenStreetMap tiles are reprojected onto
+  it by contextily — they stop at the 180th meridian, beyond which they do
+  not exist. The countries GeoInfo pushes past 180 degrees so that a Mercator
+  map does not cut them (Russia, Fiji, New Zealand, Samoa, the USA) are cut at
+  the antimeridian of the projection instead of being wrapped round the
+  world, which drew bands across the map. Bokeh, whose tiles exist in Web
+  Mercator only, keeps Mercator and ignores `projection`. `listprojection()`
+  lists the projections the current backend draws, as `listtile()` does the
+  tiles: `['eckert4', 'mercator']`, or `['mercator']` under bokeh. New helpers in
+  `tools`: `equal_area_projection`, `wrap_antimeridian`,
+  `projection_half_extent`.
 - fix: the Japanese geography (jpnmhlw) was read straight from GitHub on
   every `setwhom()`, bypassing `get_local_from_url`: never cached, never
   looked for in the Zenodo archive. Its url is now the `JPN` entry of

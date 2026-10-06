@@ -23,7 +23,9 @@ from pyvoa.__version__ import __version__
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
+    equal_area_projection,
     min_max_range,
+    projection_half_extent,
 )
 
 
@@ -427,7 +429,9 @@ class visu_matplotlib:
     def matplotlib_map(self,**kwargs):
         """Draw a choropleth map of one variable.
 
-        Colours each location by its value on a reversed viridis scale. The
+        Colours each location by its value on a reversed viridis scale, on an
+        equal-area Eckert IV projection unless 'projection' asks for
+        'mercator' (see ``tools.equal_area_projection``). The
         locations of the geography the source says nothing about ('from_db'
         False) are drawn in pink, with a note saying so. The background tiles
         are those 'tile' names, OpenStreetMap ('openstreet') unless another one
@@ -455,6 +459,7 @@ class visu_matplotlib:
         tile = kwargs.get('tile')
         typeofmap = kwargs.get('typeofmap')
         return_pltaxis= kwargs.get('return_pltaxis')
+        projection = kwargs.get('projection', 'eckert4')
         if typeofmap == 'dense':
             tile = None
         # The frames arrive labelled EPSG:4326 whatever their units: the world
@@ -467,6 +472,16 @@ class visu_matplotlib:
         in_degrees = abs(minx) <= 180 and abs(maxx) <= 180 and abs(miny) <= 90 and abs(maxy) <= 90
         data_crs = "EPSG:4326" if in_degrees else "EPSG:3857"
         minimum_extent = 1 if in_degrees else 10_000        # one degree, or 10 km
+        # The units the frame is actually in, not Lambert-93: overriding every
+        # frame to EPSG:2154 mislabelled both the world and the dense maps.
+        input = input.set_crs(data_crs, allow_override=True)
+        if projection == 'eckert4':
+            # an equal-area map, so that a surface reads as what it is; the
+            # basemap tiles are reprojected onto it by contextily
+            input = input.set_geometry(equal_area_projection(input.geometry, in_degrees))
+            data_crs = input.crs
+            minimum_extent = 10_000                         # 10 km
+            minx, miny, maxx, maxy = input.total_bounds
 
         dx = max(maxx - minx, minimum_extent)
         dy = max(maxy - miny, minimum_extent)
@@ -477,6 +492,13 @@ class visu_matplotlib:
         maxx += dx * factor
         miny -= dy * factor
         maxy += dy * factor
+        if projection == 'eckert4':
+            # contextily cannot reproject a frame reaching past the edge of the
+            # projection (its corners come back NaN, and so does the tile zoom):
+            # the margin stops at that edge, which only a world map reaches
+            xhalf, yhalf = projection_half_extent(data_crs)
+            minx, maxx = max(minx, -xhalf), min(maxx, xhalf)
+            miny, maxy = max(miny, -yhalf), min(maxy, yhalf)
         ax.set_xlim(float(minx), float(maxx))
         ax.set_ylim(float(miny), float(maxy))
         ax.set_aspect('equal')
@@ -487,9 +509,6 @@ class visu_matplotlib:
         #fig.set_figheight(fig.get_figwidth() * ratio)
         # color range
         min_col, max_col = min_max_range(np.nanmin(input[which]), np.nanmax(input[which]))
-        # The units the frame is actually in, not Lambert-93: overriding every
-        # frame to EPSG:2154 mislabelled both the world and the dense maps.
-        input = input.set_crs(data_crs, allow_override=True)
 
         # plot
         input_missing = input[

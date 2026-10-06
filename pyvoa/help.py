@@ -56,6 +56,7 @@ def display_full_help():
         ('listpop', "List normalization options (per population)"),
         ('listplot', "List available plot types"),
         ('listtile', "List available map textures"),
+        ('listprojection', "List available map projections"),
         ('listvis', "List available visualization backends"),
         ('dir(pyvoa)', "Display all available methods")
     ]

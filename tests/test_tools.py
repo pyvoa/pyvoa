@@ -969,3 +969,53 @@ def test_prioritize_keyword_puts_the_default_which_first(variables, expected):
     assert ordered[0] == expected
     assert sorted(ordered) == sorted(variables)
     assert given == variables
+
+
+# --- equal-area maps -------------------------------------------------------
+
+def test_wrap_antimeridian_cuts_a_polygon_drawn_past_180():
+    """Russia's far east, shifted past 180 degrees, comes back as two pieces."""
+    pushed = sg.box(170, 60, 190, 70)
+    wrapped = tools.wrap_antimeridian(pushed)
+    minx, _, maxx, _ = wrapped.bounds
+    assert (minx, maxx) == (-180, 180)
+    assert wrapped.area == pytest.approx(pushed.area)
+
+
+def test_wrap_antimeridian_is_relative_to_the_central_meridian():
+    """Centred on -122, a polygon from -187 to -66 is within reach: left whole."""
+    alaska_to_maine = sg.box(-187, 20, -66, 70)
+    assert tools.wrap_antimeridian(alaska_to_maine, lon_0=-122).equals(alaska_to_maine)
+
+
+def test_wrap_antimeridian_leaves_empty_and_missing_geometries_alone():
+    assert tools.wrap_antimeridian(None) is None
+    assert tools.wrap_antimeridian(sg.Polygon()).is_empty
+
+
+def test_web_mercator_to_degrees_does_not_wrap():
+    """PROJ would bring 190 degrees back to -170; the shift must survive."""
+    x190 = 20037508.342789244 * 190 / 180
+    lon, lat = tools._web_mercator_to_degrees(np.array([[x190, 0.0]]))[0]
+    assert lon == pytest.approx(190)
+    assert lat == pytest.approx(0, abs=1e-9)
+
+
+def test_equal_area_projection_centres_a_national_map_on_its_data():
+    usa = gpd.GeoSeries([sg.box(-125, 25, -67, 49), sg.box(-187, 52, -130, 71)], crs="EPSG:4326")
+    projected = tools.equal_area_projection(usa, in_degrees=True)
+    assert projected.crs.to_dict()["proj"] == "eck4"
+    assert projected.crs.to_dict()["lon_0"] == pytest.approx(-127)   # (-187 - 67) / 2
+
+
+def test_equal_area_projection_centres_a_world_map_on_zero():
+    world = gpd.GeoSeries([sg.box(-170, -50, -60, 60), sg.box(20, -30, 170, 70)], crs="EPSG:4326")
+    projected = tools.equal_area_projection(world, in_degrees=True)
+    assert projected.crs.to_dict().get("lon_0", 0) == 0
+
+
+def test_projection_half_extent_of_eckert_iv():
+    half_width, half_height = tools.projection_half_extent(
+        "+proj=eck4 +lon_0=0 +datum=WGS84 +units=m +no_defs")
+    assert half_width == pytest.approx(16.92e6, rel=1e-3)
+    assert half_height == pytest.approx(8.46e6, rel=1e-3)

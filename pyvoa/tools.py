@@ -36,7 +36,10 @@ import geopandas as gpd
 import numpy as np
 import pandas as pd
 import requests
+import shapely
+import shapely.affinity as sa
 import shapely.geometry as sg
+import shapely.ops as so
 import unidecode
 
 _coacache_folder=''
@@ -749,6 +752,114 @@ def wgs84_to_web_mercator(tuple_xy):
         lat = tuple_xy[1]
     y = np.log(np.tan((90 + lat) * np.pi / 360.0)) * k
     return x, y
+
+_WEB_MERCATOR_RADIUS = 6378137.0
+
+def _web_mercator_to_degrees(coords):
+    """Invert Web Mercator on an (n, 2) array of coordinates, without wrapping.
+
+    PROJ brings every longitude back into [-180, 180], which would undo the
+    shift GeoInfo gives the countries drawn across the antimeridian; the
+    formula keeps 190 degrees at 190.
+    """
+    lon = np.degrees(coords[:, 0] / _WEB_MERCATOR_RADIUS)
+    lat = np.degrees(2 * np.arctan(np.exp(coords[:, 1] / _WEB_MERCATOR_RADIUS)) - np.pi / 2)
+    return np.column_stack([lon, lat])
+
+def wrap_antimeridian(geom, lon_0=0):
+    """Bring a geometry back within 180 degrees of a central meridian.
+
+    GeoInfo pushes Russia, Fiji, New Zealand and Samoa east of 180 degrees, and
+    the USA west of -180, so that a Mercator map does not cut them in two. A
+    projection that is not cylindrical wraps a polygon that crosses its own
+    antimeridian round the world, drawing a band across the whole map: the
+    geometry is cut there instead, and each piece moved back by 360 degrees.
+
+    Parameters
+    ----------
+    geom : shapely geometry or None
+        In degrees.
+    lon_0 : float
+        The central meridian of the projection, whose antimeridian is
+        ``lon_0 + 180``.
+
+    Returns
+    -------
+    shapely geometry or None
+        The same area, within [lon_0 - 180, lon_0 + 180]; an empty or missing
+        geometry, and one already within, is returned as it is.
+    """
+    if geom is None or geom.is_empty:
+        return geom
+    minx, _, maxx, _ = geom.bounds
+    if minx >= lon_0 - 180 and maxx <= lon_0 + 180:
+        return geom
+    world = sg.box(lon_0 - 180, -90, lon_0 + 180, 90)
+    pieces = [geom.intersection(world)]
+    for shift in (-360, 360):
+        piece = geom.intersection(sa.translate(world, xoff=-shift))
+        if not piece.is_empty:
+            pieces.append(sa.translate(piece, xoff=shift))
+    return so.unary_union([p for p in pieces if not p.is_empty])
+
+def equal_area_projection(geometry, in_degrees):
+    """Project geometries onto Eckert IV, an equal-area projection.
+
+    The geometries are brought to degrees and projected onto Eckert IV,
+    centred on 0 for a map spanning more than half the world, on the middle of
+    the data otherwise, so that a national map is not sheared. That middle is
+    taken before any cut, on the geometries as GeoInfo shifts them, which keeps
+    a country across 180 degrees contiguous: the USA, Alaska included, centre
+    near -127. They are then cut at the antimeridian of that projection (see
+    :func:`wrap_antimeridian`).
+
+    Parameters
+    ----------
+    geometry : geopandas.GeoSeries
+        The geometries, whatever crs they are labelled with.
+    in_degrees : bool
+        True if they are in degrees, False if in Web Mercator metres, as
+        ``front.get()`` hands them out.
+
+    Returns
+    -------
+    geopandas.GeoSeries
+        The geometries in Eckert IV metres, with that crs.
+    """
+    if not in_degrees:
+        geometry = geometry.apply(
+            lambda g: g if g is None else shapely.transform(g, _web_mercator_to_degrees))
+    # now in degrees, whatever crs the series still carries
+    geometry = gpd.GeoSeries(geometry).set_crs('EPSG:4326', allow_override=True)
+    minx, _, maxx, _ = geometry.total_bounds
+    lon_0 = 0 if not np.isfinite(minx) or maxx - minx > 180 else round((minx + maxx) / 2, 1)
+    geometry = geometry.apply(lambda g: wrap_antimeridian(g, lon_0))
+    return geometry.to_crs(f'+proj=eck4 +lon_0={lon_0} +datum=WGS84 +units=m +no_defs')
+
+def projection_half_extent(crs):
+    """Return how far a pseudo-cylindrical projection reaches from its centre.
+
+    Parameters
+    ----------
+    crs : pyproj.CRS or str
+        An Eckert IV crs, as :func:`equal_area_projection` gives; read through
+        geopandas, pyproj not being a dependency of its own.
+
+    Returns
+    -------
+    tuple of float
+        (half width, half height): where 180 degrees from the central
+        meridian on the equator, and the pole, fall.
+    """
+    crs = gpd.GeoSeries([], crs=crs).crs
+    # read off the projection parameters: crs.to_dict() goes through a PROJ
+    # string, and pyproj warns on every map drawn
+    operation = crs.coordinate_operation
+    lon_0 = next((p.value for p in operation.params
+                  if 'longitude' in p.name.lower()), 0) if operation else 0
+    edge = gpd.GeoSeries([sg.Point(lon_0 + 180, 0), sg.Point(lon_0, 90)],
+                         crs='EPSG:4326').to_crs(crs)
+    return abs(edge.iloc[0].x), abs(edge.iloc[1].y)
 
 @staticmethod
 def convertmercator(gdf):
