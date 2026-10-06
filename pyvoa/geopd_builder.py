@@ -51,7 +51,7 @@ class GPDBuilder:
    is no reason to build one directly.
    """
 
-   def __init__(self, db_name = None):
+   def __init__(self, db_name = None, parse = True):
         """Build the GeoDataFrame of one database.
 
         Calls the parser for the data, the geography for the locations, and
@@ -62,15 +62,22 @@ class GPDBuilder:
         ----------
         db_name : str
             The database to load. With None, nothing is loaded.
+        parse : bool
+            True, the default, parses the database at once. False leaves it
+            unparsed, for ``front.setwhom(reload=False)``, which reads the data
+            back from the pickles instead: the parser is then only built if
+            something asks for it, through :meth:`get_parserdb`.
         """
         if db_name is not None:
             verb("Init of geopd_builder.GPDBuilder()")
             self.db = db_name
             self.currentmetadata = parser.MetaInfo().getcurrentmetadata(db_name)
-            self.currentdata = parser.DataParser(db_name)
-            self.slocation = self.currentdata.get_locations()
+            self.currentdata = parser.DataParser(db_name) if parse else None
+            # self.slocation = self.currentdata.get_locations()
             #self.geo = self.currentdata.get_geo()
-            self.db_world = self.currentdata.get_world_boolean()
+            # what DataParser.get_world_boolean() answers, read off the metadata
+            # so that it needs no parse
+            self.db_world = self.currentmetadata['geoinfo']['granularity'] == 'country'
             self.codisp  = None
             self.code = self.currentmetadata['geoinfo']['iso3']
             self.granularity = self.currentmetadata['geoinfo']['granularity']
@@ -131,14 +138,15 @@ class GPDBuilder:
 
    def get_available_keywords(self):
        """Return available from the jsondb_parser."""
-       return self.currentdata.get_available_keywords()
+       return self.get_parserdb().get_available_keywords()
 
    def factory(self,reload=True):
        """Split the parsed database, save it, and set up its charts.
 
        Splits the table the parser built into its data and its geometry, saves
-       both as pickles in the pyvoa cache -- the data with the lists
-       :meth:`listwhich` and :meth:`listwhere` give, the geometry with the
+       both as pickles in the pyvoa cache -- the data with the list
+       :meth:`listwhich` gives and both answers of :meth:`listwhere`, the
+       geometry with the
        description of the locations -- and builds the AllVisu that draws them.
        ``front.setwhom`` calls it, and reads those pickles back when asked not
        to reload.
@@ -157,11 +165,12 @@ class GPDBuilder:
        """
        f = self.db+'.pkl'
        if reload:
-          data, geo=self.split_data_geo(self.currentdata.get_maingeopandas())
+          data, geo=self.split_data_geo(self.get_parserdb().get_maingeopandas())
           self.namepkldata = 'data'+f
           datadata = {}
           datadata['listwhich'] = self.listwhich(self.db)
-          datadata['listwhere'] = self.listwhere()
+          # both answers, since front.listwhere() takes the flag
+          datadata['listwhere'] = {flag: self.listwhere(flag) for flag in (True, False)}
           datadata['data'] = data
           dumppkl(self.namepkldata, datadata)
           self.namepklgeo  = 'geo'+f
@@ -206,10 +215,9 @@ class GPDBuilder:
         pandas.DataFrame
             Every variable of the current database, for every location and date.
         """
-        col = list(self.currentdata.get_maingeopandas().columns)
-        mem=f'{self.currentdata.get_maingeopandas()[col].memory_usage(deep=True).sum():,}'
+        df = self.get_parserdb().get_maingeopandas()
+        mem=f'{df.memory_usage(deep=True).sum():,}'
         info('Memory usage of all columns: ' + mem + ' bytes')
-        df = self.currentdata.get_maingeopandas()
         return df
 
    @staticmethod
@@ -260,7 +268,14 @@ class GPDBuilder:
        return self.geo
 
    def get_parserdb(self):
-       """Return the DataParser holding the parsed database."""
+       """Return the DataParser holding the parsed database.
+
+       A builder made with ``parse=False`` parses the database here, the first
+       time something needs the parser: the full table, the variable
+       definitions and urls, or the description of the database.
+       """
+       if self.currentdata is None and self.db != 'in-house data':
+           self.currentdata = parser.DataParser(self.db)
        return self.currentdata
 
 
@@ -568,7 +583,7 @@ class GPDBuilder:
        if input.empty:
             available_keywords = self.get_available_keywords()
             kwargs_values_testing(which,available_keywords,'which error ...')
-            input = self.currentdata.get_maingeopandas()
+            input = self.get_parserdb().get_maingeopandas()
 
             #anticolumns = [x for x in available_keywords if x not in which]
             #input = input[which].loc[:,input.columns.isin(anticolumns)]

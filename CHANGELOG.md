@@ -20,9 +20,18 @@
   `reload` asks — parse the source (`reload=True`, the default) or read the
   pickles back (`reload=False`). It saves the lists `listwhich()` and
   `listwhere()` give along with the data, so that `reload=False` reads all
-  three back. Known issue: `reload=False` still parses the database once,
-  through the `GPDBuilder` that `setwhom()` creates before testing `reload`,
-  so it does not save the parse it is meant to.
+  three back.
+- fix: `setwhom(base, reload=False)` parsed the database all the same, since
+  `GPDBuilder.__init__` built a `DataParser` before `reload` was looked at —
+  the regression came with the split pickles of June 2026, whose earlier
+  version pickled the whole builder. The builder now takes `parse=False`, and
+  only builds its parser when something needs it (`getwhichinfo()`,
+  `getwhom(detailed=True)`): reselecting `owid` from its pickles takes 0.6 s
+  instead of 9.4 s. The pickle keeps both answers of `listwhere()`, with and
+  without the individual locations, where it kept only the clusters, so that
+  `listwhere()` answers alike in both modes.
+- fix: `getwhichinfo()` called `listwhich()` with an argument it no longer
+  takes, and raised a `TypeError`.
   `get_echoinfo()` now takes the dict `setwhom()` builds (`'lwhich'`,
   `'lwhere'`, `'mypd'`) and fails when called without it.
 - `listwhom(detailed=True)` no longer lists the variables of each database,

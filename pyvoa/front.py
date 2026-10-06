@@ -305,11 +305,10 @@ class front:
             The database to select; :meth:`listwhom` lists them.
         reload : bool, optional
             True, the default, parses the source again. False reads the pickle
-            of a previous parse instead, and fails if the database has never
-            been loaded on this machine. As it stands, False still parses the
-            database once, through the builder this method creates first, and
-            then uses the pickled table: it saves the geography and the
-            pickling, not the parse.
+            of a previous parse instead, without parsing, and fails if the
+            database has never been loaded on this machine. :meth:`getwhom`
+            with ``detailed`` and :meth:`getwhichinfo`, which read what only
+            the parser knows, parse it then, once.
 
         Raises
         ------
@@ -327,7 +326,9 @@ class front:
                                     'See pyvoa.fron.listwhom() for the full list.')
 
         echokwargs = {}
-        self.gpdbuilder  = builder.GPDBuilder(db_name=base)
+        # with reload=False the data come from the pickles: the builder is not
+        # to parse the database again
+        self.gpdbuilder  = builder.GPDBuilder(db_name=base, parse=reload)
         if reload:
             self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
             echokwargs['reload'] = True
@@ -343,7 +344,7 @@ class front:
             pandy = datapkl['geodescription']
             self.allvisu = AllVisu(base, pandy)
             echokwargs['reload'] = False
-            echokwargs['lwhere'] = self.lwhere
+            echokwargs['lwhere'] = self.listwhere()
             echokwargs['lwhich'] = self.lwhich
 
         echokwargs['mypd']   = self.gpdbuilderdata
@@ -413,6 +414,10 @@ class front:
             lwhere = self.gpdbuilder.listwhere(cluster_and_not)
         else:
             lwhere = self.lwhere
+            # the pickle keeps both answers; one written before it did holds
+            # a single list
+            if isinstance(lwhere, dict):
+                lwhere = lwhere[bool(cluster_and_not)]
         return lwhere
 
     def help(self,):
@@ -1587,7 +1592,7 @@ class front:
             If ``which`` is not a variable of the current database.
         """
         if which:
-            if which in self.listwhich(self.db):
+            if which in self.listwhich():
                 print(self.gpdbuilder.get_parserdb().get_keyword_definition(which))
                 print('Parsed from this url:',self.gpdbuilder.get_parserdb().get_keyword_url(which))
             else:

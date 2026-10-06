@@ -200,3 +200,37 @@ def test_measles_usa_cumulates_the_reported_increments():
 
     texas = frame.loc[frame["where"] == "Texas"].sort_values("date")["tot_cases"]
     assert texas.is_monotonic_increasing
+
+
+# --------------------------------------------------------------------------
+# front.setwhom(reload=False)
+# --------------------------------------------------------------------------
+
+def test_setwhom_without_reload_reads_the_pickles_and_does_not_parse(monkeypatch):
+    """reload=False is the fast path: it must not parse the database again.
+
+    It did, for a while, through the GPDBuilder setwhom() built before testing
+    reload. The answers must be those of a fresh parse all the same.
+    """
+    import pyvoa.front as pf
+    from pyvoa import jsondb_parser
+
+    pf.setwhom("dpc")
+    fresh = pf.get(which="tot_cases", where=["Lombardia"], output="pandas")
+    lists = (pf.listwhere(), pf.listwhere(False), pf.listwhich())
+
+    parses = []
+    original = jsondb_parser.DataParser.get_parsing
+
+    def counting(self):
+        parses.append(self.db)
+        return original(self)
+
+    monkeypatch.setattr(jsondb_parser.DataParser, "get_parsing", counting)
+    pf.setwhom("dpc", reload=False)
+    assert parses == []
+    reread = pf.get(which="tot_cases", where=["Lombardia"], output="pandas")
+    assert parses == []
+    pd.testing.assert_frame_equal(
+        fresh.reset_index(drop=True), reread.reset_index(drop=True))
+    assert (pf.listwhere(), pf.listwhere(False), pf.listwhich()) == lists
