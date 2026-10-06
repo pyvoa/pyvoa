@@ -1,4 +1,27 @@
 # Unreleased
+- locations reported by a source but missing from its geometry file are no
+  longer dropped with their counts: they get an empty geometry, which goes
+  through every join and is simply not drawn. That covers Curaçao, Sint
+  Maarten and the Caribbean Netherlands in the world geometry, which predates
+  the 2010 dissolution of the Netherlands Antilles (owid, europa, mpoxgh);
+  Puerto Rico, Guam, the US Virgin Islands, the Northern Mariana Islands and
+  American Samoa in the USA geography, as a `Territories` census region
+  (jhu-usa, covidtracking); Lakshadweep (covid19india); and the Antártica
+  comuna, 12202 (minciencia). `map()` raises a `PyvoaError` naming them when
+  every location it is asked for is one of those.
+- fix: `convertmercator()`, which `get()` runs on every geometry, skipped a
+  location whose geometry was empty (falsy), so the join that followed left
+  it with none, and `get()` dropped it.
+- the Indian geography merges Dadra and Nagar Haveli with Daman and Diu into
+  the union territory they formed in 2020 (`IN.DH`), under the name
+  covid19india reports them by.
+- covid19india: `Uttarakhand` mapped to the `Uttaranchal` of the Indian
+  geography (6452 deaths were dropped), and `Andaman and Nicobar Islands` to
+  `Andaman and Nicobar` — the existing rule mapped it to itself.
+- escovid19data: `Balears, Illes` and `Palmas, Las` mapped to `Illes Balears`
+  and `Las Palmas` (2146 deaths were dropped).
+- ebolardc: `Rumba` mapped to `Rimba`. It is a typo of the 2026-07-11 sitrep,
+  the only day it appears, in the middle of Rimba's series.
 - fix: `fill_missing_dates()` no longer forward- and back-fills the days it
   inserts (introduced in `cf7bb53`). On a column of increments declared
   `cumulative`, the previous day's increment was repeated before the

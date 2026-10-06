@@ -34,6 +34,7 @@ This file tracks what is **still open**. What has already landed is in
 | 4 | Two documentation URLs now exist — `pyvoa.org` and `pyvoa.github.io/pyvoa`. Decide how they relate. | no |
 | — | The template asks for a `Licence.txt`; the repository has `LICENSE`, no extension. Almost certainly fine, but "your paper will be returned if these are missing" is their wording. | no |
 | — | `GeoRegion` resolves `'G20'` to twenty entries with `MEX` duplicated — nineteen distinct countries. | no |
+| 5 | Merging locations sums every column on the raw dates: cumulative series reported on different days come out saw-toothed, and rates are added up (owid's France per-million figures are). Blocks a consistent treatment of Kosovo. | no |
 
 ---
 
@@ -213,6 +214,70 @@ Three ways out, none of them started:
 Whichever is chosen, record it here and put the answer in the code metadata
 table before submission.
 
+## 5. Merging locations: Kosovo, and what a merge does to the numbers
+
+Found on 2026-10-06 while comparing every database with a direct read of its
+source. Nothing below has been changed in the code.
+
+**The rule.** A location is aligned on the geometry: where the geometry has no
+polygon of its own for a place that the geometry includes in a larger one, the
+place is merged into the larger one. The world borders file has no Kosovo, and
+its `SRB` polygon contains Pristina, so in the world databases Kosovo belongs
+with Serbia. Today the databases disagree:
+
+| database | Kosovo in the source | what pyvoa does |
+|---|---|---|
+| `jhu` | `Kosovo` (a name) | merged into Serbia — `GeoManager` resolves the name to `SRB` |
+| `owid` | `OWID_KOS` | dropped, by the `drop` of the `OWID_` prefix |
+| `europa` | `XKX` | dropped, by an explicit `drop` |
+| `mpoxgh` | none (`XKX` in its `drop`) | nothing to do |
+| `risklayer` | `RS002` | kept: the EUR geography has a Kosovo polygon of its own — already aligned |
+
+**Problem 1 — a merge sums the raw dates as they are.** `replace` maps several
+raw locations onto one, and the parser then sums the rows sharing
+`(date, where)`. That is right when every location reports every day, which is
+why `jhu` is fine. It is wrong for cumulative or stock series reported on
+different days. In `europa`, Serbia and Kosovo share only 325 dates: on 29 of
+them only Kosovo reports, and a merged Serbia would drop from about 16 000 deaths
+to Kosovo's 3139; on 409 others only Serbia does, and Kosovo is missing from the
+total. A naive `XKX → SRB` was tried and reverted for that reason.
+
+**Problem 2 — a merge adds up rates.** Every column is summed, `owid`'s rates
+included (`*_per_million`, `*_per_hundred`, `positive_rate`,
+`reproduction_rate`, `gdp_per_capita`, `excess_mortality*`). The `GUF`/`PYF` →
+`FRA` merge of `owid` (kept on purpose, see the decisions below) therefore gives
+France, on 2022-06-01, a `total_cases_per_million` of 981 527 — the sum of
+France's 443 388, French Guiana's 278 065 and French Polynesia's 260 074. The
+counts (`total_cases`, `total_deaths`, …) are right; the rates are not. Merging
+Kosovo into Serbia in `owid` would do the same to Serbia. `mpoxgh` has the same
+merge but only counts, so it is unaffected.
+
+**Options.**
+
+1. *A real merge in the parser.* When a `replace` collapses several raw
+   locations onto one, carry each raw location's last value forward over the
+   union of their dates before summing, so that the sum never mixes a reported
+   day with a silent one. Sum only counts and running totals; mark the other
+   columns in the JSON (an `"intensive": true` column key, say) and give them a
+   value that is not a sum — the target's own value, or a population-weighted
+   mean where the populations are known. This is the correct fix, and it fixes
+   France's rates in `owid` while keeping the merge. It touches the core of the
+   parser and every existing merge (`dpc` Bolzano + Trento, `covid19india`
+   Telangana and Ladakh, `escovid19data`, the county sums of `measles-usa` and
+   `jhu-usa`), so it needs a full raw-versus-parsed sweep afterwards.
+   Increments (`cumulative: true` columns) must not be carried forward: they are
+   summed as they are, as now.
+2. *Leave Kosovo as it is.* Merged in `jhu`, dropped in `owid` and `europa`. The
+   numbers are right for what is kept, but Kosovo is absent from two databases
+   whose geometry includes it, and France's rates in `owid` stay wrong.
+3. *Option 1 first, then Kosovo.* Once the parser merges correctly, map
+   `OWID_KOS` and `XKX` to `SRB` (for `owid`, the `drop` of the `OWID_` prefix
+   runs before `replace`, so either the order changes or `OWID_KOS` is spared by
+   the `drop`).
+
+The comparison script that found all this, `essai_alldb.py`, sits untracked at
+the repository root; `essai_govcy.py` next to it is the single-database version.
+
 ## Decisions already taken — do not re-open
 
 - **The manuscript word limit is 4000, not 3000**, and keywords may number 1 to
@@ -239,6 +304,11 @@ table before submission.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases** rather
   than a number. The exact count lives in `README.md`'s table, which is the one
   place that has to stay in step with `pyvoa/data/`.
+- **French Guiana and French Polynesia are merged into France** in `owid` and
+  `mpoxgh` (`"GUF":"FRA"`, `"PYF":"FRA"` in their `replace`), although both have
+  a geometry of their own. They are French overseas territories, not independent
+  countries, and the merge is what gives France a correct total. What the merge
+  does to rates is §5, a separate problem: fix the merge, do not remove it.
 - **`tile='openstreet'` is not the default** and never was. `listtile()` is
   `['esri', 'positron', 'stamen', 'openstreet', None]`, first entry first, so
   maps are drawn on Esri tiles. OpenStreetMap returns "Access blocked" 403 images

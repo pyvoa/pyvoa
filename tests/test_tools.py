@@ -912,3 +912,14 @@ def test_blinking_centered_text_html_has_no_animation_when_not_blinking(monkeypa
     tools.blinking_centered_text("PYVOA Info !", "calm message", blinking=False)
 
     assert "animation: blink" not in displayed[0].data
+
+
+def test_convertmercator_keeps_a_location_with_an_empty_geometry():
+    """An empty geometry is falsy: it must not make the location vanish."""
+    given = gpd.GeoDataFrame(
+        {"where": ["a", "b"]},
+        geometry=[sg.box(0, 0, 1, 1), sg.Polygon()], crs="epsg:4326",
+    )
+    converted = tools.convertmercator(given)
+    assert list(converted["where"]) == ["a", "b"]
+    assert converted.geometry.iloc[1].is_empty

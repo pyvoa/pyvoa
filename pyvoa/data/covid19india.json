@@ -6,7 +6,8 @@
     "locationmode":"name"
   },
  "replace":{
-      "Andaman and Nicobar Islands":"Andaman and Nicobar Islands",
+      "Andaman and Nicobar Islands":"Andaman and Nicobar",
+      "Uttarakhand":"Uttaranchal",
 	  "Telangana":"Andhra Pradesh",
       "Ladakh":"Jammu and Kashmir"
   },

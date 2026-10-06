@@ -699,6 +699,13 @@ class GeoInfo:
                         poly=so.unary_union(sg.MultiPolygon([sg.Polygon([(x-360,y) if x>=0 else (x,y) for x,y in p.exterior.coords]) for p in poly.geoms]))
                         self._data_geometry.loc[self._data_geometry.id_tmp==newc,'geometry']=gpd.GeoSeries(poly).values
 
+                    # The borders file predates the 2010 dissolution of the Netherlands
+                    # Antilles (ANT): Curaçao, Sint Maarten and the Caribbean Netherlands
+                    # have no geometry of their own, yet owid, europa and mpoxgh report them
+                    self._data_geometry = _append_empty_geometries(
+                        gpd.GeoDataFrame(self._data_geometry, geometry='geometry'),
+                        [{'id_tmp': c} for c in ['CUW', 'SXM', 'BES']])
+
                 p=p.merge(self._data_geometry,how='left',\
                     left_on='iso3_tmp',right_on='id_tmp',\
                     suffixes=('','_tmp')).drop(['id_tmp'],axis=1)
@@ -1290,6 +1297,16 @@ class GeoCountry:
             h_us['flag_subregion'] = [ h.split('\xa0')[0] for h in h_us['flag_subregion'] ]
             self._country_data=self._country_data.merge(h_us,how='left',on='code_subregion')
 
+            # the states file has no territory, while jhu-usa and covidtracking report
+            # them; they get a census region of their own, which the file does not have
+            self._country_data = _append_empty_geometries(self._country_data, [
+                {'name_subregion': name, 'code_subregion': code,
+                 'name_region': 'Territories', 'code_region': 'TER'}
+                for name, code in [('Puerto Rico', 'PR'), ('Guam', 'GU'),
+                                   ('Virgin Islands', 'VI'),
+                                   ('Northern Mariana Islands', 'MP'),
+                                   ('American Samoa', 'AS')]])
+
             # if needed, define some variable for dense / main geometry
             self._list_translation={"AK":(40,-40),"HI":(60,0)}
             self._list_scale={"AK":0.4,"HI":1}
@@ -1320,6 +1337,19 @@ class GeoCountry:
                 },
                 inplace=True)
             self._country_data['name_subregion']= self._country_data['name_subregion'].replace('Orissa','Odisha')
+            # Dadra and Nagar Haveli and Daman and Diu were merged into a single union
+            # territory in 2020 (ISO 3166-2 IN-DH), the name covid19india reports them under
+            dnhdd = self._country_data['code_subregion'].isin(['IN.DN', 'IN.DD'])
+            merged = self._country_data[dnhdd].iloc[[0]].copy()
+            merged['name_subregion'] = 'Dadra and Nagar Haveli and Daman and Diu'
+            merged['code_subregion'] = 'IN.DH'
+            merged['variationname'] = ''
+            merged['geometry'] = [self._country_data[dnhdd].geometry.union_all()]
+            self._country_data = gpd.GeoDataFrame(pd.concat([self._country_data[~dnhdd], merged], ignore_index=True),
+                                                  geometry='geometry', crs=self._country_data.crs)
+            # Lakshadweep has no geometry in the file
+            self._country_data = _append_empty_geometries(self._country_data, [
+                {'name_subregion': 'Lakshadweep', 'code_subregion': 'IN.LD', 'variationname': ''}])
             variationname=self._country_data['variationname'].to_list()
             name_subregion=self._country_data['name_subregion'].to_list()
             alllocationvariation=[ i+'|'+j if j != '' else i for i,j in zip(name_subregion,variationname)]
@@ -1474,6 +1504,11 @@ class GeoCountry:
             # which the CUT codes above do take into account
             self._country_data.loc[self._country_data.code_region=='16','name_region']='Región de Ñuble'
             self._country_data=self._country_data[['name_subregion','code_subregion','name_region','code_region','geometry']]
+            # the Antártica comuna (12202), the Chilean Antarctic claim, is not in the
+            # shapefile, though minciencia reports its cases (the O'Higgins base, 2020)
+            self._country_data = _append_empty_geometries(self._country_data, [
+                {'name_subregion': 'Antártica', 'code_subregion': '12202',
+                 'name_region': 'Región de Magallanes y Antártica Chilena', 'code_region': '12'}])
 
         # --- 'EUR' case, which is a pseudo country for Europe ---------------------------------------------------------
         elif self._country == 'EUR':
@@ -2536,6 +2571,32 @@ class GeoCountry:
                             right_on=geofield)
 
 # Other Geometrical usefull functions...
+
+def _append_empty_geometries(frame, rows):
+    """Append locations that have data but no geometry in the source file.
+
+    A location absent from the geometry file is dropped by the parser, with
+    every count it carries, so a total over the country or the world comes out
+    short. Such a location is given an empty polygon instead: it is not null,
+    so it goes through the joins and the ``dropna`` on the geometry, and it is
+    simply not drawn on a map.
+
+    Parameters
+    ----------
+    frame : GeoDataFrame
+        The geography to complete.
+    rows : list of dict
+        One dict per location, keyed on the columns of ``frame``; a column
+        left out is missing for that location.
+
+    Returns
+    -------
+    GeoDataFrame
+        ``frame`` followed by the new locations, in its own crs.
+    """
+    extra = gpd.GeoDataFrame(rows, geometry=[sg.Polygon()] * len(rows), crs=frame.crs)
+    return gpd.GeoDataFrame(pd.concat([frame, extra], ignore_index=True),
+                            geometry=frame.geometry.name, crs=frame.crs)
 
 def _merge_deu_counties(frame):
     """Return one row per German county, under a name no other county carries.

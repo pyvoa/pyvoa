@@ -781,6 +781,11 @@ class front:
             # originalinput = input.copy()
             if 'geometry' not in list(input.columns):
                 raise PyvoaError('No geometry inside your pandas, map can not be asked')
+            # a location with data but no geometry of its own (Puerto Rico, Curaçao,
+            # Lakshadweep, ...) carries an empty one: it is counted, not drawn
+            if gpd.GeoSeries(input['geometry']).is_empty.all():
+                raise PyvoaError('None of '+', '.join(str(w) for w in input['where'].unique())
+                                 +' has a geometry to draw: get() returns its data, map() cannot show it.')
             # where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)

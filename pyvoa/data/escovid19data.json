@@ -13,7 +13,9 @@
       "Rioja, La":"La Rioja",
       "Alicante/Alacant":"Alacant",
       "Gipuzkoa":"Gipuzcoa",
-      "Coruña, A":"La Coruña"
+      "Coruña, A":"La Coruña",
+      "Balears, Illes":"Illes Balears",
+      "Palmas, Las":"Las Palmas"
   },
 
   "datasets": [

@@ -427,3 +427,24 @@ def test_merge_deu_counties_merges_the_rows_of_one_county():
     squares = _squares([5, 6])
     assert merged.loc["1054", "geometry"].area == squares[0].union(squares[1]).area
     assert merged.loc["9184", "geometry"].equals(_squares([2])[0])
+
+
+# --------------------------------------------------------------------------
+# Locations without a geometry of their own
+# --------------------------------------------------------------------------
+
+
+def test_append_empty_geometries_adds_a_drawless_but_joinable_location():
+    frame = gpd.GeoDataFrame(
+        {"code_subregion": ["FL"], "name_subregion": ["Florida"]},
+        geometry=_squares([1]), crs="epsg:4326",
+    )
+    completed = geo._append_empty_geometries(
+        frame, [{"code_subregion": "PR", "name_subregion": "Puerto Rico"}])
+    assert list(completed["code_subregion"]) == ["FL", "PR"]
+    assert completed.crs == frame.crs
+    added = completed.geometry.iloc[1]
+    # empty, so not drawn, but not missing, so the dropna on the geometry keeps it
+    assert added.is_empty
+    assert not completed.geometry.isna().any()
+    assert len(completed.dropna(subset=["geometry"])) == 2

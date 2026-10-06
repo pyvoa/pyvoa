@@ -686,8 +686,12 @@ def convertmercator(gdf):
     rows = []
     for idx, row in gdf.iterrows():
         new_poly = []
+        # a location with no geometry of its own carries an empty one, which is
+        # falsy : kept as it is, so that it still joins its data
+        if row["geometry"] is not None and row["geometry"].is_empty:
+            rows.append(row.copy())
         # Convertir les polygones / multipolygones
-        if row["geometry"]:
+        elif row["geometry"]:
             for pt in get_polycoords(row):
                 if isinstance(pt, tuple):
                     # Un point = tuple (lon, lat)
