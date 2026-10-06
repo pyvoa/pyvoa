@@ -1,9 +1,16 @@
 # Unreleased
+- `GPDBuilder.factory()` writes the pickles of a database with
+  `reload=True` and reads them back with `reload=False`, so that they are
+  handled in one place; `front.setwhom()` no longer reads them itself, nor
+  rebuilds their file names by hand. `factory(reload=False)` used to fail on
+  variables it never set, a path nothing took. The lists saved with the data
+  are given by `GPDBuilder.getsavedlists()`.
 - fix: `tools.prioritize_keyword` never reached its fallback on the first
   cumulative variable: with no death count, the default `which` was the
   first variable alphabetically. It is now the first `tot_...` or
-  `total_...` one, and only failing that the first variable. `spf` is the
-  one database whose default changes, from `cur_hosp` to `tot_P`.
+  `total_...` one, and only failing that the first variable. `tot_dchosp`,
+  spf's hospital deaths, joins the death counts taken first: `spf`, the one
+  database concerned, now defaults to it rather than to `cur_hosp`.
 - `get_echoinfo()` called without its dict summarises the database
   currently selected, and raises a `PyvoaError` naming `setwhom()` when
   there is none; it used to fail on `None`.
@@ -30,10 +37,11 @@
   refused with a `PyvoaError`. `maxlettersdisplayed` now defaults to
   20 characters, up from 10.
 - the default `which` is the death count when the database has one — the
-  first of `tot_deaths`, `total_deaths`, `tot_dc` and `total_dc` it offers —
-  and otherwise the first variable `listwhich()` returns, alphabetically
-  (`tools.prioritize_keyword`). It used to be the first cumulative variable
-  the JSON description declared.
+  first of `tot_deaths`, `total_deaths`, `tot_dc`, `total_dc` and
+  `tot_dchosp` (spf's hospital deaths) it offers — otherwise its first
+  `tot_...` or `total_...` variable in the order `listwhich()` gives, and
+  failing that the first variable of that list (`tools.prioritize_keyword`).
+  It used to be the first cumulative variable the JSON description declared.
 - the column `get()` returns for a variable read with an option is named with
   a space before the option, `'tot_cases smooth7'`, as it already was for a
   `what` (`'tot_cases daily'`); it used to be `'tot_casessmooth7'`.

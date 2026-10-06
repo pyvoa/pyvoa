@@ -54,7 +54,6 @@ from pyvoa.tools import (
     kwargs_keystesting,
     kwargs_values_testing,
     prioritize_keyword,
-    readpkl,
     set_live_mode,
 )
 
@@ -325,30 +324,17 @@ class front:
             raise PyvoaError(base + ' is not a supported GPDBuilder. '
                                     'See pyvoa.fron.listwhom() for the full list.')
 
-        echokwargs = {}
-        # with reload=False the data come from the pickles: the builder is not
-        # to parse the database again
+        # with reload=False the data come from the pickles, which the builder
+        # reads back itself: it is not to parse the database again
         self.gpdbuilder  = builder.GPDBuilder(db_name=base, parse=reload)
-        if reload:
-            self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
-            echokwargs['reload'] = True
-            echokwargs['lwhere'] = self.listwhere()
-            echokwargs['lwhich'] = self.listwhich()
-        else:
-            datapkl = readpkl('data'+base + '.pkl')
-            self.gpdbuilderdata = datapkl['data']
-            self.lwhere = datapkl['listwhere']
-            self.lwhich = datapkl['listwhich']
-            datapkl = readpkl('geo'+base + '.pkl')
-            self.gpdbuildergeo = datapkl['geo']
-            pandy = datapkl['geodescription']
-            self.allvisu = AllVisu(base, pandy)
-            echokwargs['reload'] = False
-            echokwargs['lwhere'] = self.listwhere()
-            echokwargs['lwhich'] = self.lwhich
+        self.gpdbuilderdata, self.gpdbuildergeo, self.allvisu = self.gpdbuilder.factory(reload)
+        if not reload:
+            saved = self.gpdbuilder.getsavedlists()
+            self.lwhich = saved['listwhich']
+            self.lwhere = saved['listwhere']
 
-        echokwargs['mypd']   = self.gpdbuilderdata
-        self.get_echoinfo(echokwargs)
+        self.get_echoinfo({'reload': reload, 'lwhere': self.listwhere(),
+                           'lwhich': self.listwhich(), 'mypd': self.gpdbuilderdata})
 
     def get_echoinfo(self, dico = None):
          """Print a summary of the selected database.
@@ -747,8 +733,10 @@ class front:
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
-            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
-            variable :meth:`listwhich` returns, in alphabetical order.
+            'tot_dc', 'total_dc' and 'tot_dchosp' it offers -- otherwise to
+            its first cumulative variable, named ``tot_...`` or ``total_...``,
+            in the order :meth:`listwhich` gives, and failing that to the first
+            variable of that list.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -916,8 +904,10 @@ class front:
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
-            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
-            variable :meth:`listwhich` returns, in alphabetical order.
+            'tot_dc', 'total_dc' and 'tot_dchosp' it offers -- otherwise to
+            its first cumulative variable, named ``tot_...`` or ``total_...``,
+            in the order :meth:`listwhich` gives, and failing that to the first
+            variable of that list.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -1031,8 +1021,10 @@ class front:
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
-            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
-            variable :meth:`listwhich` returns, in alphabetical order.
+            'tot_dc', 'total_dc' and 'tot_dchosp' it offers -- otherwise to
+            its first cumulative variable, named ``tot_...`` or ``total_...``,
+            in the order :meth:`listwhich` gives, and failing that to the first
+            variable of that list.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -1166,8 +1158,10 @@ class front:
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
-            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
-            variable :meth:`listwhich` returns, in alphabetical order.
+            'tot_dc', 'total_dc' and 'tot_dchosp' it offers -- otherwise to
+            its first cumulative variable, named ``tot_...`` or ``total_...``,
+            in the order :meth:`listwhich` gives, and failing that to the first
+            variable of that list.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.

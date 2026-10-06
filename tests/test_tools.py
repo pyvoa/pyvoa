@@ -956,6 +956,8 @@ def test_shorten_locations_never_cuts_below_five_letters():
     [
         (["tot_cases", "tot_deaths"], "tot_deaths"),
         (["b", "tot_dc", "total_deaths"], "total_deaths"),
+        # spf's hospital deaths come before its other cumulative variables
+        (["cur_hosp", "tot_P", "tot_T", "tot_dchosp"], "tot_dchosp"),
         # no death count: the first cumulative variable, not the first one
         (["cur_excess_mortality", "cur_hosp", "total_cases"], "total_cases"),
         (["cur_icu", "cur_hosp"], "cur_icu"),

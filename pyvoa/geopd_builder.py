@@ -32,6 +32,7 @@ from pyvoa.tools import (
    getnonnegfunc,
    info,
    kwargs_values_testing,
+   readpkl,
    verb,
 )
 
@@ -141,47 +142,76 @@ class GPDBuilder:
        return self.get_parserdb().get_available_keywords()
 
    def factory(self,reload=True):
-       """Split the parsed database, save it, and set up its charts.
+       """Provide the data, the geometry and the charts of the database.
 
-       Splits the table the parser built into its data and its geometry, saves
-       both as pickles in the pyvoa cache -- the data with the list
-       :meth:`listwhich` gives and both answers of :meth:`listwhere`, the
-       geometry with the
-       description of the locations -- and builds the AllVisu that draws them.
-       ``front.setwhom`` calls it, and reads those pickles back when asked not
-       to reload.
+       The pickles of a database are written and read here, and nowhere else.
+       With ``reload=True``, splits the table the parser built into its data
+       and its geometry and saves both as pickles in the pyvoa cache -- the
+       data with the list :meth:`listwhich` gives and both answers of
+       :meth:`listwhere`, the geometry with the description of the locations.
+       With ``reload=False``, reads them back instead, without parsing: build
+       the GPDBuilder with ``parse=False`` for that. Either way, builds the
+       AllVisu that draws them, and keeps the two lists for
+       :meth:`getsavedlists`.
 
        Parameters
        ----------
        reload : bool
-           True, the default, does all of the above. False is not supported:
-           the data and the geometry are then never built, and the call fails.
+           True, the default, parses and saves; False reads the saved pickles.
 
        Returns
        -------
        tuple
            (the data, without its geometry; one 'where'/'geometry' row per
            location; the AllVisu).
+
+       Raises
+       ------
+       PyvoaError
+           With ``reload=False``, if the database was never saved on this
+           machine.
        """
        f = self.db+'.pkl'
+       self.namepkldata = 'data'+f
+       self.namepklgeo  = 'geo'+f
        if reload:
           data, geo=self.split_data_geo(self.get_parserdb().get_maingeopandas())
-          self.namepkldata = 'data'+f
           datadata = {}
           datadata['listwhich'] = self.listwhich(self.db)
           # both answers, since front.listwhere() takes the flag
           datadata['listwhere'] = {flag: self.listwhere(flag) for flag in (True, False)}
           datadata['data'] = data
           dumppkl(self.namepkldata, datadata)
-          self.namepklgeo  = 'geo'+f
           geodata = {}
           geodata['geo'] = geo
           geodata['geodescription'] = self.where_geodescription
           dumppkl(self.namepklgeo,geodata)
+       else:
+          datadata = readpkl(self.namepkldata)
+          data = datadata['data']
+          geo = readpkl(self.namepklgeo)['geo']
+       self.savedlists = {'listwhich': datadata['listwhich'],
+                          'listwhere': datadata['listwhere']}
 
        self.setvisu(self.db,geo)
        self.reload = reload
        return data,geo,self.getvisu()
+
+   def getsavedlists(self):
+       """Return the variables and the locations saved with the data.
+
+       What :meth:`listwhich` and :meth:`listwhere` gave when the database was
+       parsed, as :meth:`factory` saved or read them back: front answers from
+       them when it did not reload.
+
+       Returns
+       -------
+       dict
+           'listwhich', a list; 'listwhere', both answers of
+           :meth:`listwhere` keyed on its flag -- or a single list, from a
+           pickle saved before both were kept.
+       """
+       return self.savedlists
 
    def getpklname(self,geoordata='geo'):
         """Return the name of the pickle the data or the geometry was saved to.
