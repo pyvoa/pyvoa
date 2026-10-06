@@ -5,348 +5,251 @@ Goal: bring the repository to the state expected by a software-paper review.
 Target journal: **SoftwareX** (Elsevier, ISSN 2352-7110), article type *Original
 Software Publication*. Guide for authors:
 https://www.elsevier.com/journals/softwarex/23527110/guide-for-authors
-(it was JOSS until 2026-08-13; the repository work carried over unchanged, only
-the manuscript format did not).
 
-This file tracks what is **still open**. What has already landed is in
-`CHANGELOG.md` and in `git log`; how the code and the CI work is in
-`CLAUDE.local.md`, which is machine-local and deliberately not checked in.
+This file lists **what is still to study or decide**, and nothing else up front.
+What has landed is in `CHANGELOG.md` and `git log`; how the code and the CI work
+is in `CLAUDE.local.md`, machine-local and deliberately not checked in. The
+decisions already taken, the notes for whoever edits the manuscript, and the
+history of the repository are at the end.
 
-**Status, 2026-09-12.** CI is green — `lint`, the four-version `test` matrix,
-`paper`, `minimum`, and `docs`. The suite is at 345 passed, 22 deselected;
-`ruff check` on the tracked tree is clean. v0.5.0 is on PyPI (both artefacts,
-2026-08-06) and on Zenodo (concept `10.5281/zenodo.21829901`, version
-`10.5281/zenodo.21829902`). The API documentation is published at
-<https://pyvoa.github.io/pyvoa/>. The manuscript is in `paper/`, builds, and is
-3231 words against a limit of 4000.
+**Status, 2026-10-07.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
+`minimum`, `paper` and `docs`. The suite is at 378 passed, 23 deselected
+(network); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
+`10.5281/zenodo.21829901`). The API documentation is published at
+<https://pyvoa.github.io/pyvoa/>. Archived data are read from Zenodo record
+`23198224`.
 
 ## Still open, at a glance
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 3.1 | **The generative-AI declaration is an annotation, not a statement.** The guide requires it on submission, and the repository carries public traces of AI assistance a reviewer will find. | **yes, for submission** |
-| 3 | The `\attn` items left in `main.tex`: the §4 adoption evidence, and moving the bibliography to BibTeX. | submission |
-| 3.3 | The funding wording follows the journal and no longer matches `AUTHORS` to the letter. Confirm the funder accepts it, or revert to parentheses. | decision |
-| 3.2 | Highlights (3–5 bullets, ≤85 characters, separate file) and a graphical abstract (531×1328 px). Both *encouraged*, neither written. | no |
-| 1 | The Zenodo `0.5.0` record still differs from `CITATION.cff`. Edit it by hand, or let `0.5.1` be the first consistent deposit. | no |
-| 1 | Whether to declare the IdEx award as a structured Zenodo `grants` entry. | no |
-| 2 | Confirm the issue forms render on GitHub while signed in, and add the version placeholder in `bug_report.yml` to the release checklist. | no |
-| 4 | Two documentation URLs now exist — `pyvoa.org` and `pyvoa.github.io/pyvoa`. Decide how they relate. | no |
-| — | The template asks for a `Licence.txt`; the repository has `LICENSE`, no extension. Almost certainly fine, but "your paper will be returned if these are missing" is their wording. | no |
-| 5 | Merging locations sums every column on the raw dates: cumulative series reported on different days come out saw-toothed, and rates are added up (owid's France per-million figures are). Blocks a consistent treatment of Kosovo. | no |
+| 1 | **The generative-AI declaration is an annotation, not a statement.** | **yes, for submission** |
+| 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
+| 3 | Merging locations sums raw dates and adds up rates; Kosovo waits on it. | no |
+| 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
+| 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
+| 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
+| 7 | Two documentation URLs, `pyvoa.org` and `pyvoa.github.io/pyvoa`. | no |
+| 8 | `listwhere()` returns ISO3 codes beside names for the world databases. | no |
+| 9 | Folium is untested since the empty geometries were introduced. | no |
+| 10 | `Licence.txt` asked for by the template; the repository has `LICENSE`. | no |
+| 11 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
 
 ---
 
-## 1. The Zenodo 0.5.0 record still differs from `CITATION.cff`
-
-`CONTRIBUTING.md` §9.3 requires this check at every release. Four differences
-survive on record `21829902`, re-checked against the live record on 2026-08-26;
-the divergence widened when `CITATION.cff`'s affiliations and keywords were
-rewritten on 2026-08-25, which the deposit predates.
-
-| Field | Zenodo record `21829902` | `CITATION.cff` |
-|---|---|---|
-| affiliations | `Université Paris Cité` (Beau, Browaeys), `Centre National de la Recherche Scientifique` (Dadoun) | `Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France` and the MSC equivalent |
-| keywords | 6: `open data`, `data visualisation`, `geolocation`, `python`, `reproducible research`, `science education` | 8: adds `epidemiological data` and `COVID-19`, has `geospatial data` for `geolocation` and `Python` for `python` |
-| `continues` | `https://pyvoa.org` | the pycoa repository |
-| files archived | `pyvoa-0.5.0.tar.gz` only | wheel + sdist on the GitHub release |
-
-`.zenodo.json` (alongside `codemeta.json` and `schemaorg.jsonld`) already carries
-the correct affiliations, all eight keywords and
-`continues → https://github.com/coa-project/pycoa`, so the **next** release is
-correct by construction.
-
-Decide, and record the decision here: edit the 0.5.0 record by hand in the
-Zenodo UI, or leave it and let v0.5.1 be the first consistent deposit. Editing
-metadata does not mint a new DOI; adding the wheel to an existing record does
-require a new version.
-
-### The IdEx grant, and why `.zenodo.json` does not declare it
-
-The funding acknowledgement is in `.zenodo.json` as free-text `notes` only. A
-structured `grants` entry would link the deposit to the funder in Zenodo and in
-OpenAIRE, and the award does exist — but do not add one blind, because the
-documentation and the live API disagree. Checked on 2026-08-12:
-
-| check | result |
-|---|---|
-| `GET /api/awards/00rbzpz17::ANR-18-IDEX-0001` | **200**, titled "Université de Paris" — the former name of Université Paris Cité, so this is the right award |
-| `GET /api/funders/00rbzpz17` | 200, Agence Nationale de la Recherche, carrying both the ROR `00rbzpz17` and the funder DOI `10.13039/501100001665` |
-| `GET /api/grants/10.13039/501100001665::ANR-18-IDEX-0001` | **404** |
-| `GET /api/grants/?q=ANR` | **404** — the whole legacy grants API is gone |
-| developers.zenodo.org | still documents `grants` as `[{"id": "10.13039/…::<code>"}]` |
-
-The format the deposit documentation asks for is the one that no longer
-resolves; the id that does resolve is InvenioRDM's ROR-based
-`00rbzpz17::ANR-18-IDEX-0001`. Which of the two the GitHub-integration deposit
-path accepts cannot be established without a real deposit, and a rejected
-`grants` value fails the release. Attach the award through the Zenodo UI after
-depositing instead — the form validates as you type. If a future release is to
-declare it in the file, test it on **sandbox.zenodo.org** first.
-
-## 2. Confirm the issue forms render on GitHub
-
-All four files under `.github/ISSUE_TEMPLATE/` parse as YAML locally, and every
-label they request (`bug`, `enhancement`, `new database`, `data`) exists on the
-repository. But GitHub applies a stricter schema than a plain YAML parse, and
-those errors only surface on the site; `https://github.com/pyvoa/pyvoa/issues/new/choose`
-redirects for anonymous requests, so this cannot be checked from a clone.
-Open the page while signed in and confirm the forms appear.
-
-While there: `.github/ISSUE_TEMPLATE/bug_report.yml:38` hardcodes `pyvoa 0.5.0`
-as the version placeholder, so it goes stale at every release — and the release
-checklist in `CONTRIBUTING.md` §9 does not mention it. Add it there as a fifth
-step, or the placeholder will drift again.
-
-## 3. The SoftwareX paper
-
-In `paper/`: `main.tex` (elsarticle), `Makefile`, `README.md`, `figures/`, the
-LPPL-licensed `softwarex-osp-template.tex`, and the guide for authors as a PDF
-— Elsevier copyright and **gitignored**: read it, cite it, do not push it.
-`make draft` and `make final` both compile and `tests/test_paper.py` passes.
-`main.tex` follows the template's metadata tables, headings, section order and
-numbering. What remains is editorial: 3.1 to 3.3 below, plus the
-third-party-adoption evidence for §4 and the move to BibTeX, both still `\attn`
-annotations in the file.
-
-Five things worth knowing before touching it again:
-
-- **The figures are produced, not drawn.** `examples/pyfiles/paper_examples.py`
-  writes all five into `paper/figures/` under the names the .tex includes;
-  `make figures` runs it. `architecture.png` is the exception — a drawing,
-  supplied by the authors. Re-run the script after any release and after any
-  change to a listing, and run `--check` first, which validates every database,
-  indicator and option against the installed version without plotting.
-- **Page count.** `make final` gives 13 pages, but the class is
-  `preprint,12pt,a4paper`, a reading layout. Recompiled with Elsevier's
-  `final,5p,times,twocolumn`, the same source is 6 pages including the metadata
-  tables and the references. That is the layout the 6-page limit refers to.
-- **The metadata tables come from the template, not from memory.** Eight code
-  rows, seven software rows, and the executable-software section sits after the
-  bibliography because that is where the template puts it. Renumbering them
-  moves the row `tests/test_paper.py` reads for the dependency check, which is
-  C6.
-- **elsarticle is not in every TeX Live.** It was absent here; the CTAN source
-  builds the class with `tex elsarticle.ins`, and it drops into
-  `~/texmf/tex/latex/elsarticle/`. `latexmk` was absent too, so the Makefile
-  falls back to three `pdflatex` passes.
-- **`CITATION.cff`'s commented `preferred-citation` title must equal the
-  manuscript's** — the test enforces it. If the title changes at submission,
-  change it in both.
-- **Two traps when re-checking the word count.** The guide's PDF renders every
-  digit as U+FFFD, so `pdftotext` and `pypdf` both report its limits as `����`
-  — read those pages as images. And the counted region ends at the string
-  `CRediT`: while the manuscript spelled it `CrediT` the count swept in the
-  declarations, the acknowledgements and the whole bibliography, giving 4050
-  against a true 3231.
-
-### 3.1 The generative-AI declaration is still an annotation — blocking
+## 1. The generative-AI declaration — blocking
 
 `\section*{Declaration of generative AI and AI-assisted technologies in the
-writing process}` exists and contains only an `\attnpar` telling the authors
-what to write. The guide requires the declaration at submission; the suggested
-wording is in the annotation itself.
-
-Two things that annotation notes and that remain true. Use of assistants in the
-*code* is not what this declaration covers — it is about the writing — but the
-repository still carries public traces (this file, and the 0.3.1 changelog
-entry recording that docstrings were written with LLM assistance), and a
-reviewer will find them. The agent guidance file and the commit trailers that
-also recorded it were removed from the history on 2026-09-12; anything already
-cloned or cached elsewhere keeps them. And Elsevier has
+writing process}` in `paper/main.tex` holds only an `\attnpar` telling the
+authors what to write; the guide requires the declaration at submission. It is
+about the *writing*, not the code, but the repository carries public traces of
+AI assistance a reviewer will find (this file, and the 0.3.1 changelog entry
+recording that docstrings were written with LLM assistance). Elsevier has
 revised the required wording twice: check it at submission rather than trusting
 the annotation.
 
-### 3.2 Highlights and a graphical abstract
+## 2. The manuscript
 
-Neither exists. Both are *encouraged*, not required, and both are submitted as
-separate files rather than in the manuscript:
+All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 
-- **Highlights** — 3 to 5 bullet points, each at most 85 characters including
-  spaces, in a file with "highlights" in its name.
-- **Graphical abstract** — 531 x 1328 pixels (h x w) or proportionally larger,
-  readable at 5 x 13 cm, as TIFF, EPS, PDF or an MS Office file.
+- **§4 adoption evidence** — third-party uses of pyvoa, still to document.
+- **BibTeX** — the bibliography is a hand-written `thebibliography`; move it to
+  BibTeX (`elsarticle-num`).
+- **The Zenodo-community placeholder** — l. 428 reads
+  `(****http://zenodo.org/communities/pyvoa****)`.
+- **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
+  catalogue: "12 to 24 databases" is wrong for 0.5.0, which shipped 23. The
+  figure is 24 only because `tests/test_paper.py` requires every database count
+  to match `pyvoa/data/`. Rewrite it around the release actually submitted.
+- **Highlights and a graphical abstract** — both *encouraged*, neither written,
+  both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
+  characters each, in a file named with "highlights". Graphical abstract:
+  531 x 1328 px (h x w) or proportionally larger, readable at 5 x 13 cm.
+  `paper/figures/architecture.png` (portrait, 1500 x 1934) is the closest thing,
+  and would need recomposing.
+- **The funding wording** follows the journal's literal form, `Funding: This
+  work was supported by ... [grant numbers xxxx]`, where `AUTHORS` asks for its
+  own sentence verbatim, with `(ANR-18-IDEX-0001)` in parentheses, as a
+  condition of the grant. Every element the funder mandates is present, and
+  `test_funding_acknowledgement_is_present` checks them. Confirm the funder
+  accepts the journal's form, or revert to parentheses and tell the journal why.
 
-`paper/figures/architecture.png` is close to what a graphical abstract wants and
-is already the paper's own diagram; it is portrait, 1500 x 1934, so it would
-need recomposing to the required aspect.
-
-### 3.3 The funding wording no longer matches AUTHORS to the letter
-
-The guide prescribes a literal form, `Funding: This work was supported by ...
-[grant numbers xxxx]`, and the acknowledgements now use it. `AUTHORS` requires
-its own sentence to be reused verbatim — with `(ANR-18-IDEX-0001)` in
-parentheses — and says so as a condition of the grant. The two cannot both hold
-to the word.
-
-Every element the funder mandates is present, and
-`test_funding_acknowledgement_is_present` checks those four fragments against
-`AUTHORS`, so the repository's guard still holds. What is not settled is whether
-the funder cares about the punctuation. If it does, revert to parentheses and
-tell the journal why.
-
-The acknowledgement itself: the IdEx « Université Paris Cité 2022 »
-(ANR-18-IDEX-0001) and the « Institut Covid-19 Ad Memoriam » of Université
-Paris Cité. `README.md` and `.zenodo.json` carry it too. `CITATION.cff` does
-not, and cannot: CFF 1.2.0 has no funding key and its schema sets
-`additionalProperties: false`, so adding one makes the file invalid.
-
-## 4. Two documentation URLs now exist
-
-`https://pyvoa.github.io/pyvoa/` went live on 2026-08-26, built from `docs/` by
-`.github/workflows/docs.yml`. `https://pyvoa.org` was already live and is what
-`CITATION.cff`, `codemeta.json`, `schemaorg.jsonld`, `.zenodo.json` and the
-README all name as the project URL, and what the Zenodo record carries as
-`isDocumentedBy`.
-
-Nothing is broken by having both, but a reader should not have to guess which is
-current, and the SoftwareX code metadata table asks for a documentation link.
-Three ways out, none of them started:
-
-- point `pyvoa.org` at the Pages site with a link or a redirect, and keep the
-  metadata as it is;
-- make `pyvoa.org` a custom domain for the Pages site (a `CNAME` in the
-  published artefact plus a DNS record), so the two become one address;
-- keep them separate, `pyvoa.org` as the project's front page and the Pages site
-  as the API reference, and add the Pages URL to the metadata files.
-
-Whichever is chosen, record it here and put the answer in the code metadata
-table before submission.
-
-## 5. Merging locations: Kosovo, and what a merge does to the numbers
-
-Found on 2026-10-06 while comparing every database with a direct read of its
-source. Nothing below has been changed in the code.
-
-**The rule.** A location is aligned on the geometry: where the geometry has no
-polygon of its own for a place that the geometry includes in a larger one, the
-place is merged into the larger one. The world borders file has no Kosovo, and
-its `SRB` polygon contains Pristina, so in the world databases Kosovo belongs
-with Serbia. Today the databases disagree:
-
-| database | Kosovo in the source | what pyvoa does |
-|---|---|---|
-| `jhu` | `Kosovo` (a name) | merged into Serbia — `GeoManager` resolves the name to `SRB` |
-| `owid` | `OWID_KOS` | dropped, by the `drop` of the `OWID_` prefix |
-| `europa` | `XKX` | dropped, by an explicit `drop` |
-| `mpoxgh` | none (`XKX` in its `drop`) | nothing to do |
-| `risklayer` | `RS002` | kept: the EUR geography has a Kosovo polygon of its own — already aligned |
+## 3. Merging locations: what a merge does to the numbers, and Kosovo
 
 **Problem 1 — a merge sums the raw dates as they are.** `replace` maps several
-raw locations onto one, and the parser then sums the rows sharing
-`(date, where)`. That is right when every location reports every day, which is
-why `jhu` is fine. It is wrong for cumulative or stock series reported on
-different days. In `europa`, Serbia and Kosovo share only 325 dates: on 29 of
-them only Kosovo reports, and a merged Serbia would drop from about 16 000 deaths
-to Kosovo's 3139; on 409 others only Serbia does, and Kosovo is missing from the
-total. A naive `XKX → SRB` was tried and reverted for that reason.
+raw locations onto one, and the parser sums the rows sharing `(date, where)`.
+That is right when every location reports every day (`jhu`), wrong for
+cumulative or stock series reported on different days. In `europa`, Serbia and
+Kosovo share only 325 dates: on 29 only Kosovo reports, and a merged Serbia
+would drop from about 16 000 deaths to Kosovo's 3139; on 409 only Serbia does.
+A naive `XKX → SRB` was tried and reverted.
 
 **Problem 2 — a merge adds up rates.** Every column is summed, `owid`'s rates
 included (`*_per_million`, `*_per_hundred`, `positive_rate`,
 `reproduction_rate`, `gdp_per_capita`, `excess_mortality*`). The `GUF`/`PYF` →
-`FRA` merge of `owid` (kept on purpose, see the decisions below) therefore gives
-France, on 2022-06-01, a `total_cases_per_million` of 981 527 — the sum of
-France's 443 388, French Guiana's 278 065 and French Polynesia's 260 074. The
-counts (`total_cases`, `total_deaths`, …) are right; the rates are not. Merging
-Kosovo into Serbia in `owid` would do the same to Serbia. `mpoxgh` has the same
-merge but only counts, so it is unaffected.
+`FRA` merge of `owid`, kept on purpose, gives France on 2022-06-01 a
+`total_cases_per_million` of 981 527 — the sum of France's 443 388, French
+Guiana's 278 065 and French Polynesia's 260 074. The counts are right; the rates
+are not.
 
-**Options.**
+**Kosovo.** The world borders file has no Kosovo and its `SRB` polygon contains
+Pristina, so in the world databases Kosovo belongs with Serbia. Today `jhu`
+merges it (the name resolves to `SRB`), `owid` drops it (`OWID_KOS`, by the
+`drop` of the `OWID_` prefix), `europa` drops it (`XKX`, explicit `drop`);
+`risklayer` keeps it, its EUR geography having a Kosovo polygon (`RS002`).
 
-1. *A real merge in the parser.* When a `replace` collapses several raw
-   locations onto one, carry each raw location's last value forward over the
-   union of their dates before summing, so that the sum never mixes a reported
-   day with a silent one. Sum only counts and running totals; mark the other
-   columns in the JSON (an `"intensive": true` column key, say) and give them a
-   value that is not a sum — the target's own value, or a population-weighted
-   mean where the populations are known. This is the correct fix, and it fixes
-   France's rates in `owid` while keeping the merge. It touches the core of the
-   parser and every existing merge (`dpc` Bolzano + Trento, `covid19india`
-   Telangana and Ladakh, `escovid19data`, the county sums of `measles-usa` and
-   `jhu-usa`), so it needs a full raw-versus-parsed sweep afterwards.
-   Increments (`cumulative: true` columns) must not be carried forward: they are
-   summed as they are, as now.
-2. *Leave Kosovo as it is.* Merged in `jhu`, dropped in `owid` and `europa`. The
-   numbers are right for what is kept, but Kosovo is absent from two databases
-   whose geometry includes it, and France's rates in `owid` stay wrong.
-3. *Option 1 first, then Kosovo.* Once the parser merges correctly, map
-   `OWID_KOS` and `XKX` to `SRB` (for `owid`, the `drop` of the `OWID_` prefix
-   runs before `replace`, so either the order changes or `OWID_KOS` is spared by
-   the `drop`).
+**Options.** (1) A real merge in the parser: carry each raw location's last
+value forward over the union of their dates before summing, sum only counts and
+running totals, and mark the other columns in the JSON (an `"intensive": true`
+column key, say) to give them a value that is not a sum. Increments
+(`cumulative: true`) are summed as they are. It touches every existing merge
+(`dpc` Bolzano + Trento, `covid19india` Telangana and Ladakh, `escovid19data`,
+the county sums of `measles-usa` and `jhu-usa`): run the raw-versus-parsed
+sweep (`essai_alldb.py`) afterwards. (2) Leave things as they are. (3) Option 1,
+then map `OWID_KOS` and `XKX` to `SRB` — for `owid`, the `drop` of `OWID_` runs
+before `replace`, so either the order changes or `OWID_KOS` is spared.
 
-The comparison script that found all this, `essai_alldb.py`, sits untracked at
-the repository root; `essai_govcy.py` next to it is the single-database version.
+## 4. Credit the Japanese geography
+
+`GeoCountry('JPN')` (database `jpnmhlw`) reads
+`raw.githubusercontent.com/dataofjapan/land/master/japan.geojson`, archived in
+Zenodo record `23198224`. Its source is **地球地図日本 (Global Map Japan)** of
+the GSI (国土地理院), whose content terms now apply the **Public Data License
+1.0**: commercial use and redistribution allowed, compatible with CC BY 4.0,
+attribution required (`出典：国土地理院ウェブサイト（URL）`) and modifications to
+be stated. The dataofjapan repository has **no licence** of its own; its README
+asks for credit to Global Map Japan, and, for commercial use, a report to the
+copyright holder — a condition of the old GSI terms, now superseded.
+
+To do: credit the source in the documentation of the Japanese geography (or the
+README) and in the Zenodo record — "Prefectures of Japan: 地球地図日本 (Global
+Map Japan), GSI, PDL 1.0; GeoJSON conversion by dataofjapan/land". What
+dataofjapan added (English names, ids) carries no licence: ask its authors for
+one, or rebuild the GeoJSON from Global Map Japan v2.2 downloaded from the GSI.
+
+## 5. The Zenodo 0.5.0 record, and the IdEx grant
+
+Four differences survive between record `21829902` and `CITATION.cff`:
+
+| Field | Zenodo record `21829902` | `CITATION.cff` |
+|---|---|---|
+| affiliations | `Université Paris Cité` (Beau, Browaeys), `Centre National de la Recherche Scientifique` (Dadoun) | `Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France` and the MSC equivalent |
+| keywords | 6 | 8: adds `epidemiological data` and `COVID-19`, `geospatial data` for `geolocation` |
+| `continues` | `https://pyvoa.org` | the pycoa repository |
+| files | `pyvoa-0.5.0.tar.gz` only | wheel + sdist on the GitHub release |
+
+`.zenodo.json` is already right, so the next release is correct by
+construction. Decide: edit the 0.5.0 record by hand (metadata edits mint no new
+DOI; adding the wheel does), or let 0.5.1 be the first consistent deposit.
+
+The IdEx award is in `.zenodo.json` as free-text `notes` only. A structured
+`grants` entry would link the deposit to the funder, but the documented id
+format (`10.13039/501100001665::ANR-18-IDEX-0001`) returns 404 — the legacy
+grants API is gone — while the ROR-based `00rbzpz17::ANR-18-IDEX-0001` resolves
+(checked 2026-08-12). A rejected `grants` value fails the release: attach the
+award in the Zenodo UI after depositing, or test on sandbox.zenodo.org first.
+
+## 6. The issue forms
+
+The four files under `.github/ISSUE_TEMPLATE/` parse as YAML and every label
+they request exists, but GitHub applies a stricter schema only visible on the
+site: open `https://github.com/pyvoa/pyvoa/issues/new/choose` while signed in
+and confirm the forms appear. `bug_report.yml` hardcodes `pyvoa 0.5.0` as its
+version placeholder, and the release checklist in `CONTRIBUTING.md` §9 does not
+mention it: add it there, or it drifts at every release.
+
+## 7. Two documentation URLs
+
+`https://pyvoa.github.io/pyvoa/` (built from `docs/` by
+`.github/workflows/docs.yml`) and `https://pyvoa.org`, which the metadata files
+and the README name as the project URL and Zenodo carries as `isDocumentedBy`.
+Choose: point `pyvoa.org` at the Pages site; make `pyvoa.org` its custom domain
+(`CNAME` plus a DNS record); or keep both, the Pages site as the API reference,
+and add its URL to the metadata. Put the answer in the code metadata table of
+the manuscript.
+
+## 8. ISO3 codes in `listwhere()`
+
+For a world database, `listwhere()` returns each country under its ISO3 code and
+its name (`owid`: 546 entries, `ABW`, `AFG`, … beside the names). Commit
+`0c24066` is titled "remove iso3 from listwhere": either that intent was
+dropped, or the removal is incomplete. Decide which, then document it.
+
+## 9. Folium
+
+Folium is not installed where the recent work was checked. Untested with it:
+the empty geometries (filtered out of the GeoJSON in `AllVisu.map`, as for
+bokeh, which fails on them), and the keywords `pyvoalogo` and `projection`.
+
+## 10. `Licence.txt`
+
+The template asks for a `Licence.txt`; the repository has `LICENSE`, no
+extension. Almost certainly fine, but "your paper will be returned if these are
+missing" is the journal's wording.
+
+## 11. The comparison scripts
+
+`essai_govcy.py` and `essai_alldb.py`, untracked at the repository root, compare
+each database with a direct read of its source (run them from outside the
+root, with `PYTHONPATH` pointing at the checkout). They found every data defect
+fixed in October 2026. Keep them (under `scripts/`, say) or drop them.
+
+---
+
+## Notes for whoever edits the manuscript
+
+- **The figures are produced, not drawn.** `examples/pyfiles/paper_examples.py`
+  writes them into `paper/figures/` (`make figures`); run `--check` first.
+  `architecture.png` is the exception, a drawing supplied by the authors.
+- **Page count.** `make final` gives a reading layout (`preprint,12pt`);
+  Elsevier's `final,5p,times,twocolumn` gives 6 pages, the layout the limit
+  refers to.
+- **The metadata tables come from the template.** Renumbering them moves the row
+  `tests/test_paper.py` reads for the dependency check (C6).
+- **elsarticle and latexmk may be missing**: build the class from CTAN with
+  `tex elsarticle.ins` into `~/texmf/tex/latex/elsarticle/`; the Makefile falls
+  back to three `pdflatex` passes.
+- **`CITATION.cff`'s commented `preferred-citation` title must equal the
+  manuscript's** — the test enforces it.
+- **Word count.** The guide's PDF renders digits as U+FFFD (read its limits as
+  images), and the counted region ends at the string `CRediT`.
+- **Every database count in the text must equal `pyvoa/data/`**
+  (`test_paper.py`); `\attn` / `\attnpar` contents are not searched.
 
 ## Decisions already taken — do not re-open
 
-- **The manuscript word limit is 4000, not 3000**, and keywords may number 1 to
-  7. Both have the guide and the template as their source, and
-  `tests/test_paper.py` asserts them. The 3000 that stood there for a while had
-  no source and was the whole of a long-running red CI.
-- **Dependencies carry lower bounds only, no upper bounds.** Capping a library's
-  dependencies propagates the cap into every environment that installs it, and
-  is the usual cause of unresolvable installs. A new upstream major is caught by
-  the `test` job, which always resolves to the newest release, and every floor is
-  proved necessary by the `minimum` job.
-- **`ruff format` is deliberately not run.** The tree is not format-clean and CI
-  does not check formatting. `CONTRIBUTING.md` §5 tells contributors to match the
-  surrounding style instead. Adopting a formatter is a separate decision with a
-  large, purely cosmetic diff.
+- **The manuscript word limit is 4000, not 3000**, and keywords number 1 to 7;
+  `tests/test_paper.py` asserts both.
+- **Dependencies carry lower bounds only**; the `minimum` job proves every floor.
+- **`ruff format` is deliberately not run**; contributors match the surrounding
+  style (`CONTRIBUTING.md` §5).
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
-- **`CHANGELOG.md` does not follow Keep a Changelog.** It predates the project;
-  `CONTRIBUTING.md` §4.7 documents its actual convention. Do not restructure it.
-- **`requirements.txt` is kept, not deleted.** Since `c6a5553` it is a comment
-  block plus a single `.`, which installs the project and lets pip resolve
-  dependencies from the packaging metadata. It has to stay at the repository root
-  because mybinder.org builds its environment from it, and `CONTRIBUTING.md` §3
-  names Binder as a supported environment.
-- **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases** rather
-  than a number. The exact count lives in `README.md`'s table, which is the one
-  place that has to stay in step with `pyvoa/data/`.
+- **`CHANGELOG.md` does not follow Keep a Changelog** (`CONTRIBUTING.md` §4.7).
+- **`requirements.txt` is kept**: mybinder.org builds from it.
+- **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases**; the
+  exact count lives in the README's table.
 - **French Guiana and French Polynesia are merged into France** in `owid` and
-  `mpoxgh` (`"GUF":"FRA"`, `"PYF":"FRA"` in their `replace`), although both have
-  a geometry of their own. They are French overseas territories, not independent
-  countries, and the merge is what gives France a correct total. What the merge
-  does to rates is §5, a separate problem: fix the merge, do not remove it.
-- **`tile='openstreet'` is the default**, for bokeh and matplotlib alike, since
-  `6e0cea6` (2026-08-26) and `9ff2988` (2026-09-05). `listtile()` is
-  `['openstreet', 'esri', 'positron', 'stamen']`, and `input_wrapper` gives every
-  chart keyword left out the first value of its list. This entry said the
-  opposite until 2026-10-06, written when Esri came first. OpenStreetMap does
-  serve an "Access blocked" image to a client that does not identify itself:
-  matplotlib fetches the tiles with a pyvoa User-Agent (checked 2026-10-06: a
-  real tile with it, the blocked image without), and bokeh fetches them from the
-  reader's browser. Keep that header if the basemap code is touched.
+  `mpoxgh`: overseas territories, not countries. What the merge does to rates
+  is item 3: fix the merge, do not remove it.
+- **`tile='openstreet'` is the default** of both backends; matplotlib sends a
+  pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
+- **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web
+  Mercator**, its tiles existing in that projection only. An equal-area bokeh
+  map would have no basemap: set aside on 2026-10-07.
 
-## Two traps in the git history
+## History
 
-- **Every tag is an ancestor of `main` again, since 2026-09-12.** It was not so
-  before: the early history had been rewritten, `main` carried its own copies of
-  it under different hashes, and `v0.1.0` to `v0.3.0` pointed into the orphaned
-  line, so a range like `v0.3.0..v0.4.0` silently included duplicates. The two
-  lines differed only by a signature on the root commit, which the
-  history rewrite of that day stripped, and git then saw them as one. Ranges
-  measured from a tag are trustworthy now. Still true: two releases, **0.2.1 and
-  0.3.1, were published to PyPI but never tagged at all**.
-- **Commit hashes before 2026-08-05 are stable; the ones after are not.** That
-  rewrite removed the agent guidance file and the AI attribution trailers from
-  every commit, so everything from `5ea0b0f` onward was given a new hash — the
-  tags included, `v0.5.0` among them. A hash quoted in an issue, a notebook or a
-  reviewer's notes from before that date still resolves; a later one does not.
-  `pyvoa-before-rewrite-20260912.bundle`, kept beside the repository, holds the
-  history as it stood.
-
-  It had to be done a second time on 2026-09-14. A clone that predated the
-  first rewrite was merged back in, which restored the file and the trailers
-  across 219 commits, so the purge was rerun over every branch and tag. Hashes
-  moved again; `pyvoa-before-rewrite-20260914.bundle` is that backup. The
-  second pass also collapsed the 211 duplicate commits the first one had left,
-  which is why `main` is shorter than the reflogs of older clones suggest. Any
-  clone made before 2026-09-14 has the old lineage and must be re-cloned, not
-  pulled: merging one back is exactly what caused this.
-- **Commit subjects do not always match what shipped.** The 0.4.0 rename table in
-  `CHANGELOG.md` was built by diffing the front methods and the option vocabulary
-  between the two trees, not by transcribing the log, and that caught two errors:
-  a commit reads "change which to what", but `which` and `what` both exist before
-  and after with different meanings, so no rename happened; and `getversion()`
-  already existed at 0.3.1 rather than arriving in 0.4.0.
+- **The journal was JOSS until 2026-08-13**; the repository work carried over,
+  only the manuscript format changed.
+- **Every tag is an ancestor of `main` again, since 2026-09-12.** Before, `v0.1.0`
+  to `v0.3.0` pointed into an orphaned copy of the early history. Two releases,
+  **0.2.1 and 0.3.1, were published to PyPI but never tagged**.
+- **Commit hashes before 2026-08-05 are stable; later ones are not.** The
+  history was rewritten on 2026-09-12 and again on 2026-09-14, to remove the
+  agent guidance file and the AI attribution trailers;
+  `pyvoa-before-rewrite-20260912.bundle` and `…20260914.bundle`, beside the
+  repository, hold the history as it stood. A clone made before 2026-09-14 must
+  be re-cloned, not pulled: merging one back is what forced the second rewrite.
+- **Commit subjects do not always match what shipped**: the 0.4.0 rename table
+  in `CHANGELOG.md` was built by diffing the trees, which caught two subjects
+  that described renames that never happened.
