@@ -291,11 +291,13 @@ class front:
     def setwhom(self,base,**kwargs):
         """Select the database the following calls read from.
 
-        Downloads it, parses it and builds its geography, saves the result as a
-        pickle, then prints the summary :meth:`get_echoinfo` gives. Asking again
-        for the database already selected does all of this again. This is the
-        call every other one depends on: nothing but :meth:`listwhom` works
-        before it.
+        With ``reload=True``, the default, downloads it, parses it, builds its
+        geography and saves the result as pickles; with ``reload=False``, reads
+        the table, the variables and the locations back from those pickles
+        instead. Either way it then prints the summary :meth:`get_echoinfo`
+        gives. Asking for the database already selected is not skipped: it is
+        done again, as ``reload`` says. This is the call every other one depends
+        on: nothing but :meth:`listwhom` works before it.
 
         Parameters
         ----------
@@ -303,8 +305,11 @@ class front:
             The database to select; :meth:`listwhom` lists them.
         reload : bool, optional
             True, the default, parses the source again. False reads the pickle
-            of a previous parse instead, which is faster but fails if the
-            database has never been loaded on this machine.
+            of a previous parse instead, and fails if the database has never
+            been loaded on this machine. As it stands, False still parses the
+            database once, through the builder this method creates first, and
+            then uses the pickled table: it saves the geography and the
+            pickling, not the parse.
 
         Raises
         ------

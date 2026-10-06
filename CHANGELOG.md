@@ -15,10 +15,14 @@
 - the column `get()` returns for a variable read with an option is named with
   a space before the option, `'tot_cases smooth7'`, as it already was for a
   `what` (`'tot_cases daily'`); it used to be `'tot_casessmooth7'`.
-- `setwhom()` parses the database again when asked for the one already
-  selected, where it used to only reprint its summary. It saves the lists
-  `listwhich()` and `listwhere()` give along with the data, so that
-  `setwhom(base, reload=False)` reads all three back from the pickles.
+- `setwhom()` is no longer skipped when asked for the database already
+  selected, where it used to only reprint its summary: it does again what
+  `reload` asks — parse the source (`reload=True`, the default) or read the
+  pickles back (`reload=False`). It saves the lists `listwhich()` and
+  `listwhere()` give along with the data, so that `reload=False` reads all
+  three back. Known issue: `reload=False` still parses the database once,
+  through the `GPDBuilder` that `setwhom()` creates before testing `reload`,
+  so it does not save the parse it is meant to.
   `get_echoinfo()` now takes the dict `setwhom()` builds (`'lwhich'`,
   `'lwhere'`, `'mypd'`) and fails when called without it.
 - `listwhom(detailed=True)` no longer lists the variables of each database,
