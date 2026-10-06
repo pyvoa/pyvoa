@@ -93,8 +93,10 @@
   were left undrawn by `spf`.
 - fix: the matplotlib time-series legend cut every label to ten characters on
   its own, whatever `maxlettersdisplayed` said.
-- fix: `plot()`, `hist()` and `map()` neither returned the bokeh figure nor kept
-  it for `savefig()`, which saved the previous figure instead.
+- fix: `plot()`, `hist()` and `map()` did not keep the bokeh figure for
+  `savefig()`, which saved the previous figure instead. The bokeh figure is
+  still not returned: it is shown already, and a notebook would print its
+  repr (`Tabs(id=...)`) under it, as it briefly did.
 - fix: a pie chart, or a histogram by value, of fewer locations than the twelve
   colours of the palette raised a `ValueError`.
 - fix: the parser called `GroupBy.sum(skipna=False)`, which pandas only
@@ -123,7 +125,11 @@
   American Samoa in the USA geography, as a `Territories` census region
   (jhu-usa, covidtracking); Lakshadweep (covid19india); and the Antártica
   comuna, 12202 (minciencia). `map()` raises a `PyvoaError` naming them when
-  every location it is asked for is one of those.
+  every location it is asked for is one of those. Bokeh and folium maps leave
+  them out of the GeoJSON they are given: an empty geometry is serialised as
+  null, on which BokehJS fails (`Cannot read properties of null`) and draws no
+  map at all, as it briefly did for owid, europa, mpoxgh, jhu-usa,
+  covidtracking, covid19india and minciencia.
 - fix: `convertmercator()`, which `get()` runs on every geometry, skipped a
   location whose geometry was empty (falsy), so the join that followed left
   it with none, and `get()` dropped it.

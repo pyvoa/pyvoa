@@ -468,8 +468,16 @@ class AllVisu:
         elif vis == 'seaborn':
             fig = visu_seaborn().seaborn_heatmap(**kwargs)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
+                # a location with no geometry of its own carries an empty one,
+                # serialised as null in the GeoJSON, which BokehJS fails on
+                # ("Cannot read properties of null"), drawing no map at all
+                drawable = ~gpd.GeoSeries(input['geometry']).is_empty.to_numpy()
+                kwargs['input'] = input.loc[drawable]
                 fig = visu_bokeh().bokeh_map(**kwargs)
         elif vis == 'folium':
+            # folium serialises GeoJSON too: same care as for bokeh
+            drawable = ~gpd.GeoSeries(input['geometry']).is_empty.to_numpy()
+            kwargs['input'] = input.loc[drawable]
             fig = visu_folium().folium_map(**kwargs)
         else:
             raise PyvoaError('Waiting for a valid visualisation. So far: \'bokeh\', \'folium\' or \'matplotlib\' \

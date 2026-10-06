@@ -960,9 +960,11 @@ class front:
         Returns
         -------
         object
-            The map built by the backend -- under matplotlib, its axes, or None
-            if ``return_pltaxis`` is False. It is shown as well, unless
-            :meth:`setbatch` was called, and kept for :meth:`savefig`.
+            Under matplotlib, the axes of the map, or None if
+            ``return_pltaxis`` is False; under bokeh, None. Either way the map
+            is shown, unless :meth:`setbatch` was called, and kept for
+            :meth:`savefig`; a bokeh figure is not returned, so that a notebook
+            does not print it a second time.
 
         Raises
         ------
@@ -1000,6 +1002,10 @@ class front:
                 plt.show()
         # whatever the backend: savefig() reads self.outcome
         self.outcome = fig
+        # a bokeh figure has been shown already: returned as well, a notebook
+        # would print its repr ("Tabs(id=...)") under the chart
+        if self.getvis() == 'bokeh':
+            return None
         return fig
 
     @input_wrapper
@@ -1078,9 +1084,11 @@ class front:
         Returns
         -------
         object
-            The figure built by the backend -- under matplotlib, its axes, or
-            None if ``return_pltaxis`` is False. It is shown as well, unless
-            :meth:`setbatch` was called, and kept for :meth:`savefig`.
+            Under matplotlib, the axes of the chart, or None if
+            ``return_pltaxis`` is False; under bokeh, None. Either way the
+            chart is shown, unless :meth:`setbatch` was called, and kept for
+            :meth:`savefig`; a bokeh figure is not returned, so that a notebook
+            does not print it a second time.
 
         Raises
         ------
@@ -1109,6 +1117,10 @@ class front:
                 plt.show()
         # whatever the backend: savefig() reads self.outcome
         self.outcome = fig
+        # a bokeh figure has been shown already: returned as well, a notebook
+        # would print its repr ("Tabs(id=...)") under the chart
+        if self.getvis() == 'bokeh':
+            return None
         return fig
 
     def decoplot(func):
@@ -1212,9 +1224,11 @@ class front:
         Returns
         -------
         object
-            The figure built by the backend -- under matplotlib, its axes, or
-            None if ``return_pltaxis`` is False. It is shown as well, unless
-            :meth:`setbatch` was called, and kept for :meth:`savefig`.
+            Under matplotlib, the axes of the chart, or None if
+            ``return_pltaxis`` is False; under bokeh, None. Either way the
+            chart is shown, unless :meth:`setbatch` was called, and kept for
+            :meth:`savefig`; a bokeh figure is not returned, so that a notebook
+            does not print it a second time.
 
         Raises
         ------
@@ -1246,6 +1260,10 @@ class front:
         # outside the batch test and the backend test, as in map() and hist():
         # savefig() reads self.outcome, and setbatch() must not leave it unset.
         self.outcome = fig
+        # a bokeh figure has been shown already: returned as well, a notebook
+        # would print its repr ("Tabs(id=...)") under the chart
+        if self.getvis() == 'bokeh':
+            return None
         return fig
 
     def setnamefunction(self,name):
