@@ -1,7 +1,10 @@
 # Unreleased
 - new chart keywords. `pyvoalogo` (False by default) stamps the pyvoa logo
-  on the figure, which is no longer done unasked — except on a bokeh map,
-  which keeps a faint logo in its corner whatever it says. `return_pltaxis`
+  on the figure, which is no longer done unasked, bokeh maps included: they
+  used to carry a logo whatever was asked, drawn at 5 % opacity and anchored
+  in data coordinates — at longitude 0, latitude 0 in Web Mercator, so out of
+  sight on most maps. With `pyvoalogo=True` a bokeh map gets the same
+  watermark as the other bokeh charts. `return_pltaxis`
   (True by default) makes the matplotlib charts return their axes rather
   than None; the other backends ignore it. `maxcountrydisplayed` is accepted
   but not read: the time series and the histograms by location show 12

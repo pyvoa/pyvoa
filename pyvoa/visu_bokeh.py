@@ -1460,8 +1460,8 @@ class visu_bokeh:
         lays it over the background tiles named by 'tile' ('openstreet' when
         none is named). The locations the source says nothing about are drawn
         in pink, and a location without a geometry of its own is counted but
-        not drawn. A faint pyvoa logo is stamped in a corner whatever
-        'pyvoalogo' says.
+        not drawn. The pyvoa logo is laid over the figure only when
+        'pyvoalogo' is True, as on the other charts.
 
         Parameters
         ----------
@@ -1471,7 +1471,9 @@ class visu_bokeh:
 
         Returns
         -------
-        The bokeh figure holding the map.
+        The bokeh figure holding the map, in a column under the slider when
+        'dateslider' is asked for, and in a row with the logo when
+        'pyvoalogo' is.
         """
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
@@ -1481,19 +1483,11 @@ class visu_bokeh:
             wmt = WMTSTileSource(url = tile)
             bokeh_figure.add_tile(wmt, retina=True)
 
-        logo = kwargs['logo']
-        logo_url = visu_bokeh.pyvoalogo(logo)
-
-        bokeh_figure.image_url(
-            url=[logo_url],
-            x=0.2*bokeh_figure.width,
-            y=0.2*bokeh_figure.height,
-            w=bokeh_figure.width, w_units="screen",
-            h=bokeh_figure.height, h_units="screen",
-            anchor="center",
-            alpha=0.05,
-            level='overlay'
-        )
+        # no logo glyph drawn in the map itself: its x and y are data
+        # coordinates, Web Mercator metres on a map, so a logo placed there sat
+        # at longitude 0, latitude 0, mostly out of sight. The logo, when
+        # 'pyvoalogo' asks for it, is the watermark deco_bokeh builds, laid
+        # over the figure as for every other chart.
 
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
@@ -1505,10 +1499,10 @@ class visu_bokeh:
 
         bokeh_figure.add_tools(HoverTool(renderers=[kwargs['main_renderer']],tooltips=[('location', '@where'), ('cases', '@cases{0,0}')]))
 
-        if dateslider:
-             layout = column(controls, bokeh_figure)
-             return layout
-        return bokeh_figure
+        out = column(controls, bokeh_figure) if dateslider else bokeh_figure
+        if kwargs['pyvoalogo']:
+            out = Row(out, kwargs['watermark'])
+        return out
 
     @staticmethod
     def bokeh_savefig(fig,name):

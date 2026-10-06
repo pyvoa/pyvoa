@@ -949,7 +949,6 @@ class front:
             12, the default, whatever this says.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
-            A bokeh map carries a faint logo in its corner whatever this says.
         return_pltaxis : bool, optional
             Under matplotlib, return the axes the chart was drawn on, the
             default, rather than None. The other backends ignore it.
