@@ -275,7 +275,34 @@ def shorten_locations(where, maxletters):
 
 def fill_missing_dates(p, date_field='date', loc_field='where',
                        d1=None, d2=None):
-    """Fill the input pandas dataframe p with missing dates."""
+    """Fill the input pandas dataframe p with missing dates.
+
+    Every location is given every day between d1 and d2. A day the source
+    says nothing about is left missing, never carried over from the day
+    before: a column of increments is cumulated afterwards, and forward
+    filling the running totals is ``GPDBuilder.get_stats``'s business. A
+    timezone on the dates is dropped first, the dates being calendar days.
+
+    Parameters
+    ----------
+    p : pandas.DataFrame
+        The table, one row per date and location.
+    date_field, loc_field : str
+        The names of its date and location columns, 'date' and 'where' by
+        default.
+    d1, d2 : datetime.date, optional
+        The first and last days. Default to the first and last dates of p.
+
+    Returns
+    -------
+    pandas.DataFrame
+        The table on the full daily range, a row for every location and day.
+
+    Raises
+    ------
+    PyvoaError
+        If p is not a DataFrame, lacks either column, or d1 is after d2.
+    """
     if not isinstance(p, pd.DataFrame):
         raise PyvoaError("Expecting input p as a pandas dataframe.")
 
@@ -674,7 +701,23 @@ def dumppkl(filepkl,whattodump):
 
 @staticmethod
 def prioritize_keyword(listwhich):
-    """Return all the available keywords for the database selected."""
+    """Put the default 'which' at the head of a list of variables.
+
+    The default is the death count when there is one: the first of
+    'tot_deaths', 'total_deaths', 'tot_dc' and 'total_dc' found in the list.
+    Failing that, the list is returned as it is, its own first entry being the
+    default.
+
+    Parameters
+    ----------
+    listwhich : list of str
+        The variables; it is not modified.
+
+    Returns
+    -------
+    list of str
+        The same variables, the default first.
+    """
     listwhich = listwhich.copy()
     preferred = ['tot_deaths', 'total_deaths', 'tot_dc','total_dc']
     first = next((w for w in preferred if w in listwhich), listwhich[0])

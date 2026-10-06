@@ -134,10 +134,26 @@ class GPDBuilder:
        return self.currentdata.get_available_keywords()
 
    def factory(self,reload=True):
-       """Return an instance of GPDBuilder and of the display methods.
+       """Split the parsed database, save it, and set up its charts.
 
-       Recommended over building them separately, which risks a mismatch in the
-       labels of the figures.
+       Splits the table the parser built into its data and its geometry, saves
+       both as pickles in the pyvoa cache -- the data with the lists
+       :meth:`listwhich` and :meth:`listwhere` give, the geometry with the
+       description of the locations -- and builds the AllVisu that draws them.
+       ``front.setwhom`` calls it, and reads those pickles back when asked not
+       to reload.
+
+       Parameters
+       ----------
+       reload : bool
+           True, the default, does all of the above. False is not supported:
+           the data and the geometry are then never built, and the call fails.
+
+       Returns
+       -------
+       tuple
+           (the data, without its geometry; one 'where'/'geometry' row per
+           location; the AllVisu).
        """
        f = self.db+'.pkl'
        if reload:
@@ -219,7 +235,15 @@ class GPDBuilder:
       return data,geo
 
    def setvisu(self,db_name,wheregeometrydescription):
-       """Set the Display."""
+       """Build the AllVisu that draws the charts of this database.
+
+       Parameters
+       ----------
+       db_name : str
+           The database the charts describe.
+       wheregeometrydescription : gpd.GeoDataFrame
+           One 'where'/'geometry' row per location.
+       """
        import pyvoa.visualizer as output
        self.codisp = output.AllVisu(db_name, wheregeometrydescription)
 
@@ -315,8 +339,9 @@ class GPDBuilder:
        -------
        list of str
            The values 'which' accepts, sorted alphabetically. Beware that the
-           default of 'which' is not this first entry but the first cumulative
-           variable the database declares, as :meth:`get` describes.
+           default of 'which' is not necessarily this first entry: the death
+           count comes first when the database has one, see
+           ``tools.prioritize_keyword``.
 
        Raises
        ------
@@ -345,8 +370,10 @@ class GPDBuilder:
         Parameters
         ----------
         cluster_and_not : bool
-            If True, the default, return the individual locations *and* the
-            clusters. If False, return the clusters only.
+            If True, return the individual locations *and* the clusters --
+            for a world-wide database, the countries under both their ISO3
+            code and their name. If False, the default here (``front.listwhere``
+            defaults to True), return the clusters only.
 
         Returns
         -------

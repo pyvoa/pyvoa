@@ -558,6 +558,13 @@ class GeoInfo:
         -------
         pd.DataFrame
             The modified DataFrame with the specified fields added.
+
+        Notes
+        -----
+        The 'geometry' field comes from the 2008 TM_WORLD_BORDERS file, which
+        predates the dissolution of the Netherlands Antilles: Curaçao, Sint
+        Maarten and the Caribbean Netherlands (CUW, SXM, BES) are given an empty
+        geometry, so that their data join and are counted, though not drawn.
         """
         # --- kwargs analysis ---
 

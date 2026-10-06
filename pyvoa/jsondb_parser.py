@@ -165,7 +165,8 @@ class MetaInfo:
   def getcurrentmetadatawhich(self,dico):
       """Retrieve the "which" values from the parsed json.
 
-      They are the ones defined by the 'name' keyword in the json file.
+      They are the ones defined by the 'name' keyword in the json file, plus,
+      for a wide file, its 'namedata' -- or the 'renamedata' that replaces it.
       """
       which=[]
       for i in dico['datasets']:
@@ -281,10 +282,13 @@ class DataParser:
   def get_parsing(self,):
       """Parse the json file loaded by the init function (self.metadata).
 
-      Returns a pandas with the structure ``|date|where|code|var-1 ... var-n|
-      geometry``, where the var-i are the variables selected in the json file.
+      Returns a pandas with the columns 'date', 'where', 'code', 'geometry',
+      'from_db' and one column per variable selected in the json file.
       "where" and "code" go through the geo methods, to assure a good
-      standardization.
+      standardization. Every location of the geography is present on every
+      date, with missing values where the source says nothing; 'from_db' tells
+      the locations the source reports from those it does not. A location the
+      geometry file lacks carries an empty geometry rather than none.
       """
       if 'header' in list(self.metadata.keys()):
           self.dbdescription = self.metadata['header']
@@ -613,7 +617,10 @@ class DataParser:
       return self.dates
 
   def get_available_keywords(self):
-      """Return all the available keyswords for the database selected."""
+      """Return the variables of the database, the default 'which' first.
+
+      See ``tools.prioritize_keyword`` for which one comes first.
+      """
       return prioritize_keyword(self.available_keywords)
 
   def get_url(self):

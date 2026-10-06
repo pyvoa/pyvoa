@@ -48,15 +48,15 @@ def display_full_help():
         ('setwhom(\"DBname\")', "Set the database to be used"),
         ('getwhom', "Display the currently used database"),
         ('listwhich', "List available epidemiological variables"),
-        ('listwhere', "List available departments"),
+        ('listwhere', "List available locations"),
         ('listwhere(True)', "List available regions"),
-        ('listwhat', "Show data modes: cumulative, daily, weekly"),
+        ('listwhat', "Show data modes: current, daily, weekly"),
         ('listoption', "List available options"),
         ('listoutput', "List available output formats: pandas, geopandas, list, dict, array"),
         ('listpop', "List normalization options (per population)"),
         ('listplot', "List available plot types"),
         ('listtile', "List available map textures"),
-        ('listvisu', "List available visualization options for maps"),
+        ('listvis', "List available visualization backends"),
         ('dir(pyvoa)', "Display all available methods")
     ]
     for command, description in list_commands:
@@ -106,7 +106,7 @@ def display_full_help():
         ('listwhich', "pyvoa.listwhich()"),
         ('plot', "pyvoa.plot(where=['France', 'Italy', 'United Kingdom'])"),
         ('map', "pyvoa.map(where='world', what='daily', when='01/04/2020')"),
-        ('hist', "pyvoa.hist(where='Middle Africa', which='tot_confirmed', what='cumul')"),
+        ('hist', "pyvoa.hist(where='Middle Africa', which='tot_confirmed', what='current')"),
         ('get', "pyvoa.get(where='USA', what='daily', which='tot_recovered', output='pandas')")
     ]
     for cmd, ex in examples:

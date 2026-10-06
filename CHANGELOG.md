@@ -1,4 +1,38 @@
 # Unreleased
+- new chart keywords. `pyvoalogo` (False by default) stamps the pyvoa logo
+  on the figure, which is no longer done unasked — except on a bokeh map,
+  which keeps a faint logo in its corner whatever it says. `return_pltaxis`
+  (True by default) makes the matplotlib charts return their axes rather
+  than None; the other backends ignore it. `maxcountrydisplayed` is accepted
+  but not read: the time series and the histograms by location show 12
+  locations at most, whatever it says. `maxlettersdisplayed` now defaults to
+  20 characters, up from 10.
+- the default `which` is the death count when the database has one — the
+  first of `tot_deaths`, `total_deaths`, `tot_dc` and `total_dc` it offers —
+  and otherwise the first variable `listwhich()` returns, alphabetically
+  (`tools.prioritize_keyword`). It used to be the first cumulative variable
+  the JSON description declared.
+- the column `get()` returns for a variable read with an option is named with
+  a space before the option, `'tot_cases smooth7'`, as it already was for a
+  `what` (`'tot_cases daily'`); it used to be `'tot_casessmooth7'`.
+- `setwhom()` parses the database again when asked for the one already
+  selected, where it used to only reprint its summary. It saves the lists
+  `listwhich()` and `listwhere()` give along with the data, so that
+  `setwhom(base, reload=False)` reads all three back from the pickles.
+  `get_echoinfo()` now takes the dict `setwhom()` builds (`'lwhich'`,
+  `'lwhere'`, `'mypd'`) and fails when called without it.
+- `listwhom(detailed=True)` no longer lists the variables of each database,
+  which are only known once a database is parsed: see `listwhich()`.
+- maps: bokeh draws them on `'openstreet'` tiles unless another one is named,
+  and matplotlib on none; `None` is no longer a value of `tile`. A dense map
+  is drawn without tiles.
+- every docstring was checked against the code changed since the last such
+  pass (2026-09-12) and corrected where it had drifted: the default of
+  `which`, the chart keywords, what `plot()`, `hist()` and `map()` return,
+  `setwhom()`, `listwhom()`, `get_echoinfo()`, the backends' logo and
+  axes, and seven placeholder docstrings (`AllVisu.hist`, `AllVisu.map`, …).
+  `pyvoa.help` no longer advertises a `listvisu` that does not exist, nor
+  `what='cumul'`.
 - `get()` returns location names whole. They used to be cut to
   `maxlettersdisplayed` (20 characters, then '...') in the selection step that
   `get()` shares with the charts, so `get()` handed out `'Heilbronn

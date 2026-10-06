@@ -291,10 +291,11 @@ class front:
     def setwhom(self,base,**kwargs):
         """Select the database the following calls read from.
 
-        Downloads it, parses it and builds its geography, then prints the
-        summary :meth:`get_echoinfo` gives. Asking for the database that is
-        already selected only reprints that summary. This is the call every
-        other one depends on: nothing but :meth:`listwhom` works before it.
+        Downloads it, parses it and builds its geography, saves the result as a
+        pickle, then prints the summary :meth:`get_echoinfo` gives. Asking again
+        for the database already selected does all of this again. This is the
+        call every other one depends on: nothing but :meth:`listwhom` works
+        before it.
 
         Parameters
         ----------
@@ -348,7 +349,16 @@ class front:
 
          Reports the variables it offers, a handful of example locations, and
          the first and last dates it covers. Output goes through info(), so it
-         is silent unless the verbosity allows it.
+         is silent unless the verbosity allows it. :meth:`setwhom` calls it with
+         what it has just parsed or read back.
+
+         Parameters
+         ----------
+         dico : dict
+             'lwhich', the variables; 'lwhere', the locations, as
+             :meth:`listwhere` gives them; 'mypd', the parsed table, whose
+             'date' column gives the dates. A 'reload' key is accepted and
+             ignored.
          """
          # reload  = dico['reload']
          lwhich  = dico['lwhich']
@@ -591,8 +601,10 @@ class front:
         def inner(self,**kwargs):
             """Refuse a chart the current backend cannot draw.
 
-            Checks that a backend is set, that a date slider is asked for only in
-            bokeh, and that hist() and map() are given a single variable.
+            Gives each location a colour of its own, from the tab20 cycle, in a
+            'color' column the charts draw with; then checks that a backend is
+            set, that a date slider is asked for only in bokeh, and that hist()
+            and map() are given a single variable.
             """
             wheres = kwargs['input']['where'].unique()
             colors = {w: plt.cm.tab20(i % 20) for i, w in enumerate(wheres)}
@@ -624,13 +636,13 @@ class front:
 
         Reads the 'output' keyword and converts the DataFrame the wrapper built
         into a pandas or geopandas frame, a dict, a list or a numpy array. It
-        is the last step shared by get(), plot(), hist() and map().
+        decorates get() and plot(); hist() and map() do without it.
         """
         @wraps(func)
         def inner(self,**kwargs):
             """Cast the assembled table to the type 'output' asks for.
 
-            Drops the bookkeeping column the wrapper added, falls back to a plain
+            Drops the bookkeeping 'from_db' column, falls back to a plain
             pandas frame when there is no geometry to hand out, and orders the
             locations by the value they reach on the last date selected -- the order
             the charts draw in. 'dict', 'list' and 'array' return there and then, so
@@ -712,11 +724,10 @@ class front:
             The location(s) to select. Defaults to every location the database
             holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
-            The variable(s) to read. Defaults to the first *cumulative* variable
-            the database declares -- the first one named ``tot_...`` or
-            ``total_...`` in declaration order, or simply the first declared
-            variable if the database has none. :meth:`listwhich` lists them
-            alphabetically, so its first entry is not necessarily this default.
+            The variable(s) to read. Defaults to the death count when the
+            database has one -- the first of 'tot_deaths', 'total_deaths',
+            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
+            variable :meth:`listwhich` returns, in alphabetical order.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -882,11 +893,10 @@ class front:
             The location(s) to select. Defaults to every location the database
             holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
-            The variable(s) to read. Defaults to the first *cumulative* variable
-            the database declares -- the first one named ``tot_...`` or
-            ``total_...`` in declaration order, or simply the first declared
-            variable if the database has none. :meth:`listwhich` lists them
-            alphabetically, so its first entry is not necessarily this default.
+            The variable(s) to read. Defaults to the death count when the
+            database has one -- the first of 'tot_deaths', 'total_deaths',
+            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
+            variable :meth:`listwhich` returns, in alphabetical order.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -903,8 +913,10 @@ class front:
             a table of your own sets the current database to 'in-house data'.
         typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
             How the geography is drawn; :meth:`listmap` lists them.
-        tile : {'esri', 'positron', 'stamen', 'openstreet', None}, optional
-            The background tiles; :meth:`listtile` lists them.
+        tile : {'openstreet', 'esri', 'positron', 'stamen'}, optional
+            The background tiles; :meth:`listtile` lists them. Bokeh defaults to
+            'openstreet'; matplotlib draws no tiles unless one is named. A dense
+            map is drawn without tiles.
         vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.
@@ -921,14 +933,25 @@ class front:
             tooltips of the chart, followed by '...'; 20 by default, 5 at least.
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
+        maxcountrydisplayed : int, optional
+            Accepted, but not read: the charts that cap how many locations they
+            show (the time series, and the histograms by location) cap it at
+            12, the default, whatever this says.
+        pyvoalogo : bool, optional
+            Stamp the pyvoa logo on the figure. Defaults to False.
+            A bokeh map carries a faint logo in its corner whatever this says.
+        return_pltaxis : bool, optional
+            Under matplotlib, return the axes the chart was drawn on, the
+            default, rather than None. The other backends ignore it.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
         Returns
         -------
         object
-            The map built by the backend. Under bokeh it is also shown, unless
-            :meth:`setbatch` was called.
+            The map built by the backend -- under matplotlib, its axes, or None
+            if ``return_pltaxis`` is False. It is shown as well, unless
+            :meth:`setbatch` was called, and kept for :meth:`savefig`.
 
         Raises
         ------
@@ -985,11 +1008,10 @@ class front:
             The location(s) to select. Defaults to every location the database
             holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
-            The variable(s) to read. Defaults to the first *cumulative* variable
-            the database declares -- the first one named ``tot_...`` or
-            ``total_...`` in declaration order, or simply the first declared
-            variable if the database has none. :meth:`listwhich` lists them
-            alphabetically, so its first entry is not necessarily this default.
+            The variable(s) to read. Defaults to the death count when the
+            database has one -- the first of 'tot_deaths', 'total_deaths',
+            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
+            variable :meth:`listwhich` returns, in alphabetical order.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -1027,14 +1049,24 @@ class front:
             tooltips of the chart, followed by '...'; 20 by default, 5 at least.
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
+        maxcountrydisplayed : int, optional
+            Accepted, but not read: the charts that cap how many locations they
+            show (the time series, and the histograms by location) cap it at
+            12, the default, whatever this says.
+        pyvoalogo : bool, optional
+            Stamp the pyvoa logo on the figure. Defaults to False.
+        return_pltaxis : bool, optional
+            Under matplotlib, return the axes the chart was drawn on, the
+            default, rather than None. The other backends ignore it.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
         Returns
         -------
         object
-            The figure built by the backend. Under bokeh it is also shown, unless
-            :meth:`setbatch` was called.
+            The figure built by the backend -- under matplotlib, its axes, or
+            None if ``return_pltaxis`` is False. It is shown as well, unless
+            :meth:`setbatch` was called, and kept for :meth:`savefig`.
 
         Raises
         ------
@@ -1110,11 +1142,10 @@ class front:
             The location(s) to select. Defaults to every location the database
             holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
-            The variable(s) to read. Defaults to the first *cumulative* variable
-            the database declares -- the first one named ``tot_...`` or
-            ``total_...`` in declaration order, or simply the first declared
-            variable if the database has none. :meth:`listwhich` lists them
-            alphabetically, so its first entry is not necessarily this default.
+            The variable(s) to read. Defaults to the death count when the
+            database has one -- the first of 'tot_deaths', 'total_deaths',
+            'tot_dc' and 'total_dc' it offers -- and otherwise to the first
+            variable :meth:`listwhich` returns, in alphabetical order.
         what : {'current', 'daily', 'weekly'}, optional
             How the values are reported. Defaults to 'current'; see
             :meth:`listwhat`.
@@ -1149,14 +1180,24 @@ class front:
             tooltips of the chart, followed by '...'; 20 by default, 5 at least.
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
+        maxcountrydisplayed : int, optional
+            Accepted, but not read: the charts that cap how many locations they
+            show (the time series, and the histograms by location) cap it at
+            12, the default, whatever this says.
+        pyvoalogo : bool, optional
+            Stamp the pyvoa logo on the figure. Defaults to False.
+        return_pltaxis : bool, optional
+            Under matplotlib, return the axes the chart was drawn on, the
+            default, rather than None. The other backends ignore it.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
         Returns
         -------
         object
-            The figure built by the backend. Under bokeh it is also shown, unless
-            :meth:`setbatch` was called.
+            The figure built by the backend -- under matplotlib, its axes, or
+            None if ``return_pltaxis`` is False. It is shown as well, unless
+            :meth:`setbatch` was called, and kept for :meth:`savefig`.
 
         Raises
         ------
@@ -1252,23 +1293,21 @@ class front:
         return optmap
 
     def listwhom(self, detailed = False):
-        """List the names of databases and their associated metadata.
+        """List the databases pyvoa ships.
 
         Parameters
         ----------
         detailed : bool, optional
-            If True, returns a detailed DataFrame containing database names, ISO3 codes, granularity, and variables. Defaults to False.
+            If True, describe each database rather than only naming it.
+            Defaults to False.
 
         Returns
         -------
-        list or pd.DataFrame:
-        - If detailed is False, returns a list of database names.
-        - If detailed is True, returns a DataFrame with columns for database names, ISO3 codes, granularity, and variables.
-
-        Raises
-        ------
-        PyvoaError
-            If the detailed argument is not a boolean.
+        list of str or pandas.DataFrame
+            The database names, sorted; or, if ``detailed``, a DataFrame indexed
+            by them, with their 'iso3' code and their 'granularity'. Their
+            variables are not listed: they are only known once a database is
+            parsed, see :meth:`listwhich`.
         """
         allpd  = self.meta.getallmetadata()
         namedb = allpd.name.to_list()

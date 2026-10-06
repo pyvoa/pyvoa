@@ -83,9 +83,11 @@ class AllVisu:
         Reads the geographic metadata of db_name -- its ISO3 code and its
         granularity -- unless the data is user supplied ('in-house data'),
         collects the chart methods the class exposes, and settles the drawing
-        defaults: the colour cycle, how many locations a chart shows at most,
-        how long a location name may be before it is cut, and the paths to the
-        two logo files stamped on the figures.
+        defaults: the colour cycle, how many locations a chart shows at most
+        (``maxcountrydisplayed``, 12), and the paths to the two logo files
+        stamped on the figures. How long a location name may be before it is
+        cut is not settled here: each chart reads ``maxlettersdisplayed`` from
+        its keyword arguments.
 
         Parameters
         ----------
@@ -125,7 +127,12 @@ class AllVisu:
 
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
-        """Decorate plot purpose."""
+        """Decorate preparing the data of a time-series plot.
+
+        Keeps the first ``maxcountrydisplayed`` locations, cuts their names to
+        ``maxlettersdisplayed`` for the labels, legends and tooltips, and sets
+        the title, the logo and the legend of a 'sumall' plot.
+        """
         @wraps(func)
         def inner_plot(self ,**kwargs):
             """Prepare the keyword arguments shared by every time-series plot.
@@ -156,7 +163,14 @@ class AllVisu:
 
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE & MAP'''
     def decohistomap(func):
-        """Decorate histogram and map."""
+        """Decorate preparing the data of a histogram, a pie chart or a map.
+
+        Cuts the location names to ``maxlettersdisplayed`` for the labels,
+        legends and tooltips, keeps the last date (unless a date slider is
+        asked for), ranks the locations, caps a histogram by location at
+        ``maxcountrydisplayed`` of them, and gathers the rest into a
+        'SumOthers' slice for a histogram by value or a pie chart.
+        """
         @wraps(func)
         def inner_hm(self, **kwargs):
             """Prepare the keyword arguments shared by histograms and maps.
@@ -329,7 +343,27 @@ class AllVisu:
     @decohistomap
     @decohistopie
     def hist(self,**kwargs):
-        """FILL IT."""
+        """Draw a histogram or a pie chart with whichever backend is selected.
+
+        Dispatches to matplotlib, bokeh or seaborn according to 'vis', and
+        within each to the routine matching 'typeofhist': 'location' (one bar
+        per location), 'value' (the locations binned by value) or 'pie'.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments prepared by front, including 'input',
+            'which', 'vis' and 'typeofhist'.
+
+        Returns
+        -------
+        The figure built by the backend.
+
+        Raises
+        ------
+        PyvoaError
+            If matplotlib is asked for a 'typeofhist' it does not draw.
+        """
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
         if vis == 'matplotlib':
@@ -366,7 +400,28 @@ class AllVisu:
     @decohistomap
     @decohistopie
     def map(self,**kwargs):
-        """FILL IT."""
+        """Draw a map with whichever backend is selected.
+
+        Dispatches to matplotlib, bokeh, seaborn or folium according to 'vis'.
+        A single variable is drawn: a list given as 'which' is reduced to its
+        first element.
+
+        Parameters
+        ----------
+        **kwargs
+            the drawing arguments prepared by front, including 'input' with its
+            'geometry' column, 'which', 'vis', 'typeofmap' and 'tile'.
+
+        Returns
+        -------
+        The map built by the backend.
+
+        Raises
+        ------
+        PyvoaError
+            If 'dateslider' is asked for outside bokeh, if 'input' has no
+            geometry, or if 'vis' names no backend that draws maps.
+        """
         vis = kwargs.get('vis')
         input = kwargs.get('input')
         which = kwargs.get('which')

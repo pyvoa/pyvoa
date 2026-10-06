@@ -144,8 +144,9 @@ class visu_bokeh:
         """Decorate building the bokeh figure a chart is drawn on.
 
         Gives each location a stable colour from the Category20 cycle, then
-        creates the figure, its title and the logo watermark, and passes them
-        on to the drawing method.
+        creates the figure and its title, plus the logo watermark when
+        'pyvoalogo' is True (an empty spacer otherwise), and passes them on to
+        the drawing method.
         """
         @wraps(func)
         def innerdeco_bokeh(self,**kwargs):
@@ -261,14 +262,15 @@ class visu_bokeh:
             self.listfigs = fig
 
     def bokeh_plot(func):
-        """Decorate shortening the location labels before a chart is drawn.
+        """Decorate dropping the geometry before a non-map chart is drawn.
 
-        Replaces each location by its display name, and drops the geometry
-        column, which the non-map charts have no use for.
+        The non-map charts have no use for the geometry column. The location
+        names need no work here: AllVisu has already cut them to
+        'maxlettersdisplayed'.
         """
         @wraps(func)
         def inner_bokeh_plot(self, **kwargs):
-            """Shorten the location labels and drop the geometry, then draw."""
+            """Drop the geometry, then draw."""
             input=kwargs['input']
             if 'geometry' in list(input.columns):
                 kwargs['input'] = input.drop(columns='geometry')
@@ -1455,8 +1457,11 @@ class visu_bokeh:
         """Draw a choropleth map of one variable.
 
         Colours each location by its value and, unless the map is drawn dense,
-        lays it over the background tiles named by 'tile'. The pyvoa logo is
-        stamped in a corner.
+        lays it over the background tiles named by 'tile' ('openstreet' when
+        none is named). The locations the source says nothing about are drawn
+        in pink, and a location without a geometry of its own is counted but
+        not drawn. A faint pyvoa logo is stamped in a corner whatever
+        'pyvoalogo' says.
 
         Parameters
         ----------

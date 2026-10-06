@@ -2,7 +2,7 @@
 
 Static charts: the ``date``, ``versus`` and ``yearly`` plots, the three
 histogram kinds, and maps. Every figure is created by the ``decomatplotlib``
-decorator, which also stamps the pyvoa logo on it.
+decorator, which also stamps the pyvoa logo on it when 'pyvoalogo' is True.
 
 Project : pyvoa
 Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
@@ -31,8 +31,9 @@ class visu_matplotlib:
 
     Offers the 'date', 'versus' and 'yearly' plots, the three histogram kinds and
     maps. Every figure is created by the ``decomatplotlib`` decorator, which also
-    stamps the pyvoa logo on it, so the methods here receive the axes to draw on
-    rather than making them.
+    stamps the pyvoa logo on it when asked to, so the methods here receive the
+    axes to draw on rather than making them. Each returns those axes, or None
+    when 'return_pltaxis' is False.
     """
 
     def __init__(self,):
@@ -67,8 +68,9 @@ class visu_matplotlib:
     def decomatplotlib(func):
         """Decorate creating the figure every matplotlib chart draws on.
 
-        Builds a 10x5 figure and its axes, sets the title, and stamps the pyvoa
-        logo faintly in the background. The figure, its axes and the pyplot
+        Builds a 10x5 figure and its axes, sets the title, and, when
+        'pyvoalogo' is True (it is False by default), stamps the pyvoa logo
+        faintly in the background. The figure, its axes and the pyplot
         module are passed on as the 'fig', 'ax' and 'plt' keyword arguments, so
         the drawing methods only have to draw.
         """
@@ -103,19 +105,21 @@ class visu_matplotlib:
         """Draw one or more variables against time.
 
         One line per location and per variable, the variables told apart by
-        line style and the locations by colour. Location names are shortened
-        for the legend, and the y axis honours the 'scale' option.
+        line style and the locations by colour. Location names arrive already
+        cut to 'maxlettersdisplayed' by AllVisu, and the y axis honours the
+        'scale' option.
 
         Parameters
         ----------
         **kwargs
-            the drawing arguments, including 'input', 'what', the
-            'ax' supplied by decomatplotlib, and optionally 'scale' and
-            'legend'.
+            the drawing arguments, including 'input', 'which', the
+            'ax' supplied by decomatplotlib, and optionally 'scale',
+            'legend' and 'return_pltaxis'.
 
         Returns
         -------
-        The matplotlib axes the series were drawn on.
+        The matplotlib axes the series were drawn on, or None when
+        'return_pltaxis' is False.
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
@@ -175,12 +179,13 @@ class visu_matplotlib:
         Parameters
         ----------
         **kwargs
-            the drawing arguments, including 'input', 'what' (two
+            the drawing arguments, including 'input', 'which' (two
             variables) and the 'ax' supplied by decomatplotlib.
 
         Returns
         -------
-        The matplotlib axes the curves were drawn on.
+        The matplotlib axes the curves were drawn on, or None when
+        'return_pltaxis' is False.
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
@@ -203,8 +208,12 @@ class visu_matplotlib:
     def matplotlib_yearly_plot(self,**kwargs):
         """Draw a yearly plot, one curve per calendar year.
 
-        The number of locations displayed at once is capped by
-        Max_Countries_Default.
+        Day of the year on the x axis, months labelled; the number of locations
+        displayed at once is capped by 'maxcountrydisplayed' (12).
+
+        Returns
+        -------
+        The matplotlib axes, or None when 'return_pltaxis' is False.
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
@@ -241,8 +250,12 @@ class visu_matplotlib:
     def matplotlib_pie(self,**kwargs):
         """Draw a pie chart of one variable across locations.
 
-        The number of locations displayed at once is capped by
-        Max_Countries_Default.
+        The 'maxcountrydisplayed' (12) largest locations get a slice each, and
+        AllVisu gathers the others into a 'SumOthers' slice.
+
+        Returns
+        -------
+        The matplotlib axes, or None when 'return_pltaxis' is False.
         """
         input = kwargs.get('input')
         which = kwargs.get('which')
@@ -265,7 +278,16 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_horizontal_histo(self,**kwargs):
-        """Matplotlib horizon histo."""
+        """Draw one horizontal bar per location, the largest on top.
+
+        AllVisu has already kept the 'maxcountrydisplayed' (12) largest
+        locations at the last date, and cut their names to
+        'maxlettersdisplayed'.
+
+        Returns
+        -------
+        The matplotlib axes, or None when 'return_pltaxis' is False.
+        """
         input = kwargs.get('input')
         which = kwargs.get('which')
         title = kwargs.get('title')
@@ -305,7 +327,8 @@ class visu_matplotlib:
 
         Returns
         -------
-        The matplotlib axes the histogram was drawn on.
+        The matplotlib axes the histogram was drawn on, or None when
+        'return_pltaxis' is False.
         """
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
@@ -400,7 +423,18 @@ class visu_matplotlib:
 
     @decomatplotlib
     def matplotlib_map(self,**kwargs):
-        """Matplotlib map display."""
+        """Draw a choropleth map of one variable.
+
+        Colours each location by its value on a reversed viridis scale. The
+        locations of the geography the source says nothing about ('from_db'
+        False) are drawn in pink, with a note saying so. Background tiles are
+        added only when 'tile' names one, and never on a dense map; a location
+        without a geometry of its own is counted but not drawn.
+
+        Returns
+        -------
+        The matplotlib axes, or None when 'return_pltaxis' is False.
+        """
         import contextily as cx
         import numpy as np
         from matplotlib.ticker import ScalarFormatter
