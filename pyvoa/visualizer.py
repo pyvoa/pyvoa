@@ -84,7 +84,8 @@ class AllVisu:
         granularity -- unless the data is user supplied ('in-house data'),
         collects the chart methods the class exposes, and settles the drawing
         defaults: the colour cycle, how many locations a chart shows at most
-        (``maxcountrydisplayed``, 12), and the paths to the two logo files
+        when ``maxcountrydisplayed`` is not given (12; see :meth:`maxcountry`),
+        and the paths to the two logo files
         stamped on the figures. How long a location name may be before it is
         cut is not settled here: each chart reads ``maxlettersdisplayed`` from
         its keyword arguments.
@@ -125,6 +126,30 @@ class AllVisu:
         self.logo = pathmetadb+'/logo-pyvoa.png'
         self.logosmall = pathmetadb+'/logo-pyvoa_small.png'
 
+    def maxcountry(self, kwargs):
+        """Return how many locations a chart may show, as asked for.
+
+        Parameters
+        ----------
+        kwargs : dict
+            The drawing arguments; 'maxcountrydisplayed' is read from them, and
+            the default of 12 used when it is missing.
+
+        Returns
+        -------
+        int
+            The cap.
+
+        Raises
+        ------
+        PyvoaError
+            If the value is not a positive integer.
+        """
+        n = kwargs.get('maxcountrydisplayed', self.maxcountrydisplayed)
+        if isinstance(n, bool) or not isinstance(n, (int, np.integer)) or n < 1:
+            raise PyvoaError('maxcountrydisplayed must be a positive integer, not '+repr(n))
+        return int(n)
+
     ''' DECORATORS FOR PLOT: DATE, VERSUS, SCROLLINGMENU '''
     def decoplot(func):
         """Decorate preparing the data of a time-series plot.
@@ -152,12 +177,13 @@ class AllVisu:
             if func.__name__ == 'plot' and title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database'
 
+            maxcountry = self.maxcountry(kwargs)
             loc=list(input['where'].unique())
-            input = input.loc[input['where'].isin(loc[:self.maxcountrydisplayed])].copy()
+            input = input.loc[input['where'].isin(loc[:maxcountry])].copy()
             # the names are cut for the chart only: labels, legends and tooltips
             input['where'] = shorten_locations(input['where'], kwargs['maxlettersdisplayed'])
             kwargs['input'] = input
-            kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
+            kwargs['maxcountrydisplayed'] = maxcountry
             return func(self, **kwargs)
         return inner_plot
 
@@ -200,16 +226,19 @@ class AllVisu:
             # windows =  InputOption().windows
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
+            maxcountry = self.maxcountry(kwargs)
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
-                    input = input.head(self.maxcountrydisplayed)
+                    input = input.head(maxcountry)
 
                 if typeofhist == 'value' or typeofhist == 'pie':
-                    top = input.iloc[:self.maxcountrydisplayed].copy()
-                    # fewer locations than colours when few are asked for
-                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in self.colors[:len(top)]]
-                    others = input.iloc[self.maxcountrydisplayed:]
+                    top = input.iloc[:maxcountry].copy()
+                    # one colour per slice, as many as the cap asked for, and
+                    # fewer locations than that when few are asked for
+                    colors = plt.cm.tab20(np.linspace(0, 1, maxcountry))
+                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in colors[:len(top)]]
+                    others = input.iloc[maxcountry:]
                     rest = {col: ['SumOthers'] for col in top.columns}
 
                     total = others[which].apply(
@@ -231,7 +260,7 @@ class AllVisu:
             typeofhist=kwargs.get('typeofhist',None)
             if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
                 kwargs['legend'] = 'sum all location'
-            kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
+            kwargs['maxcountrydisplayed'] = maxcountry
             kwargs['input'] = input
 
             return func(self, **kwargs)

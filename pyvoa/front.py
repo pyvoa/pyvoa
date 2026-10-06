@@ -944,9 +944,10 @@ class front:
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
         maxcountrydisplayed : int, optional
-            Accepted, but not read: the charts that cap how many locations they
-            show (the time series, and the histograms by location) cap it at
-            12, the default, whatever this says.
+            How many locations the chart shows at most; 12 by default. The time
+            series and the histograms by location keep that many; the pie
+            charts and the histograms by value gather the others into a
+            'SumOthers' slice. Must be a positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional
@@ -1059,9 +1060,10 @@ class front:
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
         maxcountrydisplayed : int, optional
-            Accepted, but not read: the charts that cap how many locations they
-            show (the time series, and the histograms by location) cap it at
-            12, the default, whatever this says.
+            How many locations the chart shows at most; 12 by default. The time
+            series and the histograms by location keep that many; the pie
+            charts and the histograms by value gather the others into a
+            'SumOthers' slice. Must be a positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional
@@ -1190,9 +1192,10 @@ class front:
             Two names cut to the same label keep their full length. The data
             themselves are not affected: :meth:`get` returns the names whole.
         maxcountrydisplayed : int, optional
-            Accepted, but not read: the charts that cap how many locations they
-            show (the time series, and the histograms by location) cap it at
-            12, the default, whatever this says.
+            How many locations the chart shows at most; 12 by default. The time
+            series and the histograms by location keep that many; the pie
+            charts and the histograms by value gather the others into a
+            'SumOthers' slice. Must be a positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional

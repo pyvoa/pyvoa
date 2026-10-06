@@ -210,7 +210,7 @@ class visu_matplotlib:
         """Draw a yearly plot, one curve per calendar year.
 
         Day of the year on the x axis, months labelled; the number of locations
-        displayed at once is capped by 'maxcountrydisplayed' (12).
+        displayed at once is capped by 'maxcountrydisplayed' (12 by default).
 
         Returns
         -------
@@ -251,7 +251,8 @@ class visu_matplotlib:
     def matplotlib_pie(self,**kwargs):
         """Draw a pie chart of one variable across locations.
 
-        The 'maxcountrydisplayed' (12) largest locations get a slice each, and
+        The 'maxcountrydisplayed' (12 by default) largest locations get a
+        slice each, and
         AllVisu gathers the others into a 'SumOthers' slice.
 
         Returns
@@ -281,7 +282,7 @@ class visu_matplotlib:
     def matplotlib_horizontal_histo(self,**kwargs):
         """Draw one horizontal bar per location, the largest on top.
 
-        AllVisu has already kept the 'maxcountrydisplayed' (12) largest
+        AllVisu has already kept the 'maxcountrydisplayed' (12 by default) largest
         locations at the last date, and cut their names to
         'maxlettersdisplayed'.
 
