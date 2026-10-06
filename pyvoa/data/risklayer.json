@@ -13,8 +13,8 @@
   	 "columns": [
     		{"alias":"UID","name":"where"},
             {"alias":"DateRpt","name":"date"},
-            {"alias":"CumulativePositive","name":"tot_positive","cumulative":true},
-            {"alias":"IncidenceCumulative","name":"tot_incidence","cumulative":true}
+            {"alias":"CumulativePositive","name":"tot_positive"},
+            {"alias":"IncidenceCumulative","name":"tot_incidence"}
 	 ]
 	}
   ]

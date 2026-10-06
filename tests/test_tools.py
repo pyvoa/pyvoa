@@ -239,6 +239,39 @@ def test_fill_missing_dates_handles_several_locations():
     assert set(filled["where"]) == {"a", "b"}
 
 
+def test_fill_missing_dates_keeps_the_values_of_a_timezone_aware_source():
+    """A source stamped in UTC, as rki is, must not lose every value.
+
+    The daily range the frame is reindexed on is naive: a tz-aware index
+    would match none of its days.
+    """
+    given = pd.DataFrame(
+        {
+            "date": pd.to_datetime(
+                ["2020-03-02T17:00:00+0000", "2020-03-04T17:00:00+0000"]
+            ),
+            "where": ["a", "a"],
+            "v": [1, 2],
+        }
+    )
+    filled = tools.fill_missing_dates(given)
+    assert len(filled) == 3
+    assert list(filled["v"].fillna(-1)) == [1, -1, 2]
+
+
+def test_fill_missing_dates_does_not_propagate_values():
+    """An inserted day is NaN : a value carried over would be cumulated twice."""
+    given = pd.DataFrame(
+        {
+            "date": [datetime.date(2020, 1, 1), datetime.date(2020, 1, 3)],
+            "where": ["a", "a"],
+            "v": [5, 7],
+        }
+    )
+    filled = tools.fill_missing_dates(given)
+    assert pd.isna(filled["v"].iloc[1])
+
+
 def test_fill_missing_dates_rejects_a_non_dataframe():
     with pytest.raises(PyvoaError):
         tools.fill_missing_dates("not a dataframe")

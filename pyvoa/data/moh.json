@@ -5,6 +5,11 @@
     "iso3": "MYS",
     "locationmode":"name"
   },
+  "replace":{
+          "W.P. Kuala Lumpur":"Wilayah Persekutuan",
+          "W.P. Putrajaya":"Wilayah Persekutuan",
+          "W.P. Labuan":"Wilayah Persekutuan Labuan"
+  	 },
 
   "datasets": [
   	{	

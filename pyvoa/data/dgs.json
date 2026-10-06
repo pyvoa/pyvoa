@@ -5,11 +5,15 @@
     "iso3": "PRT",
     "locationmode":"name"
   },
+  "replace":{
+          "AÇORES":"Azores"
+  	 },
   "datasets": [
   	{	
 	 "urldata": "https://zenodo.org/records/11222023/files/dgs_data_concelhos_new.csv?content",
 	 "urlparent":"https://raw.githubusercontent.com/dssg-pt/covid19pt-data/master/data_concelhos_new.csv",
 	 "separator":",",
+	 "dateformat":"%d-%m-%Y",
   	 "columns": [
     			{
 		   "name":"where",

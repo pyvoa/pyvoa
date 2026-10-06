@@ -246,7 +246,6 @@ def tostdstring(s):
 def fill_missing_dates(p, date_field='date', loc_field='where',
                        d1=None, d2=None):
     """Fill the input pandas dataframe p with missing dates."""
-
     if not isinstance(p, pd.DataFrame):
         raise PyvoaError("Expecting input p as a pandas dataframe.")
 
@@ -265,6 +264,10 @@ def fill_missing_dates(p, date_field='date', loc_field='where',
 
     # Dates au format datetime
     p[date_field] = pd.to_datetime(p[date_field]).dt.normalize()
+    if p[date_field].dt.tz is not None:
+        # a source stamped with a timezone (rki is in UTC) would never match
+        # the naive daily range built below, and every value would be lost
+        p[date_field] = p[date_field].dt.tz_localize(None)
     if d2 is None:
         d2 = p[date_field].max().date()
 
@@ -283,8 +286,10 @@ def fill_missing_dates(p, date_field='date', loc_field='where',
         pp = p.loc[p[loc_field] == loc].copy()
         pp = pp.set_index(date_field)
         pp.index = pd.DatetimeIndex(pp.index)
+        # an inserted day stays NaN : propagating the previous value would be
+        # wrong for a column of increments (cumulated afterwards by the parser),
+        # and the cumulative series are already forward-filled by GPDBuilder.get
         pp = pp.reindex(idx)
-        pp = pp.ffill().bfill()
         pp[loc_field] = pp[loc_field].fillna(loc)
         pfill.append(pp)
     pfill = pd.concat(pfill)

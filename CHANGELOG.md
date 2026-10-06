@@ -1,4 +1,33 @@
 # Unreleased
+- fix: `fill_missing_dates()` no longer forward- and back-fills the days it
+  inserts (introduced in `cf7bb53`). On a column of increments declared
+  `cumulative`, the previous day's increment was repeated before the
+  `cumsum`, so govcy reported 2082 deaths instead of 672, and every database
+  using `cumulative` (dgs, measles-usa, moh, risklayer, sciensano, spf) was
+  affected, `fillmissing` included. An inserted day stays NaN again; the
+  cumulative series are forward-filled by `GPDBuilder.get`, as before.
+- fix: `fill_missing_dates()` drops the timezone of a tz-aware date column
+  before reindexing on its naive daily range. Since `cf7bb53`, rki (stamped
+  in UTC) came out with every `tot_cases` / `tot_deaths` value NaN.
+- new optional dataset key `dateformat` (a `strftime` pattern) fixes how the
+  `date` column is read. Without it the parser keeps `format="mixed"`, which
+  reads an ambiguous `9/3/2020` month-first: govcy and dgs, both day-first,
+  had every date with a day ≤ 12 swapped with its month.
+- govcy: `dateformat` `%d/%m/%Y`, and `tot_deaths` / `tot_cases` now read the
+  source's own running totals (`total deaths`, `total cases`) instead of
+  cumulating its daily columns, whose sum does not match them (673 vs 672
+  deaths, 216652 vs 218374 cases).
+- dgs: `dateformat` `%d-%m-%Y`, and `AÇORES` mapped to the `Azores` of the
+  PRT geography, which dropped 7355 cases.
+- moh: `W.P. Kuala Lumpur`, `W.P. Putrajaya` and `W.P. Labuan` mapped to the
+  `Wilayah Persekutuan` / `Wilayah Persekutuan Labuan` of the MYS geography.
+  The three federal territories were dropped, 10.7 % of the cases.
+- risklayer: `cumulative` removed from `CumulativePositive` and
+  `IncidenceCumulative`, which are already running totals and would have been
+  cumulated twice by a source with more than one date per location.
+- known issue, not fixed: rki still loses 34 of its 413 AGS codes (9.4 % of
+  the cases) — the twelve Berlin districts, and the Landkreise sharing their
+  name with a kreisfreie Stadt (München, Leipzig, Rostock, Kassel, …).
 - Docstring updates
 - Adding an ASCII banner when loading the front
 - Enhancement and compatibility fixes for notebooks and py file examples

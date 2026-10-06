@@ -13,21 +13,20 @@
 	 "urldata":"https://zenodo.org/records/11222017/files/govcy.csv?content",
 	 "urlparent":"https://www.data.gov.cy/sites/default/files/CY%20Covid19%20Open%20Data%20-%20Extended%20-%20new_247.csv",
 	 "separator":",",
+	 "dateformat":"%d/%m/%Y",
 	 "columns": [
 		  {
 		     "name":"date"
   		  },
 		  {
 		  "name":"tot_deaths",
-		  "alias":"daily deaths",
-		  "description":"total deaths attributed to Covid-19 disease (total deaths)",
-		  "cumulative":true
+		  "alias":"total deaths",
+		  "description":"total deaths attributed to Covid-19 disease (total deaths)"
 		  },
 		  {
 		  "name":"tot_cases",
-		  "alias":"daily new cases",
-		  "description":"total number of confirmed cases (total cases)",
-		  "cumulative":true
+		  "alias":"total cases",
+		  "description":"total number of confirmed cases (total cases)"
 		  },
 		  {
 		  "name":"cur_hosp",

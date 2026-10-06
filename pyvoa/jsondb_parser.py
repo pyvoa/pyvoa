@@ -369,6 +369,11 @@ class DataParser:
           decimal='.'
           if 'decimal' in list(datasets.keys()):
              decimal=datasets['decimal']
+          dateformat = 'mixed'
+          if 'dateformat' in list(datasets.keys()):
+              # an ambiguous source such as 9/3/2020 must be told it is
+              # day-first, which 'mixed' would read as the 3rd of September
+              dateformat = datasets['dateformat']
           rename_columns = None
           if 'alias' in list(pdatatemp.columns) and 'name' in list(pdatatemp.columns):
             rename_columns = pdatatemp.set_index('alias')['name'].to_dict()
@@ -444,7 +449,7 @@ class DataParser:
                  #cols=[i for i in pandas_temp.columns if i not in ['date','where']]
                  #pandas_temp[cols] = pandas_temp[cols].apply(lambda x: x/7.)
 
-          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format="mixed")
+          pandas_temp['date'] = pd.to_datetime(pandas_temp['date'], errors='coerce',format=dateformat)
 
           if granularity == 'country' and 'where' not in list(pdata.name):
               pandas_temp['where'] = place

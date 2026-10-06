@@ -11,6 +11,7 @@ import json
 from pathlib import Path
 from typing import ClassVar
 
+import pandas as pd
 import pytest
 import shapely.geometry as sg
 
@@ -486,3 +487,39 @@ def test_dataparser_fills_the_missing_dates(monkeypatch, tmp_path):
     frame = jsondb_parser.DataParser("good_db").get_maingeopandas()
     assert len(frame) == 4
     assert frame["tot_cases"].isna().sum() == 2
+
+
+def test_dataparser_reads_the_dates_with_the_declared_format(monkeypatch, tmp_path):
+    """A day-first source is read day-first once 'dateformat' says so.
+
+    Without the key, 9/3/2020 would be the 3rd of September and 13/3/2020
+    the 13th of March, three days that are consecutive becoming six months
+    apart.
+    """
+    dayfirst = tmp_path / "dayfirst.csv"
+    dayfirst.write_text(
+        "date,location,cases,deaths\n"
+        "11/3/2020,FRA,100,10\n"
+        "12/3/2020,FRA,150,12\n"
+        "13/3/2020,FRA,210,15\n"
+    )
+    with open(DATA / "good_db.json") as handle:
+        metadata = json.load(handle)
+    metadata["datasets"][0]["dateformat"] = "%d/%m/%Y"
+
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(
+        jsondb_parser, "get_local_from_url",
+        lambda url, *args, **kwargs: str(dayfirst),
+    )
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+
+    frame = jsondb_parser.DataParser("good_db").get_maingeopandas()
+    frame = frame.sort_values("date")
+    assert len(frame) == 3
+    assert [str(d) for d in pd.to_datetime(frame["date"]).dt.date] == [
+        "2020-03-11", "2020-03-12", "2020-03-13"]
+    assert list(frame["tot_cases"]) == [100, 150, 210]
