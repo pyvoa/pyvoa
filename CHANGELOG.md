@@ -1,4 +1,20 @@
 # Unreleased
+- fix: `tools.prioritize_keyword` never reached its fallback on the first
+  cumulative variable: with no death count, the default `which` was the
+  first variable alphabetically. It is now the first `tot_...` or
+  `total_...` one, and only failing that the first variable. `spf` is the
+  one database whose default changes, from `cur_hosp` to `tot_P`.
+- `get_echoinfo()` called without its dict summarises the database
+  currently selected, and raises a `PyvoaError` naming `setwhom()` when
+  there is none; it used to fail on `None`.
+- ebolardc: the sitrep row dated `2026-06-25]` (Nyankunde, 93 confirmed
+  cases) is read as 2026-06-25 through a `replace` rule, which applies
+  before the dates are parsed; it was dropped as an unreadable date.
+- escovid19data: `"Alicante/Alacant"` was mapped twice in `replace`, to
+  `Alicante` and to `Alacant`; `json.load` kept the second, which the
+  geography uses, and that one alone is left. A test now refuses a key
+  repeated in any shipped description.
+- moh: its `header` read `dgs`, copied from another description.
 - new chart keywords. `pyvoalogo` (False by default) stamps the pyvoa logo
   on the figure, which is no longer done unasked, bokeh maps included: they
   used to carry a logo whatever was asked, drawn at 5 % opacity and anchored

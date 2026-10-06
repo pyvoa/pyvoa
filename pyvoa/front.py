@@ -360,12 +360,23 @@ class front:
 
          Parameters
          ----------
-         dico : dict
+         dico : dict, optional
              'lwhich', the variables; 'lwhere', the locations, as
              :meth:`listwhere` gives them; 'mypd', the parsed table, whose
              'date' column gives the dates. A 'reload' key is accepted and
-             ignored.
+             ignored. Left out, the summary is that of the database currently
+             selected.
+
+         Raises
+         ------
+         PyvoaError
+             If called without ``dico`` before any database was selected.
          """
+         if dico is None:
+             if not self.db or self.gpdbuilderdata is None:
+                 raise PyvoaError('No database selected yet: see setwhom().')
+             dico = {'lwhich': self.listwhich(), 'lwhere': self.listwhere(),
+                     'mypd': self.gpdbuilderdata}
          # reload  = dico['reload']
          lwhich  = dico['lwhich']
          lwhere  = dico['lwhere']

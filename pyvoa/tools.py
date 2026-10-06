@@ -705,8 +705,8 @@ def prioritize_keyword(listwhich):
 
     The default is the death count when there is one: the first of
     'tot_deaths', 'total_deaths', 'tot_dc' and 'total_dc' found in the list.
-    Failing that, the list is returned as it is, its own first entry being the
-    default.
+    Failing that, it is the first cumulative variable, named ``tot_...`` or
+    ``total_...``, in the order of the list; and failing that, the first entry.
 
     Parameters
     ----------
@@ -720,9 +720,9 @@ def prioritize_keyword(listwhich):
     """
     listwhich = listwhich.copy()
     preferred = ['tot_deaths', 'total_deaths', 'tot_dc','total_dc']
-    first = next((w for w in preferred if w in listwhich), listwhich[0])
+    first = next((w for w in preferred if w in listwhich), None)
     if first is None:
-        first = next((w for w in listwhich if w.startswith(('tot_', 'total_'))), None)
+        first = next((w for w in listwhich if w.startswith(('tot_', 'total_'))), listwhich[0])
     listwhich.insert(0, listwhich.pop(listwhich.index(first)))
     return listwhich
 

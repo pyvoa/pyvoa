@@ -33,7 +33,6 @@ This file tracks what is **still open**. What has already landed is in
 | 2 | Confirm the issue forms render on GitHub while signed in, and add the version placeholder in `bug_report.yml` to the release checklist. | no |
 | 4 | Two documentation URLs now exist — `pyvoa.org` and `pyvoa.github.io/pyvoa`. Decide how they relate. | no |
 | — | The template asks for a `Licence.txt`; the repository has `LICENSE`, no extension. Almost certainly fine, but "your paper will be returned if these are missing" is their wording. | no |
-| — | `GeoRegion` resolves `'G20'` to twenty entries with `MEX` duplicated — nineteen distinct countries. | no |
 | 5 | Merging locations sums every column on the raw dates: cumulative series reported on different days come out saw-toothed, and rates are added up (owid's France per-million figures are). Blocks a consistent treatment of Kosovo. | no |
 
 ---

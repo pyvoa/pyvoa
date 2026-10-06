@@ -6,7 +6,6 @@
     "locationmode":"name"
   },
    "replace":{
-      "Alicante/Alacant":"Alicante",
       "Araba/Álava":"Araba",
       "Castellón/Castelló":"Castelló",
       "Valencia/València":"València",

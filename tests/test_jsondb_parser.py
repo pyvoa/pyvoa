@@ -89,6 +89,26 @@ def test_parsejson_reports_a_missing_file():
 # the shipped database descriptions
 # --------------------------------------------------------------------------
 
+def test_no_shipped_description_repeats_a_key():
+    """json.load keeps the last of two equal keys and says nothing.
+
+    escovid19data mapped 'Alicante/Alacant' twice, to two different names,
+    and only the second one was ever applied.
+    """
+    def refuse_repeats(pairs):
+        keys = [k for k, _ in pairs]
+        repeated = sorted({k for k in keys if keys.count(k) > 1})
+        assert not repeated, f"repeated keys {repeated}"
+        return dict(pairs)
+
+    for path in sorted((Path(__file__).parents[1] / "pyvoa" / "data").glob("*.json")):
+        with open(path, encoding="utf-8") as handle:
+            try:
+                json.load(handle, object_pairs_hook=refuse_repeats)
+            except AssertionError as error:
+                raise AssertionError(f"{path.name}: {error}") from None
+
+
 def test_every_shipped_database_description_is_valid():
     """No database description in pyvoa/data/ may regress to BAD."""
     catalogue = MetaInfo.getallmetadata()

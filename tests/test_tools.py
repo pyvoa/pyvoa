@@ -949,3 +949,21 @@ def test_shorten_locations_keeps_the_order_of_a_categorical():
 
 def test_shorten_locations_never_cuts_below_five_letters():
     assert list(tools.shorten_locations(pd.Series(["Luxembourg"]), 2)) == ["Luxem..."]
+
+
+@pytest.mark.parametrize(
+    "variables, expected",
+    [
+        (["tot_cases", "tot_deaths"], "tot_deaths"),
+        (["b", "tot_dc", "total_deaths"], "total_deaths"),
+        # no death count: the first cumulative variable, not the first one
+        (["cur_excess_mortality", "cur_hosp", "total_cases"], "total_cases"),
+        (["cur_icu", "cur_hosp"], "cur_icu"),
+    ],
+)
+def test_prioritize_keyword_puts_the_default_which_first(variables, expected):
+    given = list(variables)
+    ordered = tools.prioritize_keyword(given)
+    assert ordered[0] == expected
+    assert sorted(ordered) == sorted(variables)
+    assert given == variables
