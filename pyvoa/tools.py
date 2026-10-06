@@ -243,6 +243,36 @@ def tostdstring(s):
     """Standardization of string for country,region or subregion tests."""
     return unidecode.unidecode(' '.join(s.replace('-',' ').split())).upper()
 
+def shorten_locations(where, maxletters):
+    """Cut long location names down to a chart label.
+
+    A name longer than ``maxletters`` keeps its first ``maxletters``
+    characters, followed by '...'. Two names cut to the same label keep their
+    full length instead, since a chart groups its series by label and would
+    otherwise draw two locations as one.
+
+    Parameters
+    ----------
+    where : pandas.Series
+        The location names.
+    maxletters : int
+        The length past which a name is cut; below 5, 5 is used.
+
+    Returns
+    -------
+    pandas.Series
+        The labels, aligned on ``where``.
+    """
+    if maxletters < 5:
+        PyvoaWarning('Min letter is 5 ...')
+        maxletters = 5
+    names = pd.Series(pd.unique(where.dropna().astype(str)), dtype=object)
+    cut = names.where(names.str.len() <= maxletters, names.str[:maxletters] + '...')
+    clash = cut.duplicated(keep=False)
+    cut[clash] = names[clash]
+    # the labels are unique, so an ordered Categorical keeps its order
+    return where.map(dict(zip(names, cut)))
+
 def fill_missing_dates(p, date_field='date', loc_field='where',
                        d1=None, d2=None):
     """Fill the input pandas dataframe p with missing dates."""

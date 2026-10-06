@@ -23,7 +23,7 @@ import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, PyvoaWarning, verb
+from pyvoa.tools import PyvoaError, PyvoaWarning, shorten_locations, verb
 
 # The four imports below only probe whether an optional backend is installed;
 # the backends themselves are imported lazily, hence the noqa on three of them.
@@ -146,7 +146,10 @@ class AllVisu:
                 kwargs['title'] = self.database_name.upper() + ' database'
 
             loc=list(input['where'].unique())
-            kwargs['input'] = input.loc[input['where'].isin(loc[:self.maxcountrydisplayed])]
+            input = input.loc[input['where'].isin(loc[:self.maxcountrydisplayed])].copy()
+            # the names are cut for the chart only: labels, legends and tooltips
+            input['where'] = shorten_locations(input['where'], kwargs['maxlettersdisplayed'])
+            kwargs['input'] = input
             kwargs['maxcountrydisplayed'] = self.maxcountrydisplayed
             return func(self, **kwargs)
         return inner_plot
@@ -161,7 +164,11 @@ class AllVisu:
             Adds the title, the date actually drawn, the logo and the shortened
             location labels before handing over to the drawing routine.
             """
-            input = kwargs.get('input')
+            input = kwargs.get('input').copy()
+            # the names are cut for the chart only: labels, legends and tooltips,
+            # including the list of the locations gathered into 'SumOthers'
+            input['where'] = shorten_locations(input['where'], kwargs['maxlettersdisplayed'])
+            kwargs['input'] = input
             which = kwargs.get('which')
             # where = kwargs['input']['where']
             if isinstance(which, list):
@@ -185,8 +192,9 @@ class AllVisu:
                     input = input.head(self.maxcountrydisplayed)
 
                 if typeofhist == 'value' or typeofhist == 'pie':
-                    top = input.iloc[:self.maxcountrydisplayed]
-                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in self.colors]
+                    top = input.iloc[:self.maxcountrydisplayed].copy()
+                    # fewer locations than colours when few are asked for
+                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in self.colors[:len(top)]]
                     others = input.iloc[self.maxcountrydisplayed:]
                     rest = {col: ['SumOthers'] for col in top.columns}
 

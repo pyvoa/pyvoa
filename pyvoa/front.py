@@ -557,12 +557,9 @@ class front:
             tokeep = ['date', 'where']+ (['code'] if 'code' in columns else []) + ['from_db'] + which + (['geometry'] if 'geometry' in columns else [])
             kwargs['input'] = kwargs['input'][tokeep]
             kwargs['which'] = which
-            n = kwargs['maxlettersdisplayed']
-            if n<5:
-              PyvoaWarning('Min letter is 5 ...')
-              n = 5
-            where = kwargs['input']['where']
-            kwargs['input']['where'] = where.where(where.str.len() <= n, where.str[:n] + '...')
+            # location names are left whole here: get() hands them out, and the
+            # dense map joins its geometry on them. They are cut to
+            # 'maxlettersdisplayed' by AllVisu, for the charts only.
             return func(self,**kwargs)
         return wrapper
 
@@ -768,14 +765,11 @@ class front:
         hand the undecorated body the assembled table. :meth:`whattodo` lists every
         argument together with the values it accepts.
 
-        Two things are done to the table on the way out, because the chart
-        methods share this selection code and need them. A location name longer
-        than ten characters is cut to its first ten and an ellipsis is added, so
-        'Russian Federation' is returned as 'Russian Fe...'; passing
-        ``maxlettersdisplayed`` does not change that length. And for the two
-        frame outputs, 'where' is an *ordered* ``Categorical``, ranked by the
-        value each location reaches on the last date selected, which is the
-        order the charts draw in.
+        Location names are returned whole: the cut to ``maxlettersdisplayed``
+        is made for the chart labels of :meth:`plot`, :meth:`hist` and
+        :meth:`map` only. For the two frame outputs, 'where' is an *ordered*
+        ``Categorical``, ranked by the value each location reaches on the last
+        date selected, which is the order the charts draw in.
         """
         return kwargs['input']
 
@@ -923,9 +917,10 @@ class front:
         scale : {'linear', 'log'}, optional
             The scale of the value axis. Defaults to 'linear'.
         maxlettersdisplayed : int, optional
-            Length past which location names are cut. Accepted, but not read:
-            the cut is always made at the default of ten characters, in the
-            selection step :meth:`get` describes.
+            Length past which a location name is cut in the labels, legends and
+            tooltips of the chart, followed by '...'; 20 by default, 5 at least.
+            Two names cut to the same label keep their full length. The data
+            themselves are not affected: :meth:`get` returns the names whole.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
@@ -969,8 +964,9 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
-            self.outcome = fig
-            return fig
+        # whatever the backend: savefig() reads self.outcome
+        self.outcome = fig
+        return fig
 
     @input_wrapper
     @input_visuwrapper
@@ -1027,9 +1023,10 @@ class front:
         scale : {'linear', 'log'}, optional
             The scale of the value axis. Defaults to 'linear'.
         maxlettersdisplayed : int, optional
-            Length past which location names are cut. Accepted, but not read:
-            the cut is always made at the default of ten characters, in the
-            selection step :meth:`get` describes.
+            Length past which a location name is cut in the labels, legends and
+            tooltips of the chart, followed by '...'; 20 by default, 5 at least.
+            Two names cut to the same label keep their full length. The data
+            themselves are not affected: :meth:`get` returns the names whole.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
@@ -1064,8 +1061,9 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
-            self.outcome = fig
-            return fig
+        # whatever the backend: savefig() reads self.outcome
+        self.outcome = fig
+        return fig
 
     def decoplot(func):
         """Decorate preparing the data of a time-series plot.
@@ -1147,9 +1145,10 @@ class front:
         scale : {'linear', 'log'}, optional
             The scale of the value axis. Defaults to 'linear'.
         maxlettersdisplayed : int, optional
-            Length past which location names are cut. Accepted, but not read:
-            the cut is always made at the default of ten characters, in the
-            selection step :meth:`get` describes.
+            Length past which a location name is cut in the labels, legends and
+            tooltips of the chart, followed by '...'; 20 by default, 5 at least.
+            Two names cut to the same label keep their full length. The data
+            themselves are not affected: :meth:`get` returns the names whole.
         dateslider : bool, optional
             Add a slider over the dates. Bokeh only.
 
@@ -1186,10 +1185,10 @@ class front:
             import matplotlib.pyplot as plt
             if not self.batch:
                 plt.show()
-            # outside the batch test, as in map() and hist(): savefig() reads
-            # self.outcome, and setbatch() must not leave it unset.
-            self.outcome = fig
-            return fig
+        # outside the batch test and the backend test, as in map() and hist():
+        # savefig() reads self.outcome, and setbatch() must not leave it unset.
+        self.outcome = fig
+        return fig
 
     def setnamefunction(self,name):
         """Record which method produced the last result.

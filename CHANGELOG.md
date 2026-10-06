@@ -1,4 +1,23 @@
 # Unreleased
+- `get()` returns location names whole. They used to be cut to
+  `maxlettersdisplayed` (20 characters, then '...') in the selection step that
+  `get()` shares with the charts, so `get()` handed out `'Heilbronn
+  (Landkreis...'` and a join of its output on the names failed. The cut is now
+  made by `AllVisu`, for the charts only — the labels, legends and tooltips of
+  `plot()`, `hist()` and `map()`, matplotlib and bokeh alike, bokeh's hover
+  included — by `tools.shorten_locations()`, which keeps whole two names it
+  would otherwise make identical. The docstrings said the cut was at ten
+  characters and that `maxlettersdisplayed` was not read; neither was true.
+- fix: the dense map joined its geometry on the cut names, so a location named
+  in more than 20 characters lost it: three French départements
+  (Alpes-de-Haute-Provence, Territoire de Belfort, Collectivités d'Outre-Mer)
+  were left undrawn by `spf`.
+- fix: the matplotlib time-series legend cut every label to ten characters on
+  its own, whatever `maxlettersdisplayed` said.
+- fix: `plot()`, `hist()` and `map()` neither returned the bokeh figure nor kept
+  it for `savefig()`, which saved the previous figure instead.
+- fix: a pie chart, or a histogram by value, of fewer locations than the twelve
+  colours of the palette raised a `ValueError`.
 - fix: the parser called `GroupBy.sum(skipna=False)`, which pandas only
   accepts from version 3, while the declared floor is 2.1.1: on the floor every
   database failed to parse, and the `minimum` CI job was red. The same result —

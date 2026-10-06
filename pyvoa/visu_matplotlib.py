@@ -140,8 +140,7 @@ class visu_matplotlib:
                     label = f"{where}"
                 if len(which)>1:
                     label =f"{where} — {i}"
-                if len(label)>10:
-                        label=label[:10]+'...'
+                # 'where' arrives already cut to maxlettersdisplayed by AllVisu
                 ax.plot(
                     df.index,
                     df[where],

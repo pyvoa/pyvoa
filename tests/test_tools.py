@@ -923,3 +923,29 @@ def test_convertmercator_keeps_a_location_with_an_empty_geometry():
     converted = tools.convertmercator(given)
     assert list(converted["where"]) == ["a", "b"]
     assert converted.geometry.iloc[1].is_empty
+
+
+def test_shorten_locations_cuts_a_long_name_only():
+    given = pd.Series(["France", "Northern Mariana Islands"])
+    assert list(tools.shorten_locations(given, 20)) == [
+        "France", "Northern Mariana Isl..."]
+
+
+def test_shorten_locations_keeps_whole_two_names_it_would_merge():
+    """A chart groups its series by label: two places must not share one."""
+    given = pd.Series(["Neustadt A.D. Aisch", "Neustadt A.D. Waldnaab", "Berlin"])
+    assert list(tools.shorten_locations(given, 10)) == [
+        "Neustadt A.D. Aisch", "Neustadt A.D. Waldnaab", "Berlin"]
+
+
+def test_shorten_locations_keeps_the_order_of_a_categorical():
+    given = pd.Series(pd.Categorical(
+        ["Northern Mariana Islands", "France"],
+        categories=["Northern Mariana Islands", "France"], ordered=True))
+    cut = tools.shorten_locations(given, 10)
+    assert list(cut.cat.categories) == ["Northern M...", "France"]
+    assert cut.cat.ordered
+
+
+def test_shorten_locations_never_cuts_below_five_letters():
+    assert list(tools.shorten_locations(pd.Series(["Luxembourg"]), 2)) == ["Luxem..."]
