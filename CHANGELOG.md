@@ -25,9 +25,16 @@
 - risklayer: `cumulative` removed from `CumulativePositive` and
   `IncidenceCumulative`, which are already running totals and would have been
   cumulated twice by a source with more than one date per location.
-- known issue, not fixed: rki still loses 34 of its 413 AGS codes (9.4 % of
-  the cases) — the twelve Berlin districts, and the Landkreise sharing their
-  name with a kreisfreie Stadt (München, Leipzig, Rostock, Kassel, …).
+- fix: the German geography (`GeoCountry('DEU')`) merged the rows of the
+  DE-counties geojson on the county *name*, and kept one code per name. The
+  22 Landkreise named like the kreisfreie Stadt they surround (München,
+  Leipzig, Rostock, Kassel, Karlsruhe, …) were dropped, and rki lost 6.0 % of
+  its cases and 5.4 % of its deaths, while each of those cities was drawn
+  with its Landkreis's surface. The rows are now merged on the AGS code, and
+  such a Landkreis is named after its type, `München (Landkreis)`; the city
+  keeps its bare name. rki now matches its source exactly over its 401
+  counties. The twelve Berlin districts rki also ships (11001–11012) are
+  still left out, rightly: they add up exactly to Berlin (11000).
 - Docstring updates
 - Adding an ASCII banner when loading the front
 - Enhancement and compatibility fixes for notebooks and py file examples

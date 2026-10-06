@@ -1337,18 +1337,16 @@ class GeoCountry:
                 'AGS':'code_subregion',\
                 },
                 inplace=True)
+            # one row per AGS code, and a unique name for every county
+            self._country_data = _merge_deu_counties(self._country_data)
             # See https://www.ioer-monitor.de/en/methodology/glossary/o/official-municipality-key-ags/ for decoding information of region code
             self._country_data['code_region'] = (self._country_data.code_subregion.astype(int)//1000).astype(str).str.zfill(2)
             h_deu=pd.read_html(get_local_from_url('https://de.zxc.wiki/wiki/Amtlicher_Gemeindeschl%C3%BCssel',0))[3]
             h_deu['id']=h_deu['#'].str.slice(stop=2)
             h_deu['name_region']=h_deu['country']
             self._country_data=self._country_data.merge(h_deu,how='left',left_on='code_region',right_on='id')
-            self._country_data['code_subregion']=self._country_data.code_subregion.astype(int).astype(str)
-            self._country_data=self._country_data[['name_subregion','code_subregion','name_region','code_region','geometry']]
-            disso = self._country_data[['name_subregion','geometry']].dissolve(by='name_subregion', aggfunc='sum').reset_index()
-            # aggregate geometry with the same subregion name # some code subregion is lost somehow
-            self._country_data = self._country_data.drop_duplicates(subset = ['name_subregion'])
-            self._country_data = gpd.GeoDataFrame(pd.merge(self._country_data.drop(columns=['geometry']),disso, on='name_subregion'))
+            self._country_data=gpd.GeoDataFrame(self._country_data[['name_subregion','code_subregion','name_region','code_region','geometry']],
+                                                geometry='geometry')
 
         # --- 'ESP' case ---------------------------------------------------------------------------------------
         elif self._country == 'ESP':
@@ -2538,6 +2536,40 @@ class GeoCountry:
                             right_on=geofield)
 
 # Other Geometrical usefull functions...
+
+def _merge_deu_counties(frame):
+    """Return one row per German county, under a name no other county carries.
+
+    The DE-counties geojson ships some counties in several rows (``GF=2``
+    holds the water surface of a coastal or lake county), and 22 Landkreise
+    share their ``GEN`` name with the kreisfreie Stadt they surround
+    (München, Leipzig, Rostock, ...). Merging on the name, as was done
+    before, kept a single code per name and dropped those 22 counties and
+    their data. The geometries are therefore merged on the AGS code, and a
+    county named like a city is renamed after its type, as in
+    ``München (Landkreis)``; the city keeps its bare name.
+
+    Parameters
+    ----------
+    frame : GeoDataFrame
+        The geojson, with ``GEN`` and ``AGS`` already renamed to
+        ``name_subregion`` and ``code_subregion``, and its ``BEZ`` column.
+
+    Returns
+    -------
+    GeoDataFrame
+        One row per code, the code without its leading zero.
+    """
+    frame = frame.copy()
+    frame['code_subregion'] = frame['code_subregion'].astype(int).astype(str)
+    geometry = frame[['code_subregion', 'geometry']].dissolve(by='code_subregion').reset_index()
+    frame = pd.DataFrame(frame.drop(columns='geometry')).drop_duplicates(subset=['code_subregion'])
+    homonym = frame['name_subregion'].duplicated(keep=False) & \
+        ~frame['BEZ'].isin(['Kreisfreie Stadt', 'Stadtkreis'])
+    frame.loc[homonym, 'name_subregion'] = \
+        frame.loc[homonym, 'name_subregion'] + ' (' + frame.loc[homonym, 'BEZ'] + ')'
+    return gpd.GeoDataFrame(frame.merge(geometry, on='code_subregion'),
+                            geometry='geometry', crs=geometry.crs)
 
 def pack_polygons_grid_by_area(gdf, gap=0.0, x=0.0, y=0.0, n_cols=None, ascending=False):
     """

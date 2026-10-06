@@ -380,3 +380,50 @@ def test_pack_polygons_tolerates_empty_geometries():
     packed = geo.pack_polygons_grid_by_area(frame)
     assert len(packed) == 2
     assert all(g.is_empty for g in packed.geometry)
+
+
+# --------------------------------------------------------------------------
+# German counties
+# --------------------------------------------------------------------------
+
+
+def _deu_counties():
+    """Build a DE-counties extract with the two traps of the real file.
+
+    München is both a kreisfreie Stadt (09162) and a Landkreis (09184), and
+    so is Karlsruhe, a Stadtkreis (08212) and a Landkreis (08215);
+    Nordfriesland (01054) comes in two rows, its land and its water.
+    """
+    return gpd.GeoDataFrame(
+        {
+            "code_subregion": ["09162", "09184", "08212", "08215", "01054", "01054"],
+            "name_subregion": ["München", "München", "Karlsruhe", "Karlsruhe",
+                               "Nordfriesland", "Nordfriesland"],
+            "BEZ": ["Kreisfreie Stadt", "Landkreis", "Stadtkreis", "Landkreis",
+                    "Kreis", "Kreis"],
+        },
+        geometry=_squares([1, 2, 3, 4, 5, 6]),
+        crs="epsg:4326",
+    )
+
+
+def test_merge_deu_counties_keeps_every_code():
+    merged = geo._merge_deu_counties(_deu_counties())
+    assert sorted(merged["code_subregion"]) == ["1054", "8212", "8215", "9162", "9184"]
+
+
+def test_merge_deu_counties_names_a_landkreis_after_its_type():
+    names = geo._merge_deu_counties(_deu_counties()) \
+        .set_index("code_subregion")["name_subregion"].to_dict()
+    assert names["9162"] == "München"
+    assert names["9184"] == "München (Landkreis)"
+    assert names["8212"] == "Karlsruhe"
+    assert names["8215"] == "Karlsruhe (Landkreis)"
+    assert names["1054"] == "Nordfriesland"
+
+
+def test_merge_deu_counties_merges_the_rows_of_one_county():
+    merged = geo._merge_deu_counties(_deu_counties()).set_index("code_subregion")
+    squares = _squares([5, 6])
+    assert merged.loc["1054", "geometry"].area == squares[0].union(squares[1]).area
+    assert merged.loc["9184", "geometry"].equals(_squares([2])[0])
