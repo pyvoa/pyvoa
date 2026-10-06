@@ -3,8 +3,11 @@
   every `setwhom()`, bypassing `get_local_from_url`: never cached, never
   looked for in the Zenodo archive. Its url is now the `JPN` entry of
   `GeoCountry._country_info_dict`, read like every other country's; the url
-  that entry used to declare was never read. Until the file is deposited on
-  Zenodo, the archive mode falls back to GitHub, and caches the file.
+  that entry used to declare was never read. The file is archived in the
+  Zenodo record `get_local_from_url` reads from, now 23198224 — a version of
+  18784098 holding its 50 files and this one — and is served from there in
+  archive mode. Prefectures: 地球地図日本 (Global Map Japan), GSI, under the
+  Public Data License 1.0; GeoJSON conversion by dataofjapan/land.
 - `GPDBuilder.factory()` writes the pickles of a database with
   `reload=True` and reads them back with `reload=False`, so that they are
   handled in one place; `front.setwhom()` no longer reads them itself, nor
