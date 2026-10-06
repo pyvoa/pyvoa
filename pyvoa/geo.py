@@ -1091,7 +1091,10 @@ class GeoCountry:
                     'EUR':'https://github.com/coa-project/coadata/raw/main/coastore/WHO_EUROsmall2.json',\
                     'GRC':'https://github.com/coa-project/coadata/raw/refs/heads/main/coastore/nomoiokxe.zip',\
                     # previously 'GRC':'https://geodata.gov.gr/dataset/6deb6a12-1a54-41b4-b53b-6b36068b8348/resource/3e571f7f-42a4-4b49-8db0-311695d72fa3/download/nomoiokxe.zip',\
-                    'JPN':'https://raw.githubusercontent.com/piuccio/open-data-jp-prefectures-geojson/master/output/prefectures.geojson',\
+                    # previously declared, but never read: the JPN branch fetched the
+                    # dataofjapan file below directly, bypassing get_local_from_url
+                    #'JPN':'https://raw.githubusercontent.com/piuccio/open-data-jp-prefectures-geojson/master/output/prefectures.geojson',\
+                    'JPN':'https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson',\
                     # health zones ("zones de santé") of the Democratic Republic of the Congo,
                     # the geometry the INSP situation reports of the 2026 Ebola outbreak are indexed by
                     'COD':'https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/drc_health_zones.geojson',\
@@ -1552,7 +1555,7 @@ class GeoCountry:
 
         #--- 'JPN' case ----------------------------------------------------------------------------------------
         elif self._country == 'JPN':
-            self._country_data = gpd.read_file('https://raw.githubusercontent.com/dataofjapan/land/master/japan.geojson')
+            self._country_data = gpd.read_file(get_local_from_url(url,0)) # this is a geojson file
             np_name_subregion_jpn = np.array(['Hokkaido', 'Aomori', 'Iwate', 'Miyagi', 'Akita',\
                                               'Yamagata', 'Fukushima', 'Ibaraki', 'Tochigi',\
                                               'Gunma', 'Saitama','Chiba', 'Tokyo', 'Kanagawa',\
