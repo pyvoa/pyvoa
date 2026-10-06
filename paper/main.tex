@@ -4,10 +4,10 @@
 %%  Guide for authors: https://www.sciencedirect.com/journal/softwarex/publish/guide-for-authors
 %%
 %%  CONSTRAINTS TO RESPECT (SoftwareX, Guide for Authors):
-%%    - Sections 1-5: max 6 pages / max 3000 words, counting abstract,
+%%    - Sections 1-5: max 6 pages / max 4000 words, counting abstract,
 %%      running text, captions and footnotes; excluding title, authors,
 %%      affiliations, references and metadata tables.
-%%    - Max 6 figures. Abstract ca. 100 words. Max 6 keywords.
+%%    - Max 6 figures. Abstract ca. 100 words. Max 7 keywords.
 %%    - Code must be in a public *GitHub* repository (not GitLab).
 %%  ============================================================================
 
@@ -167,7 +167,7 @@ visualisation of open epidemiological data}
 \begin{abstract}
 
 pyvoa (Python Virus Open Analysis) is an open-source Python library providing
-access to 25 epidemiological data resources through a single query with five keywords. They range from global aggregators, such as Our World in Data, to
+access to 24 epidemiological data resources through a single query with five keywords. They range from global aggregators, such as Our World in Data, to
 national agencies, and cover COVID-19, mpox, measles, and Ebola. Each resource
 is described by a JSON file rather than by code, so the catalogue can be
 extended without modifying the library. Resources are normalised into a common
@@ -330,7 +330,7 @@ visualisation, and data preservation within a single Python framework.
 Table~\ref{tab:comparison} summarises the main differences between
 \texttt{pyvoa} and the tools discussed above.
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \centering
 \footnotesize
 \setlength{\tabcolsep}{3pt}
@@ -348,7 +348,7 @@ COVIDcast~\cite{reinhart2021}
 \texttt{covid19.analytics}~\cite{ponce2020}
     & R & 7 & No & Yes & GitHub backup repo \\
 \texttt{pyvoa} (this work)
-    & Python & 25 & Yes & Yes & Zenodo archive \\
+    & Python & 24 & Yes & Yes & Zenodo archive \\
 \bottomrule
 \end{tabular}
 
@@ -363,7 +363,7 @@ direct retrieval from the original source.}
 \end{table}
 
 The two challenges identified above are addressed in \texttt{pyvoa} through a
-common architecture. Twenty-five data resources are described declaratively,
+common architecture. Twenty-four data resources are described declaratively,
 normalised into a common schema, and linked to a geographic layer that
 reconciles location identifiers and provides the corresponding geometries.
 Data can be retrieved either from their original sources, when current values
@@ -377,8 +377,7 @@ a complete figure to be produced in only a few lines of Python.
 
 This architecture is not specific to COVID-19. The catalogue has progressively
 been extended to other infectious diseases and surveillance systems, including
-mpox~\cite{owid_mpox}, acute respiratory infections monitored by the French
-Réseau Sentinelles~\cite{sentinelles_ira}, measles cases in the United
+mpox~\cite{owid_mpox}, measles cases in the United
 States~\cite{ahmadi2025}, and the 2026 Bundibugyo ebolavirus outbreak in the
 Democratic Republic of the Congo~\cite{bdbv2026}. These resources are described using the same JSON-based mechanism as their
 COVID-19 counterparts. New resources can therefore be added without modifying
@@ -402,60 +401,94 @@ changes or disappears, improving both recoverability and reproducibility.
 \subsection{Software architecture}
 \label{sec:architecture}
 
-pyvoa is layered (Fig.~\ref{fig:architecture}). A user calls the front end; the
-front end never touches a URL.
+pyvoa starts from the open data that providers publish on the web and ends with
+a small set of functions called by the user. Between the two, the data follow a
+single path (Fig.~\ref{fig:architecture}). The content served by a provider is
+in most cases deposited on Zenodo, which gives a citable, long-term archive
+hosted at CERN. A preprocessing stage then turns each heterogeneous data
+resource into a common internal representation. A unified Python interface
+finally returns time series, histograms, maps or exported tables. Preprocessing
+forms the back end and the interface the front end; the user only ever calls
+the front end and never handles a URL.
 
-\textbf{Declarative source descriptions.} Every database is a JSON file in
-\texttt{pyvoa/data/}. It carries the payload URL, the upstream reference URL,
-the separator and decimal conventions, the columns to drop, the rows to select,
-and a list of column descriptors mapping the source's own names onto pyvoa's
-vocabulary --- with, for each, whether the series is cumulative and a
-human-readable description. It also carries the geographic block: granularity
-(\texttt{country}, \texttt{region}, \texttt{subregion}), the ISO~3166-1 alpha-3
-code of the covered territory, and the location mode. \texttt{MetaInfo} and
-\texttt{DataParser} interpret these files, so adding a source usually means
-adding one JSON file and no Python at all.
-
-\textbf{Geolocation.} Four classes handle geography. \texttt{GeoManager}
-converts location names between the \texttt{iso2}, \texttt{iso3}, \texttt{name}
-and \texttt{num} standards and absorbs the idiosyncratic spellings of individual
-databases; all names pass through a normalisation that strips accents, collapses
-separators and folds case, so \texttt{'esp'}, \texttt{'spain'} and
-\texttt{'SPAIN'} resolve alike, as do \texttt{"cote d'ivoire"} and
-\texttt{"Côte d'Ivoire"}. \texttt{GeoRegion} resolves supranational
-groupings --- the UN M49 regions, plus the European Union, G7, G8, G20, G77,
-OECD, BRICS, the Commonwealth and eight African and Latin American economic
-communities --- so that a whole grouping is a single \texttt{where} argument.
-\texttt{GeoCountry} provides sub-national units and their geometries for the
-countries covered at that granularity, in main, dense or exploded variants so
-that overseas territories can be drawn or set aside. \texttt{GPDBuilder} then
-joins the epidemiological frame to the geometries and returns a geopandas~\cite{geopandas}
-object. Formally, the layer implements
-%
-\begin{equation}
-G:\ (\textit{source\_id},\ \textit{raw\_name}) \longrightarrow
-(\textit{iso\_code},\ \textit{display\_name},\ \textit{geometry}),
-\label{eq:geomapping}
-\end{equation}
-%
-applied on loading, so that changing database leaves geographic identifiers
-unchanged. The layer is importable on its own and useful outside epidemiology.
-
-\textbf{Front end and visualisation.} \texttt{pyvoa.front} exposes a singleton's
-methods at module level, so that the API reads as plain functions. Plotting
-backends --- matplotlib~\cite{hunter2007}, bokeh~\cite{bokeh} and
-seaborn~\cite{waskom2021} --- are optional imports probed at run time: the
-library returns data with none of them installed, and reports a missing backend
-rather than failing on import.
-
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.5\textwidth]{figures/schema_PYVOA_vertical.pdf}
-\caption{Architecture of pyvoa. Upstream providers are mirrored on Zenodo; JSON
-descriptors drive the parser; the geolocation layer reconciles names and adds
-geometries; the front end exposes one query grammar and three chart families.}
+\caption{Architecture of pyvoa. Open data from the providers are in most cases
+archived on Zenodo. The preprocessing stage reads each data resource through
+its JSON descriptor and normalises it; the unified Python interface returns
+time series, histograms, maps and exported tables.}
 \label{fig:architecture}
 \end{figure}
+
+\subsubsection{Back end}
+
+\textbf{Curation (manual).} Adding a data resource takes two steps, neither of
+which involves writing Python. First, the content served at the provider's URL
+can be deposited on the Pyvoa community Zenodo (****http://zenodo.org/communities/pyvoa****). Second, the resource is described in a JSON file stored
+in \texttt{pyvoa/data/}, in the GitHub repository. This descriptor gives the
+two locations of the data: the Zenodo mirror (\texttt{urldata}) (if it exists) and the
+provider's live URL (\texttt{urlparent}). It also gives the separator and
+decimal conventions, the columns to drop and the rows to select. It maps each
+of the provider's column names onto pyvoa's own vocabulary. Lastly, it gives the geographic granularity
+(\texttt{country}, \texttt{region} or \texttt{subregion}) and the ISO~3166-1
+alpha-3 code of the territory covered.  Of the 24
+data resources, 21 can currently be read from both locations, 3 from the
+archive only, their provider having withdrawn the files ; the repository README
+lists the status of each.
+
+\textbf{Preprocessing (automatic).} On loading, \texttt{MetaInfo} and
+\texttt{DataParser} read the descriptor, fetch the data and reshape them into a
+normalised table. By default the data are read from the Zenodo mirror, so that
+a given release of pyvoa always returns the same numbers; a resource without a
+mirror is read from its provider. Locations are then mapped onto an internal
+geographic abstraction layer, so that changing data resource leaves geographic
+identifiers unchanged. For international data this layer follows the United
+Nations M49 standard~\cite{geoscheme}; for sub-national data it follows the
+administrative nomenclature in use in the country concerned.
+\texttt{GeoManager} converts between the \texttt{iso2}, \texttt{iso3},
+\texttt{name} and \texttt{num} standards and absorbs the spellings specific to
+each provider: names are stripped of accents and case-folded, so that
+\texttt{"cote d'ivoire"} and \texttt{"Côte d'Ivoire"} resolve alike.
+\texttt{GeoRegion} resolves supranational groupings (M49 regions, European
+Union, G20, OECD and others), so that a grouping is a single \texttt{where}
+argument. \texttt{GeoCountry} provides sub-national units and their geometries,
+with variants that draw overseas territories in place, next to the mainland, or
+not at all. Finally, \texttt{GPDBuilder} joins the table to the geometries. The
+result is held internally as a single geopandas
+\texttt{GeoDataFrame}~\cite{geopandas}. The geographic layer can be imported on
+its own and is also useful outside epidemiology.
+
+\subsubsection{Front end}
+
+The user interacts with a single module, \texttt{pyvoa.front}, conventionally
+imported as \texttt{pf}. It is used through plain function calls, such as
+\texttt{pf.setwhom('owid')} to select a data resource: there is no class to
+instantiate, and the module keeps the state of the session (selected resource,
+archive or live mode) between calls. 
+
+A single call to \texttt{pf.get} returns the selected data as a pandas
+\texttt{DataFrame}, with one row per date and per location, or on request as a
+geopandas \texttt{GeoDataFrame}, a list, a dictionary or an array. Since these
+are standard objects, export to CSV and any further analysis rely on the usual
+pandas methods. The same keywords drive the graphical functions:
+\texttt{pf.plot} draws time series, \texttt{pf.hist} histograms and
+\texttt{pf.map} maps. Common processing steps are available as options.
+
+
+Calling
+\texttt{pf.setlive(True)} switches all subsequent loading to the providers'
+live URLs. This returns the most recent data, but the results are no longer
+reproducible: they change from day to day, and an upstream file may move or
+change format. The archived and live copies are cached separately and never
+overwrite each other. 
+
+Charts can be drawn with matplotlib~\cite{hunter2007}, bokeh~\cite{bokeh} or
+seaborn~\cite{waskom2021}, at the user's choice. These libraries are optional:
+the core installation is lightweight and gives full access to the data, and
+the \texttt{pyvoa-full} distribution adds the plotting libraries. If a chart is
+requested from a library that is not installed, pyvoa says which one is
+missing.
 
 \subsection{Software functionalities}
 \label{sec:functionalities}
@@ -498,9 +531,9 @@ stays fetchable, and an analysis re-runnable, after its provider stops
 publishing. That upstream URL is not merely documentary:
 \texttt{setlive(True)} reads it instead of the mirror, which is what an
 epidemic still under way requires, at the cost of the reproducibility the
-archive gives. Of the twenty-five databases, twenty are readable both ways,
-three only from the archive --- their provider has withdrawn the files --- and
-two, added since the last deposit, only from their provider. The two copies are
+archive gives. Of the twenty-four databases, twenty-one are readable both ways
+--- two of them, following epidemics still under way, best read live --- and
+three only from the archive, their provider having withdrawn the files. The two copies are
 cached apart, and a database absent from the archive falls back to its provider
 in either mode.
 
@@ -548,7 +581,7 @@ COVID-specific vocabulary was removed from the code base and the project became
 about one virus.
 
 Version 0.5.0 (August 2026) is the first release prepared for external scrutiny.
-The catalogue grew from 12 to 25 databases; payloads moved to the Zenodo
+The catalogue grew from 12 to 24 databases; payloads moved to the Zenodo
 mirrors; packaging moved to PEP~621; an offline test suite was added, in which
 any test needing an upstream server must be marked and is deselected by default,
 so that a test cannot silently start depending on the network; and continuous
@@ -601,7 +634,7 @@ the cumulative series the source publishes; and \texttt{option='smooth7'}
 applies a seven-day rolling mean, which suppresses the weekday reporting
 artefacts common in national series (Fig.~\ref{fig:timeseries}).
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig2_timeseries_weu.pdf}
 \caption{Daily COVID-19 deaths in the nine
@@ -626,7 +659,7 @@ mirror, upstream collection having ended in March~2023
 (Fig.~\ref{fig:map}). In the absence of a \texttt{what} keyword, a
 \texttt{tot\_} variable is taken at its cumulative value.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig3_map_g20.pdf}
 \caption{Total confirmed COVID-19 cases across the
@@ -651,7 +684,7 @@ inhabitants, which is what makes \emph{départements} of very different sizes
 comparable; the bars are then ranked by value rather than by name
 (Fig.~\ref{fig:hist}).
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.85\textwidth]{figures/fig4_hist_spf.pdf}
 \caption{Patients hospitalised for COVID-19 per
@@ -715,11 +748,9 @@ geography the geolocation layer resolves just as it resolves French
 \emph{départements} or United States states; \texttt{typeofhist='pie'} asks for
 a composition rather than a ranking, the smaller zones being gathered into a
 single slice rather than discarded (Fig.~\ref{fig:beyond}). Measles in the
-United States, mpox, and acute respiratory infections (\emph{infections
-respiratoires aiguës}) from the French Réseau Sentinelles are read on the same
-terms.
+United States and mpox are read on the same terms.
 
-\begin{figure}[!h]
+\begin{figure}[!ht]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
 \caption{Confirmed cases of the 2026 Bundibugyo
@@ -742,7 +773,7 @@ tarde. \textbf{À relancer avant soumission} :
 \label{sec:impact}
 
 \textbf{Questions that become tractable.} Two kinds. First, cross-source
-comparison. Because twenty-five databases share one schema and one geographic
+comparison. Because twenty-four databases share one schema and one geographic
 key, a sub-national national source and an international country-level source
 can be put side by side without writing a join: the French wastewater signal and
 the reported incidence over the same territory, or a country's own agency series
@@ -840,7 +871,7 @@ d'exemples fourni contient la requête correspondante.}
 \section{Conclusions}
 \label{sec:conclusions}
 
-pyvoa gives one Python interface to twenty-five open epidemiological databases.
+pyvoa gives one Python interface to twenty-four open epidemiological databases.
 Sources are described declaratively rather than coded, normalised into a common
 frame, reconciled geographically by a layer that is useful in its own right, and
 served from archived copies with persistent identifiers rather than from
@@ -981,12 +1012,6 @@ Mpox data,
 \url{https://github.com/owid/monkeypox},
 accessed 25 August 2026.
 
-\bibitem{sentinelles_ira}
-Réseau Sentinelles,
-Infection respiratoire aiguë (IRA),
-\url{https://www.sentiweb.fr/?page=maladies&mal=25},
-accessed 25 August 2026.
-
 \bibitem{ahmadi2025}
 F.~Ahmadi, E.~Dong, L.~Gardner, Tracking county-level measles cases in the US,
 JAMA 334~(23) (2025) 2130--2132.
@@ -1044,7 +1069,7 @@ Repository: \url{https://github.com/pyvoa/pyvoa}.
 
 \section*{Current executable software version}
 
-\begin{table}[!h]
+\begin{table}[!ht]
 \small
 \begin{tabular}{|l|p{5.6cm}|p{7.0cm}|}
 \hline

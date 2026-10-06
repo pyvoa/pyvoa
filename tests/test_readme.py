@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 DATADIR = ROOT / "pyvoa" / "data"
 
-READ_FROM = {"both", "archive only", "live only"}
+READ_FROM = {"both", "both (prefer live)", "archive only", "live only"}
 
 
 @pytest.fixture(scope="module")

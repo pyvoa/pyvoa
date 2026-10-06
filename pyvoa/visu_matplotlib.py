@@ -17,13 +17,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
+from PIL import Image
 
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
     min_max_range,
 )
-from PIL import Image
+
 
 class visu_matplotlib:
     """The matplotlib backend, drawing static charts.
@@ -255,7 +256,7 @@ class visu_matplotlib:
         if 'colors' in  input.columns:
             color=input['colors']
         else:
-            color=cmap.colors
+            color=kwargs.get('plt').get_cmap('Paired').colors
         ax =  input.plot(kind="pie",y=which, color=color, autopct='%1.1f%%', legend=True,
         title=title, ylabel='', labeldistance=None,ax=ax)
         ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)

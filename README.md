@@ -115,13 +115,15 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
 The payloads are read from Zenodo mirrors of the upstream files, so a series
 stays reproducible after its original provider stops publishing. *Read from*
-says where each one is available: **both** for the twenty databases carrying a
-mirror and an upstream file that still resolves — which does not mean the
-provider still updates it — **archive only** for the three whose provider has
-gone (`phe` lost its API host, `minciencia` and `moh` renamed or withdrew
-files), and **live only** for the two added since the last deposit, which are
-always fetched from their provider. Only the archived ones are
-reproducible; see [Archived data, live data](#archived-data-live-data).
+says where each one is available: **both** for the twenty-one databases carrying
+a mirror and an upstream file that still resolves — which does not mean the
+provider still updates it — and **archive only** for the three whose provider
+has gone (`phe` lost its API host, `minciencia` and `moh` renamed or withdrew
+files). **both (prefer live)** marks the two that follow an epidemic still under
+way, `ebolardc` and `measles-usa`: their mirror is a snapshot, and the provider
+is ahead of it. A database with no mirror at all would be **live only**, always
+fetched from its provider. Only the archived data are reproducible; see
+[Archived data, live data](#archived-data-live-data).
 
 | Key | Coverage | Granularity | Source | Read from |
 |---|---|---|---|---|

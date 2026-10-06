@@ -649,7 +649,7 @@ def prioritize_keyword(listwhich):
     preferred = ['tot_deaths', 'total_deaths', 'tot_dc','total_dc']
     first = next((w for w in preferred if w in listwhich), listwhich[0])
     if first is None:
-        first = next((w for w in listwhich if w.startswith('tot_') or w.startswith('total_')), None)
+        first = next((w for w in listwhich if w.startswith(('tot_', 'total_'))), None)
     listwhich.insert(0, listwhich.pop(listwhich.index(first)))
     return listwhich
 

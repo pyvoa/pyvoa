@@ -33,8 +33,8 @@ from pyvoa.tools import (
   fill_missing_dates,
   get_live_mode,
   get_local_from_url,
+  prioritize_keyword,
   week_to_date,
-  prioritize_keyword
 )
 
 
@@ -549,7 +549,12 @@ class DataParser:
 
       numeric_cols = pandas_db.select_dtypes(include='number').columns.tolist()
       non_numeric_cols = [i for i in pandas_db.columns if i not in numeric_cols]
-      pandas_db = pandas_db.groupby(non_numeric_cols, as_index=False,dropna=False)[numeric_cols].sum(skipna=False)
+      # a group with a missing value stays missing, as sum(skipna=False) would
+      # do; GroupBy.sum only takes skipna from pandas 3 on, and the floor is 2.1
+      keys = [pandas_db[c] for c in non_numeric_cols]
+      summed = pandas_db.groupby(keys, dropna=False)[numeric_cols].sum(min_count=1)
+      missing = pandas_db[numeric_cols].isna().groupby(keys, dropna=False).any()
+      pandas_db = summed.mask(missing).reset_index()
       all_dates = pandas_db['date'].unique()
 
       cartesian = pd.DataFrame(

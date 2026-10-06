@@ -1,4 +1,21 @@
 # Unreleased
+- fix: the parser called `GroupBy.sum(skipna=False)`, which pandas only
+  accepts from version 3, while the declared floor is 2.1.1: on the floor every
+  database failed to parse, and the `minimum` CI job was red. The same result —
+  a group holding a missing value stays missing — is now computed with
+  `min_count=1` and a mask, on every supported pandas.
+- fix: `typeofhist='pie'` on matplotlib, when no colours were given, and the
+  bokeh histogram by value both raised a `NameError` (`cmap`, `lcolors`).
+- fix: `GPDBuilder.getpklname()` built its `PyvoaError` without raising it, and
+  returned `None` on a wrong argument.
+- the manuscript and the README count 24 databases, since `sentinellesIRA` was
+  removed for copyright reasons; the manuscript no longer cites the Réseau
+  Sentinelles among the supported sources, and the README explains the
+  *both (prefer live)* marking of `ebolardc` and `measles-usa`, both now
+  mirrored on Zenodo.
+- `ruff check .` is clean again: imports sorted, dead assignments commented
+  out, and docstrings restored on `listwhere()`, `listwhich()` and
+  `getdatabase()` of the front, which had lost them.
 - locations reported by a source but missing from its geometry file are no
   longer dropped with their counts: they get an empty geometry, which goes
   through every join and is simply not drawn. That covers Curaçao, Sint

@@ -28,10 +28,12 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
 import ast
+import random
 from functools import wraps
 from importlib import import_module
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
@@ -41,8 +43,6 @@ import pyvoa.help as h
 from pyvoa._banner import print_banner
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
-import matplotlib.pyplot as plt
-
 from pyvoa.tools import (
     PyvoaError,
     PyvoaInfo,
@@ -53,11 +53,11 @@ from pyvoa.tools import (
     info,
     kwargs_keystesting,
     kwargs_values_testing,
+    prioritize_keyword,
     readpkl,
     set_live_mode,
-    prioritize_keyword
 )
-import random
+
 # Aliased, and deliberately so. The loop at the foot of this module copies every
 # public method of the singleton onto the module, which overwrites a module
 # global of the same name: were these imported under their own names, the
@@ -350,7 +350,7 @@ class front:
          the first and last dates it covers. Output goes through info(), so it
          is silent unless the verbosity allows it.
          """
-         reload  = dico['reload']
+         # reload  = dico['reload']
          lwhich  = dico['lwhich']
          lwhere  = dico['lwhere']
          mypd    = dico['mypd']
@@ -375,6 +375,24 @@ class front:
 
 
     def listwhere(self, cluster_and_not = True):
+        """List the locations the current database can be asked for.
+
+        Asks the builder of the selected database, whose ``listwhere`` describes
+        what a location is for each granularity; when the database was selected
+        with ``reload=False``, returns the list saved with the pickle instead.
+
+        Parameters
+        ----------
+        cluster_and_not : bool
+            If True, the default, return the individual locations *and* the
+            clusters -- names standing for a group of locations, such as a
+            continent. If False, return the clusters only.
+
+        Returns
+        -------
+        list of str or str
+            The locations, sorted.
+        """
         lwhere = None
         if self.reload:
             lwhere = self.gpdbuilder.listwhere(cluster_and_not)
@@ -1259,7 +1277,8 @@ class front:
 
         if detailed:
             dico = {}
-            namels, iso3ls, grls, varls = [],[],[],[]
+            namels, iso3ls, grls = [],[],[]
+            # varls = []
             for i in namedb:
 
                 mypd = allpd.loc[allpd.name.isin([i])]
@@ -1403,6 +1422,17 @@ class front:
             raise PyvoaError(self.vis+ ' : has not map function !')
 
     def listwhich(self):
+        """List the variables the current database offers.
+
+        Asks the builder of the selected database; when it was selected with
+        ``reload=False``, returns the list saved with the pickle instead.
+
+        Returns
+        -------
+        list of str
+            The values 'which' accepts. Beware that the default of 'which' is
+            not necessarily the first of them, as :meth:`get` describes.
+        """
         if self.reload:
             return self.gpdbuilder.listwhich()
         else:
@@ -1524,6 +1554,18 @@ class front:
             return df
 
     def getdatabase(self,):
+        """Return the whole database, as parsed, for every location and variable.
+
+        The table :meth:`get` selects from, before any selection: this is the
+        raw material, not a query. When the database was selected with
+        ``reload=False``, the table saved with the pickle is returned, with a
+        warning.
+
+        Returns
+        -------
+        pandas.DataFrame
+            Every variable of the current database, for every location and date.
+        """
         if self.reload:
             return self.gpdbuilder.getdatabase()
         else:

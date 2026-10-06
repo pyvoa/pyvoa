@@ -30,9 +30,9 @@ from pyvoa.tools import (
    extract_dates,
    flat_list,
    getnonnegfunc,
+   info,
    kwargs_values_testing,
    verb,
-   info
 )
 
 pd.options.mode.chained_assignment = None  # default='warn'
@@ -159,12 +159,25 @@ class GPDBuilder:
        return data,geo,self.getvisu()
 
    def getpklname(self,geoordata='geo'):
+        """Return the name of the pickle the data or the geometry was saved to.
+
+        Parameters
+        ----------
+        geoordata : str
+            'geo', the default, for the geometry pickle, or 'data' for the data
+            one.
+
+        Raises
+        ------
+        PyvoaError
+            If ``geoordata`` is neither.
+        """
         if geoordata == 'geo':
             return self.namepklgeo
         elif geoordata == 'data':
             return self.namepkldata
         else:
-            PyvoaError("No geo nor data ... crashed")
+            raise PyvoaError("No geo nor data ... crashed")
 
    def getdatabase(self):
         """Return the whole database, as parsed, for every location and variable.

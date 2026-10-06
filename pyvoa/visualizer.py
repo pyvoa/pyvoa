@@ -17,15 +17,18 @@ import datetime as dt
 from functools import wraps
 
 import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import PyvoaError, PyvoaWarning, verb
-import matplotlib.pyplot as plt
-import numpy as np
+
 # The four imports below only probe whether an optional backend is installed;
-# the backends themselves are imported lazily, hence the noqa on each of them.
+# the backends themselves are imported lazily, hence the noqa on three of them.
+# matplotlib needs none, being imported at the top of the module anyway (and a
+# hard dependency through contextily), so its probe always succeeds.
 try:
     import bokeh  # noqa: F401
     BOKEH_AVAILABLE = True
@@ -33,7 +36,7 @@ except ImportError:
     BOKEH_AVAILABLE = False
 
 try:
-    import matplotlib  # noqa: F401
+    import matplotlib
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
@@ -91,7 +94,6 @@ class AllVisu:
         kindgeo : gpd.GeoDataFrame
             the geometry to draw the locations with.
         """
-
         if kindgeo is None:
             pass
         else:
@@ -161,7 +163,7 @@ class AllVisu:
             """
             input = kwargs.get('input')
             which = kwargs.get('which')
-            where = kwargs['input']['where']
+            # where = kwargs['input']['where']
             if isinstance(which, list):
                 which = which[0]
                 kwargs['which'] = which

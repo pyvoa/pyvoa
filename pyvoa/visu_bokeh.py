@@ -44,10 +44,10 @@ from bokeh.models import (
     Range1d,
     Row,
     Select,
+    Spacer,
     Title,
     Toggle,
     WMTSTileSource,
-    Spacer
 )
 from bokeh.models.layouts import TabPanel, Tabs
 from bokeh.palettes import Category10, Category20, Viridis256
@@ -883,7 +883,7 @@ class visu_bokeh:
                 input_dates = input_dates.sort_values(by=['date', 'where'])
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
                 unique_dates = input_dates['date'].drop_duplicates().tolist()
-                unique_where = input_dates['where'].unique().tolist()
+                # unique_where = input_dates['where'].unique().tolist()
                 frames = []
                 cols = list(input_dates.columns)
                 frames = []
@@ -1115,6 +1115,7 @@ class visu_bokeh:
 
         contributors = dict(sorted(contributors.items()))
 
+        lcolors = itertools.cycle(self.lcolors)
         frame_histo = pd.DataFrame({
                 'left': interval[:-1],
                 'right': interval[1:],
