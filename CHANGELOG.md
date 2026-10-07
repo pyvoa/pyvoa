@@ -1,4 +1,12 @@
 # Unreleased
+- the `from_db` column of a parsed database is a bool column; it was an
+  object one holding True and False, the rows a database lacks being added
+  by a merge that leaves them missing. `~from_db` therefore gave -1 and -2
+  instead of negating it. The measles-usa network test, which still expected
+  every state of the geography at the last date, now expects it of the
+  states the source reports only: the others (five territories, Mississippi
+  and New Hampshire, with no measles case) have been added without data
+  since `fdbd7c0`.
 - fix: `get()` and every chart handed out the raw count under the name of
   the normalised one: with `option='normalize:pop1M'`, `cur_hosp
   normalize:pop1M` carried `cur_hosp` itself. The builder computed the rate

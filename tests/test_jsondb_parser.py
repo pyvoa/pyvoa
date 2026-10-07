@@ -361,6 +361,44 @@ def test_dataparser_exposes_the_keyword_urls(offline_parser):
     assert offline_parser.get_keyword_url("tot_cases").startswith("https://")
 
 
+class _FakeWorldGeoManager(_FakeGeoManager):
+    """A world whose geography holds a country the source never reports."""
+
+    _NAMES: ClassVar[dict] = {"FRA": "France", "DEU": "Germany"}
+
+    def get_GeoRegion(self):
+        class _Region:
+            def get_countries_from_region(self, region):
+                return ["FRA", "DEU"]
+        return _Region()
+
+
+def test_dataparser_from_db_is_a_bool_column(monkeypatch):
+    """from_db tells the rows of the source from those the geography adds.
+
+    The rows added for a place the source never names come out of a left
+    merge with a missing value; from_db must still be a bool column, not an
+    object one holding True and False.
+    """
+    with open(DATA / "good_db.json") as handle:
+        metadata = json.load(handle)
+    metadata["geoinfo"]["iso3"] = "WLD"
+
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(
+        jsondb_parser, "get_local_from_url",
+        lambda url, *args, **kwargs: str(DATA / "tiny.csv"),
+    )
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeWorldGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+    frame = jsondb_parser.DataParser("good_db").get_maingeopandas()
+
+    assert frame["from_db"].dtype == bool
+    assert dict(frame.groupby("code")["from_db"].all()) == {"DEU": False, "FRA": True}
+
+
 def test_dataparser_exposes_the_parsed_urls(offline_parser):
     assert offline_parser.get_url() == ["https://example.org/frozen/tiny.csv"]
 

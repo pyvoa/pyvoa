@@ -193,8 +193,13 @@ def test_measles_usa_cumulates_the_reported_increments():
         set_live_mode(False)
 
     last = frame.loc[frame["date"] == frame["date"].max()]
-    # no state may be left out of the last date, or a map would show holes
-    assert last["tot_cases"].notna().all()
+    from_db = last["from_db"]
+    assert from_db.dtype == bool
+    # no state the source reports may be left out of the last date
+    assert last.loc[from_db, "tot_cases"].notna().all()
+    # the places pyvoa adds without data are exactly those the source never names
+    named = set(source["location_name"].str.split(",").str[-1].str.strip())
+    assert not set(last.loc[~from_db, "where"]) & named
     # every case reported upstream, and no more, ends up in the total
     assert last["tot_cases"].sum() == source["value"].sum()
 

@@ -579,7 +579,9 @@ class DataParser:
 
       pandas_db = pandas_db[pandas_db['where'] != 'ANTARCTICA']
       pandas_db['where']=pandas_db['where'].str.title()
-      pandas_db['from_db']=pandas_db['from_db'].fillna(False)
+      # True where the source has the row, NaN where the left merge added it:
+      # eq(True) makes that a bool column, where fillna(False) left an object one
+      pandas_db['from_db']=pandas_db['from_db'].eq(True)
       self.slocation = list(pandas_db['where'].unique())
       self.dates = list(pandas_db['date'].unique())
       pandas_db = pandas_db.dropna(subset=['geometry'])
