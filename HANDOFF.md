@@ -36,6 +36,7 @@ history of the repository are at the end.
 | 11 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
 | 12 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure cannot be frozen meanwhile. | no |
 | 13 | The Bulk archive keeps reference files whose licence is restricted or unknown; documented per file, kept for now. | no |
+| 14 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -229,6 +230,59 @@ licence. Decided on 2026-10-07 to keep them as they are; if they are ever
 revisited, the WHO/Europe file can go first, and open replacements be sought
 for the others — each change being a new Zenodo version, hence a new record id
 in `tools.get_local_from_url`.
+
+## 14. Authors of the Zenodo community records
+
+Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
+the source each database actually reads. Metadata edits mint no new version,
+so none of this touches the code. At the least, fix the records pyvoa reads:
+10082179 (jhu), 11222009 (mpoxgh), 11222014 (moh), 11222015 (jpnmhlw),
+11222016 (imed), 11222017 (govcy), 11222020 (europa), 11222021
+(escovid19data), 11222022 (dpc), 11222023 (dgs), 11267174 (jhu-usa), 18682655
+(rki), 18772757 (phe), 18773580 (minciencia), 18788895 (covidtracking),
+18788975 (covid19india), 18789975 (owid), 18790064 (sciensano), 18790282 (spf,
+spfnational), 18790381 (sumeau), 23047588 (geo), 23165146 (measles-usa),
+23212632 (Bulk).
+
+**Data producers named as creators**, in order of urgency:
+
+| Record | Creator now | Problem | Proposed |
+|---|---|---|---|
+| `rki` 18682655 | Risklayer | wrong: pyvoa reads `cases-rki-by-ags.csv` of jgehrcke/covid-19-germany-gae, RKI data (the Risklayer files there are `*-rl-crowdsource-*`) | Robert Koch-Institut; Jan-Philip Gehrcke as contributor (DataCollector) |
+| `measles-usa` 23165146 | Beau, Tristan | the record's own description credits the JHU Measles Tracking Team | Johns Hopkins University Measles Tracking Team; Beau as DataCurator |
+| `mpoxgh` 11222009 | Our World in Data | Global.health, the primary source, is missing | Global.health; Our World in Data |
+| `covidtracking` 18788895 | "Covid Tracking Database" | not the project's name | The COVID Tracking Project at The Atlantic |
+| `covid19india` 18788975 | "Covid 19 India" | idem | covid19india.org |
+| `sumeau` 18790381 | "Sumeau" | data.gouv.fr gives Santé publique France as publisher | Santé publique France |
+| `dgs` 11222023 | DSSG Portugal | right for the compilation; the DGS is absent | add Direção-Geral da Saúde (DataCollector, or in the description) |
+
+The other records pyvoa reads name their producer correctly.
+
+**The pyvoa team as contributor** is written three ways: the organisation
+"PyCoa" (DataCurator) on every record of account 43047, the 2026 versions of
+`spf` and `sciensano` included; "Pyvoa" on the 2026 versions of `owid` only;
+nothing on `jhu-usa` nor on any record of account 1008528 (Chile,
+covidtracking, covid19india, sumeau, measles-usa). One rule for all data
+records: the three authors as DataCurator, with ORCID and affiliation — or,
+failing that, the organisation "pyvoa", spelt alike everywhere.
+
+**Our own identity.** Bulk (23212632 and its earlier versions) names "Beau,
+Tristan", affiliation "pyvoa.org", no ORCID; `geo` and `measles-usa` carry the
+ORCID but no affiliation. Bulk being a compilation of third-party files whose
+credits its description gives per file, name the three authors as its
+creators, with ORCID and affiliation as in `AUTHORS` — or at least complete
+Beau's. `geo` is derived by us: Beau as creator is right, add the affiliation.
+
+**The software record 21829902** has the right authors and ORCIDs but
+shortened affiliations; see §5.
+
+**Lesser points.** Titles mix the database key (`dgs`, `sumeau`) and free
+descriptions ("Covid 19 data for Chile", "Covid Tracking USA"); a common form
+would be "`<key>` — `<description>` (mirror for pyvoa)". Publication dates are
+mostly the deposit date, but some give the data period (18772757
+`2020-09-05/2023-02-11`, 18682655 2023, Bulk 18773027 2021). `coadata`
+11198165 is credited to "PyCoa", a PyCoA-era record: keep it as history, or
+name the three authors.
 
 ---
 
