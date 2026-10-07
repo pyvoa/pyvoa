@@ -1523,14 +1523,14 @@ class visu_bokeh:
         tile = ''
         if tilename == 'openstreet':
             tile = r'http://c.tile.openstreetmap.org/{Z}/{X}/{Y}.png'
-        elif tilename == 'positron':
-            #print('Problem with positron tile (huge http resquest need to check), esri is then used ...')
-            #tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
-            tile = 'https://tiles.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
         elif tilename == 'esri':
             tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
-        elif tilename == 'stamen':
-            tile = r'http://tile.stamen.com/toner/{z}/{x}/{y}.png'
+        # withdrawn: CartoDB displays a request for an API key over the map
+        #elif tilename == 'positron':
+        #    tile = 'https://tiles.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+        # withdrawn: Stamen moved to Stadia Maps
+        #elif tilename == 'stamen':
+        #    tile = r'http://tile.stamen.com/toner/{z}/{x}/{y}.png'
         else:
             PyvoaWarning('Don\'t know you tile ...')
         return tile

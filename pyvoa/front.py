@@ -925,7 +925,7 @@ class front:
             a table of your own sets the current database to 'in-house data'.
         typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
             How the geography is drawn; :meth:`listmap` lists them.
-        tile : {'openstreet', 'esri', 'positron', 'stamen'}, optional
+        tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
             matplotlib alike. A dense map is drawn without tiles.

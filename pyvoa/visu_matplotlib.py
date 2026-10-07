@@ -576,20 +576,20 @@ class visu_matplotlib:
                     crs=data_crs,
                     source=cx.providers.Esri.WorldStreetMap,
                 )
-
-            elif tile == 'stamen':
-                cx.add_basemap(
-                    ax,
-                    crs=data_crs,
-                    source=cx.providers.Stamen.TonerLite,
-                )
-
-            elif tile == 'positron':
-                cx.add_basemap(
-                    ax,
-                    crs=data_crs,
-                    source=cx.providers.CartoDB.PositronNoLabels,
-                )
+            # withdrawn: Stamen moved to Stadia Maps and no longer loads here
+            #elif tile == 'stamen':
+            #    cx.add_basemap(
+            #        ax,
+            #        crs=data_crs,
+            #        source=cx.providers.Stamen.TonerLite,
+            #    )
+            # withdrawn: CartoDB displays a request for an API key over the map
+            #elif tile == 'positron':
+            #    cx.add_basemap(
+            #        ax,
+            #        crs=data_crs,
+            #        source=cx.providers.CartoDB.PositronNoLabels,
+            #    )
 
             else:
                 raise PyvoaError("Don't know what kind of tile it is...")

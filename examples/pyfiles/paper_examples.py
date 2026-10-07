@@ -65,9 +65,9 @@ FIGDIR = _default_figdir()
 # listing that reads `when=JHU_DATE` here and `when='31/12/2021'` in the paper
 # cannot be compared at all, which is the point of this file.
 #
-# No `tile=` either: the default is 'esri' (the first entry of listtile()), and
-# it renders. An earlier draft passed 'positron' to avoid OpenStreetMap's
-# blocked tiles, which only matters if 'openstreet' is asked for by name.
+# No `tile=` either: the default is 'openstreet' (the first entry of
+# listtile()), which renders now that matplotlib identifies itself to
+# OpenStreetMap.
 
 
 # ---------------------------------------------------------------------------

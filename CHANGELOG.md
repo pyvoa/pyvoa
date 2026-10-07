@@ -1,4 +1,9 @@
 # Unreleased
+- the 'positron' and 'stamen' tiles are withdrawn from both backends:
+  CartoDB's positron now displays a request for an API key over the map, and
+  Stamen's tiles, moved to Stadia Maps, no longer load under matplotlib.
+  `listtile()` gives `['openstreet', 'esri']`; another name raises a
+  PyvoaError.
 - archived data are read from Zenodo record 23212632, a version of 23198224
   without the sentiweb file of the withdrawn `sentinellesIRA` database, whose
   data are licensed for non-commercial use only and which no shipped code
