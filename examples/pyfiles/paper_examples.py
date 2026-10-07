@@ -139,7 +139,7 @@ def example_2(pf, vis: str) -> None:
 def example_3(pf, vis: str) -> None:
     banner(3, "sub-national data, normalised by population", """
         pf.setwhom('spf')    # Sante Publique France db
-        pf.hist(which='cur_hosp',when='31/12/2021',
+        pf.hist(which='cur_hosp', when='31/12/2021',
                 option='normalize:pop1M')
     """)
     pf.setvis(vis)
@@ -155,7 +155,7 @@ def example_3(pf, vis: str) -> None:
     banner(3, "the frame behind Fig. 4 (same listing, printed)", """
         pf.setwhom('spf')    # Sante Publique France db
         pdf = pf.get(which='cur_hosp', when='31/12/2021',
-                option='normalize:pop1M', what='daily')
+                     option='normalize:pop1M', what='daily')
     """)
     pf.setwhom('spf')
     pdf = pf.get(which='cur_hosp', when='31/12/2021',
@@ -182,6 +182,11 @@ def example_3(pf, vis: str) -> None:
     print("    >>> pdf.shape")
     print(f"    {pdf.shape}")
     print()
+    # Not in the manuscript: the notebook adds this cell, to show the other
+    # forms get() can return through its 'output' keyword.
+    print("    >>> pf.listoutput()")
+    print(f"    {pf.listoutput()}")
+    print()
     print("    >>> pdf.head(4)")
     with pd.option_context('display.width', 80, 'display.max_columns', None):
         print(textwrap.indent(repr(pdf.head(4)), "    "))
@@ -194,11 +199,11 @@ def example_3(pf, vis: str) -> None:
 def example_4(pf, vis: str) -> None:
     banner(4, "beyond COVID-19 (Ebola, DR Congo)", """
         pf.setwhom('ebolardc')
-        pf.hist(which='tot_confirmed',typeofhist='pie')
+        pf.hist(which='tot_confirmed', typeofhist='pie')
     """)
     pf.setvis(vis)
     pf.setwhom('ebolardc')
-    pf.hist(which='tot_confirmed',typeofhist='pie')
+    pf.hist(which='tot_confirmed', typeofhist='pie')
     save(pf, "fig5_ebola_drc.pdf")
 
 

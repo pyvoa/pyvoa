@@ -737,17 +737,17 @@ map or a spatial join needs:
 (102, 5)
 
 >>> pdf.head(4)
-        date                  where code  cur_hosp daily normalize:pop1M  \
-0 2021-12-31       Bouches-Du-Rhône   13                        2.457779   
-1 2021-12-31           Corse-Du-Sud   2A                       88.690110   
-2 2021-12-31  Territoire De Belfort   90                      -70.496010   
-3 2021-12-31               Vaucluse   84                        0.000000   
+        date           where code  cur_hosp daily normalize:pop1M  \
+0 2021-12-31    Corse-Du-Sud   2A                       88.690110
+1 2021-12-31           Isère   38                       29.282276
+2 2021-12-31    Eure-Et-Loir   28                       27.777971
+3 2021-12-31  Hauts-De-Seine   92                       25.940017
 
-                                            geometry  
-0  POLYGON ((470905.18323 5382327.2226, 477130.57...  
-1  POLYGON ((954375.99062 5218303.80578, 954292.9...  
-2  POLYGON ((759600.52216 6075847.9608, 758232.12...  
-3  MULTIPOLYGON (((544949.0389 5517924.90438, 543...  
+                                            geometry
+0  POLYGON ((954375.99062 5218303.80578, 954292.9...
+1  POLYGON ((696923.44222 5641512.66328, 697482.7...
+2  POLYGON ((213957.78999 6183341.89871, 213839.0...
+3  POLYGON ((255029.557 6266545.41899, 252593.947...
 \end{lstlisting}
 
 \subsection{Beyond COVID-19}
@@ -777,7 +777,7 @@ from the situation reports of the Institut National de Santé Publique.}
 \end{figure}
 
 \attnpar{La figure~\ref{fig:beyond} porte la date du
-17/08/2026, dernier jour couvert par la source --- à figer si la soumission
+04/10/2026, dernier jour couvert par la source --- à figer si la soumission
 tarde. \texttt{ebolardc} n'étant plus archivé (lecture chez le fournisseur
 seulement, l'INSP demandant à être consulté avant toute republication), la
 régénérer donne l'état du jour de la source : le miroir Zenodo ne peut plus la
