@@ -157,6 +157,7 @@ rules out commercial use.
 | `spf` | France | subregion (*départements*) | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
 | `spfnational` | France | country | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
 | `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | Licence Ouverte / Etalab 2.0 | both |
+
 Most of these are COVID-19 series; `mpoxgh` covers mpox, `ebolardc` the 2026 Bundibugyo ebolavirus
 outbreak in the Democratic Republic of the Congo and `measles-usa` the U.S.
 measles cases. Upstream providers stopped updating several of
