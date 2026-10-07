@@ -13,11 +13,11 @@ decisions already taken, the notes for whoever edits the manuscript, and the
 history of the repository are at the end.
 
 **Status, 2026-10-07.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
-`minimum`, `paper` and `docs`. The suite is at 378 passed, 23 deselected
+`minimum`, `paper` and `docs`. The suite is at 380 passed, 23 deselected
 (network); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
 `10.5281/zenodo.21829901`). The API documentation is published at
 <https://pyvoa.github.io/pyvoa/>. Archived data are read from Zenodo record
-`23198224`.
+`23212632`.
 
 ## Still open, at a glance
 
@@ -34,6 +34,8 @@ history of the repository are at the end.
 | 9 | Folium is untested since the empty geometries were introduced. | no |
 | 10 | `Licence.txt` asked for by the template; the repository has `LICENSE`. | no |
 | 11 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
+| 12 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure cannot be frozen meanwhile. | no |
+| 13 | The Bulk archive keeps reference files whose licence is restricted or unknown; documented per file, kept for now. | no |
 
 ---
 
@@ -58,8 +60,10 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 - **The Zenodo-community placeholder** — l. 428 reads
   `(****http://zenodo.org/communities/pyvoa****)`.
 - **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
-  catalogue: "12 to 24 databases" is wrong for 0.5.0, which shipped 23. The
-  figure is 24 only because `tests/test_paper.py` requires every database count
+  catalogue: "12 to 23 databases" holds for 0.5.0 by coincidence only — it
+  shipped 23 too, but not the same ones (with sentinellesIRA and risklayer,
+  without ebolardc and measles-usa). The figure follows today's catalogue
+  only because `tests/test_paper.py` requires every database count
   to match `pyvoa/data/`. Rewrite it around the release actually submitted.
 - **Highlights and a graphical abstract** — both *encouraged*, neither written,
   both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
@@ -95,8 +99,7 @@ are not.
 **Kosovo.** The world borders file has no Kosovo and its `SRB` polygon contains
 Pristina, so in the world databases Kosovo belongs with Serbia. Today `jhu`
 merges it (the name resolves to `SRB`), `owid` drops it (`OWID_KOS`, by the
-`drop` of the `OWID_` prefix), `europa` drops it (`XKX`, explicit `drop`);
-`risklayer` keeps it, its EUR geography having a Kosovo polygon (`RS002`).
+`drop` of the `OWID_` prefix), `europa` drops it (`XKX`, explicit `drop`).
 
 **Options.** (1) A real merge in the parser: carry each raw location's last
 value forward over the union of their dates before summing, sum only counts and
@@ -113,7 +116,7 @@ before `replace`, so either the order changes or `OWID_KOS` is spared.
 
 `GeoCountry('JPN')` (database `jpnmhlw`) reads
 `raw.githubusercontent.com/dataofjapan/land/master/japan.geojson`, archived in
-Zenodo record `23198224`. Its source is **地球地図日本 (Global Map Japan)** of
+Zenodo record `23212632`. Its source is **地球地図日本 (Global Map Japan)** of
 the GSI (国土地理院), whose content terms now apply the **Public Data License
 1.0**: commercial use and redistribution allowed, compatible with CC BY 4.0,
 attribution required (`出典：国土地理院ウェブサイト（URL）`) and modifications to
@@ -193,6 +196,39 @@ missing" is the journal's wording.
 each database with a direct read of its source (run them from outside the
 root, with `PYTHONPATH` pointing at the checkout). They found every data defect
 fixed in October 2026. Keep them (under `scripts/`, say) or drop them.
+
+## 12. The Ebola mirror
+
+`ebolardc` is read from its provider only (*live only* in the README): its
+`urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
+`urldata` is not on Zenodo in live mode, whatever `setlive()` says. The reason
+is the data's terms. The repository's MIT `LICENSE.md` covers its code; the
+sitrep extracts pyvoa reads carry their own, in
+`data/insp_sitrep/metadata.yaml`: *"reuse with attribution to INSP and citation
+of the specific report number and date. Confirm distribution terms with INSP
+before external republication."* (contact given: pierre.akilimali@insp.cd).
+
+Zenodo record 23165598 (`ebolardc data`, owner account 1008528) was such a
+republication; pyvoa no longer reads it, and it has been closed to the public
+(embargoed, files no longer served) on 2026-10-07. With the INSP's written
+agreement the mirror can come back, under the INSP's terms rather than MIT,
+and the Ebola figure of the manuscript can be frozen again. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
+as `bdbv2026`) is also labelled MIT; that is theirs to settle.
+
+## 13. Reference files of the Bulk archive
+
+The 23 databases each carry a checked licence (README table). The Bulk archive
+pyvoa reads its reference pages and geometries from (record 23212632) also
+redistributes files whose licence is restricted or unknown: worldometers
+(population, used by `GeoInfo`), worlddata.info (COMESA), the WHO/Europe
+gateway (WHO terms; used by no shipped database since risklayer went),
+meteochile (Chile), the socrata USA geometry, johan/world.geo.json (SSD, SDN),
+the Belgian *arrondissements*, the Spanish provinces (opendatasoft) and the
+Malaysian states (Stanford). The record's description states each file's
+licence. Decided on 2026-10-07 to keep them as they are; if they are ever
+revisited, the WHO/Europe file can go first, and open replacements be sought
+for the others — each change being a new Zenodo version, hence a new record id
+in `tools.get_local_from_url`.
 
 ---
 

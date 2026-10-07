@@ -662,6 +662,19 @@ def test_get_local_from_url_honours_the_expiration_in_live_mode(cache_dir, monke
     assert len(calls) == 2
 
 
+def test_get_local_from_url_live_argument_overrides_the_archive_mode(cache_dir, monkeypatch):
+    """A file with no archived copy is fetched live, and kept up to date."""
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
+    assert tools.get_live_mode() is False
+    tools.get_local_from_url("https://example.org/data.csv", -1, live=True)
+    tools.get_local_from_url("https://example.org/data.csv", -1, live=True)
+    assert calls == ["https://example.org/data.csv"] * 2
+
+
 def test_get_local_from_url_caches_the_two_modes_apart(cache_dir, monkeypatch):
     """Switching mode must not make one source overwrite the other's file."""
     monkeypatch.setattr(

@@ -401,6 +401,31 @@ def test_dataparser_reads_the_urlparent_in_live_mode(monkeypatch):
     assert calls == ["https://upstream.example.org/live.csv"]
 
 
+def test_dataparser_reads_an_unmirrored_dataset_live_in_archive_mode(monkeypatch):
+    """A urldata that is not a Zenodo file has no mirror, so it is read live."""
+    with open(DATA / "good_db.json") as handle:
+        metadata = json.load(handle)
+    upstream = "https://upstream.example.org/live.csv"
+    metadata["datasets"][0]["urldata"] = upstream
+    metadata["datasets"][0]["urlparent"] = upstream
+
+    calls = []
+
+    def fake_download(url, *args, live=None, **kwargs):
+        calls.append((url, live))
+        return str(DATA / "tiny.csv")
+
+    monkeypatch.setattr(
+        MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
+    )
+    monkeypatch.setattr(jsondb_parser, "get_local_from_url", fake_download)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoManager", _FakeGeoManager)
+    monkeypatch.setattr(jsondb_parser.coge, "GeoInfo", _FakeGeoInfo)
+    assert tools.get_live_mode() is False
+    jsondb_parser.DataParser("good_db")
+    assert calls == [(upstream, True)]
+
+
 def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
     """A dataset with no live source keeps using urldata, and warns about it."""
     with open(DATA / "good_db.json") as handle:

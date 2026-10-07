@@ -167,7 +167,7 @@ visualisation of open epidemiological data}
 \begin{abstract}
 
 pyvoa (Python Virus Open Analysis) is an open-source Python library providing
-access to 24 epidemiological data resources through a single query with five keywords. They range from global aggregators, such as Our World in Data, to
+access to 23 epidemiological data resources through a single query with five keywords. They range from global aggregators, such as Our World in Data, to
 national agencies, and cover COVID-19, mpox, measles, and Ebola. Each resource
 is described by a JSON file rather than by code, so the catalogue can be
 extended without modifying the library. Resources are normalised into a common
@@ -348,7 +348,7 @@ COVIDcast~\cite{reinhart2021}
 \texttt{covid19.analytics}~\cite{ponce2020}
     & R & 7 & No & Yes & GitHub backup repo \\
 \texttt{pyvoa} (this work)
-    & Python & 24 & Yes & Yes & Zenodo archive \\
+    & Python & 23 & Yes & Yes & Zenodo archive \\
 \bottomrule
 \end{tabular}
 
@@ -363,7 +363,7 @@ direct retrieval from the original source.}
 \end{table}
 
 The two challenges identified above are addressed in \texttt{pyvoa} through a
-common architecture. Twenty-four data resources are described declaratively,
+common architecture. Twenty-three data resources are described declaratively,
 normalised into a common schema, and linked to a geographic layer that
 reconciles location identifiers and provides the corresponding geometries.
 Data can be retrieved either from their original sources, when current values
@@ -432,10 +432,14 @@ provider's live URL (\texttt{urlparent}). It also gives the separator and
 decimal conventions, the columns to drop and the rows to select. It maps each
 of the provider's column names onto pyvoa's own vocabulary. Lastly, it gives the geographic granularity
 (\texttt{country}, \texttt{region} or \texttt{subregion}) and the ISO~3166-1
-alpha-3 code of the territory covered.  Of the 24
-data resources, 21 can currently be read from both locations, 3 from the
-archive only, their provider having withdrawn the files ; the repository README
-lists the status of each.
+alpha-3 code of the territory covered.  Of the 23
+data resources, 19 can currently be read from both locations, 3 from the
+archive only, their provider having withdrawn the files, and 1 from its
+provider only, its publisher asking to be consulted before any republication;
+the repository README lists the status and the licence of each. Licences are
+the providers': most are open, one rules out commercial reuse, and two
+compilations rest on official data published with no licence or reserved
+before republication.
 
 \textbf{Preprocessing (automatic).} On loading, \texttt{MetaInfo} and
 \texttt{DataParser} read the descriptor, fetch the data and reshape them into a
@@ -531,9 +535,10 @@ stays fetchable, and an analysis re-runnable, after its provider stops
 publishing. That upstream URL is not merely documentary:
 \texttt{setlive(True)} reads it instead of the mirror, which is what an
 epidemic still under way requires, at the cost of the reproducibility the
-archive gives. Of the twenty-four databases, twenty-one are readable both ways
---- two of them, following epidemics still under way, best read live --- and
-three only from the archive, their provider having withdrawn the files. The two copies are
+archive gives. Of the twenty-three databases, nineteen are readable both ways
+--- one of them, following an epidemic still under way, best read live ---,
+three only from the archive, their provider having withdrawn the files, and one,
+the Ebola series, only from its provider, which is not mirrored. The two copies are
 cached apart, and a database absent from the archive falls back to its provider
 in either mode.
 
@@ -581,7 +586,7 @@ COVID-specific vocabulary was removed from the code base and the project became
 about one virus.
 
 Version 0.5.0 (August 2026) is the first release prepared for external scrutiny.
-The catalogue grew from 12 to 24 databases; payloads moved to the Zenodo
+The catalogue grew from 12 to 23 databases; payloads moved to the Zenodo
 mirrors; packaging moved to PEP~621; an offline test suite was added, in which
 any test needing an upstream server must be marked and is deselected by default,
 so that a test cannot silently start depending on the network; and continuous
@@ -594,10 +599,12 @@ since 0.1.0 as well as the CoCoA and PyCoA years --- the only public record of a
 history whose middle repository is private.
 
 \attnpar{\textbf{Paragraphe « Version 0.5.0 » à mettre à jour avant soumission.}
-Il décrit la 0.5.0 mais donne le catalogue \emph{actuel} : « grew from 12 to 24
-databases » est faux pour la 0.5.0, qui en livrait 23 (avec \texttt{sentinellesIRA},
-retirée depuis pour raison de droits ; sans \texttt{ebolardc} ni
-\texttt{measles-usa}, ajoutées après). Le chiffre est à 24 uniquement parce que
+Il décrit la 0.5.0 mais donne le catalogue \emph{actuel} : « grew from 12 to 23
+databases » ne vaut pour la 0.5.0 que par coïncidence. Elle en livrait 23 aussi, mais pas
+les mêmes : avec \texttt{sentinellesIRA} et \texttt{risklayer}, retirées depuis (la
+première pour raison de droits, la seconde faute de licence publiée) ; sans
+\texttt{ebolardc} ni \texttt{measles-usa}, ajoutées après. Le chiffre suit le catalogue
+actuel uniquement parce que
 \texttt{tests/test\_paper.py} exige que tout nombre de bases cité égale le contenu de
 \texttt{pyvoa/data/}. À réécrire autour de la version effectivement soumise (0.5.1 ou
 suivante) --- numéro, date, liste de ce qu'elle apporte --- en vérifiant aussi
@@ -771,7 +778,10 @@ from the situation reports of the Institut National de Santé Publique.}
 
 \attnpar{La figure~\ref{fig:beyond} porte la date du
 17/08/2026, dernier jour couvert par la source --- à figer si la soumission
-tarde. \textbf{À relancer avant soumission} :
+tarde. \texttt{ebolardc} n'étant plus archivé (lecture chez le fournisseur
+seulement, l'INSP demandant à être consulté avant toute republication), la
+régénérer donne l'état du jour de la source : le miroir Zenodo ne peut plus la
+figer sans l'accord de l'INSP. \textbf{À relancer avant soumission} :
 \texttt{python paper\_examples.py -{-}check}, puis
 \texttt{python paper\_examples.py} pour régénérer les quatre PDF.}
 
@@ -783,7 +793,7 @@ tarde. \textbf{À relancer avant soumission} :
 \label{sec:impact}
 
 \textbf{Questions that become tractable.} Two kinds. First, cross-source
-comparison. Because twenty-four databases share one schema and one geographic
+comparison. Because twenty-three databases share one schema and one geographic
 key, a sub-national national source and an international country-level source
 can be put side by side without writing a join: the French wastewater signal and
 the reported incidence over the same territory, or a country's own agency series
@@ -793,7 +803,7 @@ on sources that have ceased. The JHU series used in Section~\ref{sec:examples}
 is no longer published; it is nonetheless fetched, by identifier, in one line.
 The reverse case is served by the same code: an outbreak still under way, such
 as the Ebola epidemic of Section~\ref{sec:ex-beyond}, is read from the provider itself, the
-archive being consulted only when it holds the file.
+archive holding no copy of it.
 
 \textbf{Existing questions pursued better.} The gain is on reproducibility
 rather than on speed. An analysis written against pyvoa records which database,
@@ -881,7 +891,8 @@ d'exemples fourni contient la requête correspondante.}
 \section{Conclusions}
 \label{sec:conclusions}
 
-pyvoa gives one Python interface to twenty-four open epidemiological databases.
+pyvoa gives one Python interface to twenty-three publicly available
+epidemiological databases, most of them openly licensed.
 Sources are described declaratively rather than coded, normalised into a common
 frame, reconciled geographically by a layer that is useful in its own right, and
 served from archived copies with persistent identifiers rather than from
@@ -891,8 +902,8 @@ boundary.
 
 The pandemic's open data are now a historical record, and an increasingly
 fragile one, while the diseases that followed produce their own. Work ahead
-follows from that: widening the catalogue beyond the mpox, measles, Ebola and
-acute respiratory infection series it already carries, deepening the
+follows from that: widening the catalogue beyond the mpox, measles and Ebola
+series it already carries, deepening the
 sub-national geolocation layer, and continuing to mirror sources before they
 disappear. Contributions ---
 in particular new database descriptors --- are welcome through the

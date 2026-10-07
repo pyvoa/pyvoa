@@ -1,5 +1,5 @@
 {
-  "header": "Bundibugyo ebolavirus outbreak 2026 in the Democratic Republic of the Congo, by health zone, from the INSP situation reports collated by INRB/UMIE. Preliminary data, see https://github.com/INRB-UMIE/BDBV2026-Data",
+  "header": "Bundibugyo ebolavirus outbreak 2026 in the Democratic Republic of the Congo, by health zone, from the INSP situation reports collated by INRB/UMIE. Preliminary data, see https://github.com/INRB-UMIE/BDBV2026-Data . Always read from the provider, never archived: INSP asks to be credited (report number and date) and consulted before any republication.",
   "geoinfo": {
     "granularity": "subregion",
     "iso3": "COD",
@@ -16,7 +16,7 @@
   },
   "datasets": [
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_confirmed_cases.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -45,7 +45,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_confirmed_deaths.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_confirmed_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -74,7 +74,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_suspected_cases.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -103,7 +103,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_suspected_deaths.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_suspected_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -132,7 +132,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__cumulative_contacts_traced.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__cumulative_contacts_traced.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -161,7 +161,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_confirmed_cases.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_confirmed_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -190,7 +190,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_suspected_cases.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_cases.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -219,7 +219,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__new_suspected_deaths.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__new_suspected_deaths.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",
@@ -248,7 +248,7 @@
       ]
     },
     {
-      "urldata": "https://zenodo.org/records/23165598/files/insp_sitrep__hospitalised.csv?content",
+      "urldata": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
       "urlparent": "https://raw.githubusercontent.com/INRB-UMIE/BDBV2026-Data/main/build/long/insp_sitrep__hospitalised.csv",
       "urlmaster": "https://github.com/INRB-UMIE/BDBV2026-Data",
       "separator": ",",

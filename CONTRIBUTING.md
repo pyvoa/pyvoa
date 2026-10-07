@@ -130,7 +130,11 @@ never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
 pyvoa's value lies in exposing heterogeneous sources through a single
 standardised interface. A new data provider should:
 
-1. be **openly licensed and publicly accessible**, with a stable URL;
+1. be **publicly accessible**, with a stable URL, and **openly licensed** — or
+   at least reusable with attribution for non-commercial purposes, as `imed`
+   (CC BY-NC 4.0) is. The licence goes in the README table, whatever it is. A
+   provider who asks to be consulted before any republication can be read live
+   but not mirrored on Zenodo, as `ebolardc` is;
 2. be documented in the pull request: provider, licence, update frequency,
    geographical granularity, known caveats;
 3. expose geographical entities resolvable by the geolocation layer (ISO 3166

@@ -312,6 +312,9 @@ class DataParser:
 
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
+          # a dataset whose urldata is not a Zenodo file has no mirror: it is
+          # read from its provider whatever the mode, and kept up to date
+          live = get_live_mode() or 'zenodo.org' not in url
           if get_live_mode():
               if datasets.get('urlparent'):
                   url = datasets['urlparent']
@@ -396,7 +399,7 @@ class DataParser:
                           cast.update({thewhere[0]:'str'})
                       else:
                           cast={thewhere[0]:'str'}
-              pandas_temp = pd.read_csv(get_local_from_url(url,10000), sep = separator, usecols = usecols,
+              pandas_temp = pd.read_csv(get_local_from_url(url,10000,live=live), sep = separator, usecols = usecols,
               #pandas_temp = pd.read_csv(url, sep = separator, usecols = usecols,
                             keep_default_na = False, na_values = na_values ,
                             header = 0 if names is None else None, names = names,

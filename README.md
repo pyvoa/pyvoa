@@ -92,7 +92,9 @@ Live data are the most recent ones, and the least dependable: an upstream file
 may have moved, changed format or disappeared since the release you are running,
 and results change from one day to the next. A database whose archive does not
 carry a given file — one added after the last deposit — is fetched from its
-provider in either mode.
+provider in either mode. So is a database whose `urldata` is not a Zenodo file
+(`ebolardc`, marked *live only* below): it has no mirror by design, and it is
+re-downloaded when stale just as in live mode.
 
 The introspection functions are the fastest way to explore the API — every one
 of them returns a plain Python list:
@@ -109,49 +111,52 @@ pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 
 ## Supported databases
 
-24 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
+23 databases are shipped with pyvoa; `pf.listwhom()` returns the keys below, and
 `pf.setwhom(key)` selects one. Each is described by a JSON file in
 [`pyvoa/data/`](pyvoa/data/) — adding a source usually means adding one such
 file and no Python at all (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
 The payloads are read from Zenodo mirrors of the upstream files, so a series
 stays reproducible after its original provider stops publishing. *Read from*
-says where each one is available: **both** for the twenty-one databases carrying
+says where each one is available: **both** for the nineteen databases carrying
 a mirror and an upstream file that still resolves — which does not mean the
 provider still updates it — and **archive only** for the three whose provider
 has gone (`phe` lost its API host, `minciencia` and `moh` renamed or withdrew
-files). **both (prefer live)** marks the two that follow an epidemic still under
-way, `ebolardc` and `measles-usa`: their mirror is a snapshot, and the provider
-is ahead of it. A database with no mirror at all would be **live only**, always
-fetched from its provider. Only the archived data are reproducible; see
-[Archived data, live data](#archived-data-live-data).
+files). **both (prefer live)** marks `measles-usa`, which follows an epidemic
+still under way: its mirror is a snapshot, and the provider is ahead of it.
+**live only** marks `ebolardc`, which has no mirror at all and is always fetched
+from its provider, whatever the mode: the Institut National de Santé Publique,
+whose situation reports it transcribes, asks to be consulted before any
+republication. Only the archived data are reproducible; see
+[Archived data, live data](#archived-data-live-data). *Licence* is the licence
+of the data, set by its provider and kept on its Zenodo mirror if any; it is not
+pyvoa's own (MIT), and it binds whoever reuses the data — `imed`'s, for one,
+rules out commercial use.
 
-| Key | Coverage | Granularity | Source | Read from |
-|---|---|---|---|---|
-| `covid19india` | India | region | covid19india.org | both |
-| `covidtracking` | United States | subregion (states) | The COVID Tracking Project | both |
-| `dgs` | Portugal | region | Direção-Geral da Saúde | both |
-| `dpc` | Italy | region | Dipartimento della Protezione Civile | both |
-| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | both (prefer live) |
-| `escovid19data` | Spain | subregion (provinces) | escovid19data | both |
-| `europa` | worldwide | country | European Commission, Joint Research Centre | both |
-| `govcy` | Cyprus | country | Government of Cyprus | both |
-| `imed` | Greece | subregion | iMEDD | both |
-| `jhu` | worldwide | country | Johns Hopkins University CSSE | both |
-| `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE | both |
-| `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare | both |
-| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team | both (prefer live) |
-| `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación | archive only |
-| `moh` | Malaysia | subregion (states) | Ministry of Health | archive only |
-| `mpoxgh` | worldwide | country | Global.health, via Our World in Data | both |
-| `owid` | worldwide | country | Our World in Data | both |
-| `phe` | United Kingdom | subregion | Public Health England / UKHSA | archive only |
-| `risklayer` | Europe | subregion | Risklayer, for WHO Europe | both |
-| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut | both |
-| `sciensano` | Belgium | region | Sciensano | both |
-| `spf` | France | subregion (*départements*) | Santé publique France | both |
-| `spfnational` | France | country | Santé publique France | both |
-| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | both |
-
+| Key | Coverage | Granularity | Source | Licence | Read from |
+|---|---|---|---|---|---|
+| `covid19india` | India | region | covid19india.org | CC BY 4.0 | both |
+| `covidtracking` | United States | subregion (states) | The COVID Tracking Project | CC BY 4.0 | both |
+| `dgs` | Portugal | region | Direção-Geral da Saúde | GPL-3.0 (DSSG compilation; DGS data without a published licence) | both |
+| `dpc` | Italy | region | Dipartimento della Protezione Civile | CC BY 4.0 | both |
+| `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | INSP terms: credit the report, ask before republishing | live only |
+| `escovid19data` | Spain | subregion (provinces) | escovid19data | CC BY 4.0 | both |
+| `europa` | worldwide | country | European Commission, Joint Research Centre | CC BY 4.0 | both |
+| `govcy` | Cyprus | country | Government of Cyprus | CC BY 4.0 | both |
+| `imed` | Greece | subregion | iMEDD | CC BY-NC 4.0 | both |
+| `jhu` | worldwide | country | Johns Hopkins University CSSE | CC BY 4.0 | both |
+| `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE | CC BY 4.0 | both |
+| `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare | CC BY 4.0 (via Public Data License 1.0) | both |
+| `measles-usa` | United States | subregion (states) | Johns Hopkins University Measles Tracking Team | CC BY 4.0 | both (prefer live) |
+| `minciencia` | Chile | subregion | Ministerio de Ciencia, Tecnología, Conocimiento e Innovación | CC0 1.0 | archive only |
+| `moh` | Malaysia | subregion (states) | Ministry of Health | Open Data 1.0 Government of Malaysia | archive only |
+| `mpoxgh` | worldwide | country | Global.health, via Our World in Data | CC BY 4.0 | both |
+| `owid` | worldwide | country | Our World in Data | CC BY 4.0 | both |
+| `phe` | United Kingdom | subregion | Public Health England / UKHSA | OGL v3.0 | archive only |
+| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut | dl-de/by-2-0 | both |
+| `sciensano` | Belgium | region | Sciensano | CC0 1.0 | both |
+| `spf` | France | subregion (*départements*) | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
+| `spfnational` | France | country | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
+| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | Licence Ouverte / Etalab 2.0 | both |
 Most of these are COVID-19 series; `mpoxgh` covers mpox, `ebolardc` the 2026 Bundibugyo ebolavirus
 outbreak in the Democratic Republic of the Congo and `measles-usa` the U.S.
 measles cases. Upstream providers stopped updating several of
@@ -211,4 +216,6 @@ about pyvoa; see the *Funding* section of [AUTHORS](AUTHORS).
 
 ## Licence
 
-[MIT](LICENSE).
+[MIT](LICENSE), for the code. The data each database reads keep the
+licence of their provider, given in the table of
+[supported databases](#supported-databases).

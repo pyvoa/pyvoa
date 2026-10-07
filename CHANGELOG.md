@@ -1,4 +1,39 @@
 # Unreleased
+- archived data are read from Zenodo record 23212632, a version of 23198224
+  without the sentiweb file of the withdrawn `sentinellesIRA` database, whose
+  data are licensed for non-commercial use only and which no shipped code
+  reads. The 50 other files are unchanged (same checksums).
+- ebolardc is read from its provider only, in both modes, and no longer from
+  its Zenodo mirror: the INSP situation reports it transcribes may be reused
+  with credit to the INSP (report number and date), but the INSP asks to be
+  consulted before any republication, which a mirror is. Its `urldata` is now
+  the upstream file. More generally, a dataset whose `urldata` is not a Zenodo
+  file has no mirror, and the parser reads it live — no archive lookup, and
+  re-downloaded when stale — whatever `setlive()` says; `get_local_from_url`
+  takes a `live` argument to that end. The README marks it *live only*.
+- CONTRIBUTING §6 no longer asks a new database for an open licence alone: a
+  licence allowing non-commercial reuse with attribution, as `imed`'s CC BY-NC
+  4.0 does, is accepted, and a provider who reserves republication is read
+  live and not mirrored. The manuscript says "publicly available" databases,
+  most of them openly licensed, rather than "open" ones, and states that
+  licences vary by provider; its conclusion no longer lists acute
+  respiratory infection series, which pyvoa stopped carrying with
+  sentinellesIRA.
+- the README gives `dgs` as GPL-3.0 for the DSSG compilation, the DGS data
+  behind it being published with no licence.
+- risklayer is removed: the sub-national European data Risklayer compiled for
+  WHO/Europe are published with no licence — neither the source spreadsheet
+  nor any page it links to states one, and the WHO's terms leave data credited
+  to a third party to that third party. pyvoa now ships 23 databases; the
+  README and the manuscript count them so. The EUR geography it was resolved
+  against stays in `GeoCountry`, unused by any shipped database.
+- the README's database table gains a *Licence* column: the licence of the
+  data, set by each provider, distinct from pyvoa's own (MIT).
+- phe reads its Zenodo mirror from record 18772757, the current version of
+  the series and the one in the pyvoa community, instead of 10222748, an
+  older version outside it. The five files phe reads are identical in both
+  (same checksums), and so is the parsed table; the newer version only adds
+  a file pyvoa does not read.
 - matplotlib maps are drawn on an equal-area projection, Eckert IV, so that
   a surface reads as what it is; the new `projection` keyword ('eckert4' by
   default, 'mercator') brings Web Mercator back. A national map is centred on
@@ -18,7 +53,7 @@
   looked for in the Zenodo archive. Its url is now the `JPN` entry of
   `GeoCountry._country_info_dict`, read like every other country's; the url
   that entry used to declare was never read. The file is archived in the
-  Zenodo record `get_local_from_url` reads from, now 23198224 — a version of
+  Zenodo record `get_local_from_url` reads from, then 23198224 — a version of
   18784098 holding its 50 files and this one — and is served from there in
   archive mode. Prefectures: 地球地図日本 (Global Map Japan), GSI, under the
   Public Data License 1.0; GeoJSON conversion by dataofjapan/land.

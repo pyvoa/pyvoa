@@ -464,7 +464,7 @@ def exists_from_url(path):
     r = requests.head(path)
     return r.status_code == requests.codes.ok
 
-def get_local_from_url(url,expiration_time=0,suffix=''):
+def get_local_from_url(url,expiration_time=0,suffix='',live=None):
     """"Download data from the given url and store it into a local file.
 
     If the expiration time is 0 (default), the data will never be downloaded anymore if available.
@@ -473,11 +473,17 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
     time of the file, the file is downloaded.
 
     One may add a suffix to the local filename if known.
+
+    live overrides the global live mode for this one download: True for a
+    file pyvoa has no archived copy of, which is always fetched from its
+    provider. None, the default, follows get_live_mode().
     """
+    if live is None:
+        live = _live_mode
     # Archived files never change, so they are downloaded once and for all.
     # In live mode the caller's expiration time is honoured, so that upstream
     # updates are eventually seen.
-    if not _live_mode:
+    if not live:
         expiration_time=0
 
     if not os.path.exists(tmpdir):
@@ -515,8 +521,8 @@ def get_local_from_url(url,expiration_time=0,suffix=''):
         #headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
         headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
         urlfile = None
-        if not _live_mode and 'zenodo.org' not in url:
-            archived='https://zenodo.org/api/records/23198224/files/'+local_base_filename+'/content'
+        if not live and 'zenodo.org' not in url:
+            archived='https://zenodo.org/api/records/23212632/files/'+local_base_filename+'/content'
             verb('Instead of using original URL '+url)
             verb('using zenodo archived file '+archived)
             urlfile = requests.get(archived, allow_redirects=True,headers=headers)
