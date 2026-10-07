@@ -656,17 +656,19 @@ class GPDBuilder:
        when_beg = pd.Timestamp(when_beg)
        when_end = pd.Timestamp(when_end)
 
-       kwargs['input'] = input.loc[
-            (input['date'] >= when_beg) &
-            (input['date'] <= when_end)
-       ]
        when_beg_data, when_end_data = when_beg, when_end
 
        kwargs['when']=[when_beg_data.strftime("%d/%m/%Y")+':'+when_end_data.strftime("%d/%m/%Y")]
 
        bypopvalue = None
        #datesunique = list(input.date.unique())
-       kwargs['input'] = input.loc[(input.date>=when_beg)&(input.date<=when_end)]
+       # A single date is selected at the very end, once 'daily' and 'weekly'
+       # have been computed: cut here, the day would have no day before it to
+       # be differenced against, and every daily value would come out NaN.
+       if when_beg != when_end:
+           kwargs['input'] = input.loc[(input.date>=when_beg)&(input.date<=when_end)]
+       else:
+           kwargs['input'] = input
 
        if kwargs['kwargsuser']['input'].empty:
           input = self.whereclustered(**kwargs)

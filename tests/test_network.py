@@ -234,3 +234,48 @@ def test_setwhom_without_reload_reads_the_pickles_and_does_not_parse(monkeypatch
     pd.testing.assert_frame_equal(
         fresh.reset_index(drop=True), reread.reset_index(drop=True))
     assert (pf.listwhere(), pf.listwhere(False), pf.listwhich()) == lists
+
+
+# --------------------------------------------------------------------------
+# front.get: what= and option= on a real database
+# --------------------------------------------------------------------------
+
+def _by_where(frame, column):
+    return dict(zip(frame["where"], frame[column]))
+
+
+def test_get_daily_on_a_single_date_matches_the_same_day_of_a_range():
+    """A single 'when' is cut once 'daily' is computed, not before.
+
+    Cut first, the day had no day before it, and every daily value came
+    out NaN (October 2026).
+    """
+    import pyvoa.front as pf
+
+    pf.setwhom("spf")
+    single = pf.get(which="cur_hosp", what="daily", when="31/12/2021",
+                    output="pandas")
+    span = pf.get(which="cur_hosp", what="daily",
+                  when="25/12/2021:31/12/2021", output="pandas")
+    last = span[span["date"] == pd.Timestamp("2021-12-31")]
+    assert single["cur_hosp daily"].notna().all()
+    assert _by_where(single, "cur_hosp daily") == _by_where(last, "cur_hosp daily")
+
+
+def test_get_normalize_hands_out_the_normalised_values():
+    """'normalize:pop1M' divides by the population, it does not just rename.
+
+    The raw count was handed out under the normalised name (September 2026).
+    """
+    import pyvoa.front as pf
+
+    pf.setwhom("spf")
+    raw = pf.get(which="cur_hosp", when="31/12/2021", output="pandas")
+    normed = pf.get(which="cur_hosp", when="31/12/2021",
+                    option="normalize:pop1M", output="pandas")
+    population = (geo.GeoCountry("FRA").get_data()
+                  .set_index("name_subregion")["population_subregion"])
+    count = _by_where(raw, "cur_hosp")
+    rate = _by_where(normed, "cur_hosp normalize:pop1M")
+    # Paris is a department whose name pyvoa keeps unchanged
+    assert rate["Paris"] == pytest.approx(count["Paris"] / population["Paris"] * 1e6)

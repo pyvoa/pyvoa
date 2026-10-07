@@ -566,9 +566,18 @@ class front:
             ext = ' '.join(kwargs['option']).strip()
             d = {i: f"{i} {ext}".strip() for i in kwargs['which']}
             which = list(d.values())
-            cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in d]
+            # 'normalize:...' is the one option the builder writes to a column
+            # of its own, '<which> normalize:...'; the others change '<which>'
+            # in place. The column handed out is that normalised one when it
+            # exists, never the raw count under the normalised name.
+            normalize = next((o for o in kwargs['option'] if o.startswith('normalize:')), None)
+            source = {}
+            for i, target in d.items():
+                normed = f"{i} {normalize}" if normalize else None
+                source[normed if normed in kwargs['input'].columns else i] = target
+            cols_to_drop = [v for v in d.values() if v in kwargs['input'].columns and v not in source]
             kwargs['input'] = kwargs['input'].drop(columns=cols_to_drop)
-            kwargs['input'] = kwargs['input'].rename(columns=d)
+            kwargs['input'] = kwargs['input'].rename(columns=source)
 
             if 'from_db' not in columns:
                 kwargs['input']['from_db']=True

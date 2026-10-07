@@ -1,4 +1,14 @@
 # Unreleased
+- fix: `get()` and every chart handed out the raw count under the name of
+  the normalised one: with `option='normalize:pop1M'`, `cur_hosp
+  normalize:pop1M` carried `cur_hosp` itself. The builder computed the rate
+  right, and `front` dropped it before renaming the raw column onto its name
+  (since `ccede93`, September 2026). Fig. 4 of the manuscript was drawn so.
+- fix: `what='daily'` or `'weekly'` on a single `when` date gave NaN for
+  every location: the date was cut before the difference was taken, leaving
+  it no day before (since `7828bb4`, September 2026). A single date is again
+  cut once the differences are computed, and gives the value the same day
+  has inside a range. Two network tests on `spf` guard both fixes.
 - the 'positron' and 'stamen' tiles are withdrawn from both backends:
   CartoDB's positron now displays a request for an API key over the map, and
   Stamen's tiles, moved to Stadia Maps, no longer load under matplotlib.
