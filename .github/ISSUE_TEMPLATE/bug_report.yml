@@ -12,11 +12,15 @@ body:
 
         pyvoa reads from about two dozen third-party providers, and those
         providers change their files without notice. Before filling this in,
-        two checks take a minute and often identify the cause — see
+        three checks take a minute and often identify the cause — see
         [SUPPORT.md](https://github.com/pyvoa/pyvoa/blob/main/SUPPORT.md):
 
         1. does another database work (`setwhom('owid')` vs `setwhom('jhu')`)?
         2. does the problem survive clearing `~/.cache/pyvoa.data_<username>/`?
+        3. does it survive a switch between the archived and the live data?
+           `pf.getlive()` says which you are reading; `pf.setlive(True)` reads
+           the providers' current files, `pf.setlive(False)` the frozen Zenodo
+           archive (the default). Call `setwhom()` again after switching.
 
   - type: textarea
     id: summary
@@ -35,12 +39,29 @@ body:
         `python -c "import pyvoa, sys, platform; print(pyvoa.__version__,
         sys.version, platform.platform())"` and paste the output.
       placeholder: |
-        pyvoa 0.5.0
-        Python 3.12.3
-        Linux-6.8.0-generic-x86_64
+        pyvoa X.Y.Z
+        Python X.Y.Z
+        Linux-X.Y.Z-generic-x86_64
       render: text
     validations:
       required: true
+
+  - type: dropdown
+    id: data-source
+    attributes:
+      label: Archived or live data
+      description: >-
+        Which data the problem shows with: `pf.getlive()` returns False for the
+        frozen Zenodo archive (the default) and True for the providers' live
+        files (`pf.setlive(True)`). If you tried both, say whether the problem
+        shows with both.
+      options:
+        - archive (pf.getlive() is False, the default)
+        - live (pf.setlive(True))
+        - both
+        - not checked
+    validations:
+      required: false
 
   - type: textarea
     id: reproducer
@@ -87,7 +108,7 @@ body:
       description: >-
         Upstream data changes from day to day, so a report that is
         reproducible today may not be next week. Format YYYY-MM-DD.
-      placeholder: "2026-08-06"
+      placeholder: "YYYY-MM-DD"
     validations:
       required: true
 

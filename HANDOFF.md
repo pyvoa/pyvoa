@@ -28,9 +28,8 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 | 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
 | 3 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
-| 5 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
-| 6 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 7 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 5 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 6 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -117,16 +116,7 @@ Map Japan), GSI, PDL 1.0; GeoJSON conversion by dataofjapan/land". What
 dataofjapan added (English names, ids) carries no licence: ask its authors for
 one, or rebuild the GeoJSON from Global Map Japan v2.2 downloaded from the GSI.
 
-## 5. The issue forms
-
-The four files under `.github/ISSUE_TEMPLATE/` parse as YAML and every label
-they request exists, but GitHub applies a stricter schema only visible on the
-site: open `https://github.com/pyvoa/pyvoa/issues/new/choose` while signed in
-and confirm the forms appear. `bug_report.yml` hardcodes `pyvoa 0.5.0` as its
-version placeholder, and the release checklist in `CONTRIBUTING.md` §9 does not
-mention it: add it there, or it drifts at every release.
-
-## 6. The Ebola mirror
+## 5. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -146,7 +136,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 7. Authors of the Zenodo community records
+## 6. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,
@@ -272,6 +262,11 @@ name the three authors.
   funder DOI form `10.13039/501100001665::...` would be mapped to the same ROR
   id. No manual step: the next release carries it. The free-text `notes`
   stay, for the Institut Covid-19 Ad Memoriam, which has no award id.
+- **The issue forms are checked on GitHub, and the bug form's example answers
+  are timeless** (2026-10-08): `pyvoa X.Y.Z`, `Python X.Y.Z` and
+  `YYYY-MM-DD`, so that no release has to update them. The bug form also asks
+  whether the problem shows with the archived or the live data
+  (`pf.getlive()`, `pf.setlive()`), as SUPPORT.md's third check does.
 - **`tile='openstreet'` is the default** of both backends; matplotlib sends a
   pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web

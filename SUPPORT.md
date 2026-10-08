@@ -25,7 +25,7 @@ reported.
 pyvoa reads data from about two dozen third-party providers. Those providers
 change their file formats, column names and URLs without notice, and they
 sometimes go offline. **A large share of the problems reported against pyvoa are
-data-side, not code-side.** Two checks take a minute and save everyone time:
+data-side, not code-side.** Three checks take a minute and save everyone time:
 
 1. **Try another database.** If `setwhom('owid')` works and `setwhom('jhu')`
    does not, the problem is likely upstream of pyvoa.
@@ -33,8 +33,13 @@ data-side, not code-side.** Two checks take a minute and save everyone time:
    `~/.cache/pyvoa.data_<username>/`; a truncated or stale file can produce
    confusing errors. Delete the relevant file, or the whole directory, and run
    again.
+3. **Switch between the archived and the live data.** pyvoa reads a frozen
+   Zenodo archive by default; `pf.setlive(True)` reads the providers' current
+   files instead, `pf.setlive(False)` goes back, and `pf.getlive()` says which
+   is in use. Call `setwhom()` again after switching. A problem with the live
+   data only is most likely a change upstream.
 
-If the problem survives both, it is worth an issue.
+If the problem survives all three, it is worth an issue.
 
 ## What to include
 

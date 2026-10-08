@@ -1,4 +1,8 @@
 # Unreleased
+- the bug report form asks whether the problem shows with the archived or the
+  live data, with the commands to switch (`pf.getlive()`, `pf.setlive()`), as
+  SUPPORT.md now does in a third check; its example answers are timeless
+  (`pyvoa X.Y.Z`, `YYYY-MM-DD`) rather than dated.
 - `.zenodo.json` gives the IdEx Université Paris Cité award as a structured
   `grants` entry, `00rbzpz17::ANR-18-IDEX-0001` (the ROR id of the ANR, then
   the award number), so that the next deposit is linked to its funder. The
