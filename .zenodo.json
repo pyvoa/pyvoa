@@ -5,6 +5,11 @@
     "license": "mit",
     "language": "eng",
     "notes": "This work was supported by the IdEx « Université Paris Cité 2022 » (ANR-18-IDEX-0001) and by the « Institut Covid-19 Ad Memoriam » of Université Paris Cité (https://institut-ad-memoriam.u-pariscite.fr/).",
+    "grants": [
+        {
+            "id": "00rbzpz17::ANR-18-IDEX-0001"
+        }
+    ],
     "creators": [
         {
             "name": "Beau, Tristan",

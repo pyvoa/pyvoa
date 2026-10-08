@@ -1,4 +1,8 @@
 # Unreleased
+- `.zenodo.json` gives the IdEx Université Paris Cité award as a structured
+  `grants` entry, `00rbzpz17::ANR-18-IDEX-0001` (the ROR id of the ANR, then
+  the award number), so that the next deposit is linked to its funder. The
+  free-text `notes` stay, for the Institut Covid-19 Ad Memoriam.
 - jhu drops its Kosovo row, which used to be added into Serbia (Serbia's
   confirmed cases on 2021-12-31: 1 299 339, not 1 460 823). Kosovo is now left
   out of every database, as owid and europa already did, its independence not

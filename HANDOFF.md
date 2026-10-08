@@ -28,10 +28,9 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 | 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
 | 3 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
-| 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
-| 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
-| 7 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 8 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 5 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
+| 6 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 7 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -118,29 +117,7 @@ Map Japan), GSI, PDL 1.0; GeoJSON conversion by dataofjapan/land". What
 dataofjapan added (English names, ids) carries no licence: ask its authors for
 one, or rebuild the GeoJSON from Global Map Japan v2.2 downloaded from the GSI.
 
-## 5. The Zenodo 0.5.0 record, and the IdEx grant
-
-Four differences survive between record `21829902` and `CITATION.cff`:
-
-| Field | Zenodo record `21829902` | `CITATION.cff` |
-|---|---|---|
-| affiliations | `Université Paris Cité` (Beau, Browaeys), `Centre National de la Recherche Scientifique` (Dadoun) | `Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France` and the MSC equivalent |
-| keywords | 6 | 8: adds `epidemiological data` and `COVID-19`, `geospatial data` for `geolocation` |
-| `continues` | `https://pyvoa.org` | the pycoa repository |
-| files | `pyvoa-0.5.0.tar.gz` only | wheel + sdist on the GitHub release |
-
-`.zenodo.json` is already right, so the next release is correct by
-construction. Decide: edit the 0.5.0 record by hand (metadata edits mint no new
-DOI; adding the wheel does), or let 0.5.1 be the first consistent deposit.
-
-The IdEx award is in `.zenodo.json` as free-text `notes` only. A structured
-`grants` entry would link the deposit to the funder, but the documented id
-format (`10.13039/501100001665::ANR-18-IDEX-0001`) returns 404 — the legacy
-grants API is gone — while the ROR-based `00rbzpz17::ANR-18-IDEX-0001` resolves
-(checked 2026-08-12). A rejected `grants` value fails the release: attach the
-award in the Zenodo UI after depositing, or test on sandbox.zenodo.org first.
-
-## 6. The issue forms
+## 5. The issue forms
 
 The four files under `.github/ISSUE_TEMPLATE/` parse as YAML and every label
 they request exists, but GitHub applies a stricter schema only visible on the
@@ -149,7 +126,7 @@ and confirm the forms appear. `bug_report.yml` hardcodes `pyvoa 0.5.0` as its
 version placeholder, and the release checklist in `CONTRIBUTING.md` §9 does not
 mention it: add it there, or it drifts at every release.
 
-## 7. The Ebola mirror
+## 6. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -169,7 +146,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 8. Authors of the Zenodo community records
+## 7. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,
@@ -212,7 +189,8 @@ creators, with ORCID and affiliation as in `AUTHORS` — or at least complete
 Beau's. `geo` is derived by us: Beau as creator is right, add the affiliation.
 
 **The software record 21829902** has the right authors and ORCIDs but
-shortened affiliations; see §5.
+shortened affiliations; it stays as it is (see the decisions), the next release
+being the first consistent deposit.
 
 **Lesser points.** Titles mix the database key (`dgs`, `sumeau`) and free
 descriptions ("Covid 19 data for Chile", "Covid Tracking USA"); a common form
@@ -277,6 +255,23 @@ name the three authors.
   location's value rather than a mean (0.14 for France 0.33 and Germany 0.14).
   A fix needs to know which columns are rates: the `"intensive"` column key of
   item 3 would serve both.
+- **The Zenodo 0.5.0 record (`21829902`) stays as it is** (2026-10-08), though
+  it differs from `CITATION.cff` and `.zenodo.json`: shorter affiliations
+  (`Université Paris Cité` for Beau and Browaeys, `Centre National de la
+  Recherche Scientifique` for Dadoun), 6 keywords instead of 8, `continues` and
+  `isDocumentedBy` pointing at `https://pyvoa.org` instead of the pycoa
+  repository and the Pages site, and the sdist alone without the wheel.
+  `.zenodo.json` is right, so the next release is the first consistent deposit.
+- **The IdEx award is a structured `grants` entry of `.zenodo.json`**,
+  `00rbzpz17::ANR-18-IDEX-0001` (2026-10-08): the ROR id of the ANR, then the
+  award number. Zenodo's awards vocabulary holds it (`/api/awards/` answers
+  "Université de Paris", funder Agence Nationale de la Recherche), and the
+  GitHub release reads `.zenodo.json` through Zenodo's legacy schema, whose
+  `load_funding` takes `funder::award` and keeps a ROR id as it is
+  (`zenodo-rdm`, `site/zenodo_rdm/legacy/deserializers/metadata.py`). The
+  funder DOI form `10.13039/501100001665::...` would be mapped to the same ROR
+  id. No manual step: the next release carries it. The free-text `notes`
+  stay, for the Institut Covid-19 Ad Memoriam, which has no award id.
 - **`tile='openstreet'` is the default** of both backends; matplotlib sends a
   pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web
