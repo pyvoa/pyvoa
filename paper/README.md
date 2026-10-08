@@ -49,8 +49,11 @@ the text that describes `v0.5.0` are one commit away from each other.
 `texlive-publishers`; on a distribution that does not package it, the CTAN
 source builds the class with `tex elsarticle.ins` and drops into
 `~/texmf/tex/latex/elsarticle/`). `latexmk` is used when it is installed
-(`texlive-extra-utils`) and three `pdflatex` passes otherwise — the
-bibliography is a manual `thebibliography`, so there is no bibtex step.
+(`texlive-extra-utils`), and otherwise `pdflatex`, `bibtex` and `pdflatex`
+twice. The references are in `references.bib`, typeset by `elsarticle-num.bst`
+(shipped with the class, and named by the SoftwareX template), which numbers
+them in order of first citation as the guide for authors requires. Submit
+`references.bib` with `main.tex`.
 
 The annotations are switched by a single toggle at the top of `main.tex`; the
 Makefile sets it, nothing else differs between the two builds.

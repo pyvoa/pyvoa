@@ -207,8 +207,9 @@ the *Cite this repository* button. Authorship is documented in
 
 ## Funding
 
-This work was supported by the IdEx « Université Paris Cité 2022 »
-(ANR-18-IDEX-0001) and by the
+This work was supported by the IdEx « Université Paris Cité 2022 », funded by
+the French State under the « Investissements d'avenir » programme [grant number
+ANR-18-IDEX-0001]; and by the
 [« Institut Covid-19 Ad Memoriam »](https://institut-ad-memoriam.u-pariscite.fr/)
 of Université Paris Cité.
 

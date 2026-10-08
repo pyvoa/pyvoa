@@ -24,10 +24,11 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 1 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
+| 1 | Manuscript: §4 adoption evidence, the 0.5.0 paragraph, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
 | 4 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 5 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
 
 ---
 
@@ -36,10 +37,6 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 
 - **§4 adoption evidence** — third-party uses of pyvoa, still to document.
-- **BibTeX** — the bibliography is a hand-written `thebibliography`; move it to
-  BibTeX (`elsarticle-num`).
-- **The Zenodo-community placeholder** — l. 428 reads
-  `(****http://zenodo.org/communities/pyvoa****)`.
 - **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
   catalogue: "12 to 23 databases" holds for 0.5.0 by coincidence only — it
   shipped 23 too, but not the same ones (with sentinellesIRA and risklayer,
@@ -52,12 +49,6 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   531 x 1328 px (h x w) or proportionally larger, readable at 5 x 13 cm.
   `paper/figures/architecture.png` (portrait, 1500 x 1934) is the closest thing,
   and would need recomposing.
-- **The funding wording** follows the journal's literal form, `Funding: This
-  work was supported by ... [grant numbers xxxx]`, where `AUTHORS` asks for its
-  own sentence verbatim, with `(ANR-18-IDEX-0001)` in parentheses, as a
-  condition of the grant. Every element the funder mandates is present, and
-  `test_funding_acknowledgement_is_present` checks them. Confirm the funder
-  accepts the journal's form, or revert to parentheses and tell the journal why.
 
 ## 2. Merging locations: a merge sums the raw dates as they are
 
@@ -159,6 +150,49 @@ mostly the deposit date, but some give the data period (18772757
 11198165 is credited to "PyCoa", a PyCoA-era record: keep it as history, or
 name the three authors.
 
+
+## 5. Moving `contextily` to `pyvoa-full`
+
+`contextily` is a hard dependency, imported once, inside the matplotlib map
+(`visu_matplotlib.py`), for the basemap tiles; it is only needed once a chart
+is asked for. Moving it to `pyvoa-full` would make `pip install pyvoa` truly
+free of plotting libraries — what §2.2 of the manuscript claims — but
+matplotlib reaches a plain `pip install pyvoa` through contextily alone
+(geopandas and pandas ask for it as an extra only), so it would go too.
+Considered on 2026-10-08, left for a later decision. What it takes:
+
+1. **`import pyvoa.front` would fail.** `front.py` (l. 36) and `visualizer.py`
+   (l. 20) import `matplotlib.pyplot` at module level, unconditionally. Make
+   those imports lazy; `MATPLOTLIB_AVAILABLE` in `visualizer.py`, which can
+   never be False today, would then mean something.
+2. **matplotlib serves outside the charts.** The `tab20` colour map is read
+   when `AllVisu` is built — which `get()` does on a user's own frame — and in
+   the decorator of `front.py` that gives each location a colour. Hard-code the
+   twenty colours, or defer the lookup.
+3. **`pyvoa-full` must ship with it.** It lives in its own repository
+   (`pyvoa/pyvoa_full`); 0.1.3 requires `pyvoa>=0.5.0`, `matplotlib>=3.8.4` and
+   `bokeh>=3.1`, not contextily. Release a `pyvoa-full` adding `contextily>=1.3`
+   and requiring the new pyvoa together with it: a 0.1.3 next to the new pyvoa
+   would draw no tiles, and `tile='openstreet'` is the default. Raise a
+   `PyvoaError` naming contextily when matplotlib is there without it.
+4. **CI.** The `test` job installs `.[dev]`, and `tests/test_visualizer.py`
+   imports `AllVisu`: add matplotlib and contextily to `dev` (or a `plot`
+   extra). Keep a tested floor for contextily in the `minimum` job.
+5. **Docs.** The build imports the real modules: add `matplotlib` and
+   `contextily` to `autodoc_mock_imports` in `docs/conf.py`, or the `-W` build
+   fails.
+6. **Binder.** `requirements.txt` installs `.` only, and the notebooks draw:
+   add matplotlib, bokeh and contextily there.
+7. **Manuscript.** Row C6 lists contextily among the required dependencies,
+   and `test_paper.py` checks C6 against `pyproject.toml`: update both. The
+   §2.2 sentence on a lightweight core then becomes true as written.
+8. **`pyvoa.geo` alone.** `GeoCountry('FRA').get_data().plot()`, shown in the
+   paper notebook as drawn "by geopandas alone", needs matplotlib, which a
+   plain `pip install pyvoa` would no longer bring.
+
+Points 1, 2 and 4 to 7 are in this repository; 3 is in `pyvoa_full`, at
+release time.
+
 ---
 
 ## Notes for whoever edits the manuscript
@@ -242,6 +276,22 @@ name the three authors.
   acknowledgements, just before the references: Claude for consistency checks
   and editing, ChatGPT for the English phrasing. Recheck Elsevier's page at
   submission; its wording has changed three times.
+- **pyvoa dates from 2023** (2026-10-08): the project took the name in 2023
+  and was developed in a branch of the pycoa repository until March 2025, when
+  it moved to a repository of its own and the code took the name. The
+  manuscript (§2.3), `AUTHORS`, `CITATION.cff` and the CHANGELOG say so alike;
+  the "some 1900 commits" of PyCoA stay, unverifiable by a third party since
+  the pycoa repository is private.
+- **One funding sentence everywhere** (2026-10-08) — the manuscript, `AUTHORS`,
+  the README and `.zenodo.json`: "This work was supported by the IdEx
+  « Université Paris Cité 2022 », funded by the French State under the
+  « Investissements d'avenir » programme [grant number ANR-18-IDEX-0001]; and by
+  the « Institut Covid-19 Ad Memoriam » of Université Paris Cité." It is the
+  journal's form (`Funding: ... [grant number ...]`) and carries every mention
+  the funder requires, the « Investissements d'avenir » one included, which was
+  missing before. The manuscript adds that the funders had no role in the
+  design, the writing or the decision to submit, as the guide asks.
+  `test_funding_acknowledgement_is_present` checks the fragments.
 - **The issue forms are checked on GitHub, and the bug form's example answers
   are timeless** (2026-10-08): `pyvoa X.Y.Z`, `Python X.Y.Z` and
   `YYYY-MM-DD`, so that no release has to update them. The bug form also asks

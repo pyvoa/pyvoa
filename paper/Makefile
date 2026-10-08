@@ -12,6 +12,7 @@
 
 LATEXMK ?= latexmk
 PDFLATEX ?= pdflatex
+BIBTEX  ?= bibtex
 PYTHON  ?= python3
 MAIN     = main.tex
 
@@ -22,9 +23,9 @@ FIGURES  = figures/fig2_timeseries_weu.pdf figures/fig3_map_g20.pdf \
            figures/fig4_hist_spf.pdf figures/fig5_ebola_drc.pdf
 
 # latexmk is not in every TeX installation (Debian/Ubuntu ship it in
-# texlive-extra-utils, separately from the class itself). Fall back to three
-# pdflatex passes, which is what latexmk would run here: the bibliography is a
-# manual thebibliography, so there is no bibtex step to get right.
+# texlive-extra-utils, separately from the class itself). Fall back to what
+# latexmk would run here: pdflatex, bibtex on references.bib (typeset by
+# elsarticle-num.bst, which ships with the class), then pdflatex twice.
 HAVE_LATEXMK := $(shell command -v $(LATEXMK) 2>/dev/null)
 
 .PHONY: all draft final check figures clean clean-figures distclean
@@ -36,6 +37,7 @@ ifdef HAVE_LATEXMK
 	$(LATEXMK) -pdf -interaction=nonstopmode -halt-on-error $(MAIN)
 else
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error $(MAIN)
+	$(BIBTEX) $(basename $(MAIN))
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error $(MAIN)
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error $(MAIN)
 endif
@@ -51,6 +53,7 @@ ifdef HAVE_LATEXMK
 	  -pretex='\def\paperfinal{1}' -usepretex $(MAIN)
 else
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error "\def\paperfinal{1}\input{$(MAIN)}"
+	$(BIBTEX) $(basename $(MAIN))
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error "\def\paperfinal{1}\input{$(MAIN)}"
 	$(PDFLATEX) -interaction=nonstopmode -halt-on-error "\def\paperfinal{1}\input{$(MAIN)}"
 endif
@@ -70,7 +73,7 @@ clean:
 ifdef HAVE_LATEXMK
 	$(LATEXMK) -c $(MAIN)
 else
-	@rm -f main.aux main.log main.out main.fdb_latexmk main.fls main.spl
+	@rm -f main.aux main.log main.out main.fdb_latexmk main.fls main.spl main.bbl main.blg
 endif
 	@rm -f main.bbl main.run.xml
 

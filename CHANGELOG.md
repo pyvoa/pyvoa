@@ -1,4 +1,20 @@
 # Unreleased
+- the manuscript's references move from a hand-written `thebibliography` to
+  `paper/references.bib`, typeset by `elsarticle-num` as the SoftwareX
+  template proposes; the Makefile runs bibtex, and tests/test_paper.py reads
+  the .bib. The manuscript's stale editorial notes (the compliance note of
+  13 August, the template's section list, the REST API) are gone.
+- the manuscript cites the pyvoa community on Zenodo where it held a
+  placeholder, no longer presents seaborn as a backend (`listvis()` leaves it
+  out), and numbers its references in order of first citation, as the guide
+  for authors requires; a test in tests/test_paper.py keeps that order.
+- one funding sentence in the manuscript, AUTHORS, the README and
+  `.zenodo.json`, which now mentions the « Investissements d'avenir » programme
+  the funder requires; the manuscript adds that the funders had no role in the
+  work, as the guide for authors asks.
+- pyvoa is dated from 2023, when the project took the name and was developed
+  in a branch of the pycoa repository, until it moved to its own in March
+  2025: AUTHORS, CITATION.cff, this changelog and the manuscript agree.
 - the bug report form asks whether the problem shows with the archived or the
   live data, with the commands to switch (`pf.getlive()`, `pf.setlive()`), as
   SUPPORT.md now does in a third check; its example answers are timeless
@@ -569,7 +585,7 @@ First import, skeleton only: the project structure and a first upload to PyPI.
 
 ---
 
-# Before pyvoa — CoCoA and pycoa, 2020 to 2025
+# Before pyvoa — CoCoA and pycoa, 2020 to 2023
 
 pyvoa is the third name of one continuous project, and version 0.3.0 above is
 the import of the code base it had already accumulated. The lineage:
@@ -577,8 +593,8 @@ the import of the code base it had already accumulated. The lineage:
 | | name | dates | repository |
 |---|---|---|---|
 | 1 | **CoCoA** — Covid Collaborative Analysis | 2020-04-29 to 2020-11-26 | <https://github.com/tjbtjbtjb/CoCoA> (public, archived) |
-| 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2025-03-24 | <https://github.com/coa-project/pycoa> (private) |
-| 3 | **pyvoa** — Python Virus Open Analysis | since 2025-03 | <https://github.com/pyvoa/pyvoa> |
+| 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2023 | <https://github.com/coa-project/pycoa> (private), until 2025-03-24 |
+| 3 | **pyvoa** — Python Virus Open Analysis | since 2023 | a branch of the pycoa repository, then <https://github.com/pyvoa/pyvoa> from 2025-03 |
 
 ## CoCoA, april to november 2020
 
@@ -600,7 +616,7 @@ called itself `pre1.0`.
 - in november 2020 the project was renamed and moved; the CoCoA README has
   pointed at the new home ever since.
 
-## PyCoA, november 2020 to march 2025
+## PyCoA, november 2020 to 2023, and pyvoa in its repository until march 2025
 
 The repository is private, so the history below is summarised from pycoa's own
 `Release_notes.md` and from its log — the authoritative record, and not public.
@@ -635,16 +651,16 @@ The repository is private, so the history below is summarised from pycoa's own
   class, so that one file describes a database; `setwhom(reload=True)` reading
   a pickled cache; OWID replacing JHU as the default database.
 
-After v2.22 the work went on untagged for 311 more commits, and that stretch is
-what became pyvoa:
+After v2.22 the work went on untagged for 311 more commits. In 2023 the project
+was renamed pyvoa, and developed in a branch of the pycoa repository:
 
 - matplotlib and seaborn backends joined bokeh in may 2024, and the front end
   was pulled apart from the visualization classes — batch output separated from
   graphical output, `bypop` moved out of `allvisu`, `front.py` rewritten.
 - an Olympics medal dataset was carried for a while as an experiment. pyvoa
   dropped it in 0.4.0, on the grounds that it is not a virus database.
-- in february and march 2025 the rename happened: `src` became `pyvoa`, the
-  JSON descriptions became `pyvoa-data`, `Coa` became `Pyvoa` throughout, and
-  the covid-specific vocabulary was taken out of the code — the point at which
-  the project stopped being about one virus. The last pycoa commit is dated
-  2025-03-24, and pyvoa 0.3.0 was tagged two days later.
+- in february and march 2025 pyvoa left the pycoa repository for a repository
+  of its own, and the code took the name: `src` became `pyvoa`, the JSON
+  descriptions became `pyvoa-data`, `Coa` became `Pyvoa` throughout, and the
+  covid-specific vocabulary was taken out of the code. The last pycoa commit is
+  dated 2025-03-24, and pyvoa 0.3.0 was tagged two days later.

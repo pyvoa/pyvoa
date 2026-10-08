@@ -40,9 +40,10 @@ same authors:
   CoCoA  Covid Collaborative Analysis, 2020
          started during the Covid Hackathon of April 2020
          https://github.com/tjbtjbtjb/CoCoA (public, archived)
-  PyCoA  Python COVID Analysis, 2020–2025
+  PyCoA  Python COVID Analysis, 2020–2023
          https://github.com/coa-project/pycoa (no longer public)
-  pyvoa  Python Virus Open Analysis, since 2025
+  pyvoa  Python Virus Open Analysis, since 2023
+         developed in a branch of the PyCoA repository until March 2025
          https://github.com/pyvoa/pyvoa
 
 Earlier contributions are recorded in the git histories of those repositories.
@@ -57,9 +58,12 @@ MSC — Matière et Systèmes Complexes (Université Paris Cité, CNRS), UMR 705
 
 ## Funding — required acknowledgement
 
-This work was supported by the IdEx « Université Paris Cité 2022 »
-(ANR-18-IDEX-0001) and by the « Institut Covid-19 Ad Memoriam » of Université
-Paris Cité (https://institut-ad-memoriam.u-pariscite.fr/).
+This work was supported by the IdEx « Université Paris Cité 2022 », funded by
+the French State under the « Investissements d'avenir » programme [grant number
+ANR-18-IDEX-0001]; and by the « Institut Covid-19 Ad Memoriam » of Université
+Paris Cité.
+
+Institut Covid-19 Ad Memoriam: https://institut-ad-memoriam.u-pariscite.fr/
 
 Both must be acknowledged in any publication, presentation, poster or derived
 material about pyvoa. This is a condition of the funding, not a courtesy: keep

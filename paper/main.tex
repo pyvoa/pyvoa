@@ -106,48 +106,6 @@
 \begin{document}
 \renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
 
-\attnpar{\textbf{État de conformité au 13 août 2026 --- à supprimer avant soumission.}
-\emph{Dépôt.} Le commit \texttt{a6d6e43} « docs: target SoftwareX instead of JOSS » a
-levé l'ambiguïté de cible : \texttt{HANDOFF.md} déclare désormais SoftwareX (ISSN
-2352-7110, type \emph{Original Software Publication}), \texttt{CITATION.cff} porte un
-bloc \texttt{preferred-citation} SoftwareX prêt à décommenter, \texttt{AUTHORS} parle de
-« software paper », et la seule mention JOSS résiduelle
-(\texttt{CONTRIBUTING.md}~§8) ne concerne que la \emph{politique d'auteurat}, avec la
-précision « whatever the venue » : c'est un usage légitime et neutre, à conserver. Le
-dépôt est cohérent ; aucune action requise de ce côté.\\[3pt]
-\emph{Article.} Structure conforme au canevas v4 : métadonnées, §1 Motivation and
-significance, §2 Software description (2.1 architecture, 2.2 fonctionnalités,
-2.3 historique et qualité), §3 Illustrative examples, §4 Impact, §5 Conclusions,
-déclarations, remerciements, bibliographie. Corps $\approx$2\,400 mots sur 3\,000
-autorisés ; 5 figures sur 6 ; 6 mots-clés sur 6 ; résumé 112 mots.
-\textbf{Deux réserves} : (i)~le canevas officiel n'a pas pu être téléchargé
-(sciencedirect renvoie 403 aux robots) --- \textbf{le récupérer et vérifier l'ordre et
-l'intitulé exacts des rubriques}, notamment si des \emph{Highlights} sont demandés ;
-(ii)~la section Impact demande des éléments que seuls les auteurs détiennent (voir §4).
-Les cinq figures sont produites (2026-08-13) par
-\texttt{examples/pyfiles/paper\_examples.py}, qui les écrit dans
-\texttt{paper/figures/} ; \texttt{make figures} les régénère. En mise en page
-Elsevier définitive (\texttt{final,5p,times,twocolumn}) l'article tient en
-6~pages, tables de métadonnées et bibliographie comprises.\\[3pt]
-\emph{Emplacement.} Ce fichier est destiné à \texttt{paper/main.tex} dans le dépôt, avec
-\texttt{paper/Makefile} (\texttt{make draft} / \texttt{make final}),
-\texttt{paper/README.md}, et \texttt{tests/test\_paper.py} qui vérifie à chaque
-\emph{push} que l'article et le code disent la même chose : version C1/S1, nombre de
-bases, plancher Python et dépendances de C7, bases et appels utilisés par les listings,
-phrase de financement exigée par \texttt{AUTHORS}, titre de \texttt{CITATION.cff}, et
-les limites SoftwareX (3\,000 mots, 6 figures, 6 mots-clés, références toutes citées).
-Le test ne lit que des fichiers --- ni import de \texttt{geopandas}, ni réseau --- donc
-il entre dans le \emph{job} hors-ligne existant sans nouvelle dépendance ni
-modification de \texttt{ci.yml}, et se \emph{skip} de lui-même si \texttt{paper/} est
-absent. Les deux PDF sortent de la même source : \texttt{make final} passe
-\texttt{-pretex='\textbackslash def\textbackslash paperfinal\{1\}'}, rien n'est édité.
-\textbf{Point à trancher} : ces annotations deviennent publiques. \texttt{HANDOFF.md}
-fait déjà ce choix, mais l'appréciation portée en §4 sur la faiblesse des preuves
-d'adoption est d'une autre nature. Alternative décrite dans \texttt{paper/README.md}.
-\textbf{Derniers commentaires lors du push git du papier par Claude} 
-Still yours to decide, all recorded in HANDOFF.md: inside main.tex the reproducible-capsule link for C3/S3, the Section 4 adoption evidence, and a look at the official template's exact section list — plus the one I flagged but didn't act on, contextily forcing matplotlib (the openstreet default, flagged with it, was settled on 2026-10-06: it is the default of both backends, see HANDOFF.md).
-}
-
 \begin{frontmatter}
 
 \title{pyvoa: a Python framework for unified access, standardisation and
@@ -224,7 +182,7 @@ pandas~$\geq$~2.1.1, geopandas~$\geq$~1.0, shapely~$\geq$~2.0.2,
 beautifulsoup4~$\geq$~4.11, numpy~$\geq$~1.26, pycountry~$\geq$~22.3.5,
 pycountry\_convert~$\geq$~0.7.2, requests~$\geq$~2.28, unidecode~$\geq$~1.3,
 lxml~$\geq$~4.9.3, IPython~$\geq$~8.10, contextily~$\geq$~1.3,
-html5lib~$\geq$~1.1. Plotting backends (matplotlib, bokeh, seaborn) are optional and
+html5lib~$\geq$~1.1. Plotting backends (matplotlib, bokeh) are optional and
 detected at run time; \texttt{pip install pyvoa-full} installs them. Runs on
 Linux, macOS and Windows, in a script, a console or a Jupyter notebook. \\
 \hline
@@ -317,7 +275,7 @@ from medical claims, surveys, mobility data, and internet search trends. These
 signals are provided in a common format at fine geographic and temporal
 resolution, and historical revisions are explicitly tracked. Its geographic
 coverage, however, remains focused on the United States.
-\texttt{covid19.analytics}~\cite{ponce2020} gives access within the R
+\texttt{covid19.analytics}~\cite{ponce2021} gives access within the R
 ecosystem to several sources of global COVID-19 data, including case, testing,
 vaccination, and genomic data. It also includes data-integrity checks,
 analytical and modelling tools, and static and interactive visualisations.
@@ -345,7 +303,7 @@ Table~\ref{tab:comparison} summarises the main differences between
     & Python & 1 & No & No & No \\
 COVIDcast~\cite{reinhart2021}
     & Python/R & 12 & Yes (US) & Yes & Revision history \\
-\texttt{covid19.analytics}~\cite{ponce2020}
+\texttt{covid19.analytics}~\cite{ponce2021}
     & R & 7 & No & Yes & GitHub backup repo \\
 \texttt{pyvoa} (this work)
     & Python & 23 & Yes & Yes & Zenodo archive \\
@@ -425,7 +383,7 @@ time series, histograms, maps and exported tables.}
 
 \textbf{Curation (manual).} Adding a data resource takes two steps, neither of
 which involves writing Python. First, the content served at the provider's URL
-can be deposited on the Pyvoa community Zenodo (****http://zenodo.org/communities/pyvoa****). Second, the resource is described in a JSON file stored
+can be deposited in the pyvoa community on Zenodo~\cite{zenodo_pyvoa}. Second, the resource is described in a JSON file stored
 in \texttt{pyvoa/data/}, in the GitHub repository. This descriptor gives the
 two locations of the data: the Zenodo mirror (\texttt{urldata}) (if it exists) and the
 provider's live URL (\texttt{urlparent}). It also gives the separator and
@@ -487,8 +445,8 @@ reproducible: they change from day to day, and an upstream file may move or
 change format. The archived and live copies are cached separately and never
 overwrite each other. 
 
-Charts can be drawn with matplotlib~\cite{hunter2007}, bokeh~\cite{bokeh} or
-seaborn~\cite{waskom2021}, at the user's choice. These libraries are optional:
+Charts can be drawn with matplotlib~\cite{hunter2007} or bokeh~\cite{bokeh},
+at the user's choice. These libraries are optional:
 the core installation is lightweight and gives full access to the data, and
 the \texttt{pyvoa-full} distribution adds the plotting libraries. If a chart is
 requested from a library that is not installed, pyvoa says which one is
@@ -546,28 +504,16 @@ in either mode.
 renders a coloured banner at construction, so the message reaches a notebook
 user even when the traceback is hidden. Verbosity has three levels.
 
-\attnpar{Points à confirmer dans cette section. \textbf{(a)}~L'article annonce que le
-paquet \texttt{pyvoa} seul retourne des données sans backend graphique. C'est ce
-qu'affirment \texttt{README.md} et \texttt{CLAUDE.md} ; le vérifier réellement dans un
-environnement neuf (\texttt{pip install pyvoa} puis \texttt{get()}), car c'est une
-affirmation vérifiable par un relecteur en trois minutes. \textbf{(b)}~\texttt{CLAUDE.md}
-signale que \texttt{front.merger()} appelle une méthode inexistante. \emph{Traitement
-différé, selon décision des auteurs} : l'article n'en fait donc aucune mention, ce qui
-est la conduite correcte --- ne pas documenter une API non fonctionnelle. Noter
-simplement que l'exposition subsiste, \texttt{merger} étant publique.
-\textbf{(c)}~Le backend folium existe dans le code (\texttt{visu\_folium.py}) mais a été
-retiré de la liste annoncée en 0.4.0 : ne pas le mentionner, ce qui est le cas ici ;
-vérifier que la figure~1 ne le fait pas non plus. \textbf{(d)}~Confirmer que
-\texttt{seaborn}, cité ici comme backend, est bien installé par \texttt{pyvoa-full}.
-\textbf{(e)}~\emph{Réglé le 2026-08-13} : \texttt{pyproject.toml} porte désormais un
-plancher testé sur chaque dépendance directe, vérifié par le \emph{job} CI
-\texttt{minimum}. La table~C7 les reprend un à un ; les mettre à jour ensemble.
-\textbf{(f)}~Sur le point (a) : \texttt{contextily}, dépendance \emph{requise},
-exige lui-même \texttt{matplotlib}. Un \texttt{pip install pyvoa} installe donc
-toujours matplotlib, et l'affirmation « la bibliothèque renvoie des données sans
-aucun backend » décrit le comportement du code, pas ce qu'un utilisateur obtient.
-Formulation plus sûre : les backends sont sondés à l'exécution et leur absence est
-signalée au lieu de casser l'import.}
+\attnpar{Points à confirmer dans cette section. \textbf{(a)}~« The core
+installation is lightweight and gives full access to the data » : vrai pour l'accès
+aux données, mais un \texttt{pip install pyvoa} installe toujours matplotlib, que
+\texttt{contextily}, dépendance requise, exige. Le déplacement de \texttt{contextily}
+dans \texttt{pyvoa-full} rendrait la phrase exacte ; il est à l'étude
+(\texttt{HANDOFF.md}, point~5). D'ici là, formulation plus sûre : les backends sont
+sondés à l'exécution et leur absence est signalée au lieu de casser l'import.
+\textbf{(b)}~Le backend folium existe dans le code (\texttt{visu\_folium.py}) mais
+n'est pas proposé : l'article ne le mentionne pas, la figure~1 non plus --- à
+vérifier sur la figure.}
 
 \subsection{Development history and quality assurance}
 \label{sec:history}
@@ -576,14 +522,15 @@ pyvoa is the third name of one continuous project, developed throughout by the
 same authors. \emph{CoCoA} (Covid Collaborative Analysis) began at the Data
 Against COVID-19 hackathon of April 2020 with the aim it still has: unified
 access to pandemic data for people who are not data specialists. It was renamed
-\emph{PyCoA} (Python Covid Analysis) in November 2020 and developed under that
-name until March 2025, accumulating some 1900 commits --- the multi-database
-front end and the \texttt{GeoCountry} class in 2021, normalisation by
-population, yearly and spiral plots in 2022, the JSON database descriptors in
-2023, the matplotlib and seaborn backends in 2024. In early 2025 the
-COVID-specific vocabulary was removed from the code base and the project became
-\emph{pyvoa}, Python Virus Open Analysis: the point at which it stopped being
-about one virus.
+\emph{PyCoA} (Python Covid Analysis) in November 2020, and its repository
+accumulated some 1900 commits --- the multi-database front end and the
+\texttt{GeoCountry} class in 2021, normalisation by population, yearly and
+spiral plots in 2022, the JSON database descriptors in 2023. In 2023 the project
+became \emph{pyvoa}, Python Virus Open Analysis: the point at which it stopped
+being about one virus. pyvoa was developed in a branch of the PyCoA repository,
+where the matplotlib backend was added in 2024, until March 2025,
+when it moved to a repository of its own and the COVID-specific vocabulary left
+the code base.
 
 Version 0.5.0 (August 2026) is the first release prepared for external scrutiny.
 The catalogue grew from 12 to 23 databases; payloads moved to the Zenodo
@@ -623,17 +570,6 @@ actuel uniquement parce que
 suivante) --- numéro, date, liste de ce qu'elle apporte --- en vérifiant aussi
 « Python 3.10 to 3.14 » contre la matrice de CI du moment.}
 
-\attnpar{Section ajoutée (absente du brouillon). Elle répond directement à deux critères
-de relecture SoftwareX --- maturité et pérennité du logiciel --- et vaut mieux que de
-laisser croire que le projet date de 2025. \textbf{Deux vérifications} :
-\textbf{(a)}~le brouillon initial affirmait un renommage « en 2023 », ce que reprend
-aussi la page presse de pyvoa.org ; le \texttt{CHANGELOG.md} et \texttt{AUTHORS} datent
-le renommage de février--mars~2025 (dernier commit pycoa : 2025-03-24). J'ai retenu 2025.
-\textbf{Trancher, puis corriger pyvoa.org} pour éviter une incohérence entre l'article et
-le site cité en métadonnée S7. \textbf{(b)}~Le chiffre de $\sim$1900 commits pour PyCoA
-vient du \texttt{CHANGELOG.md} (1924 sur la ligne principale) ; comme le dépôt est privé,
-ce nombre n'est pas vérifiable par un tiers. Soit on l'assume tel quel, soit on écrit
-« some 1900 commits, recorded in the project's changelog ».}
 
 
 %% ============================================================================
@@ -854,26 +790,10 @@ which is what makes a new disease a matter of hours rather than of a release
 cycle. The software is distributed under the MIT licence, has no commercial
 version and is not exploited commercially.
 
-\attnpar{\textbf{Ce que le canevas SoftwareX attend exactement de la section 4.} Le
-\emph{template} v4 demande d'y traiter, explicitement, les points suivants --- la
-section ci-dessus est structurée dans cet ordre, un paragraphe par point :
-\begin{enumerate}
-\item les \emph{nouvelles} questions de recherche que le logiciel rend abordables ;
-\item en quoi il améliore la poursuite de questions \emph{déjà} posées (précision,
-      rapidité, reproductibilité, abaissement de la barrière d'entrée) ;
-\item comment il modifie la pratique quotidienne de ses utilisateurs ;
-\item les projets de recherche en cours qui l'utilisent, et son adoption effective ;
-\item son éventuelle exploitation commerciale, ou l'absence de celle-ci.
-\end{enumerate}
-\textbf{Vérifier cette liste sur le canevas téléchargé} :
-sciencedirect.com renvoie 403 aux récupérations automatiques, la liste ci-dessus est donc
-donnée de mémoire des versions v3/v4 et doit être recoupée avec le fichier réel obtenu
-depuis \url{https://www.elsevier.com/journals/softwarex/23527110/guide-for-authors}. Le
-canevas est \emph{obligatoire} : SoftwareX n'examine que les articles qui l'utilisent.}
-
 \attnpar{\textbf{Impact --- c'est ici que se joue l'acceptation.} Un article SoftwareX est
-évalué sur la démonstration d'usage, pas sur l'élégance du code, et le point~4 ci-dessus
-est aujourd'hui le maillon faible : la liste hackathons/presse établit une visibilité,
+évalué sur la démonstration d'usage, pas sur l'élégance du code, et le paragraphe sur
+l'adoption (le quatrième des cinq points que le canevas demande ici) est aujourd'hui le
+maillon faible : la liste hackathons/presse établit une visibilité,
 pas une adoption. \textbf{Trois éléments à réunir, par ordre d'efficacité décroissante.}
 \textbf{(a)}~\emph{Un usage tiers documenté} --- un travail publié, un mémoire, un cours
 hors laboratoire, un article de presse ayant produit ses figures avec pyvoa ou PyCoA.
@@ -890,7 +810,8 @@ préférer alors PyPI. \textbf{(d)}~Le lien data.gouv.fr du brouillon initial re
 vers une réutilisation \emph{PyCoa} : vérifier qu'il résout, et le citer en le
 présentant comme tel, ou le retirer.}
 
-\attnpar{\textbf{Suggestion de contenu pour le point~1.} L'exemple le plus convaincant
+\attnpar{\textbf{Suggestion de contenu pour le premier point du canevas, les questions
+nouvelles que le logiciel rend abordables.} L'exemple le plus convaincant
 serait une figure ou une phrase montrant une question réellement traitée grâce à la
 réconciliation multi-sources --- par exemple la comparaison
 \texttt{sumeau} (eaux usées) / \texttt{spfnational} (incidence déclarée) sur la même
@@ -924,11 +845,6 @@ disappear. Contributions ---
 in particular new database descriptors --- are welcome through the
 repository~\cite{pyvoa_github}, which documents the procedure.
 
-\attn{Le brouillon annonçait aussi une API REST : rien dans le dépôt ne l'amorce, et une
-feuille de route non engagée est un point faible en relecture. Retiré. Ne réintroduire
-que si c'est décidé.}
-
-
 %% ============================================================================
 %%  DECLARATIONS
 %% ============================================================================
@@ -952,22 +868,21 @@ The project originated at the Data Against COVID-19 hackathon (April 2020).
 The authors thank the CNRS MODCOV19 platform, and CNRS/IN2P3, Université Paris
 Cité and Sorbonne Université for institutional support.
 
-Funding: This work was supported by the IdEx « Université Paris Cité 2022 »
+Funding: This work was supported by the IdEx « Université Paris Cité 2022 »,
+funded by the French State under the « Investissements d'avenir » programme
 [grant number ANR-18-IDEX-0001]; and by the « Institut Covid-19 Ad Memoriam »
-of Université Paris Cité.
+of Université Paris Cité. The funders had no role in the design of the
+software, the writing of the article or the decision to submit it for
+publication.
 
-\attnpar{\textbf{Financement : formulation imposée par le journal.} Le guide exige
-la forme littérale « \emph{Funding: This work was supported by \dots{} [grant numbers
-xxxx]} », d'où le paragraphe séparé et les crochets. \textbf{Point à surveiller} : le
-fichier \texttt{AUTHORS} du dépôt impose de reprendre sa phrase \emph{telle quelle},
-avec « (ANR-18-IDEX-0001) » entre parenthèses ; les deux exigences ne peuvent être
-satisfaites au mot près en même temps. Les quatre éléments imposés --- IdEx,
-« Université Paris Cité 2022 », ANR-18-IDEX-0001, « Institut Covid-19 Ad Memoriam » ---
-sont tous présents, et le test \texttt{test\_funding\_acknowledgement\_is\_present}
-du dépôt le vérifie. Si le bailleur exige la ponctuation exacte, revenir aux parenthèses
-et le signaler au journal. Renseigner par ailleurs les financeurs dans le formulaire
-Editorial Manager (Funder Registry : Agence Nationale de la Recherche,
-ANR-18-IDEX-0001).}
+\attnpar{Financement : forme imposée par le guide SoftwareX (« Funding: This work
+was supported by \dots{} [grant number \dots] »), avec les mentions exigées par le
+financeur --- l'IdEx « Université Paris Cité 2022 », l'Institut Covid-19 Ad
+Memoriam, et le soutien au titre des « Investissements d'avenir » (référence
+ANR-18-IDEX-0001). La même phrase figure dans \texttt{AUTHORS}, le README et
+\texttt{.zenodo.json}. La dernière phrase répond à l'obligation du guide de déclarer
+le rôle des financeurs. Renseigner aussi le financeur dans Editorial Manager
+(Funder Registry : Agence Nationale de la Recherche, ANR-18-IDEX-0001).}
 
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
@@ -992,117 +907,8 @@ déclaration. Revérifier la page au moment de la soumission.}
 %%  REFERENCES
 %% ============================================================================
 
-\begin{thebibliography}{00}
-
-\bibitem{dong2020}
-E.~Dong, H.~Du, L.~Gardner, An interactive web-based dashboard to track COVID-19
-in real time, Lancet Infect.\ Dis.\ 20~(5) (2020) 533--534.
-\url{https://doi.org/10.1016/S1473-3099(20)30120-1}.
-
-\bibitem{dong2022}
-E.~Dong, J.~Ratcliff, T.D.~Goyea, et~al., The Johns Hopkins University Center
-for Systems Science and Engineering COVID-19 Dashboard: data collection
-process, challenges faced, and lessons learned, Lancet Infect.\ Dis.\ 22~(12)
-(2022) e370--e376. \url{https://doi.org/10.1016/S1473-3099(22)00434-0}.
-
-\bibitem{mathieu2021}
-E.~Mathieu, H.~Ritchie, E.~Ortiz-Ospina, et~al., A global database of COVID-19
-vaccinations, Nat.\ Hum.\ Behav.\ 5 (2021) 947--953.
-\url{https://doi.org/10.1038/s41562-021-01122-8}.
-
-\bibitem{minciencia}
-Ministerio de Ciencia, Tecnología, Conocimiento e Innovación (Chile),
-Datos-COVID19,
-\url{https://github.com/MinCiencia/Datos-COVID19}
-(repository no longer public; URL unresolved as of 25 August 2026).
-An archived snapshot of the GitHub repository, dated 3 September 2023, is
-available from the Internet Archive:
-\url{https://web.archive.org/web/20230903082956/https://github.com/MinCiencia/Datos-COVID19/}.
-
-\bibitem{ivankovic2021}
-D.~Ivanković, E.~Barbazza, V.~Bos, et~al., Features constituting actionable
-COVID-19 dashboards: descriptive assessment and expert appraisal of 158 public
-web-based COVID-19 dashboards, J.\ Med.\ Internet Res.\ 23~(2) (2021) e25682.
-\url{https://doi.org/10.2196/25682}.
-
-\bibitem{covid_pypi}
-covid --- Python package to get information regarding the novel coronavirus,
-\url{https://pypi.org/project/covid/}, accessed 25 August 2026.
-
-\bibitem{covid19py}
-COVID19Py --- a tiny Python package for easy access to up-to-date coronavirus
-data, \url{https://pypi.org/project/COVID19Py/}, accessed 25 August 2026.
-
-\bibitem{reinhart2021}
-A.~Reinhart, L.~Brooks, M.~Jahja, et~al., An open repository of real-time
-COVID-19 indicators, Proc.\ Natl.\ Acad.\ Sci.\ USA 118~(51) (2021) e2111452118.
-\url{https://doi.org/10.1073/pnas.2111452118}.
-
-\bibitem{ponce2020}
-M.~Ponce, A.~Sandhel, covid19.analytics: An R package to obtain, analyze and
-visualize data from the 2019 coronavirus disease pandemic, J.\ Open Source
-Softw.\ 6~(60) (2021) 2995. \url{https://doi.org/10.21105/joss.02995}.
-
-\bibitem{owid_mpox}
-Our World in Data,
-Mpox data,
-\url{https://github.com/owid/monkeypox},
-accessed 25 August 2026.
-
-\bibitem{ahmadi2025}
-F.~Ahmadi, E.~Dong, L.~Gardner, Tracking county-level measles cases in the US,
-JAMA 334~(23) (2025) 2130--2132.
-\url{https://doi.org/10.1001/jama.2025.17812}.
-
-\bibitem{bdbv2026}
-C.~Judge, B.~Gutierrez, L.H.~Tsui, M.U.G.~Kraemer, et~al., INRB-UMIE/BDBV2026-Data:
-data for the 2026 Bundibugyo ebolavirus outbreak, Zenodo (2026).
-\url{https://doi.org/10.5281/zenodo.21223302}.
-
-\bibitem{geopandas}
-M.~Fleischmann, J.~Van~den~Bossche, K.~Jordahl, M.~J. Richards, J.~McBride,
-J.~Wasserman, B.~Ward, L.~J. Wolf,
-GeoPandas: Fundamental data structures for vector spatial data in Python,
-Computers, Environment and Urban Systems 130 (2026) 102495.
-doi:10.1016/j.compenvurbsys.2026.102495.
-
-\bibitem{hunter2007}
-J.D.~Hunter, Matplotlib: a 2D graphics environment, Comput.\ Sci.\ Eng.\ 9~(3)
-(2007) 90--95. \url{https://doi.org/10.1109/MCSE.2007.55}.
-
-\bibitem{bokeh}
-Bokeh Development Team, Bokeh: Python library for interactive visualization,
-\url{https://bokeh.org/}.
-
-\bibitem{waskom2021}
-M.L.~Waskom, seaborn: statistical data visualization, J.\ Open Source Softw.\
-6~(60) (2021) 3021. \url{https://doi.org/10.21105/joss.03021}.
-
-\bibitem{geoscheme}
-United Nations geoscheme M49. \url{https://unstats.un.org/unsd/methodology/m49/}
-
-\bibitem{g20}
-About G20. \url{https://www.oecd.org/en/about/oecd-and-g20.html}
-
-\bibitem{mckinney2010}
-W.~McKinney, Data structures for statistical computing in Python, in: Proc.\
-9th Python in Science Conf., 2010, pp.~56--61.
-\url{https://doi.org/10.25080/Majora-92bf1922-00a}.
-
-\bibitem{zenodo_pyvoa}
-pyvoa community on Zenodo, \url{https://zenodo.org/communities/pyvoa}.
-
-\bibitem{modcov19}
-T.~Beau, J.~Browaeys, O.~Dadoun, PyCoa: Python Covid Analysis, MODCOV19
-(CNRS), 2022.
-\url{https://modcov19.math.cnrs.fr/prepublications/2022_03_11_beau/}.
-
-\bibitem{pyvoa_github}
-T.~Beau, J.~Browaeys, O.~Dadoun, pyvoa: Python Virus Open Analysis, v0.5.0,
-Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.21829901}.
-Repository: \url{https://github.com/pyvoa/pyvoa}.
-
-\end{thebibliography}
+\bibliographystyle{elsarticle-num}
+\bibliography{references}
 
 \section*{Current executable software version}
 
@@ -1144,15 +950,16 @@ S7 & Support email for questions & contact@pyvoa.org \\
 citées dans le texte ont été supprimées (SoftwareX les refuse), ainsi que
 \texttt{spf2020}, \texttt{insee2020}, \texttt{kluyver2016}, \texttt{geopandas},
 \texttt{datagouv}, \texttt{lauer2023} et \texttt{heer2008}, devenues sans objet.
-\textbf{(b)}~\texttt{ponce2020} : la référence du brouillon (JOSS 5(51):2363, 2020)
-correspond à un autre article ; celle donnée ici (6(60):2995, 2021) est
-\texttt{covid19.analytics}. \textbf{À revérifier} sur \url{https://joss.theoj.org}.
-\textbf{(c)}~\texttt{covid\_pypi} et \texttt{covid19py} n'ont ni auteur fiable ni DOI ;
-les noms d'auteurs du brouillon étaient invérifiables et ont été retirés. Envisager de
-les citer en note de bas de page plutôt qu'en bibliographie. \textbf{(d)}~Elsevier
+\textbf{(b)}~\texttt{ponce2021} : la référence du brouillon (JOSS 5(51):2363, 2020)
+correspondait à un autre article ; celle donnée ici (6(60):2995, 2021) est
+\texttt{covid19.analytics}, vérifiée contre Crossref le 8 octobre 2026.
+\textbf{(c)}~\texttt{covid\_pypi} et \texttt{covid19py} n'ont pas de DOI : ils sont
+cités comme logiciels (auteur d'après PyPI et GitHub, version, année, dépôt) avec leur
+identifiant Software Heritage (SWHID), vérifiés le 8 octobre 2026. \textbf{(d)}~Elsevier
 souhaite un DOI pour chaque référence qui en possède un : les six premières en ont, les
-autres sont des logiciels ou des pages web, ce qui est admis. \textbf{(e)}~Passer en
-BibTeX (\texttt{elsarticle-num}) plutôt qu'en \texttt{thebibliography} manuel avant
-soumission, pour limiter les erreurs de saisie.}
+autres sont des logiciels ou des pages web, ce qui est admis. \textbf{(e)}~Les références
+sont dans \texttt{references.bib}, mises en forme par \texttt{elsarticle-num}, qui les
+numérote dans l'ordre de première citation : joindre \texttt{references.bib} à la
+soumission. BibTeX signale une année absente pour les huit pages web, qui n'en ont pas.}
 
 \end{document}

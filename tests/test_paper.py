@@ -25,6 +25,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 PAPER = ROOT / "paper" / "main.tex"
+BIBLIOGRAPHY = ROOT / "paper" / "references.bib"
 
 pytestmark = pytest.mark.skipif(
     not PAPER.exists(), reason="no manuscript in paper/, nothing to check"
@@ -235,6 +236,7 @@ def test_funding_acknowledgement_is_present(body: str) -> None:
         "IdEx",
         "Université Paris Cité 2022",
         "ANR-18-IDEX-0001",
+        "Investissements d'avenir",
         "Institut Covid-19 Ad Memoriam",
     ):
         assert fragment in authors, f"AUTHORS no longer contains {fragment!r}"
@@ -290,11 +292,10 @@ def test_release_dois_are_the_project_ones(tex: str) -> None:
     zenodo = (ROOT / ".zenodo.json").read_text(encoding="utf-8")
     citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
 
-    head, _, bibliography = tex.partition(r"\begin{thebibliography}")
+    head = tex.partition(r"\bibliography{")[0]
     ours = [
-        block
-        for block in re.split(r"\\bibitem\{", bibliography)
-        if re.search(r"pyvoa", block, re.IGNORECASE)
+        entry for entry in _bib_entries().values()
+        if re.search(r"pyvoa", entry, re.IGNORECASE)
     ]
 
     for doi in re.findall(r"10\.5281/zenodo\.(\d+)", head + "".join(ours)):
@@ -347,7 +348,7 @@ def test_every_citation_resolves(body: str, tex: str) -> None:
     cited = set()
     for m in re.finditer(r"\\cite\{([^}]*)\}", body):
         cited |= {k.strip() for k in m.group(1).split(",")}
-    defined = set(re.findall(r"\\bibitem\{([^}]*)\}", tex))
+    defined = set(_bib_entries())
 
     assert not (cited - defined), f"cited but not in the bibliography: {sorted(cited - defined)}"
     assert not (defined - cited), (
@@ -356,9 +357,33 @@ def test_every_citation_resolves(body: str, tex: str) -> None:
     )
 
 
+def test_references_are_numbered_in_order_of_citation(tex: str) -> None:
+    """Check the bibliography is typeset by elsarticle-num.
+
+    The guide for authors: "Number the references in the reference list in
+    the order in which they appear in the text." elsarticle-num.bst, the style
+    the SoftwareX template names, numbers the entries that way, whatever their
+    order in references.bib.
+    """
+    assert r"\bibliographystyle{elsarticle-num}" in tex, (
+        "the bibliography must be typeset by elsarticle-num, which numbers the "
+        "references in order of citation"
+    )
+    assert r"\bibliography{references}" in tex, "main.tex no longer reads references.bib"
+
+
 # ---------------------------------------------------------------------------
 # internals
 # ---------------------------------------------------------------------------
+
+
+def _bib_entries() -> dict[str, str]:
+    """Return the entries of references.bib, keyed by citation key."""
+    text = BIBLIOGRAPHY.read_text(encoding="utf-8")
+    entries = {}
+    for m in re.finditer(r"@\w+\{([^,\s]+),(.*?)(?=^@|\Z)", text, re.DOTALL | re.MULTILINE):
+        entries[m.group(1)] = m.group(2)
+    return entries
 
 
 def _metadata_row(tex: str, field: str) -> str:
