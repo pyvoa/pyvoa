@@ -29,9 +29,8 @@ history of the repository are at the end.
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
 | 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
 | 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
-| 7 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
-| 8 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 9 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 7 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 8 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -104,7 +103,7 @@ column key, say) to give them a value that is not a sum. Increments
 (`cumulative: true`) are summed as they are. It touches every existing merge
 (`dpc` Bolzano + Trento, `covid19india` Telangana and Ladakh, `escovid19data`,
 the county sums of `measles-usa` and `jhu-usa`): run the raw-versus-parsed
-sweep (`essai_alldb.py`) afterwards. (2) Leave things as they are. (3) Option 1,
+sweep (`pytest -m network tests/test_sources.py`) afterwards. (2) Leave things as they are. (3) Option 1,
 then map `OWID_KOS` and `XKX` to `SRB` — for `owid`, the `drop` of `OWID_` runs
 before `replace`, so either the order changes or `OWID_KOS` is spared.
 
@@ -157,14 +156,7 @@ and confirm the forms appear. `bug_report.yml` hardcodes `pyvoa 0.5.0` as its
 version placeholder, and the release checklist in `CONTRIBUTING.md` §9 does not
 mention it: add it there, or it drifts at every release.
 
-## 7. The comparison scripts
-
-`essai_govcy.py` and `essai_alldb.py`, untracked at the repository root, compare
-each database with a direct read of its source (run them from outside the
-root, with `PYTHONPATH` pointing at the checkout). They found every data defect
-fixed in October 2026. Keep them (under `scripts/`, say) or drop them.
-
-## 8. The Ebola mirror
+## 7. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -184,7 +176,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 9. Authors of the Zenodo community records
+## 8. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,

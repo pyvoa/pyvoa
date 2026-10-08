@@ -141,7 +141,8 @@ jobs:
     # genuinely download data run on the weekly schedule and on demand only.
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # tests/test_sources.py parses every shipped database, downloads included
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
 

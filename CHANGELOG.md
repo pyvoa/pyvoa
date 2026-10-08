@@ -1,4 +1,14 @@
 # Unreleased
+- tests/test_sources.py checks every shipped database against a direct read
+  of the files it is parsed from, written apart from the parser: the dates
+  parse with no NaT and none is a day-first date read month-first (the govcy
+  defect), each variable summed over the locations equals the raw file date
+  by date, and `get()` hands out the last parsed value. The locations pyvoa
+  leaves out on purpose (national rows of covid19india and imed, the cruise
+  ships and Olympic Games of jhu and jhu-usa, ...) are named, so that the
+  comparison stays exact. Marked `network`; the network job of the CI may now
+  run 60 minutes. It replaces the untracked essai_alldb.py, and essai_govcy.py
+  is gone.
 - the `from_db` column of a parsed database is a bool column; it was an
   object one holding True and False, the rows a database lacks being added
   by a merge that leaves them missing. `~from_db` therefore gave -1 and -2
