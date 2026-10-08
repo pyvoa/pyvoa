@@ -26,7 +26,7 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 |---|---|---|
 | 1 | **The generative-AI declaration is an annotation, not a statement.** | **yes, for submission** |
 | 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
-| 3 | Merging locations sums raw dates; `sumall` adds up rates. | no |
+| 3 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
 | 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
 | 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
@@ -74,46 +74,31 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   `test_funding_acknowledgement_is_present` checks them. Confirm the funder
   accepts the journal's form, or revert to parentheses and tell the journal why.
 
-## 3. Merging locations: what a merge does to the numbers
+## 3. Merging locations: a merge sums the raw dates as they are
 
-**Problem 1 — a merge sums the raw dates as they are.** `replace` maps several
-raw locations onto one, and the parser sums the rows sharing `(date, where)`.
-That is right when every location reports every day (`jhu`), wrong for
-cumulative or stock series reported on different days. In `europa`, Serbia and
-Kosovo share only 325 dates: on 29 only Kosovo reports, and a merged Serbia
-would drop from about 16 000 deaths to Kosovo's 3139; on 409 only Serbia does.
-A naive `XKX → SRB` was tried and reverted.
+`replace` maps several raw locations onto one, and the parser sums the rows
+sharing `(date, where)`. That is right when every location reports every day
+(`jhu` provinces, `jhu-usa` and `measles-usa` counties, `dpc`, `moh`,
+`covid19india`, `dgs`, `minciencia`, the age classes of `sciensano` and `spf`),
+wrong for cumulative or stock series reported on different days. The case that
+showed it, Serbia and Kosovo in `europa` (325 common dates only), is moot now
+Kosovo is left out; no shipped merge has been shown to suffer from it, and
+`europa`'s sums of regions are the one not checked. Every column is summed,
+rates included, but no shipped merge sums a rate since the `GUF`/`PYF` merge of
+`owid` went (see the decisions).
 
-**Problem 2 — a merge adds up rates.** Every column is summed, rates
-included. No shipped database merges a rate any more: the only case was the
-`GUF`/`PYF` → `FRA` merge of `owid`, which gave France on 2022-06-01 a
-`total_cases_per_million` of 981 527 (the sum of France's 443 388, French
-Guiana's 278 065 and French Polynesia's 260 074), and it was removed on
-2026-10-08 (see the decisions). Every other merge (`jhu` provinces, `jhu-usa`
-and `measles-usa` counties, `dpc`, `moh`, `covid19india`, `dgs`, `minciencia`,
-age classes of `sciensano` and `spf`) sums counts only. The problem stays for
-a future merge, and in `get()`: `option='sumall'` adds rates up as well
-(`total_cases_per_million` of France and Germany is summed), and its own
-branch for `cur_idx_`/`cur_tx_` names returns one location's value rather than
-a mean (0.14 for France 0.33 and Germany 0.14). Two smaller source defects
-were found on the way: `owid` ships East Timor twice on 1014 dates and the
-Faroe Islands on 394, half-empty rows the merge sums harmlessly except for
-`total_gdp_per_capita` of East Timor, which comes out doubled.
-
-**Kosovo** is settled: it is left out of every database (see the decisions),
-so it no longer waits on a merge.
+One source defect goes through the same sum: `owid` ships East Timor twice on
+1014 dates and the Faroe Islands on 394. The rows are half empty, so the sum is
+harmless except for `total_gdp_per_capita` of East Timor, which comes out
+doubled (13 140.2 for 6 570.1).
 
 **Options.** (1) A real merge in the parser: carry each raw location's last
 value forward over the union of their dates before summing, sum only counts and
 running totals, and mark the other columns in the JSON (an `"intensive": true`
 column key, say) to give them a value that is not a sum. Increments
-(`cumulative: true`) are summed as they are. It touches every existing merge
-(`dpc` Bolzano + Trento, `covid19india` Telangana and Ladakh, `escovid19data`,
-the county sums of `measles-usa` and `jhu-usa`): run the raw-versus-parsed
-sweep (`pytest -m network tests/test_sources.py`) afterwards. (2) Leave things
-as they are: no shipped merge has been shown to suffer from problem 1 (the
-Serbia/Kosovo case above is moot now Kosovo is left out); `europa`'s sums of
-regions are the one not checked.
+(`cumulative: true`) are summed as they are. It touches every existing merge:
+run `pytest -m network tests/test_sources.py` afterwards. (2) Leave things as
+they are.
 
 ## 4. Credit the Japanese geography
 
@@ -286,6 +271,12 @@ name the three authors.
   no Kosovo polygon, its `SRB` polygon takes the territory in, so a map
   paints it with Serbia's value; the population pyvoa gives Serbia
   (6 641 964) excludes Kosovo, as the data now do.
+- **`option='sumall'` on rates is set aside, not for the paper** (2026-10-08).
+  It adds rates up (`total_cases_per_million` of France and Germany is
+  summed), and its own branch for `cur_idx_`/`cur_tx_` names returns one
+  location's value rather than a mean (0.14 for France 0.33 and Germany 0.14).
+  A fix needs to know which columns are rates: the `"intensive"` column key of
+  item 3 would serve both.
 - **`tile='openstreet'` is the default** of both backends; matplotlib sends a
   pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web
