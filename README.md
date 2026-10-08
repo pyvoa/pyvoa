@@ -5,6 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/pyvoa)](https://pypi.org/project/pyvoa/)
 [![Python](https://img.shields.io/pypi/pyversions/pyvoa)](https://pypi.org/project/pyvoa/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21829901.svg)](https://doi.org/10.5281/zenodo.21829901)
+[![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/pyvoa/pyvoa/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/pyvoa/pyvoa)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
 [Pyvoa](https://pyvoa.org) (Python Virus Open Analysis) is a collection of Python™ code that provides:

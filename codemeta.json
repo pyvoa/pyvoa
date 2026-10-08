@@ -107,6 +107,7 @@
     "relatedLink": [
         "https://pypi.org/project/pyvoa/",
         "https://pypi.org/project/pyvoa-full/",
-        "https://doi.org/10.5281/zenodo.21829901"
+        "https://doi.org/10.5281/zenodo.21829901",
+        "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/pyvoa/pyvoa"
     ]
 }

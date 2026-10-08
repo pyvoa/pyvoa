@@ -166,7 +166,8 @@ C1 & Current code version & v0.5.0 (released 2026-08-06) \\
 C2 & Permanent GitHub link to code/repository used for this code version &
 \url{https://github.com/pyvoa/pyvoa} \newline
 archived release: \url{https://doi.org/10.5281/zenodo.21829902} \newline
-concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \\
+concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \newline
+Software Heritage: \href{https://archive.softwareheritage.org/swh:1:rel:75b64eb789cc495c7543d058fbf660f7d3d0f527;origin=https://github.com/pyvoa/pyvoa}{\texttt{swh:1:rel:75b64eb7\allowbreak 89cc495c\allowbreak 7543d058\allowbreak fbf660f7\allowbreak d3d0f527}} \\
 \hline
 C3 & Legal Code License & MIT License \\
 \hline
@@ -174,7 +175,7 @@ C4 & Code versioning system used & git \\
 \hline
 C5 & Software code languages, tools and services used &
 Python~3; JSON database descriptors; pytest; ruff; GitHub Actions (lint, test
-matrix on Python 3.10--3.14, weekly network tests); PyPI; Zenodo \\
+matrix on Python 3.10--3.14, weekly network tests); PyPI; Zenodo; Software Heritage \\
 \hline
 C6 & Compilation requirements, operating environments \& dependencies &
 Python~$\geq$~3.10. Required, with the lower bound each is tested against:
@@ -512,7 +513,9 @@ runs the network tests, which compare every database, as parsed by pyvoa,
 with an independent reading of its source files.
 
 \textbf{Release and citation.} Releases are published on PyPI and archived on
-Zenodo under a concept DOI. The repository carries citation and software
+Zenodo under a concept DOI; the git history is also preserved by Software
+Heritage, which identifies each release by an intrinsic, content-based
+identifier (SWHID). The repository carries citation and software
 metadata (\texttt{CITATION.cff}, \texttt{codemeta.json}), contribution and
 conduct guidelines, and a changelog covering every release since 0.1.0 as well
 as the CoCoA and PyCoA years --- the only public record of a history whose

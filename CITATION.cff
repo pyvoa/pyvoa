@@ -64,6 +64,9 @@ identifiers:
   - type: doi
     value: "10.5281/zenodo.21829902"
     description: "Version DOI - pyvoa 0.5.0"
+  - type: swh
+    value: "swh:1:rel:75b64eb789cc495c7543d058fbf660f7d3d0f527"
+    description: "Software Heritage identifier - pyvoa 0.5.0 (tag v0.5.0)"
   - type: url
     value: "https://pypi.org/project/pyvoa/"
     description: "Package distributed on PyPI"
