@@ -462,6 +462,10 @@ class front:
             input = kwargs.get('input',pd.DataFrame())
             if not isinstance(input,pd.DataFrame):
                 raise PyvoaError('input field must be a pd.DataFrame()!')
+            # a copy, so that the caller's frame never gains the columns added here
+            input = input.copy()
+            if 'input' in kwargs:
+                kwargs['input'] = input
             if not input.empty:
                 if 'date' not in input or 'where' not in input:
                     raise PyvoaError('input should have date and where columns')
@@ -625,7 +629,9 @@ class front:
             """
             wheres = kwargs['input']['where'].unique()
             colors = {w: plt.cm.tab20(i % 20) for i, w in enumerate(wheres)}
-            kwargs['input']['color'] = kwargs['input']['where'].map(colors)
+            # get() hands 'where' out as a Categorical, whose map() cannot take
+            # tuple values: pandas builds a MultiIndex of categories out of them
+            kwargs['input']['color'] = kwargs['input']['where'].astype(object).map(colors)
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis
