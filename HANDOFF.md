@@ -16,7 +16,8 @@ history of the repository are at the end.
 `minimum`, `paper` and `docs`. The suite is at 381 passed, 94 deselected
 (network, 69 of them in `tests/test_sources.py`, which compares every database
 with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
-`10.5281/zenodo.21829901`). The API documentation is published at
+`10.5281/zenodo.21829901`) and archived by Software Heritage (release
+`swh:1:rel:75b64eb789cc495c7543d058fbf660f7d3d0f527`). The API documentation is published at
 <https://pyvoa.github.io/pyvoa/>. Archived data are read from Zenodo record
 `23212632`.
 
@@ -330,6 +331,27 @@ release time.
   `url` of `CITATION.cff`, `codemeta.json` and `schemaorg.jsonld` give
   pyvoa.org; `Documentation` in `pyproject.toml` and `isDocumentedBy` in
   `.zenodo.json` give the Pages site (2026-10-08).
+- **The code is cited in Software Heritage as well as on Zenodo**
+  (2026-10-08). Software Heritage had only archived the PyPI sdists
+  (origin `https://pypi.org/project/pyvoa/`, *synthetic* releases without
+  `tests/`, `paper/` or the CI); a "Save code now" of
+  `https://github.com/pyvoa/pyvoa` added the git history the same day. The
+  annotated tag `v0.5.0` is the release
+  `swh:1:rel:75b64eb789cc495c7543d058fbf660f7d3d0f527` (commit `7c16489`),
+  cited next to the Zenodo DOIs in row C2 of the code metadata table, in the
+  `pyvoa_github` reference, in `CITATION.cff` (`type: swh`) and
+  `codemeta.json`; the README carries the Software Heritage badge. The
+  guide for authors lists Software Heritage IDs among the accepted
+  persistent identifiers for software. The two archives complement each
+  other: Zenodo keeps the release as deposited (sdist, metadata, DOIs
+  `21829902` for 0.5.0 and concept `21829901`, both already cited) and is
+  also the archive of the data; Software Heritage keeps the git history,
+  with an identifier computed from the content. **At each release**: request a
+  "Save code now" of the GitHub origin once the tag is pushed (a few
+  minutes), read the `swh:1:rel:` of the new tag from the snapshot
+  (`/api/1/origin/https://github.com/pyvoa/pyvoa/visit/latest/`), and
+  update those four places. A lightweight tag would give a `swh:1:rev:`
+  instead: tag annotated.
 
 ## History
 
