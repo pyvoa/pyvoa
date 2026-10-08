@@ -670,8 +670,11 @@ class GPDBuilder:
        else:
            kwargs['input'] = input
 
+       # 'input' must carry the cut made above: the rest reads it, not kwargs
        if kwargs['kwargsuser']['input'].empty:
           input = self.whereclustered(**kwargs)
+       else:
+          input = kwargs['input'].copy()
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']

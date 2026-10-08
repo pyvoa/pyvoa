@@ -33,3 +33,18 @@ def test_get_and_plot_leave_the_caller_frame_untouched(in_house_frame):
     pf.setvis('matplotlib')
     pf.plot(input=z, which='cur_rea')
     pd.testing.assert_frame_equal(z, z_before)
+
+
+def test_when_cuts_an_in_house_frame(cache_dir):
+    days = pd.date_range('2021-03-01', '2021-03-10')
+    frame = pd.DataFrame({
+        'date': days.repeat(2),
+        'where': ['Ain', 'Aisne'] * len(days),
+        'cur_rea': range(2 * len(days)),
+    })
+    z = pf.get(input=frame, which='cur_rea', when='03/03/2021:05/03/2021')
+    assert sorted(z['date'].unique()) == list(pd.date_range('2021-03-03', '2021-03-05'))
+    # the case first reported: a frame from get(), cut afterwards
+    z = pf.get(input=frame, which='cur_rea', option='sumall', what='daily')
+    z = pf.get(input=z, when='03/03/2021:05/03/2021')
+    assert sorted(z['date'].unique()) == list(pd.date_range('2021-03-03', '2021-03-05'))
