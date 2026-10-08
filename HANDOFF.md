@@ -29,11 +29,9 @@ history of the repository are at the end.
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
 | 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
 | 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
-| 7 | Two documentation URLs, `pyvoa.org` and `pyvoa.github.io/pyvoa`. | no |
-| 8 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
-| 9 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 10 | The Bulk archive keeps reference files whose licence is restricted or unknown; documented per file, kept for now. | no |
-| 11 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 7 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
+| 8 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 9 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -159,24 +157,14 @@ and confirm the forms appear. `bug_report.yml` hardcodes `pyvoa 0.5.0` as its
 version placeholder, and the release checklist in `CONTRIBUTING.md` §9 does not
 mention it: add it there, or it drifts at every release.
 
-## 7. Two documentation URLs
-
-`https://pyvoa.github.io/pyvoa/` (built from `docs/` by
-`.github/workflows/docs.yml`) and `https://pyvoa.org`, which the metadata files
-and the README name as the project URL and Zenodo carries as `isDocumentedBy`.
-Choose: point `pyvoa.org` at the Pages site; make `pyvoa.org` its custom domain
-(`CNAME` plus a DNS record); or keep both, the Pages site as the API reference,
-and add its URL to the metadata. Put the answer in the code metadata table of
-the manuscript.
-
-## 8. The comparison scripts
+## 7. The comparison scripts
 
 `essai_govcy.py` and `essai_alldb.py`, untracked at the repository root, compare
 each database with a direct read of its source (run them from outside the
 root, with `PYTHONPATH` pointing at the checkout). They found every data defect
 fixed in October 2026. Keep them (under `scripts/`, say) or drop them.
 
-## 9. The Ebola mirror
+## 8. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -196,22 +184,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 10. Reference files of the Bulk archive
-
-The 23 databases each carry a checked licence (README table). The Bulk archive
-pyvoa reads its reference pages and geometries from (record 23212632) also
-redistributes files whose licence is restricted or unknown: worldometers
-(population, used by `GeoInfo`), worlddata.info (COMESA), the WHO/Europe
-gateway (WHO terms; used by no shipped database since risklayer went),
-meteochile (Chile), the socrata USA geometry, johan/world.geo.json (SSD, SDN),
-the Belgian *arrondissements*, the Spanish provinces (opendatasoft) and the
-Malaysian states (Stanford). The record's description states each file's
-licence. Decided on 2026-10-07 to keep them as they are; if they are ever
-revisited, the WHO/Europe file can go first, and open replacements be sought
-for the others — each change being a new Zenodo version, hence a new record id
-in `tools.get_local_from_url`.
-
-## 11. Authors of the Zenodo community records
+## 9. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,
@@ -314,6 +287,19 @@ name the three authors.
   repo/src directory": both layouts are standard for the PyPA and PyPI alike,
   numpy, pandas, scipy and matplotlib are flat, and CI tests the installed
   package (2026-10-08).
+- **The Bulk archive keeps its reference files as they are**, those whose
+  licence is restricted or unknown included (worldometers, worlddata.info, the
+  WHO/Europe gateway, meteochile, the socrata USA geometry,
+  johan/world.geo.json, the Belgian *arrondissements*, the Spanish provinces,
+  the Malaysian states): the description of record 23212632 states each
+  file's licence (2026-10-08). Revisiting one means a new Zenodo version,
+  hence a new record id in `tools.get_local_from_url`.
+- **pyvoa.org is the project's showcase site, the documentation is
+  <https://pyvoa.github.io/pyvoa/>**, which pyvoa.org links to with the
+  repository. The metadata follow suit: `Homepage` in `pyproject.toml` and the
+  `url` of `CITATION.cff`, `codemeta.json` and `schemaorg.jsonld` give
+  pyvoa.org; `Documentation` in `pyproject.toml` and `isDocumentedBy` in
+  `.zenodo.json` give the Pages site (2026-10-08).
 
 ## History
 

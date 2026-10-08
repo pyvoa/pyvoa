@@ -70,6 +70,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://pyvoa.org"
+Documentation = "https://pyvoa.github.io/pyvoa/"
 Repository = "https://github.com/pyvoa/pyvoa"
 
 [tool.setuptools.dynamic]
