@@ -755,7 +755,7 @@ map or a spatial join needs:
 
 \begin{lstlisting}[style=python]
 pf.setwhom('ebolardc')
-pf.hist(which='tot_confirmed', typeofhist='pie')
+pf.hist(which='tot_confirmed', typeofhist='pie', when='01/10/2026')
 \end{lstlisting}
 
 The grammar does not change with the disease. The situation reports on
@@ -765,23 +765,25 @@ geography the geolocation layer resolves just as it resolves French
 \emph{départements} or United States states; \texttt{typeofhist='pie'} asks for
 a composition rather than a ranking, the smaller zones being gathered into a
 single slice rather than discarded (Fig.~\ref{fig:beyond}). Measles in the
-United States and mpox are read on the same terms.
+United States and mpox are read on the same terms. Unlike the other examples,
+these data are not archived: the Institut asks to be consulted before any
+republication, so pyvoa reads them from the provider at every call, and only
+the \texttt{when} keyword keeps the figure from following the latest report.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.7\textwidth]{figures/fig5_ebola_drc.pdf}
 \caption{Confirmed cases of the 2026 Bundibugyo
 ebolavirus outbreak by health zone of the Democratic Republic of the Congo,
-from the situation reports of the Institut National de Santé Publique.}
+from the situation reports of the Institut National de Santé Publique, on
+1~October 2026.}
 \label{fig:beyond}
 \end{figure}
 
-\attnpar{La figure~\ref{fig:beyond} porte la date du
-04/10/2026, dernier jour couvert par la source --- à figer si la soumission
-tarde. \texttt{ebolardc} n'étant plus archivé (lecture chez le fournisseur
-seulement, l'INSP demandant à être consulté avant toute republication), la
-régénérer donne l'état du jour de la source : le miroir Zenodo ne peut plus la
-figer sans l'accord de l'INSP. \textbf{À relancer avant soumission} :
+\attnpar{La figure~\ref{fig:beyond} est figée au 01/10/2026 par
+\texttt{when}, \texttt{ebolardc} n'étant pas archivé. Elle reste à la merci
+d'une révision rétroactive des rapports par la source, ou de leur retrait.
+\textbf{À relancer avant soumission} :
 \texttt{python paper\_examples.py -{-}check}, puis
 \texttt{python paper\_examples.py} pour régénérer les quatre PDF.}
 

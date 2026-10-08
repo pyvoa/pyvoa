@@ -199,11 +199,13 @@ def example_3(pf, vis: str) -> None:
 def example_4(pf, vis: str) -> None:
     banner(4, "beyond COVID-19 (Ebola, DR Congo)", """
         pf.setwhom('ebolardc')
-        pf.hist(which='tot_confirmed', typeofhist='pie')
+        pf.hist(which='tot_confirmed', typeofhist='pie', when='01/10/2026')
     """)
     pf.setvis(vis)
     pf.setwhom('ebolardc')
-    pf.hist(which='tot_confirmed', typeofhist='pie')
+    # ebolardc is read from its provider only, never archived: the date pins
+    # the figure, which would otherwise follow the latest situation report.
+    pf.hist(which='tot_confirmed', typeofhist='pie', when='01/10/2026')
     save(pf, "fig5_ebola_drc.pdf")
 
 

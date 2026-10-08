@@ -30,13 +30,10 @@ history of the repository are at the end.
 | 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
 | 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
 | 7 | Two documentation URLs, `pyvoa.org` and `pyvoa.github.io/pyvoa`. | no |
-| 8 | `listwhere()` returns ISO3 codes beside names for the world databases. | no |
-| 9 | Folium is untested since the empty geometries were introduced. | no |
-| 10 | `Licence.txt` asked for by the template; the repository has `LICENSE`. | no |
-| 11 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
-| 12 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure cannot be frozen meanwhile. | no |
-| 13 | The Bulk archive keeps reference files whose licence is restricted or unknown; documented per file, kept for now. | no |
-| 14 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 8 | `essai_govcy.py` and `essai_alldb.py`, untracked: keep them, or not. | no |
+| 9 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 10 | The Bulk archive keeps reference files whose licence is restricted or unknown; documented per file, kept for now. | no |
+| 11 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
@@ -172,33 +169,14 @@ Choose: point `pyvoa.org` at the Pages site; make `pyvoa.org` its custom domain
 and add its URL to the metadata. Put the answer in the code metadata table of
 the manuscript.
 
-## 8. ISO3 codes in `listwhere()`
-
-For a world database, `listwhere()` returns each country under its ISO3 code and
-its name (`owid`: 546 entries, `ABW`, `AFG`, … beside the names). Commit
-`0c24066` is titled "remove iso3 from listwhere": either that intent was
-dropped, or the removal is incomplete. Decide which, then document it.
-
-## 9. Folium
-
-Folium is not installed where the recent work was checked. Untested with it:
-the empty geometries (filtered out of the GeoJSON in `AllVisu.map`, as for
-bokeh, which fails on them), and the keywords `pyvoalogo` and `projection`.
-
-## 10. `Licence.txt`
-
-The template asks for a `Licence.txt`; the repository has `LICENSE`, no
-extension. Almost certainly fine, but "your paper will be returned if these are
-missing" is the journal's wording.
-
-## 11. The comparison scripts
+## 8. The comparison scripts
 
 `essai_govcy.py` and `essai_alldb.py`, untracked at the repository root, compare
 each database with a direct read of its source (run them from outside the
 root, with `PYTHONPATH` pointing at the checkout). They found every data defect
 fixed in October 2026. Keep them (under `scripts/`, say) or drop them.
 
-## 12. The Ebola mirror
+## 9. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -212,11 +190,13 @@ before external republication."* (contact given: pierre.akilimali@insp.cd).
 Zenodo record 23165598 (`ebolardc data`, owner account 1008528) was such a
 republication; pyvoa no longer reads it, and it has been closed to the public
 (embargoed, files no longer served) on 2026-10-07. With the INSP's written
-agreement the mirror can come back, under the INSP's terms rather than MIT,
-and the Ebola figure of the manuscript can be frozen again. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
+agreement the mirror can come back, under the INSP's terms rather than MIT.
+Meanwhile the Ebola listing of the manuscript carries `when='01/10/2026'`, so
+that Fig. 5 does not follow the latest report; it would still change if the
+provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 13. Reference files of the Bulk archive
+## 10. Reference files of the Bulk archive
 
 The 23 databases each carry a checked licence (README table). The Bulk archive
 pyvoa reads its reference pages and geometries from (record 23212632) also
@@ -231,7 +211,7 @@ revisited, the WHO/Europe file can go first, and open replacements be sought
 for the others — each change being a new Zenodo version, hence a new record id
 in `tools.get_local_from_url`.
 
-## 14. Authors of the Zenodo community records
+## 11. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,
@@ -326,6 +306,14 @@ name the three authors.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web
   Mercator**, its tiles existing in that projection only. An equal-area bokeh
   map would have no basemap: set aside on 2026-10-07.
+- **`LICENSE` keeps its name**, although the SoftwareX template asks for a
+  `Licence.txt` and the guide for authors for a `LICENSE.txt`: GitHub, the
+  package metadata and `CITATION.cff` all go by `LICENSE` (2026-10-08).
+- **The package stays in a flat layout (`pyvoa/` at the root), not under
+  `src/`**, although the guide for authors asks for "source code in a
+  repo/src directory": both layouts are standard for the PyPA and PyPI alike,
+  numpy, pandas, scipy and matplotlib are flat, and CI tests the installed
+  package (2026-10-08).
 
 ## History
 
