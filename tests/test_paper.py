@@ -122,8 +122,11 @@ def test_database_count_matches_the_catalogue(body: str) -> None:
     """The count claimed in the abstract and the text is len(pyvoa/data/*.json)."""
     shipped = len(list((ROOT / "pyvoa" / "data").glob("*.json")))
 
-    claims = re.findall(r"(\d+)\s+(?:open\s+)?(?:epidemiological\s+)?databases", body)
-    claims += re.findall(r"``Sources'':|\\textbf\{pyvoa\}\s*&[^&]*&\s*(\d+)", body)
+    claims = re.findall(
+        r"(\d+)\s+(?:open\s+)?(?:epidemiological\s+)?(?:databases|data\s+resources)", body
+    )
+    # the pyvoa row of the comparison table: tool, language, resources
+    claims += re.findall(r"\\texttt\{pyvoa\}\s*\(this work\)\s*&[^&]*&\s*(\d+)", body)
     numeric = {int(c) for c in claims if c.isdigit()}
     assert numeric, "no numeric database count found in the manuscript"
     assert numeric == {shipped}, (

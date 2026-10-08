@@ -427,125 +427,98 @@ The user interacts with a single module, \texttt{pyvoa.front}, conventionally
 imported as \texttt{pf}. It is used through plain function calls, such as
 \texttt{pf.setwhom('owid')} to select a data resource: there is no class to
 instantiate, and the module keeps the state of the session (selected resource,
-archive or live mode) between calls. 
-
-A single call to \texttt{pf.get} returns the selected data as a pandas
-\texttt{DataFrame}, with one row per date and per location, or on request as a
-geopandas \texttt{GeoDataFrame}, a list, a dictionary or an array. Since these
-are standard objects, export to CSV and any further analysis rely on the usual
-pandas methods. The same keywords drive the graphical functions:
-\texttt{pf.plot} draws time series, \texttt{pf.hist} histograms and
-\texttt{pf.map} maps. Common processing steps are available as options.
-
-
-Calling
-\texttt{pf.setlive(True)} switches all subsequent loading to the providers'
-live URLs. This returns the most recent data, but the results are no longer
-reproducible: they change from day to day, and an upstream file may move or
-change format. The archived and live copies are cached separately and never
-overwrite each other. 
-
-Charts can be drawn with matplotlib~\cite{hunter2007} or bokeh~\cite{bokeh},
-at the user's choice. These libraries are optional:
-the core installation is lightweight and gives full access to the data, and
-the \texttt{pyvoa-full} distribution adds the plotting libraries. If a chart is
-requested from a library that is not installed, pyvoa says which one is
-missing.
+archive or live mode, chart backend) between calls. Its functions are presented
+in Section~\ref{sec:functionalities}.
 
 \subsection{Software functionalities}
 \label{sec:functionalities}
 
-\textbf{One query grammar.} Four functions --- \texttt{get()},
-\texttt{plot()}, \texttt{map()} and \texttt{hist()} --- take the same five
-keywords, after \texttt{setwhom()} has selected a database and, for charts,
-\texttt{setvis()} a backend:
-\texttt{where} (one place, a list of places, or a grouping),
-\texttt{which} (an indicator of the selected database),
-\texttt{what} (\texttt{current}, \texttt{daily} or \texttt{weekly}),
-\texttt{when} (a date or a \texttt{begin:end} range, \texttt{dd/mm/yyyy}), and
-\texttt{option} (\texttt{sumall}, \texttt{nonneg}, \texttt{smooth7}, or
-normalisation by population at six scales, combinable in a list).
-\texttt{get()} additionally takes \texttt{output}, returning a pandas or
-geopandas frame, a list, a dict or an array; \texttt{input} accepts an external
-frame, so pyvoa charts data it did not fetch.
+\textbf{Selecting data.} A session starts by choosing a data resource with
+\texttt{pf.setwhom()}; \texttt{pf.listwhom()} lists the twenty-three available.
+By default the data are read from the Zenodo archive, so that an analysis
+returns the same numbers whenever it is run again. \texttt{pf.setlive(True)}
+reads the providers' current files instead, which an epidemic still under way
+requires, at the cost of that reproducibility (Section~\ref{sec:ex-beyond}).
+Downloaded files are cached locally, the archived and the live copies apart.
 
-\textbf{Introspection.} Every vocabulary is enumerable at run time ---
-\texttt{listwhom()}, \texttt{listwhich()}, \texttt{listwhere()},
-\texttt{listwhat()}, \texttt{listoption()}, \texttt{listvis()},
-\texttt{listoutput()} --- each returning a plain list, and \texttt{whattodo()}
-returning the whole keyword-value matrix as a frame. Discovery needs no
-documentation lookup, which matters for the teaching use described in
-Section~\ref{sec:impact}.
+\textbf{One query grammar.} Four functions share the same keywords:
+\texttt{get()} returns the data, and \texttt{plot()}, \texttt{hist()} and
+\texttt{map()} draw them. The keywords state what is asked for:
+\begin{itemize}
+\item \texttt{where}: a location, a list of locations, or a grouping such as
+  \texttt{'G20'} or \texttt{'Western Europe'}
+  (Sections~\ref{sec:ex-timeseries} and~\ref{sec:ex-map});
+\item \texttt{which}: the indicator, among those of the selected resource;
+\item \texttt{what}: the value as published (\texttt{current}), or its daily
+  or weekly change;
+\item \texttt{when}: a date or a period;
+\item \texttt{option}: transformations such as a seven-day smoothing, the sum
+  over the selected locations, or a normalisation by population
+  (Section~\ref{sec:ex-hist}).
+\end{itemize}
 
-\textbf{Charts.} \texttt{plot()} draws \texttt{date}, \texttt{compare},
-\texttt{versus}, \texttt{spiral} and \texttt{yearly} views; \texttt{hist()}
-draws histograms by location or by value, and pie charts; \texttt{map()} draws
-choropleths over standard or dense geometries, with a date slider under bokeh.
-Titles, legends, watermarks and \texttt{savefig()} behave identically across
-backends, and \texttt{setbatch()} renders without opening a window.
+\textbf{Outputs.} \texttt{get()} returns a table with one row per date and
+location: by default a geopandas \texttt{GeoDataFrame}, which carries the
+geometry of each location, or on request a pandas \texttt{DataFrame}, a list, a
+dictionary or an array (Section~\ref{sec:ex-hist}). These are standard Python
+objects, so further analysis and export use the usual pandas methods.
+Conversely, a user's own table can be passed through the \texttt{input}
+keyword, and pyvoa then processes and draws data it did not fetch.
 
-\textbf{Caching, mirroring and live sources.} Downloads are cached under
-\texttt{\textasciitilde/.cache/pyvoa.data\_<user>/} with CRC32 invalidation; a
-file below 1000 characters is treated as a failed download and re-fetched.
-Since v0.5.0 the payloads themselves are read from the project's Zenodo
-deposits, the upstream URL being retained in the descriptor. A series therefore
-stays fetchable, and an analysis re-runnable, after its provider stops
-publishing. That upstream URL is not merely documentary:
-\texttt{setlive(True)} reads it instead of the mirror, which is what an
-epidemic still under way requires, at the cost of the reproducibility the
-archive gives. Of the twenty-three databases, nineteen are readable both ways
---- one of them, following an epidemic still under way, best read live ---,
-three only from the archive, their provider having withdrawn the files, and one,
-the Ebola series, only from its provider, which is not mirrored. The two copies are
-cached apart, and a database absent from the archive falls back to its provider
-in either mode.
+\textbf{Charts.} Charts are drawn with matplotlib~\cite{hunter2007} or
+bokeh~\cite{bokeh}, chosen with \texttt{pf.setvis()}. \texttt{plot()} draws
+time series (Section~\ref{sec:ex-timeseries}); \texttt{hist()} draws bar charts
+comparing locations (Section~\ref{sec:ex-hist}), histograms of the values, or
+pie charts (Section~\ref{sec:ex-beyond}); \texttt{map()} draws choropleth maps
+(Section~\ref{sec:ex-map}), on an equal-area projection with matplotlib and
+with a date slider with bokeh. Titles, legends and the export to image files
+(\texttt{pf.savefig()}) behave alike with both. The backends are detected at
+run time: one that is not installed is reported when it is selected, rather
+than breaking the import, and the \texttt{pyvoa-full} distribution installs
+them both.
 
-\textbf{Errors.} \texttt{PyvoaError} is the library's single exception type; it
-renders a coloured banner at construction, so the message reaches a notebook
-user even when the traceback is hidden. Verbosity has three levels.
-
-\attnpar{Points à confirmer dans cette section. \textbf{(a)}~« The core
-installation is lightweight and gives full access to the data » : vrai pour l'accès
-aux données, mais un \texttt{pip install pyvoa} installe toujours matplotlib, que
-\texttt{contextily}, dépendance requise, exige. Le déplacement de \texttt{contextily}
-dans \texttt{pyvoa-full} rendrait la phrase exacte ; il est à l'étude
-(\texttt{HANDOFF.md}, point~5). D'ici là, formulation plus sûre : les backends sont
-sondés à l'exécution et leur absence est signalée au lieu de casser l'import.
-\textbf{(b)}~Le backend folium existe dans le code (\texttt{visu\_folium.py}) mais
-n'est pas proposé : l'article ne le mentionne pas, la figure~1 non plus --- à
-vérifier sur la figure.}
+\textbf{Discovering the vocabulary.} Every accepted value can be listed at
+run time: \texttt{listwhom()}, \texttt{listwhich()}, \texttt{listwhere()},
+\texttt{listwhat()}, \texttt{listoption()} and their counterparts for the
+charts return plain Python lists. A user can thus explore a resource without
+consulting the documentation, which matters for teaching
+(Section~\ref{sec:impact}).
 
 \subsection{Development history and quality assurance}
 \label{sec:history}
 
-pyvoa is the third name of one continuous project, developed throughout by the
-same authors. \emph{CoCoA} (Covid Collaborative Analysis) began at the Data
-Against COVID-19 hackathon of April 2020 with the aim it still has: unified
-access to pandemic data for people who are not data specialists. It was renamed
-\emph{PyCoA} (Python Covid Analysis) in November 2020, and its repository
-accumulated some 1900 commits --- the multi-database front end and the
-\texttt{GeoCountry} class in 2021, normalisation by population, yearly and
-spiral plots in 2022, the JSON database descriptors in 2023. In 2023 the project
-became \emph{pyvoa}, Python Virus Open Analysis: the point at which it stopped
-being about one virus. pyvoa was developed in a branch of the PyCoA repository,
-where the matplotlib backend was added in 2024, until March 2025,
-when it moved to a repository of its own and the COVID-specific vocabulary left
-the code base.
+\textbf{History.} pyvoa is the third name of one continuous project, developed
+throughout by the same authors. It began as \emph{CoCoA} (Covid Collaborative
+Analysis) at the Data Against COVID-19 hackathon of April 2020, with the aim it
+still has: unified access to pandemic data for people who are not data
+specialists. Renamed \emph{PyCoA} (Python Covid Analysis) in November 2020, it
+gained, over some 1900 commits, its support for several databases and its
+sub-national geography in 2021, the normalisation by population in 2022 and the
+JSON descriptors in 2023. The same year it became \emph{pyvoa}, Python Virus
+Open Analysis, as its scope widened beyond COVID-19. pyvoa was developed in a
+branch of the PyCoA repository until March 2025, then in a repository of its
+own. Version 0.5.0 (August 2026) is the first release prepared for external
+scrutiny.
 
-Version 0.5.0 (August 2026) is the first release prepared for external scrutiny.
-The catalogue grew from 12 to 23 databases; payloads moved to the Zenodo
-mirrors; packaging moved to PEP~621; an offline test suite was added, in which
-any test needing an upstream server must be marked and is deselected by default,
-so that a test cannot silently start depending on the network; and continuous
-integration on GitHub Actions runs linting, the suite on Python 3.10 to 3.14,
-and the network tests on a weekly schedule. Releases are published on PyPI and
-archived on Zenodo with a concept DOI. The repository carries
-\texttt{CITATION.cff}, \texttt{codemeta.json}, \texttt{.zenodo.json},
-contribution and conduct guidelines, and a changelog covering every release
-since 0.1.0 as well as the CoCoA and PyCoA years --- the only public record of a
-history whose middle repository is private.
+\textbf{Quality assurance.} An offline test suite covers the parsing of the
+descriptors, the geographic layer and the visualisation layer; a test that
+needs a network connection must be marked as such, so that the default suite
+cannot silently depend on an upstream server. Continuous integration on GitHub
+Actions runs the suite on Python 3.10 to 3.14, against both the newest and the
+oldest supported version of each dependency; it also checks the code style,
+the documentation build, and this manuscript against the code it describes
+(database counts, functions used in the listings, dependencies). A weekly job
+runs the network tests, which compare every database, as parsed by pyvoa,
+with an independent reading of its source files.
 
-Generative AI was used at two stages of the development. For release 0.3.1, the
+\textbf{Release and citation.} Releases are published on PyPI and archived on
+Zenodo under a concept DOI. The repository carries citation and software
+metadata (\texttt{CITATION.cff}, \texttt{codemeta.json}), contribution and
+conduct guidelines, and a changelog covering every release since 0.1.0 as well
+as the CoCoA and PyCoA years --- the only public record of a history whose
+PyCoA repository is private.
+
+\textbf{Use of generative AI.} Generative AI was used at two stages of the development. For release 0.3.1, the
 docstrings of the code base were drafted with the help of large language model
 assistants (GitHub Copilot, Claude) and reviewed by the authors. In 2026, before
 the release described here, an AI coding assistant, Claude (Anthropic) used
@@ -558,17 +531,10 @@ consistency between the code, its documentation and this article. Every change
 was reviewed by the authors before being committed, and is recorded in the
 project's changelog.
 
-\attnpar{\textbf{Paragraphe « Version 0.5.0 » à mettre à jour avant soumission.}
-Il décrit la 0.5.0 mais donne le catalogue \emph{actuel} : « grew from 12 to 23
-databases » ne vaut pour la 0.5.0 que par coïncidence. Elle en livrait 23 aussi, mais pas
-les mêmes : avec \texttt{sentinellesIRA} et \texttt{risklayer}, retirées depuis (la
-première pour raison de droits, la seconde faute de licence publiée) ; sans
-\texttt{ebolardc} ni \texttt{measles-usa}, ajoutées après. Le chiffre suit le catalogue
-actuel uniquement parce que
-\texttt{tests/test\_paper.py} exige que tout nombre de bases cité égale le contenu de
-\texttt{pyvoa/data/}. À réécrire autour de la version effectivement soumise (0.5.1 ou
-suivante) --- numéro, date, liste de ce qu'elle apporte --- en vérifiant aussi
-« Python 3.10 to 3.14 » contre la matrice de CI du moment.}
+\attnpar{\textbf{Version soumise.} Le texte décrit la 0.5.0 (« Version 0.5.0
+(August 2026) is the first release prepared for external scrutiny ») et les lignes
+C1/S1 des tableaux de métadonnées aussi. Si la version soumise est une 0.5.1 ou
+suivante, mettre à jour ces trois endroits ensemble.}
 
 
 
