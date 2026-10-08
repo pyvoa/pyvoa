@@ -145,7 +145,7 @@ absent. Les deux PDF sortent de la même source : \texttt{make final} passe
 fait déjà ce choix, mais l'appréciation portée en §4 sur la faiblesse des preuves
 d'adoption est d'une autre nature. Alternative décrite dans \texttt{paper/README.md}.
 \textbf{Derniers commentaires lors du push git du papier par Claude} 
-Still yours to decide, all recorded in HANDOFF.md: inside main.tex the reproducible-capsule link for C3/S3, the Section 4 adoption evidence, the AI-use declaration, and a look at the official template's exact section list — plus the one I flagged but didn't act on, contextily forcing matplotlib (the openstreet default, flagged with it, was settled on 2026-10-06: it is the default of both backends, see HANDOFF.md).
+Still yours to decide, all recorded in HANDOFF.md: inside main.tex the reproducible-capsule link for C3/S3, the Section 4 adoption evidence, and a look at the official template's exact section list — plus the one I flagged but didn't act on, contextily forcing matplotlib (the openstreet default, flagged with it, was settled on 2026-10-06: it is the default of both backends, see HANDOFF.md).
 }
 
 \begin{frontmatter}
@@ -598,6 +598,19 @@ contribution and conduct guidelines, and a changelog covering every release
 since 0.1.0 as well as the CoCoA and PyCoA years --- the only public record of a
 history whose middle repository is private.
 
+Generative AI was used at two stages of the development. For release 0.3.1, the
+docstrings of the code base were drafted with the help of large language model
+assistants (GitHub Copilot, Claude) and reviewed by the authors. In 2026, before
+the release described here, an AI coding assistant, Claude (Anthropic) used
+through Claude Code, assisted in finalising and debugging the code --- locating
+and fixing defects, writing regression tests, and checking every database
+against a direct read of its source files --- and in preparing the publication:
+maintaining the metadata (\texttt{CITATION.cff}, \texttt{.zenodo.json},
+\texttt{codemeta.json}), packaging and releasing on PyPI, and checking the
+consistency between the code, its documentation and this article. Every change
+was reviewed by the authors before being committed, and is recorded in the
+project's changelog.
+
 \attnpar{\textbf{Paragraphe « Version 0.5.0 » à mettre à jour avant soumission.}
 Il décrit la 0.5.0 mais donne le catalogue \emph{actuel} : « grew from 12 to 23
 databases » ne vaut pour la 0.5.0 que par coïncidence. Elle en livrait 23 aussi, mais pas
@@ -932,23 +945,6 @@ The authors declare that they have no known competing financial interests or
 personal relationships that could have appeared to influence the work reported
 in this paper.
 
-\section*{Declaration of generative AI and AI-assisted technologies in the writing process}
-
-\attnpar{Déclaration obligatoire, à compléter par les auteurs. Elsevier impose une
-formulation en fin de manuscrit, avant les remerciements, uniquement pour l'usage d'IA
-générative \emph{dans la rédaction}. Formulation type :\\[3pt]
-\textit{« During the preparation of this work the authors used [outil] in order to
-[tâche]. After using this tool, the authors reviewed and edited the content as needed
-and take full responsibility for the content of the publication. »}\\[3pt]
-Deux précisions utiles ici. \textbf{(1)}~L'usage d'assistants dans le \emph{code} ne
-relève pas de cette déclaration (elle vise la rédaction), mais le dépôt en porte la
-trace publique --- \texttt{HANDOFF.md} et le \texttt{CHANGELOG}
-de la 0.3.1 qui indique que les docstrings ont été écrites avec assistance LLM. Un
-relecteur les verra. Le plus sûr est de le mentionner brièvement et sans détour, ce qui
-est aussi cohérent avec la politique éditoriale. \textbf{(2)}~Vérifier la formulation en
-vigueur sur \url{https://www.elsevier.com/about/policies/publishing-ethics} au moment de
-la soumission : elle a déjà été révisée deux fois.}
-
 \section*{Acknowledgements}
 \label{sec:acknowledgements}
 
@@ -973,6 +969,24 @@ et le signaler au journal. Renseigner par ailleurs les financeurs dans le formul
 Editorial Manager (Funder Registry : Agence Nationale de la Recherche,
 ANR-18-IDEX-0001).}
 
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+
+During the preparation of this work the authors used Claude (Anthropic),
+through Claude Code, in order to check the consistency of the manuscript with
+the software it describes (database counts, code listings and the output they
+produce, metadata) and to edit parts of the text, and ChatGPT (OpenAI) in order
+to improve the English phrasing. After using these tools, the authors reviewed
+and edited the content as needed and take full responsibility for the content
+of the published article. The use of generative AI in developing the software
+is described in Section~\ref{sec:history}.
+
+\attnpar{Formulation et emplacement conformes à la page Elsevier « Generative AI
+policies for journals » consultée le 8 octobre 2026 : titre « \dots{} in the
+manuscript preparation process » (l'ancien titre disait « writing process »),
+section séparée en fin de manuscrit, juste avant les références ; l'usage de l'IA
+dans le code relève du corps de l'article (§\ref{sec:history}), pas de cette
+déclaration. Revérifier la page au moment de la soumission.}
 
 %% ============================================================================
 %%  REFERENCES

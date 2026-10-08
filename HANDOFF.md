@@ -24,27 +24,14 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 1 | **The generative-AI declaration is an annotation, not a statement.** | **yes, for submission** |
-| 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
-| 3 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
-| 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
-| 5 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 6 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 1 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
+| 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
+| 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
+| 4 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
 
 ---
 
-## 1. The generative-AI declaration — blocking
-
-`\section*{Declaration of generative AI and AI-assisted technologies in the
-writing process}` in `paper/main.tex` holds only an `\attnpar` telling the
-authors what to write; the guide requires the declaration at submission. It is
-about the *writing*, not the code, but the repository carries public traces of
-AI assistance a reviewer will find (this file, and the 0.3.1 changelog entry
-recording that docstrings were written with LLM assistance). Elsevier has
-revised the required wording twice: check it at submission rather than trusting
-the annotation.
-
-## 2. The manuscript
+## 1. The manuscript
 
 All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 
@@ -72,7 +59,7 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   `test_funding_acknowledgement_is_present` checks them. Confirm the funder
   accepts the journal's form, or revert to parentheses and tell the journal why.
 
-## 3. Merging locations: a merge sums the raw dates as they are
+## 2. Merging locations: a merge sums the raw dates as they are
 
 `replace` maps several raw locations onto one, and the parser sums the rows
 sharing `(date, where)`. That is right when every location reports every day
@@ -98,25 +85,7 @@ column key, say) to give them a value that is not a sum. Increments
 run `pytest -m network tests/test_sources.py` afterwards. (2) Leave things as
 they are.
 
-## 4. Credit the Japanese geography
-
-`GeoCountry('JPN')` (database `jpnmhlw`) reads
-`raw.githubusercontent.com/dataofjapan/land/master/japan.geojson`, archived in
-Zenodo record `23212632`. Its source is **地球地図日本 (Global Map Japan)** of
-the GSI (国土地理院), whose content terms now apply the **Public Data License
-1.0**: commercial use and redistribution allowed, compatible with CC BY 4.0,
-attribution required (`出典：国土地理院ウェブサイト（URL）`) and modifications to
-be stated. The dataofjapan repository has **no licence** of its own; its README
-asks for credit to Global Map Japan, and, for commercial use, a report to the
-copyright holder — a condition of the old GSI terms, now superseded.
-
-To do: credit the source in the documentation of the Japanese geography (or the
-README) and in the Zenodo record — "Prefectures of Japan: 地球地図日本 (Global
-Map Japan), GSI, PDL 1.0; GeoJSON conversion by dataofjapan/land". What
-dataofjapan added (English names, ids) carries no licence: ask its authors for
-one, or rebuild the GeoJSON from Global Map Japan v2.2 downloaded from the GSI.
-
-## 5. The Ebola mirror
+## 3. The Ebola mirror
 
 `ebolardc` is read from its provider only (*live only* in the README): its
 `urldata` is the INRB/UMIE GitHub file, and the parser reads any dataset whose
@@ -136,7 +105,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 6. Authors of the Zenodo community records
+## 4. Authors of the Zenodo community records
 
 Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
 the source each database actually reads. Metadata edits mint no new version,
@@ -244,7 +213,7 @@ name the three authors.
   summed), and its own branch for `cur_idx_`/`cur_tx_` names returns one
   location's value rather than a mean (0.14 for France 0.33 and Germany 0.14).
   A fix needs to know which columns are rates: the `"intensive"` column key of
-  item 3 would serve both.
+  item 2 would serve both.
 - **The Zenodo 0.5.0 record (`21829902`) stays as it is** (2026-10-08), though
   it differs from `CITATION.cff` and `.zenodo.json`: shorter affiliations
   (`Université Paris Cité` for Beau and Browaeys, `Centre National de la
@@ -262,6 +231,17 @@ name the three authors.
   funder DOI form `10.13039/501100001665::...` would be mapped to the same ROR
   id. No manual step: the next release carries it. The free-text `notes`
   stay, for the Institut Covid-19 Ad Memoriam, which has no award id.
+- **The generative-AI declaration is written** (2026-10-08), in the two places
+  Elsevier's current policy asks for. The use in the software goes in §2.3 of
+  the manuscript (`sec:history`): docstrings of 0.3.1 drafted with GitHub
+  Copilot and Claude; in 2026, Claude through Claude Code for finalising and
+  debugging the code and preparing the publication (metadata, PyPI,
+  consistency checks). The use in the manuscript goes in the section
+  "Declaration of generative AI and AI-assisted technologies in the manuscript
+  preparation process" — the title Elsevier now uses — placed after the
+  acknowledgements, just before the references: Claude for consistency checks
+  and editing, ChatGPT for the English phrasing. Recheck Elsevier's page at
+  submission; its wording has changed three times.
 - **The issue forms are checked on GitHub, and the bug form's example answers
   are timeless** (2026-10-08): `pyvoa X.Y.Z`, `Python X.Y.Z` and
   `YYYY-MM-DD`, so that no release has to update them. The bug form also asks
@@ -287,6 +267,13 @@ name the three authors.
   the Malaysian states): the description of record 23212632 states each
   file's licence (2026-10-08). Revisiting one means a new Zenodo version,
   hence a new record id in `tools.get_local_from_url`.
+- **The Japanese geography is credited in the Zenodo record only**, as every
+  other file of the Bulk archive is (2026-10-08). `GeoCountry('JPN')` reads
+  `dataofjapan/land`'s `japan.geojson`, archived in record 23212632, whose
+  description gives the source: 地球地図日本 (Global Map Japan), GSI (国土地理院),
+  under the Public Data License 1.0 (compatible with CC BY 4.0), GeoJSON
+  conversion by dataofjapan/land. That repository has no licence of its own
+  for what it added (English names, ids); not pursued.
 - **pyvoa.org is the project's showcase site, the documentation is
   <https://pyvoa.github.io/pyvoa/>**, which pyvoa.org links to with the
   repository. The metadata follow suit: `Homepage` in `pyproject.toml` and the
