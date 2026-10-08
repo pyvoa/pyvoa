@@ -44,11 +44,23 @@ class visu_matplotlib:
 
         Chooses the inline backend inside a Jupyter kernel and TkAgg on a plain
         terminal or an IPython console, falling back to TkAgg if the detection
-        itself fails. Doing this at construction keeps the choice out of the
-        drawing methods.
+        itself fails. Where Tk cannot load, without a display, the backend
+        matplotlib resolved by itself is kept. Doing this at construction keeps
+        the choice out of the drawing methods.
         """
         import matplotlib
         self.av = InputOption()
+        def use_tkagg():
+            """Switch to TkAgg, or keep matplotlib's own choice if Tk cannot load.
+
+            Without a display (a server, a container, CI) Tk is unavailable and
+            matplotlib.use("TkAgg") raises; the backend matplotlib resolved
+            by itself (Agg there) still draws, and savefig() still works.
+            """
+            try:
+                matplotlib.use("TkAgg")
+            except ImportError:
+                pass
         def set_matplotlib_backend():
             """Select the backend: inline under a Jupyter kernel, TkAgg otherwise."""
             try:
@@ -56,16 +68,16 @@ class visu_matplotlib:
                 ipy = get_ipython()
                 if ipy is None:
                     # For classic terminal  (python)
-                    matplotlib.use("TkAgg")
+                    use_tkagg()
                 elif "IPKernelApp" in ipy.config:
                     # For Jupyter notebook
                     matplotlib.use("module://matplotlib_inline.backend_inline")
                 else:
                     # Cas IPython shell (ex : ipython en console)
-                    matplotlib.use("TkAgg")
+                    use_tkagg()
             except Exception:
                 #in other case fallback vers TkAgg (fenêtre graphique)
-                matplotlib.use("TkAgg")
+                use_tkagg()
         set_matplotlib_backend()
 
     def decomatplotlib(func):
