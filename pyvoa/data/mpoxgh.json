@@ -5,10 +5,6 @@
     "iso3": "WLD",
     "locationmode":"code"
   },
-  "replace":{
-	  "GUF":"FRA",
-	  "PYF":"FRA"
-  },
   "datasets": [
   	{	
 	 "urldata": "https://zenodo.org/records/11222009/files/mpoxgh_owid-monkeypox-data.csv?content",
@@ -16,7 +12,7 @@
 	 "urlmaster":"https://github.com/owid/monkeypox",
 	 "drop":
             {
-            "iso_code": ["OWID_","XKX"]
+            "iso_code": ["OWID_","XKX","GUF","PYF"]
 	    },
 	 "separator":",",
   	 "columns": [

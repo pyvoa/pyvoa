@@ -1,4 +1,13 @@
 # Unreleased
+- jhu drops its Kosovo row, which used to be added into Serbia (Serbia's
+  confirmed cases on 2021-12-31: 1 299 339, not 1 460 823). Kosovo is now left
+  out of every database, as owid and europa already did, its independence not
+  being recognised by the United Nations.
+- owid and mpoxgh no longer merge French Guiana and French Polynesia into
+  France, and drop their rows. The merge added the three territories' rates up:
+  France's `total_cases_per_million` read 981 527 on 2022-06-01 instead of
+  443 388. OWID's France is metropolitan already (cases and rates), so the
+  merge doubled nothing but rates; mpoxgh has no row for either territory.
 - tests/test_sources.py checks every shipped database against a direct read
   of the files it is parsed from, written apart from the parser: the dates
   parse with no NaT and none is a day-first date read month-first (the govcy

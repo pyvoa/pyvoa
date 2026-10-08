@@ -12,9 +12,10 @@ is in `CLAUDE.local.md`, machine-local and deliberately not checked in. The
 decisions already taken, the notes for whoever edits the manuscript, and the
 history of the repository are at the end.
 
-**Status, 2026-10-07.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
-`minimum`, `paper` and `docs`. The suite is at 380 passed, 23 deselected
-(network); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
+**Status, 2026-10-08.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
+`minimum`, `paper` and `docs`. The suite is at 381 passed, 94 deselected
+(network, 69 of them in `tests/test_sources.py`, which compares every database
+with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
 `10.5281/zenodo.21829901`). The API documentation is published at
 <https://pyvoa.github.io/pyvoa/>. Archived data are read from Zenodo record
 `23212632`.
@@ -25,7 +26,7 @@ history of the repository are at the end.
 |---|---|---|
 | 1 | **The generative-AI declaration is an annotation, not a statement.** | **yes, for submission** |
 | 2 | Manuscript: §4 adoption evidence, BibTeX, the Zenodo-community placeholder, the 0.5.0 paragraph, highlights and graphical abstract, the funding wording. | submission |
-| 3 | Merging locations sums raw dates and adds up rates; Kosovo waits on it. | no |
+| 3 | Merging locations sums raw dates; `sumall` adds up rates. | no |
 | 4 | The Japanese geography (GSI data) is credited nowhere. | before release |
 | 5 | The Zenodo `0.5.0` record differs from `CITATION.cff`; the IdEx award is not a structured grant. | no |
 | 6 | The issue forms are unchecked on GitHub, and their version placeholder goes stale. | no |
@@ -73,7 +74,7 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   `test_funding_acknowledgement_is_present` checks them. Confirm the funder
   accepts the journal's form, or revert to parentheses and tell the journal why.
 
-## 3. Merging locations: what a merge does to the numbers, and Kosovo
+## 3. Merging locations: what a merge does to the numbers
 
 **Problem 1 — a merge sums the raw dates as they are.** `replace` maps several
 raw locations onto one, and the parser sums the rows sharing `(date, where)`.
@@ -83,18 +84,24 @@ Kosovo share only 325 dates: on 29 only Kosovo reports, and a merged Serbia
 would drop from about 16 000 deaths to Kosovo's 3139; on 409 only Serbia does.
 A naive `XKX → SRB` was tried and reverted.
 
-**Problem 2 — a merge adds up rates.** Every column is summed, `owid`'s rates
-included (`*_per_million`, `*_per_hundred`, `positive_rate`,
-`reproduction_rate`, `gdp_per_capita`, `excess_mortality*`). The `GUF`/`PYF` →
-`FRA` merge of `owid`, kept on purpose, gives France on 2022-06-01 a
-`total_cases_per_million` of 981 527 — the sum of France's 443 388, French
-Guiana's 278 065 and French Polynesia's 260 074. The counts are right; the rates
-are not.
+**Problem 2 — a merge adds up rates.** Every column is summed, rates
+included. No shipped database merges a rate any more: the only case was the
+`GUF`/`PYF` → `FRA` merge of `owid`, which gave France on 2022-06-01 a
+`total_cases_per_million` of 981 527 (the sum of France's 443 388, French
+Guiana's 278 065 and French Polynesia's 260 074), and it was removed on
+2026-10-08 (see the decisions). Every other merge (`jhu` provinces, `jhu-usa`
+and `measles-usa` counties, `dpc`, `moh`, `covid19india`, `dgs`, `minciencia`,
+age classes of `sciensano` and `spf`) sums counts only. The problem stays for
+a future merge, and in `get()`: `option='sumall'` adds rates up as well
+(`total_cases_per_million` of France and Germany is summed), and its own
+branch for `cur_idx_`/`cur_tx_` names returns one location's value rather than
+a mean (0.14 for France 0.33 and Germany 0.14). Two smaller source defects
+were found on the way: `owid` ships East Timor twice on 1014 dates and the
+Faroe Islands on 394, half-empty rows the merge sums harmlessly except for
+`total_gdp_per_capita` of East Timor, which comes out doubled.
 
-**Kosovo.** The world borders file has no Kosovo and its `SRB` polygon contains
-Pristina, so in the world databases Kosovo belongs with Serbia. Today `jhu`
-merges it (the name resolves to `SRB`), `owid` drops it (`OWID_KOS`, by the
-`drop` of the `OWID_` prefix), `europa` drops it (`XKX`, explicit `drop`).
+**Kosovo** is settled: it is left out of every database (see the decisions),
+so it no longer waits on a merge.
 
 **Options.** (1) A real merge in the parser: carry each raw location's last
 value forward over the union of their dates before summing, sum only counts and
@@ -103,9 +110,10 @@ column key, say) to give them a value that is not a sum. Increments
 (`cumulative: true`) are summed as they are. It touches every existing merge
 (`dpc` Bolzano + Trento, `covid19india` Telangana and Ladakh, `escovid19data`,
 the county sums of `measles-usa` and `jhu-usa`): run the raw-versus-parsed
-sweep (`pytest -m network tests/test_sources.py`) afterwards. (2) Leave things as they are. (3) Option 1,
-then map `OWID_KOS` and `XKX` to `SRB` — for `owid`, the `drop` of `OWID_` runs
-before `replace`, so either the order changes or `OWID_KOS` is spared.
+sweep (`pytest -m network tests/test_sources.py`) afterwards. (2) Leave things
+as they are: no shipped merge has been shown to suffer from problem 1 (the
+Serbia/Kosovo case above is moot now Kosovo is left out); `europa`'s sums of
+regions are the one not checked.
 
 ## 4. Credit the Japanese geography
 
@@ -263,9 +271,21 @@ name the three authors.
 - **`requirements.txt` is kept**: mybinder.org builds from it.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases**; the
   exact count lives in the README's table.
-- **French Guiana and French Polynesia are merged into France** in `owid` and
-  `mpoxgh`: overseas territories, not countries. What the merge does to rates
-  is item 3: fix the merge, do not remove it.
+- **French Guiana and French Polynesia are no longer merged into France** in
+  `owid` and `mpoxgh`, and their rows are dropped (2026-10-08). OWID's France
+  excludes them already: its cases follow metropolitan France (just under
+  JHU's metropolitan row, 3.6 % under JHU's France with its overseas rows),
+  and its rates divide by a metropolitan population, 64 277 411 as implied by
+  `total_cases_per_million`. Only OWID's `population` column (67 813 000)
+  takes the overseas departments in, and pyvoa does not read it. The merge
+  counted nothing twice, but summed the rates.
+- **Kosovo is left out of every database**, its independence not being
+  recognised by the United Nations (2026-10-08). `owid` drops `OWID_KOS` (by
+  the `OWID_` prefix), `europa` and `mpoxgh` drop `XKX`, `jhu` drops the
+  `Kosovo` row, which used to be added into Serbia. The world borders file has
+  no Kosovo polygon, its `SRB` polygon takes the territory in, so a map
+  paints it with Serbia's value; the population pyvoa gives Serbia
+  (6 641 964) excludes Kosovo, as the data now do.
 - **`tile='openstreet'` is the default** of both backends; matplotlib sends a
   pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web

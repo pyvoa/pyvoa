@@ -15,6 +15,7 @@
 	 "urlparent":"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv",
 	 "urlmaster":"https://github.com/CSSEGISandData/COVID-19",
 	 "separator":",",
+	 "drop":{"Country/Region":"Kosovo"},
   	 "dropcolumns":["Province/State","Lat","Long"],
 	 "columns": [
 		 {
@@ -29,6 +30,7 @@
 	 "urlparent":"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",
 	 "urlmaster":"https://github.com/CSSEGISandData/COVID-19",
 	 "separator":",",
+	 "drop":{"Country/Region":"Kosovo"},
   	 "dropcolumns":["Province/State","Lat","Long"],
 	 "columns": [
 		 {
@@ -43,6 +45,7 @@
 	 "urlparent":"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv",
 	 "urlmaster":"https://github.com/CSSEGISandData/COVID-19",
 	 "separator":",",
+	 "drop":{"Country/Region":"Kosovo"},
   	 "dropcolumns":["Province/State","Lat","Long"],
 	 "columns": [
 		 {
