@@ -286,8 +286,9 @@ class DataParser:
       'from_db' and one column per variable selected in the json file.
       "where" and "code" go through the geo methods, to assure a good
       standardization. Every location of the geography is present on every
-      date, with missing values where the source says nothing; 'from_db' tells
-      the locations the source reports from those it does not. A location the
+      date, with missing values where the source says nothing; 'from_db', a
+      bool column, tells the locations the source reports from those it does
+      not. A location the
       geometry file lacks carries an empty geometry rather than none.
       """
       if 'header' in list(self.metadata.keys()):

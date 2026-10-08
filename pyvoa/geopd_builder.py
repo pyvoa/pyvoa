@@ -592,6 +592,12 @@ class GPDBuilder:
        Tests every argument and its values, and applies the options asked for, in
        particular 'nonneg', which redistributes values so as to remove the
        negative ones.
+
+       The 'when' range cuts the database and a frame passed as 'input' alike.
+       A single date is only selected at the very end, once 'daily' and
+       'weekly' have been computed, so that it keeps a day before it to be
+       differenced against. 'normalize:...' writes its rate to a column of its
+       own, '<which> normalize:...'.
        """
        defaultargs = InputOption().d_batchinput_args
        option = kwargs.get('option',defaultargs['option'][0])
