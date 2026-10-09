@@ -25,7 +25,7 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 1 | Manuscript: §4 adoption evidence, the 0.5.0 paragraph, highlights and graphical abstract. | submission |
+| 1 | Manuscript: §4 adoption evidence, a new release to describe, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
 | 4 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
@@ -41,12 +41,13 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   `c68e6a1`) as the authors' own page, not as adoption. Its view count, 5 452
   on 2026-10-09 from the data.gouv.fr API, must be read again before
   submission.
-- **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
-  catalogue: "12 to 23 databases" holds for 0.5.0 by coincidence only — it
-  shipped 23 too, but not the same ones (with sentinellesIRA and risklayer,
-  without ebolardc and measles-usa). The figure follows today's catalogue
-  only because `tests/test_paper.py` requires every database count
-  to match `pyvoa/data/`. Rewrite it around the release actually submitted.
+- **A new release before submitting.** The manuscript announces 0.5.0 (the
+  history sentence, the AI declaration's "before the release described here",
+  rows C1 and S1, the PyPI url in S1) but describes `main`: not the same 23
+  databases (ebolardc and measles-usa instead of sentinellesIRA and
+  risklayer), and the live mode came after 0.5.0. Release first, then update
+  those places together with the release's DOIs and SWHID; note 1 of the
+  manuscript says the same.
 - **Highlights and a graphical abstract** — both *encouraged*, neither written,
   both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
   characters each, in a file named with "highlights". Graphical abstract:

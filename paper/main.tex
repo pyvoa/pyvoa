@@ -534,10 +534,14 @@ consistency between the code, its documentation and this article. Every change
 was reviewed by the authors before being committed, and is recorded in the
 project's changelog.
 
-\attnpar{\textbf{Version soumise.} Le texte décrit la 0.5.0 (« Version 0.5.0
-(August 2026) is the first release prepared for external scrutiny ») et les lignes
-C1/S1 des tableaux de métadonnées aussi. Si la version soumise est une 0.5.1 ou
-suivante, mettre à jour ces trois endroits ensemble.}
+\attnpar{\textbf{Version soumise.} Le texte annonce la 0.5.0 (ci-dessus, la
+déclaration d'IA « before the release described here », lignes C1 et S1 des tableaux
+de métadonnées, URL PyPI en S1), mais décrit le code de \texttt{main}, qui n'est pas
+celui de la 0.5.0 : le catalogue de 23 bases n'est pas le même (\texttt{ebolardc}
+et \texttt{measles-usa} au lieu de \texttt{sentinellesIRA} et \texttt{risklayer}),
+et le mode live (\texttt{pf.setlive}) qu'il présente est postérieur. Il faut donc publier une
+nouvelle version avant de soumettre, puis mettre à jour ces endroits ensemble, avec
+les DOI et le SWHID de la version.}
 
 
 
@@ -778,15 +782,13 @@ citations de PyCoA sur Google Scholar et HAL. \textbf{(b)}~\emph{Des chiffres
 d'enseignement} : intitulés d'UE, niveaux (L2/L3/M1), effectifs annuels, années
 concernées. « Utilisé en cours depuis 2020 » sans quantification sera lu comme une
 autopromotion ; « environ N étudiants par an dans l'UE X » ne le sera pas.
-\textbf{(c)}~\emph{Des chiffres d'adoption} : téléchargements PyPI (via
-\url{https://pypistats.org/packages/pyvoa}), étoiles et forks GitHub, participants aux
-Discussions. Attention : le dépôt affiche actuellement 0~étoile et 0~fork, et un
-relecteur peut le constater --- ne citer ces métriques que si elles sont favorables, et
-préférer alors PyPI. \textbf{(d)}~La réutilisation data.gouv.fr de PyCoA (2021) a été mise à
-jour le 9 octobre 2026 au nom de pyvoa et est citée (\texttt{datagouv\_pyvoa}) : c'est
-une page déposée par les auteurs, présentée comme telle, et non un usage tiers. Le
-nombre de vues (5\,452 le 9 octobre 2026) est celui de l'API data.gouv.fr ; le
-réactualiser avant soumission.}
+\textbf{(c)}~\emph{Des chiffres
+d'adoption} : au 9 octobre 2026, 0~étoile et 0~fork sur GitHub, et 49 téléchargements
+PyPI le mois écoulé pour \texttt{pyvoa}, 26 pour \texttt{pyvoa-full}
+(\url{https://pypistats.org/packages/pyvoa}). Trop faibles pour être cités ; un
+relecteur peut les constater. \textbf{(d)}~Le nombre de vues de la réutilisation
+data.gouv.fr (5\,452 le 9 octobre 2026, API data.gouv.fr) est à relire avant
+soumission.}
 
 \attnpar{\textbf{Suggestion de contenu pour le premier point du canevas, les questions
 nouvelles que le logiciel rend abordables.} L'exemple le plus convaincant
@@ -858,9 +860,10 @@ was supported by \dots{} [grant number \dots] »), avec les mentions exigées pa
 financeur --- l'IdEx « Université Paris Cité 2022 », l'Institut Covid-19 Ad
 Memoriam, et le soutien au titre des « Investissements d'avenir » (référence
 ANR-18-IDEX-0001). La même phrase figure dans \texttt{AUTHORS}, le README et
-\texttt{.zenodo.json}. La dernière phrase répond à l'obligation du guide de déclarer
-le rôle des financeurs. Renseigner aussi le financeur dans Editorial Manager
-(Funder Registry : Agence Nationale de la Recherche, ANR-18-IDEX-0001).}
+\texttt{.zenodo.json}, qui porte aussi la subvention en entrée \texttt{grants}. La
+dernière phrase répond à l'obligation du guide de déclarer le rôle des financeurs.
+\textbf{À la soumission} : renseigner le financeur dans Editorial Manager (Funder
+Registry : Agence Nationale de la Recherche, ANR-18-IDEX-0001).}
 
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
@@ -924,20 +927,12 @@ S7 & Support email for questions & contact@pyvoa.org \\
 \label{executableMetadata}
 \end{table}
 
-\attnpar{Bibliographie. \textbf{(a)}~Passée de 20 à 15 entrées : les références non
-citées dans le texte ont été supprimées (SoftwareX les refuse), ainsi que
-\texttt{spf2020}, \texttt{insee2020}, \texttt{kluyver2016}, \texttt{geopandas},
-\texttt{datagouv}, \texttt{lauer2023} et \texttt{heer2008}, devenues sans objet.
-\textbf{(b)}~\texttt{ponce2021} : la référence du brouillon (JOSS 5(51):2363, 2020)
-correspondait à un autre article ; celle donnée ici (6(60):2995, 2021) est
-\texttt{covid19.analytics}, vérifiée contre Crossref le 8 octobre 2026.
-\textbf{(c)}~\texttt{covid\_pypi} et \texttt{covid19py} n'ont pas de DOI : ils sont
-cités comme logiciels (auteur d'après PyPI et GitHub, version, année, dépôt) avec leur
-identifiant Software Heritage (SWHID), vérifiés le 8 octobre 2026. \textbf{(d)}~Elsevier
-souhaite un DOI pour chaque référence qui en possède un : les six premières en ont, les
-autres sont des logiciels ou des pages web, ce qui est admis. \textbf{(e)}~Les références
-sont dans \texttt{references.bib}, mises en forme par \texttt{elsarticle-num}, qui les
-numérote dans l'ordre de première citation : joindre \texttt{references.bib} à la
-soumission. BibTeX signale une année absente pour les huit pages web, qui n'en ont pas.}
+\attnpar{Bibliographie. 22 entrées, toutes citées (SoftwareX refuse les
+références non citées), numérotées dans l'ordre de première citation par
+\texttt{elsarticle-num}. Les douze qui ont un DOI le portent, comme Elsevier le
+souhaite ; les dix autres sont des logiciels ou des pages web, ce qui est admis.
+\texttt{ponce2021}, \texttt{covid\_pypi} et \texttt{covid19py} ont été vérifiés
+le 8 octobre 2026 (Crossref, PyPI, Software Heritage). \textbf{À la soumission} :
+joindre \texttt{references.bib}.}
 
 \end{document}
