@@ -305,7 +305,32 @@ release time.
   update those four places. A lightweight tag would give a `swh:1:rev:`
   instead: tag annotated.
 
+- **Two data.gouv.fr reuses, both ours, both under the organisation
+  `python-covid-analysis`.** They show where pyvoa is used, but they are
+  not third-party adoption and must not be counted as such in §4 of the
+  manuscript. `docs/_static/img/map_spf_metropole.png` is the image embedded in
+  the pyvoa reuse, served by GitHub Pages: do not remove or rename it. Editing
+  the reuses goes through the data.gouv.fr API (`/api/1/reuses/<id>/`, key in
+  the `X-API-KEY` header, read from `~/.datagouv_token`).
+
 ## History
+
+- **The data.gouv.fr reuses were updated on 2026-10-09.** The 2021 PyCoa reuse
+  became [pyvoa](https://www.data.gouv.fr/reuses/pyvoa-ex-pycoa-python-virus-open-analysis)
+  (id `603c9fb5aee027e6de724e33`). The old slug redirects to the new one, and
+  the views since 2021 are kept. It got a new text, a matplotlib example drawing
+  the map of hospital deaths per 1000 inhabitants in metropolitan France, the
+  pyvoa logo and the type `application`. Its eleven PyCoa-era datasets were
+  replaced by the six pyvoa reads or illustrates: the five behind `spf`,
+  `spfnational` and `sumeau`, and the Insee death records. A second reuse,
+  [Décès journaliers en France depuis 2000](https://www.data.gouv.fr/reuses/deces-journaliers-en-france-depuis-2000-vus-par-pyvoa)
+  (id `6ac90c777cbe1b9e85e73df9`, type `visualization`), presents
+  `examples/notebooks/PyvoaFront-withINSEE.ipynb` and its script twin
+  `examples/pyfiles/insee_deaths.py`, whose figure it shows: the one of the
+  2026-08-05 Bluesky post, redrawn with matplotlib and its arrows placed by
+  code. The Insee resource titled `deces-2026-m09.txt` serves
+  `deces-2025-m09.txt`; both examples leave it out by name, to be lifted
+  once Insee fixes it.
 
 - **The Zenodo records were brought in line on 2026-10-09**, metadata only, no
   new version: data producers credited (Risklayer was wrong on every `rki`
