@@ -28,7 +28,7 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 | 1 | Manuscript: §4 adoption evidence, the 0.5.0 paragraph, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 4 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
+| 4 | Authors of the Zenodo community records: data producers fixed on 2026-10-09; the pyvoa team still named three ways or not at all, our own identity incomplete. | before release |
 | 5 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
 
 ---
@@ -110,17 +110,34 @@ so none of this touches the code. At the least, fix the records pyvoa reads:
 spfnational), 18790381 (sumeau), 23047588 (geo), 23165146 (measles-usa),
 23212632 (Bulk).
 
-**Data producers named as creators**, in order of urgency:
+**Data producers named as creators — done 2026-10-09**, checked against the
+public API afterwards:
 
-| Record | Creator now | Problem | Proposed |
-|---|---|---|---|
-| `rki` 18682655 | Risklayer | wrong: pyvoa reads `cases-rki-by-ags.csv` of jgehrcke/covid-19-germany-gae, RKI data (the Risklayer files there are `*-rl-crowdsource-*`) | Robert Koch-Institut; Jan-Philip Gehrcke as contributor (DataCollector) |
-| `measles-usa` 23165146 | Beau, Tristan | the record's own description credits the JHU Measles Tracking Team | Johns Hopkins University Measles Tracking Team; Beau as DataCurator |
-| `mpoxgh` 11222009 | Our World in Data | Global.health, the primary source, is missing | Global.health; Our World in Data |
-| `covidtracking` 18788895 | "Covid Tracking Database" | not the project's name | The COVID Tracking Project at The Atlantic |
-| `covid19india` 18788975 | "Covid 19 India" | idem | covid19india.org |
-| `sumeau` 18790381 | "Sumeau" | data.gouv.fr gives Santé publique France as publisher | Santé publique France |
-| `dgs` 11222023 | DSSG Portugal | right for the compilation; the DGS is absent | add Direção-Geral da Saúde (DataCollector, or in the description) |
+| Record | Creators now |
+|---|---|
+| `rki` 18682655, and its earlier versions 11222012, 10082320 | Robert Koch Institute (ROR, ISNI); Gehrcke, Jan-Philip (DataCollector) — Risklayer was wrong on all three, which hold RKI files only |
+| `measles-usa` 23165146 | Johns Hopkins University (ROR); Beau as DataCurator |
+| `mpoxgh` 11222009 | Global.health; Our World in Data |
+| `covidtracking` 18788895 | The COVID Tracking Project at The Atlantic |
+| `covid19india` 18788975 | covid19india.org |
+| `sumeau` 18790381 | Santé Publique France (ROR) |
+| `dgs` 11222023 | DSSG Portugal; Direção-Geral da Saúde |
+
+`measles-usa` and `sumeau` keep the name of their ROR entry ("Johns Hopkins
+University" rather than its Measles Tracking Team, "Santé Publique France" with
+the ROR's capital *P*): renaming them would put the displayed name at odds with
+the identifier. The earlier versions of `mpoxgh` (10083685) and `dgs`
+(10082026) still lack Global.health and the DGS — incomplete, not wrong, and
+read by no code. The earlier `rki` versions declared an MIT licence; they now
+give the DL-DE/by-2.0 of the data, as 18682655 does.
+
+How the edit is done, for the remaining points: the InvenioRDM API (`POST
+/api/records/<id>/draft`, `PUT` the draft back with only the field changed,
+`POST …/draft/actions/publish`), with `Accept:
+application/vnd.inveniordm.v1+json`. A vocabulary licence must be sent back as
+`{"id": …}` alone, or the draft fails validation; a failed `PUT` still saves
+the draft. One token of the account that owns the records reached all six
+records edited, `sumeau` and `measles-usa` included.
 
 The other records pyvoa reads name their producer correctly.
 
