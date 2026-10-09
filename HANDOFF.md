@@ -37,6 +37,10 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 
 - **§4 adoption evidence** — third-party uses of pyvoa, still to document.
+  The data.gouv.fr reuse is cited under *Uptake so far* (`datagouv_pyvoa`,
+  `c68e6a1`) as the authors' own page, not as adoption. Its view count, 5 452
+  on 2026-10-09 from the data.gouv.fr API, must be read again before
+  submission.
 - **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
   catalogue: "12 to 23 databases" holds for 0.5.0 by coincidence only — it
   shipped 23 too, but not the same ones (with sentinellesIRA and risklayer,
@@ -312,8 +316,8 @@ release time.
 
 - **Two data.gouv.fr reuses, both ours, both under the organisation
   `python-covid-analysis`.** They show where pyvoa is used, but they are
-  not third-party adoption and must not be counted as such in §4 of the
-  manuscript. `docs/_static/img/map_spf_metropole.png` is the image embedded in
+  not third-party adoption: §4 of the manuscript cites the pyvoa one as the
+  authors' own page, and must keep doing so. `docs/_static/img/map_spf_metropole.png` is the image embedded in
   the pyvoa reuse, served by GitHub Pages: do not remove or rename it. Editing
   the reuses goes through the data.gouv.fr API (`/api/1/reuses/<id>/`, key in
   the `X-API-KEY` header, read from `~/.datagouv_token`).
