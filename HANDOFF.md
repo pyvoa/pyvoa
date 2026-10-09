@@ -169,6 +169,11 @@ release time.
   style (`CONTRIBUTING.md` §5).
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
 - **`CHANGELOG.md` does not follow Keep a Changelog** (`CONTRIBUTING.md` §4.7).
+- **The changelog lists user-visible changes only**, grouped by theme as in
+  the 0.5.0 entry. The manuscript, metadata, tests, lint and internal
+  refactors stay out, and so do fixes of regressions no release shipped. The
+  *Unreleased* entry was cut from about 400 lines to 76 on that basis on
+  2026-10-09 (`d81e0e6`); a new entry is a line or two, not a paragraph.
 - **`requirements.txt` is kept**: mybinder.org builds from it.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases**; the
   exact count lives in the README's table.
