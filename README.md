@@ -171,7 +171,9 @@ database to the next — `setwhom()` prints it.
   with `PyvoaForBeginners.ipynb`; `GeoByExamples.ipynb` covers the geolocation
   layer on its own.
 - [`examples/pyfiles/`](examples/pyfiles/) — `owid.py` and `using_geo.py`, the
-  same workflows as plain scripts.
+  same workflows as plain scripts; `insee_deaths.py`, the twin of
+  `PyvoaFront-withINSEE.ipynb`, hands pyvoa a DataFrame built from the Insee
+  death records.
 - <https://pyvoa.org> — project website.
 - `pf.whattodo()` returns a DataFrame listing every keyword accepted by `get`,
   `plot`, `hist` and `map`, with its allowed values — the quickest reference
