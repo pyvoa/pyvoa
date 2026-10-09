@@ -148,8 +148,8 @@ descriptions ("Covid 19 data for Chile", "Covid Tracking USA"); a common form
 would be "`<key>` — `<description>` (mirror for pyvoa)". Publication dates are
 mostly the deposit date, but some give the data period (18772757
 `2020-09-05/2023-02-11`, 18682655 2023, Bulk 18773027 2021). `coadata`
-11198165 is credited to "PyCoa", a PyCoA-era record: keep it as history, or
-name the three authors.
+11198165 is credited to "PyCoa", a PyCoA-era record that no code reads: it
+was made private in the community on 2026-10-08.
 
 
 ## 5. Moving `contextily` to `pyvoa-full`

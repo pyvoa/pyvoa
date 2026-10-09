@@ -457,7 +457,8 @@ class front:
 
             Fills a missing argument with its default value, transforms 'where',
             'which' and 'option' into lists when they are not already, and orders the
-            items of 'option'.
+            items of 'option'. A frame passed as 'input' is replaced by a copy, so
+            the columns added downstream never reach the caller's frame.
             """
             input = kwargs.get('input',pd.DataFrame())
             if not isinstance(input,pd.DataFrame):
@@ -767,6 +768,8 @@ class front:
             column, a 'where' column and at least one column of data; a 'code'
             column is kept when there is one, but is not required. Selecting on
             a table of your own sets the current database to 'in-house data'.
+            ``when`` cuts it as it cuts a database, and the table itself is
+            never modified; a frame returned by :meth:`get` can be passed back.
         output : {'geopandas', 'pandas', 'list', 'dict', 'array'}, optional
             The type to return. Defaults to 'geopandas'; see :meth:`listoutput`.
             A table with no geometry to speak of -- one read from ``input``, or
@@ -938,6 +941,8 @@ class front:
             column, a 'where' column and at least one column of data; a 'code'
             column is kept when there is one, but is not required. Selecting on
             a table of your own sets the current database to 'in-house data'.
+            ``when`` cuts it as it cuts a database, and the table itself is
+            never modified; a frame returned by :meth:`get` can be passed back.
         typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
             How the geography is drawn; :meth:`listmap` lists them.
         tile : {'openstreet', 'esri'}, optional
@@ -1069,6 +1074,8 @@ class front:
             column, a 'where' column and at least one column of data; a 'code'
             column is kept when there is one, but is not required. Selecting on
             a table of your own sets the current database to 'in-house data'.
+            ``when`` cuts it as it cuts a database, and the table itself is
+            never modified; a frame returned by :meth:`get` can be passed back.
         typeofhist : {'location', 'value', 'pie'}, optional
             The kind of histogram. Defaults to 'location'; :meth:`listhist` lists
             them.
@@ -1212,6 +1219,8 @@ class front:
             column, a 'where' column and at least one column of data; a 'code'
             column is kept when there is one, but is not required. Selecting on
             a table of your own sets the current database to 'in-house data'.
+            ``when`` cuts it as it cuts a database, and the table itself is
+            never modified; a frame returned by :meth:`get` can be passed back.
         typeofplot : {'date', 'compare', 'versus', 'spiral', 'yearly'}, optional
             The kind of plot. Defaults to 'date'; :meth:`listplot` lists them.
             'compare' and 'spiral' are bokeh only, and 'versus' takes exactly two
