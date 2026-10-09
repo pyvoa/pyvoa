@@ -28,8 +28,7 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 | 1 | Manuscript: §4 adoption evidence, the 0.5.0 paragraph, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 4 | Zenodo records: our own credit — Bulk creators, the pyvoa team as contributor spelt four ways, geo affiliation. | before release |
-| 5 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
+| 4 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
 
 ---
 
@@ -97,54 +96,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 4. Authors of the Zenodo community records
-
-State checked against the public API on 2026-10-09; the data producers are
-now credited correctly on every record pyvoa reads. What is left is how *we*
-appear. Metadata edits mint no new version and touch no code.
-
-**Necessary, in order of priority**
-
-1. **Bulk 23212632** — the record every archived download is read from. Its
-   only creator is "Beau, Tristan", affiliation "pyvoa.org", no ORCID. Its
-   files are third-party data whose credits the description gives per file, so
-   name the three authors as creators, with ORCID and affiliation as in
-   `AUTHORS` — or at least complete Beau's. Same on its earlier versions.
-2. **The pyvoa team as contributor, one spelling.** Today it is written four
-   ways: "PyCoa" (DataCurator) on 14 records — jhu 10082179, mpoxgh 11222009,
-   moh 11222014, jpnmhlw 11222015, imed 11222016, govcy 11222017, europa
-   11222020, escovid19data 11222021, dpc 11222022, dgs 11222023, rki 18682655,
-   phe 18772757, sciensano 18790064, spf 18790282 (spf, spfnational) — and on
-   the earlier versions of rki; "Pyvoa" on owid 18789975; "Beau, Tristan" on
-   measles-usa 23165146; nothing on jhu-usa 11267174, minciencia 18773580,
-   covidtracking 18788895, covid19india 18788975, sumeau 18790381. Rule: the
-   three authors as DataCurator, with ORCID and affiliation — or, failing
-   that, the organisation "pyvoa", spelt alike everywhere.
-3. **geo 23047588** — derived by us, so Beau as creator is right; add the
-   affiliation (the ORCID is there).
-
-**Optional**
-
-- Titles mix the database key (`dgs`, `sumeau`) and free descriptions ("Covid
-  19 data for Chile", "Covid Tracking USA", "Covid 19 India"); a common form
-  would be "`<key>` — `<description>` (mirror for pyvoa)".
-- Publication dates are mostly the deposit date, but some give the data
-  period: phe 18772757 `2020-09-05/2023-02-11`, rki 18682655 2023-01-27, Bulk
-  18773027 2021.
-- The earlier versions of mpoxgh (10083685) and dgs (10082026) still lack
-  Global.health and the DGS — incomplete, not wrong, read by no code.
-
-**How to edit.** The InvenioRDM API, with `Accept:
-application/vnd.inveniordm.v1+json`: `POST /api/records/<id>/draft`, `PUT` the
-draft back with only the field changed, `POST …/draft/actions/publish`. A
-vocabulary licence must be sent back as `{"id": …}` alone or the draft fails
-validation, and a failed `PUT` still saves the draft — re-read it before
-retrying. A single token reached all six records edited on 2026-10-09,
-though they were thought to sit on two accounts. Querying the public API takes
-up to half a minute per record: read them in parallel.
-
-
-## 5. Moving `contextily` to `pyvoa-full`
+## 4. Moving `contextily` to `pyvoa-full`
 
 `contextily` is a hard dependency, imported once, inside the matplotlib map
 (`visu_matplotlib.py`), for the basemap tiles; it is only needed once a chart
@@ -273,6 +225,10 @@ release time.
   `measles-usa` stays "Johns Hopkins University" rather than its Measles
   Tracking Team, `sumeau` "Santé Publique France" with the capital *P* —
   renaming them would put the displayed name at odds with the identifier.
+- **Dates of the Zenodo data records follow DataCite** (2026-10-09): the
+  *publication date* is the deposit date of the version; the first and last
+  dates in the data go in a single `dates` entry of type *Collected*. The
+  download date (2023-10-31 on the 2023–2024 versions) was dropped.
 - **pyvoa dates from 2023** (2026-10-08): the project took the name in 2023
   and was developed in a branch of the pycoa repository until March 2025, when
   it moved to a repository of its own and the code took the name. The
@@ -351,6 +307,15 @@ release time.
 
 ## History
 
+- **The Zenodo records were brought in line on 2026-10-09**, metadata only, no
+  new version: data producers credited (Risklayer was wrong on every `rki`
+  version), the three authors with ORCID and affiliation on Bulk and Beau on
+  `geo`, `pyvoa.org` as the one DataCurator of the 44 data records, titles of
+  the form `<key> — <description> (mirror for pyvoa)`, the period of the data
+  as the *Collected* date, three stray drafts deleted. Records read by no code
+  were left as they are: `ebolardc data` 23165598, `SentinellesIRA` 18790187,
+  "Who Europe from RiskLayer" 18789238, the test deposits "PYVOA - GEO 6/7",
+  `coadata` 11198165. How to edit them is in `CLAUDE.local.md`.
 - **The journal was JOSS until 2026-08-13**; the repository work carried over,
   only the manuscript format changed.
 - **Every tag is an ancestor of `main` again, since 2026-09-12.** Before, `v0.1.0`
