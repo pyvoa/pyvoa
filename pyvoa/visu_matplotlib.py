@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 from PIL import Image
+import matplotlib.patheffects as pe
 
 from pyvoa.__version__ import __version__
 from pyvoa.kwargs_options import InputOption
@@ -469,10 +470,15 @@ class visu_matplotlib:
         which = kwargs.get('which')
         title = kwargs.get('title')
         tile = kwargs.get('tile')
+
         typeofmap = kwargs.get('typeofmap')
+        show_values = False
+        if 'show_values' in typeofmap:
+            show_values = True
+
         return_pltaxis= kwargs.get('return_pltaxis')
         projection = kwargs.get('projection', 'eckert4')
-        if typeofmap == 'dense':
+        if 'dense' in typeofmap:
             tile = None
         # The frames arrive labelled EPSG:4326 whatever their units: the world
         # geometries are in Web Mercator metres, the dense country geometries in
@@ -557,7 +563,28 @@ class visu_matplotlib:
             }
         )
 
-
+         # values written on the map
+        print('show_values',show_values)
+        if show_values:
+            # representative_point() is always inside the polygon, unlike the
+            # centroid, which can fall outside a concave shape (France with
+            # its overseas territories, Norway, Chile...)
+            points = input.geometry.representative_point()
+            for pt, value in zip(points, input[which]):
+                if value is None or np.isnan(value):
+                    continue
+                # keep only the points inside the visible window
+                if not (minx <= pt.x <= maxx and miny <= pt.y <= maxy):
+                    continue
+                ax.annotate(
+                    f"{value:,.3g}",
+                    xy=(pt.x, pt.y),
+                    ha='center',
+                    va='center',
+                    fontsize=kwargs.get('value_fontsize', 6),
+                    color='black',
+                    path_effects=[pe.withStroke(linewidth=1.5, foreground='white')],
+                )
         cbar = plot.get_figure().axes[-1]
         formatter = ScalarFormatter(useMathText=True)
         formatter.set_scientific(True)

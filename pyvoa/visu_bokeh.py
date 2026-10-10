@@ -880,6 +880,31 @@ class visu_bokeh:
                 return val + " ×10" + exp.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || d).join('');
             """)
             bokeh_figure_map.add_layout(color_bar, 'below')
+            if 'show_values' in kwargs.get('typeofmap'):
+                from bokeh.models import LabelSet, CustomJS
+
+                def _fmt(v):
+                    # 3 significant digits with thousands separators, no scientific notation
+                    if v is None or np.isnan(v):
+                        return ''
+                    return format(float(f"{v:.3g}"), ",.10g")
+
+                # same coordinates as the patches drawn above (not gdf, which is
+                # reprojected only to measure the extent)
+                pts = input.geometry.representative_point()
+                labelsrc = ColumnDataSource(data={
+                    'x': pts.x.tolist(),
+                    'y': pts.y.tolist(),
+                    'where': input['where'].tolist(),
+                    'label': [_fmt(v) for v in input_dates.set_index('where')[which]
+                              .reindex(input['where']).tolist()],
+                })
+                bokeh_figure_map.add_layout(LabelSet(
+                    x='x', y='y', text='label', source=labelsrc,
+                    text_align='center', text_baseline='middle',
+                    text_font_size='8px', text_color='black',
+                    background_fill_color='white', background_fill_alpha=0.6,
+                ))
 
             if dateslider:
                 input_dates = input_dates.sort_values(by=['date', 'where'])
@@ -1024,7 +1049,7 @@ class visu_bokeh:
                     ],
                     point_policy='follow_mouse',    # recommandé pour les patches
                     )
-                
+
                     bokeh_figure_map.add_tools(hover_missing)
 
                 main_renderer = bokeh_figure_map.patches('xs', 'ys', source = geocolumndatasrc,
@@ -1478,7 +1503,7 @@ class visu_bokeh:
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
-        if kwargs['typeofmap']!='dense':
+        if 'dense' in kwargs['typeofmap'] :
             tile = visu_bokeh.convert_tile(tile)
             wmt = WMTSTileSource(url = tile)
             bokeh_figure.add_tile(wmt, retina=True)

@@ -59,7 +59,7 @@ class InputOption:
                         'mode':['mouse','vline','hline'],\
                         'typeofhist':['location','value','pie'],\
                         'typeofplot':['date','compare','versus','spiral','yearly'],
-                        'typeofmap':[None,'not dense','dense','folium'],\
+                        'typeofmap':['not dense','dense','folium','show_values'],\
                         'bins':10,\
                         'vis':['matplotlib','bokeh','seaborn'],\
                         'tile' : ['openstreet','esri'],\
@@ -77,10 +77,10 @@ class InputOption:
 
         self.pdcharts = pd.DataFrame({
             'matplotlib': ["'typeofplot'=['date', 'versus', 'yearly']","'typeofhist'=['location','value','pie']",\
-                "'typeofmap'=[None,'not dense','dense']" ],
+                "'typeofmap'=['not dense','dense','show_values']" ],
             'seaborn': ["'typeofplot'=['date', 'versus','yearly']","'typeofhist'=['location','value','pie']",False],
             'bokeh': ["'typeofplot'=['date', 'compare', 'versus', 'spiral', 'yearly']","'typeofhist'=['location','value','pie']",
-            "'typeofmap'=[None,'not dense','dense']"]
+            "'typeofmap'=['not dense','dense','show_values']"]
             }, index=['plot', 'hist','map'])
 
         self.windows = {' daily':1,' weekly':7}

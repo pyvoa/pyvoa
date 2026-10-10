@@ -636,6 +636,8 @@ class front:
             if self._setkwargsvisu is None:
                 raise PyvoaError("vis is not set can you can not use charts functions  ...")
             kwargs['vis'] = self.vis
+            if not isinstance(kwargs['typeofmap'],list):
+                kwargs['typeofmap'] = [kwargs['typeofmap']]
             if 'get' not in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:
@@ -854,10 +856,10 @@ class front:
 
             if mapoption:
                 if 'folium' in mapoption:
-                    mapoption.remove('folium')
-                    print(self.av.test_add_graphics_libraries(['folium']))
+                    PyvoaWarning('Folium has been removed from this version... but it is still around and could be added easily.')
+                    #print(self.av.test_add_graphics_libraries(['folium']))
                     #self.setvis('folium')
-                if mapoption == 'dense':
+                if 'dense' in mapoption:
                     self.gpdbuilder.gettypeofgeometry().set_dense_geometry()
                     new_geo = self.gpdbuilder.geo.get_data()
                     granularity = self.meta.getcurrentmetadata(self.db)['geoinfo']['granularity']
@@ -943,7 +945,7 @@ class front:
             a table of your own sets the current database to 'in-house data'.
             ``when`` cuts it as it cuts a database, and the table itself is
             never modified; a frame returned by :meth:`get` can be passed back.
-        typeofmap : {None, 'not dense', 'dense', 'folium'}, optional
+        typeofmap : {'not dense', 'dense', 'show_values'}, optional
             How the geography is drawn; :meth:`listmap` lists them.
         tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
