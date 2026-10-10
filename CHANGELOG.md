@@ -1,400 +1,78 @@
 # Unreleased
-- the manuscript's references move from a hand-written `thebibliography` to
-  `paper/references.bib`, typeset by `elsarticle-num` as the SoftwareX
-  template proposes; the Makefile runs bibtex, and tests/test_paper.py reads
-  the .bib. The manuscript's stale editorial notes (the compliance note of
-  13 August, the template's section list, the REST API) are gone.
-- the manuscript cites the pyvoa community on Zenodo where it held a
-  placeholder, no longer presents seaborn as a backend (`listvis()` leaves it
-  out), and numbers its references in order of first citation, as the guide
-  for authors requires; a test in tests/test_paper.py keeps that order.
-- one funding sentence in the manuscript, AUTHORS, the README and
-  `.zenodo.json`, which now mentions the « Investissements d'avenir » programme
-  the funder requires; the manuscript adds that the funders had no role in the
-  work, as the guide for authors asks.
-- pyvoa is dated from 2023, when the project took the name and was developed
-  in a branch of the pycoa repository, until it moved to its own in March
-  2025: AUTHORS, CITATION.cff, this changelog and the manuscript agree.
-- the bug report form asks whether the problem shows with the archived or the
-  live data, with the commands to switch (`pf.getlive()`, `pf.setlive()`), as
-  SUPPORT.md now does in a third check; its example answers are timeless
-  (`pyvoa X.Y.Z`, `YYYY-MM-DD`) rather than dated.
-- `.zenodo.json` gives the IdEx Université Paris Cité award as a structured
-  `grants` entry, `00rbzpz17::ANR-18-IDEX-0001` (the ROR id of the ANR, then
-  the award number), so that the next deposit is linked to its funder. The
-  free-text `notes` stay, for the Institut Covid-19 Ad Memoriam.
-- jhu drops its Kosovo row, which used to be added into Serbia (Serbia's
-  confirmed cases on 2021-12-31: 1 299 339, not 1 460 823). Kosovo is now left
-  out of every database, as owid and europa already did, its independence not
-  being recognised by the United Nations.
-- owid and mpoxgh no longer merge French Guiana and French Polynesia into
-  France, and drop their rows. The merge added the three territories' rates up:
-  France's `total_cases_per_million` read 981 527 on 2022-06-01 instead of
-  443 388. OWID's France is metropolitan already (cases and rates), so the
-  merge doubled nothing but rates; mpoxgh has no row for either territory.
-- tests/test_sources.py checks every shipped database against a direct read
-  of the files it is parsed from, written apart from the parser: the dates
-  parse with no NaT and none is a day-first date read month-first (the govcy
-  defect), each variable summed over the locations equals the raw file date
-  by date, and `get()` hands out the last parsed value. The locations pyvoa
-  leaves out on purpose (national rows of covid19india and imed, the cruise
-  ships and Olympic Games of jhu and jhu-usa, ...) are named, so that the
-  comparison stays exact. Marked `network`; the network job of the CI may now
-  run 60 minutes. It replaces the untracked essai_alldb.py, and essai_govcy.py
-  is gone.
-- the `from_db` column of a parsed database is a bool column; it was an
-  object one holding True and False, the rows a database lacks being added
-  by a merge that leaves them missing. `~from_db` therefore gave -1 and -2
-  instead of negating it. The measles-usa network test, which still expected
-  every state of the geography at the last date, now expects it of the
-  states the source reports only: the others (five territories, Mississippi
-  and New Hampshire, with no measles case) have been added without data
-  since `fdbd7c0`.
-- fix: `get()` and every chart handed out the raw count under the name of
-  the normalised one: with `option='normalize:pop1M'`, `cur_hosp
-  normalize:pop1M` carried `cur_hosp` itself. The builder computed the rate
-  right, and `front` dropped it before renaming the raw column onto its name
-  (since `ccede93`, September 2026). Fig. 4 of the manuscript was drawn so.
-- fix: `what='daily'` or `'weekly'` on a single `when` date gave NaN for
-  every location: the date was cut before the difference was taken, leaving
-  it no day before (since `7828bb4`, September 2026). A single date is again
-  cut once the differences are computed, and gives the value the same day
-  has inside a range. Two network tests on `spf` guard both fixes.
-- the 'positron' and 'stamen' tiles are withdrawn from both backends:
-  CartoDB's positron now displays a request for an API key over the map, and
-  Stamen's tiles, moved to Stadia Maps, no longer load under matplotlib.
-  `listtile()` gives `['openstreet', 'esri']`; another name raises a
-  PyvoaError.
-- archived data are read from Zenodo record 23212632, a version of 23198224
-  without the sentiweb file of the withdrawn `sentinellesIRA` database, whose
-  data are licensed for non-commercial use only and which no shipped code
-  reads. The 50 other files are unchanged (same checksums).
-- ebolardc is read from its provider only, in both modes, and no longer from
-  its Zenodo mirror: the INSP situation reports it transcribes may be reused
-  with credit to the INSP (report number and date), but the INSP asks to be
-  consulted before any republication, which a mirror is. Its `urldata` is now
-  the upstream file. More generally, a dataset whose `urldata` is not a Zenodo
-  file has no mirror, and the parser reads it live — no archive lookup, and
-  re-downloaded when stale — whatever `setlive()` says; `get_local_from_url`
-  takes a `live` argument to that end. The README marks it *live only*.
-- CONTRIBUTING §6 no longer asks a new database for an open licence alone: a
-  licence allowing non-commercial reuse with attribution, as `imed`'s CC BY-NC
-  4.0 does, is accepted, and a provider who reserves republication is read
-  live and not mirrored. The manuscript says "publicly available" databases,
-  most of them openly licensed, rather than "open" ones, and states that
-  licences vary by provider; its conclusion no longer lists acute
-  respiratory infection series, which pyvoa stopped carrying with
-  sentinellesIRA.
-- the README gives `dgs` as GPL-3.0 for the DSSG compilation, the DGS data
-  behind it being published with no licence.
-- risklayer is removed: the sub-national European data Risklayer compiled for
-  WHO/Europe are published with no licence — neither the source spreadsheet
-  nor any page it links to states one, and the WHO's terms leave data credited
-  to a third party to that third party. pyvoa now ships 23 databases; the
-  README and the manuscript count them so. The EUR geography it was resolved
-  against stays in `GeoCountry`, unused by any shipped database.
-- the README's database table gains a *Licence* column: the licence of the
-  data, set by each provider, distinct from pyvoa's own (MIT).
-- phe reads its Zenodo mirror from record 18772757, the current version of
-  the series and the one in the pyvoa community, instead of 10222748, an
-  older version outside it. The five files phe reads are identical in both
-  (same checksums), and so is the parsed table; the newer version only adds
-  a file pyvoa does not read.
-- matplotlib maps are drawn on an equal-area projection, Eckert IV, so that
-  a surface reads as what it is; the new `projection` keyword ('eckert4' by
-  default, 'mercator') brings Web Mercator back. A national map is centred on
-  its data, a world map on 0, and the OpenStreetMap tiles are reprojected onto
-  it by contextily — they stop at the 180th meridian, beyond which they do
-  not exist. The countries GeoInfo pushes past 180 degrees so that a Mercator
-  map does not cut them (Russia, Fiji, New Zealand, Samoa, the USA) are cut at
-  the antimeridian of the projection instead of being wrapped round the
-  world, which drew bands across the map. Bokeh, whose tiles exist in Web
-  Mercator only, keeps Mercator and ignores `projection`. `listprojection()`
-  lists the projections the current backend draws, as `listtile()` does the
-  tiles: `['eckert4', 'mercator']`, or `['mercator']` under bokeh. New helpers in
-  `tools`: `equal_area_projection`, `wrap_antimeridian`,
-  `projection_half_extent`.
-- fix: the Japanese geography (jpnmhlw) was read straight from GitHub on
-  every `setwhom()`, bypassing `get_local_from_url`: never cached, never
-  looked for in the Zenodo archive. Its url is now the `JPN` entry of
-  `GeoCountry._country_info_dict`, read like every other country's; the url
-  that entry used to declare was never read. The file is archived in the
-  Zenodo record `get_local_from_url` reads from, then 23198224 — a version of
-  18784098 holding its 50 files and this one — and is served from there in
-  archive mode. Prefectures: 地球地図日本 (Global Map Japan), GSI, under the
-  Public Data License 1.0; GeoJSON conversion by dataofjapan/land.
-- `GPDBuilder.factory()` writes the pickles of a database with
-  `reload=True` and reads them back with `reload=False`, so that they are
-  handled in one place; `front.setwhom()` no longer reads them itself, nor
-  rebuilds their file names by hand. `factory(reload=False)` used to fail on
-  variables it never set, a path nothing took. The lists saved with the data
-  are given by `GPDBuilder.getsavedlists()`.
-- fix: `tools.prioritize_keyword` never reached its fallback on the first
-  cumulative variable: with no death count, the default `which` was the
-  first variable alphabetically. It is now the first `tot_...` or
-  `total_...` one, and only failing that the first variable. `tot_dchosp`,
-  spf's hospital deaths, joins the death counts taken first: `spf`, the one
-  database concerned, now defaults to it rather than to `cur_hosp`.
-- `get_echoinfo()` called without its dict summarises the database
-  currently selected, and raises a `PyvoaError` naming `setwhom()` when
-  there is none; it used to fail on `None`.
-- ebolardc: the sitrep row dated `2026-06-25]` (Nyankunde, 93 confirmed
-  cases) is read as 2026-06-25 through a `replace` rule, which applies
-  before the dates are parsed; it was dropped as an unreadable date.
-- escovid19data: `"Alicante/Alacant"` was mapped twice in `replace`, to
-  `Alicante` and to `Alacant`; `json.load` kept the second, which the
-  geography uses, and that one alone is left. A test now refuses a key
-  repeated in any shipped description.
-- moh: its `header` read `dgs`, copied from another description.
-- new chart keywords. `pyvoalogo` (False by default) stamps the pyvoa logo
-  on the figure, which is no longer done unasked, bokeh maps included: they
-  used to carry a logo whatever was asked, drawn at 5 % opacity and anchored
-  in data coordinates — at longitude 0, latitude 0 in Web Mercator, so out of
-  sight on most maps. With `pyvoalogo=True` a bokeh map gets the same
-  watermark as the other bokeh charts. `return_pltaxis`
-  (True by default) makes the matplotlib charts return their axes rather
-  than None; the other backends ignore it. `maxcountrydisplayed` (12 by
-  default) caps how many locations a chart shows — the time series and the
-  histograms by location keep that many, the pie charts and the histograms by
-  value gather the others into 'SumOthers'; it was accepted but never read,
-  the cap staying at 12, and a value that is not a positive integer is now
-  refused with a `PyvoaError`. `maxlettersdisplayed` now defaults to
-  20 characters, up from 10.
-- the default `which` is the death count when the database has one — the
-  first of `tot_deaths`, `total_deaths`, `tot_dc`, `total_dc` and
-  `tot_dchosp` (spf's hospital deaths) it offers — otherwise its first
-  `tot_...` or `total_...` variable in the order `listwhich()` gives, and
-  failing that the first variable of that list (`tools.prioritize_keyword`).
-  It used to be the first cumulative variable the JSON description declared.
-- the column `get()` returns for a variable read with an option is named with
-  a space before the option, `'tot_cases smooth7'`, as it already was for a
-  `what` (`'tot_cases daily'`); it used to be `'tot_casessmooth7'`.
-- `setwhom()` is no longer skipped when asked for the database already
-  selected, where it used to only reprint its summary: it does again what
-  `reload` asks — parse the source (`reload=True`, the default) or read the
-  pickles back (`reload=False`). It saves the lists `listwhich()` and
-  `listwhere()` give along with the data, so that `reload=False` reads all
-  three back.
-- fix: `setwhom(base, reload=False)` parsed the database all the same, since
-  `GPDBuilder.__init__` built a `DataParser` before `reload` was looked at —
-  the regression came with the split pickles of June 2026, whose earlier
-  version pickled the whole builder. The builder now takes `parse=False`, and
-  only builds its parser when something needs it (`getwhichinfo()`,
-  `getwhom(detailed=True)`): reselecting `owid` from its pickles takes 0.6 s
-  instead of 9.4 s. The pickle keeps both answers of `listwhere()`, with and
-  without the individual locations, where it kept only the clusters, so that
-  `listwhere()` answers alike in both modes.
-- fix: `getwhichinfo()` called `listwhich()` with an argument it no longer
-  takes, and raised a `TypeError`.
-  `get_echoinfo()` now takes the dict `setwhom()` builds (`'lwhich'`,
-  `'lwhere'`, `'mypd'`) and fails when called without it.
-- `listwhom(detailed=True)` no longer lists the variables of each database,
-  which are only known once a database is parsed: see `listwhich()`.
-- maps are drawn on OpenStreetMap tiles (`'openstreet'`) unless another one is
-  named, by bokeh and matplotlib alike: `'openstreet'` now heads
-  `listtile()`, whose first entry is the default, and `None` is no longer a
-  value of `tile`. matplotlib fetches the tiles with a pyvoa User-Agent, which
-  OpenStreetMap requires. A dense map is drawn without tiles.
-- every docstring was checked against the code changed since the last such
-  pass (2026-09-12) and corrected where it had drifted: the default of
-  `which`, the chart keywords, what `plot()`, `hist()` and `map()` return,
-  `setwhom()`, `listwhom()`, `get_echoinfo()`, the backends' logo and
-  axes, and seven placeholder docstrings (`AllVisu.hist`, `AllVisu.map`, …).
-  `pyvoa.help` no longer advertises a `listvisu` that does not exist, nor
-  `what='cumul'`.
-- `get()` returns location names whole. They used to be cut to
-  `maxlettersdisplayed` (20 characters, then '...') in the selection step that
-  `get()` shares with the charts, so `get()` handed out `'Heilbronn
-  (Landkreis...'` and a join of its output on the names failed. The cut is now
-  made by `AllVisu`, for the charts only — the labels, legends and tooltips of
-  `plot()`, `hist()` and `map()`, matplotlib and bokeh alike, bokeh's hover
-  included — by `tools.shorten_locations()`, which keeps whole two names it
-  would otherwise make identical. The docstrings said the cut was at ten
-  characters and that `maxlettersdisplayed` was not read; neither was true.
-- fix: the dense map joined its geometry on the cut names, so a location named
-  in more than 20 characters lost it: three French départements
-  (Alpes-de-Haute-Provence, Territoire de Belfort, Collectivités d'Outre-Mer)
-  were left undrawn by `spf`.
-- fix: the matplotlib time-series legend cut every label to ten characters on
-  its own, whatever `maxlettersdisplayed` said.
-- fix: `plot()`, `hist()` and `map()` did not keep the bokeh figure for
-  `savefig()`, which saved the previous figure instead. The bokeh figure is
-  still not returned: it is shown already, and a notebook would print its
-  repr (`Tabs(id=...)`) under it, as it briefly did.
-- fix: a pie chart, or a histogram by value, of fewer locations than the twelve
-  colours of the palette raised a `ValueError`.
-- fix: the parser called `GroupBy.sum(skipna=False)`, which pandas only
-  accepts from version 3, while the declared floor is 2.1.1: on the floor every
-  database failed to parse, and the `minimum` CI job was red. The same result —
-  a group holding a missing value stays missing — is now computed with
-  `min_count=1` and a mask, on every supported pandas.
-- fix: `typeofhist='pie'` on matplotlib, when no colours were given, and the
-  bokeh histogram by value both raised a `NameError` (`cmap`, `lcolors`).
-- fix: `GPDBuilder.getpklname()` built its `PyvoaError` without raising it, and
-  returned `None` on a wrong argument.
-- the manuscript and the README count 24 databases, since `sentinellesIRA` was
-  removed for copyright reasons; the manuscript no longer cites the Réseau
-  Sentinelles among the supported sources, and the README explains the
-  *both (prefer live)* marking of `ebolardc` and `measles-usa`, both now
-  mirrored on Zenodo.
-- `ruff check .` is clean again: imports sorted, dead assignments commented
-  out, and docstrings restored on `listwhere()`, `listwhich()` and
-  `getdatabase()` of the front, which had lost them.
-- locations reported by a source but missing from its geometry file are no
-  longer dropped with their counts: they get an empty geometry, which goes
-  through every join and is simply not drawn. That covers Curaçao, Sint
-  Maarten and the Caribbean Netherlands in the world geometry, which predates
-  the 2010 dissolution of the Netherlands Antilles (owid, europa, mpoxgh);
-  Puerto Rico, Guam, the US Virgin Islands, the Northern Mariana Islands and
-  American Samoa in the USA geography, as a `Territories` census region
-  (jhu-usa, covidtracking); Lakshadweep (covid19india); and the Antártica
-  comuna, 12202 (minciencia). `map()` raises a `PyvoaError` naming them when
-  every location it is asked for is one of those. Bokeh and folium maps leave
-  them out of the GeoJSON they are given: an empty geometry is serialised as
-  null, on which BokehJS fails (`Cannot read properties of null`) and draws no
-  map at all, as it briefly did for owid, europa, mpoxgh, jhu-usa,
-  covidtracking, covid19india and minciencia.
-- fix: `convertmercator()`, which `get()` runs on every geometry, skipped a
-  location whose geometry was empty (falsy), so the join that followed left
-  it with none, and `get()` dropped it.
-- the Indian geography merges Dadra and Nagar Haveli with Daman and Diu into
-  the union territory they formed in 2020 (`IN.DH`), under the name
-  covid19india reports them by.
-- covid19india: `Uttarakhand` mapped to the `Uttaranchal` of the Indian
-  geography (6452 deaths were dropped), and `Andaman and Nicobar Islands` to
-  `Andaman and Nicobar` — the existing rule mapped it to itself.
-- escovid19data: `Balears, Illes` and `Palmas, Las` mapped to `Illes Balears`
-  and `Las Palmas` (2146 deaths were dropped).
-- ebolardc: `Rumba` mapped to `Rimba`. It is a typo of the 2026-07-11 sitrep,
-  the only day it appears, in the middle of Rimba's series.
-- fix: `fill_missing_dates()` no longer forward- and back-fills the days it
-  inserts (introduced in `cf7bb53`). On a column of increments declared
-  `cumulative`, the previous day's increment was repeated before the
-  `cumsum`, so govcy reported 2082 deaths instead of 672, and every database
-  using `cumulative` (dgs, measles-usa, moh, risklayer, sciensano, spf) was
-  affected, `fillmissing` included. An inserted day stays NaN again; the
-  cumulative series are forward-filled by `GPDBuilder.get`, as before.
-- fix: `fill_missing_dates()` drops the timezone of a tz-aware date column
-  before reindexing on its naive daily range. Since `cf7bb53`, rki (stamped
-  in UTC) came out with every `tot_cases` / `tot_deaths` value NaN.
-- new optional dataset key `dateformat` (a `strftime` pattern) fixes how the
-  `date` column is read. Without it the parser keeps `format="mixed"`, which
-  reads an ambiguous `9/3/2020` month-first: govcy and dgs, both day-first,
-  had every date with a day ≤ 12 swapped with its month.
-- govcy: `dateformat` `%d/%m/%Y`, and `tot_deaths` / `tot_cases` now read the
-  source's own running totals (`total deaths`, `total cases`) instead of
-  cumulating its daily columns, whose sum does not match them (673 vs 672
-  deaths, 216652 vs 218374 cases).
-- dgs: `dateformat` `%d-%m-%Y`, and `AÇORES` mapped to the `Azores` of the
-  PRT geography, which dropped 7355 cases.
-- moh: `W.P. Kuala Lumpur`, `W.P. Putrajaya` and `W.P. Labuan` mapped to the
-  `Wilayah Persekutuan` / `Wilayah Persekutuan Labuan` of the MYS geography.
-  The three federal territories were dropped, 10.7 % of the cases.
-- risklayer: `cumulative` removed from `CumulativePositive` and
-  `IncidenceCumulative`, which are already running totals and would have been
-  cumulated twice by a source with more than one date per location.
-- fix: the German geography (`GeoCountry('DEU')`) merged the rows of the
-  DE-counties geojson on the county *name*, and kept one code per name. The
-  22 Landkreise named like the kreisfreie Stadt they surround (München,
-  Leipzig, Rostock, Kassel, Karlsruhe, …) were dropped, and rki lost 6.0 % of
-  its cases and 5.4 % of its deaths, while each of those cities was drawn
-  with its Landkreis's surface. The rows are now merged on the AGS code, and
-  such a Landkreis is named after its type, `München (Landkreis)`; the city
-  keeps its bare name. rki now matches its source exactly over its 401
-  counties. The twelve Berlin districts rki also ships (11001–11012) are
-  still left out, rightly: they add up exactly to Berlin (11000).
-- Docstring updates
-- Adding an ASCII banner when loading the front
-- Enhancement and compatibility fixes for notebooks and py file examples
-- Highlight locations absent from the original database in pink on the map.
-- Add log scale in Bokeh
-- Remove duplicate columns in the main pandas
-- Fill missing values in maps for JHU and mpox datasets
-- bug fix for 3 regions : Bug fix for regions. SACD, CENSAD and CELAC
-- `set_verbose_mode()` and `get_verbose_mode()` are methods of the front class,
-  so `pf.set_verbose_mode(2)` works alongside the rest of the front-level API
-  and both appear in the published reference. They were previously reachable
-  only as a side effect of being imported into `pyvoa/front.py`, which is why
-  the lint pass removed them without anyone noticing. `pyvoa.tools` keeps the
-  functions themselves; the front methods delegate. Front-level values are
-  checked: anything other than 0, 1 or 2 raises a `PyvoaError` naming the three
-  levels, where `pyvoa.tools.set_verbose_mode()` takes whatever it is given.
-- `saveoutput()` writes `pyvoa_out.xlsx` / `pyvoa_out.csv` when no `savename`
-  is given. The default used to be `pycoa.ut`, the wreckage of a `pycoa`
-  rename that had run through the string itself, so the files came out as
-  `pycoa.ut.xlsx`. An explicit `savename` is unaffected.
-- fix: `saveoutput()` called before any `setwhom()` raised a bare
-  `AttributeError` on `None`, since the writer lives on the `GPDBuilder` that
-  only exists once a database is selected. It raises a `PyvoaError` naming
-  `setwhom()`, like the rest of the library.
-- the distribution now names its authors: `[project] authors` in
-  `pyproject.toml` carries the three people, spelled as in `AUTHORS` and
-  `CITATION.cff`, instead of the project address, so
-  `importlib.metadata.metadata("pyvoa")["Author"]` and `pyvoa.__author__` no
-  longer disagree. `maintainers` stays `contact@pyvoa.org`, the stable contact
-  point. The build requirements dropped `wheel`, which setuptools declares by
-  itself, and gained the `setuptools>=64` floor that reading the version out of
-  `pyvoa/__version__.py` needs.
-- `pyvoa/__version__.py` documents what it is instead of referring to the
-  `setup.py` that no longer exists: that setuptools and `tests/test_paper.py`
-  both read it *statically*, and that it must therefore stay a plain literal
-  with no imports. `__author__` and `__email__` are marked as a mirror of
-  `AUTHORS`, which is the canonical record.
-- author metadata is aligned across the repository. `AUTHORS` and
-  `paper/main.tex` carry the affiliations in the form the journal expects, and
-  `CITATION.cff`, `.zenodo.json`, `codemeta.json` and `schemaorg.jsonld` now
-  repeat them verbatim, together with Olivier Dadoun's `dadoun@in2p3.fr`
-  address and the paper's keywords (`epidemiological data`, `geospatial data`).
-  The same pass brought the two schema files back in step with
-  `pyproject.toml`: `beautifulsoup4` instead of `bs4`, and Python 3.13 among
-  the supported runtimes.
-- every dependency now declares a lower bound, and the bounds are tested: a
-  `minimum` CI job installs the floors on python 3.10 and runs the suite, so
-  they cannot quietly become false. There are no upper bounds, on purpose — a
-  cap in a library propagates into every environment that installs it. The
-  declared minimum is pandas 2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26.
-- `bs4` is replaced by `beautifulsoup4` in the dependency list. It is the same
-  code — `bs4` is a forwarding package — but its versions are `0.0.x`, so it
-  could not carry a meaningful bound.
-- `GeoCountry` gained four converters between codes and names:
-  `from_subregion_codes_to_names`, `from_subregion_names_to_codes`,
-  `from_region_names_to_codes` and `from_region_codes_to_names`. Each takes a
-  list and answers in the same order, so the two lists can be zipped, and
-  translates a repeated entry as many times as it appears. A non-list
-  argument, or an entry absent from the country data, raises a `PyvoaError`
-  that names the offending entries.
-- Python 3.13 is declared as supported and added to the CI test matrix, which
-  now covers 3.10, 3.11, 3.12 and 3.13.
-- Python 3.14 joins them: the classifier is declared in `pyproject.toml`, the
-  runtime is listed in `codemeta.json` and `schemaorg.jsonld`, and the `test`
-  job of the CI matrix now runs the offline suite on 3.10 through 3.14. The
-  manuscript's code-metadata table follows. Nothing in the package needed a
-  change — no module removed in 3.14 is imported — so this is a claim the
-  matrix now verifies rather than a port.
-- fix: the four `GeoInfo` tests built a real `GeoInfo(0)`, which builds a
-  `GeoManager` and downloads about ten pages, so they failed on CI and passed
-  locally only on a warm cache. They now use `GeoInfo.__new__`, like the
-  `GeoManager` tests next to them.
-- `README.md` now documents installation (`pip install pyvoa`, `pyvoa-full`), a
-  first example, and a table of the 23 supported databases with their coverage,
-  granularity and source.
-- fix: `GeoCountry('CHL')` gives every comuna its own `code_subregion`.
-  The `COD_COMUNA` field of the meteochile shapefile is four characters wide,
-  so the five-digit CUT codes of the regions numbered 10 and above lost their
-  last digit upstream: the nine comunas of the Llanquihue province all read
-  `1010` instead of `10101` to `10109`, and 346 comunas collapsed onto 254
-  distinct values. Only 206 of them matched the `minciencia` join key, the
-  other 140 dropping out of every map and series without a word. The code is
-  now resolved from the comuna name through a CUT table archived on Zenodo
-  (record 23047588, `chl_comuna_codes.csv`), so all 346 codes are distinct and 345 of
-  them match the database — the one gap being Antártica (`12202`), which the
-  shapefile has no geometry for. `Zona sin demarcar`, the undelimited Campo de
-  Hielo Sur, is no comuna and keeps the `00000` the truncated field gave it.
-  Ñuble comes with it: the CUT codes postdate its 2018 split out of Bío-Bío
-  while the shapefile predates it, so `get_data(True)` would otherwise have
-  returned two regions both named `Región del Bío-Bío`. It is named `Región de
-  Ñuble` wherever `code_region` is `16`, and the region list is the sixteen
-  official regions plus the undelimited zone.
+Since 0.5.0 (2026-08-06). Two databases come in and two go out, the data can
+be read live from their providers, and a pass over every source brings the
+parsed series back to their providers' totals. A few defaults changed: see
+*Behaviour changes*.
+
+Data sources:
+
+- new databases: `measles-usa`, the US measles cases of the JHU tracking team,
+  and `ebolardc`, the 2026 Ebola outbreak in the DR Congo by health zone.
+  `ebolardc` is read from its provider only, the INSP asking to be consulted
+  before any republication, which a mirror would be.
+- removed: `sentinellesIRA` and `risklayer`, whose data are not licensed for
+  redistribution. 23 databases are shipped; the README gives each one's
+  licence, set by its provider.
+- live mode: `pf.setlive(True)` reads the upstream files instead of the frozen
+  Zenodo copies (now record 23212632), `pf.getlive()` tells which is in use.
+- new keys in the database descriptions: `names` (csv with no header line),
+  `splitwhere` (composite locations), `cumulative` and `fillmissing` (sources
+  reporting increments), `dateformat` (day-first dates).
+- Kosovo is left out of every database, as the UN does not recognise it; `jhu`
+  used to add it into Serbia. `owid` and `mpoxgh` no longer merge French
+  Guiana and French Polynesia into France, which inflated France's rates.
+
+Parsing:
+
+- fix: dates were read month-first in the day-first `govcy` and `dgs`; `govcy`
+  now takes the source's own running totals.
+- fix: locations were lost on the way, and are now matched: 22 German
+  Landkreise named like the city they surround (`rki`, 6 % of the cases), 140
+  Chilean comunas whose codes were truncated upstream (`minciencia`), and
+  naming mismatches in `covid19india`, `escovid19data`, `dgs` and `moh`.
+  `tests/test_sources.py` compares every database with a direct read of its
+  files.
+- fix: locations a source reports but its geometry lacks (Curaçao, the US
+  territories, Lakshadweep, …) keep their counts and are simply not drawn.
+
+Maps and charts:
+
+- matplotlib maps are drawn on an equal-area projection, Eckert IV;
+  `projection='mercator'` brings Web Mercator back, `listprojection()` lists
+  both. Bokeh stays in Mercator.
+- maps use OpenStreetMap tiles by default, on both backends; `positron` and
+  `stamen` are withdrawn, so `listtile()` gives `['openstreet', 'esri']`.
+- new keywords: `pyvoalogo` (the logo is no longer stamped unasked),
+  `return_pltaxis` and `maxcountrydisplayed`; `maxlettersdisplayed` defaults
+  to 20. Locations missing from the parsed database are shown in pink.
+- fix: `savefig()` saved the previous bokeh figure instead of the last one.
+
+Behaviour changes:
+
+- `get()` returns location names whole; they are cut in chart labels only.
+- a variable read with an option is named `'tot_cases smooth7'`, with a space,
+  like `'tot_cases daily'`; it was `'tot_casessmooth7'`.
+- the default `which` is the death count when the database has one, otherwise
+  its first cumulative variable.
+- `setwhom()` on the current database redoes what `reload` asks instead of
+  doing nothing, and `reload=False` really reads the pickles back without
+  parsing (`owid` in 0.6 s instead of 9.4 s).
+- `listwhom(detailed=True)` no longer lists the variables: see `listwhich()`.
+- `saveoutput()` writes `pyvoa_out.*` by default, instead of `pycoa.ut.*`.
+- `pf.set_verbose_mode()` and `pf.get_verbose_mode()` are front methods again.
+
+Packaging and documentation:
+
+- Python 3.13 and 3.14 are supported and tested.
+- every dependency has a lower bound, tested by a `minimum` CI job (pandas
+  2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26); `beautifulsoup4` replaces
+  `bs4`.
+- the API documentation is published at <https://pyvoa.github.io/pyvoa/>.
+- `GeoCountry` converts region and subregion codes to names and back.
+- a welcome banner is printed when `pyvoa.front` is imported.
+- a new example reads the Insee death records into a DataFrame and plots them
+  through `input=`: `PyvoaFront-withINSEE.ipynb` and
+  `examples/pyfiles/insee_deaths.py`.
 
 # version 0.5.0
 Eight months and 236 commits since 0.4.2 (2025-12-12 to 2026-08-06), in two

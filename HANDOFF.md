@@ -25,11 +25,10 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 
 | # | Open item | Blocking? |
 |---|---|---|
-| 1 | Manuscript: §4 adoption evidence, the 0.5.0 paragraph, highlights and graphical abstract. | submission |
+| 1 | Manuscript: §4 adoption evidence, a new release to describe, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 4 | Authors of the Zenodo community records: `rki` credited to Risklayer, `measles-usa` to us, the pyvoa team named three ways or not at all. | before release |
-| 5 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
+| 4 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
 
 ---
 
@@ -38,12 +37,17 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
 
 - **§4 adoption evidence** — third-party uses of pyvoa, still to document.
-- **The 0.5.0 paragraph** (§ history) describes 0.5.0 but gives today's
-  catalogue: "12 to 23 databases" holds for 0.5.0 by coincidence only — it
-  shipped 23 too, but not the same ones (with sentinellesIRA and risklayer,
-  without ebolardc and measles-usa). The figure follows today's catalogue
-  only because `tests/test_paper.py` requires every database count
-  to match `pyvoa/data/`. Rewrite it around the release actually submitted.
+  The data.gouv.fr reuse is cited under *Uptake so far* (`datagouv_pyvoa`,
+  `c68e6a1`) as the authors' own page, not as adoption. Its view count, 5 452
+  on 2026-10-09 from the data.gouv.fr API, must be read again before
+  submission.
+- **A new release before submitting.** The manuscript announces 0.5.0 (the
+  history sentence, the AI declaration's "before the release described here",
+  rows C1 and S1, the PyPI url in S1) but describes `main`: not the same 23
+  databases (ebolardc and measles-usa instead of sentinellesIRA and
+  risklayer), and the live mode came after 0.5.0. Release first, then update
+  those places together with the release's DOIs and SWHID; note 1 of the
+  manuscript says the same.
 - **Highlights and a graphical abstract** — both *encouraged*, neither written,
   both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
   characters each, in a file named with "highlights". Graphical abstract:
@@ -97,62 +101,7 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 4. Authors of the Zenodo community records
-
-Reviewed on 2026-10-07 against `AUTHORS`, `CITATION.cff`, `.zenodo.json` and
-the source each database actually reads. Metadata edits mint no new version,
-so none of this touches the code. At the least, fix the records pyvoa reads:
-10082179 (jhu), 11222009 (mpoxgh), 11222014 (moh), 11222015 (jpnmhlw),
-11222016 (imed), 11222017 (govcy), 11222020 (europa), 11222021
-(escovid19data), 11222022 (dpc), 11222023 (dgs), 11267174 (jhu-usa), 18682655
-(rki), 18772757 (phe), 18773580 (minciencia), 18788895 (covidtracking),
-18788975 (covid19india), 18789975 (owid), 18790064 (sciensano), 18790282 (spf,
-spfnational), 18790381 (sumeau), 23047588 (geo), 23165146 (measles-usa),
-23212632 (Bulk).
-
-**Data producers named as creators**, in order of urgency:
-
-| Record | Creator now | Problem | Proposed |
-|---|---|---|---|
-| `rki` 18682655 | Risklayer | wrong: pyvoa reads `cases-rki-by-ags.csv` of jgehrcke/covid-19-germany-gae, RKI data (the Risklayer files there are `*-rl-crowdsource-*`) | Robert Koch-Institut; Jan-Philip Gehrcke as contributor (DataCollector) |
-| `measles-usa` 23165146 | Beau, Tristan | the record's own description credits the JHU Measles Tracking Team | Johns Hopkins University Measles Tracking Team; Beau as DataCurator |
-| `mpoxgh` 11222009 | Our World in Data | Global.health, the primary source, is missing | Global.health; Our World in Data |
-| `covidtracking` 18788895 | "Covid Tracking Database" | not the project's name | The COVID Tracking Project at The Atlantic |
-| `covid19india` 18788975 | "Covid 19 India" | idem | covid19india.org |
-| `sumeau` 18790381 | "Sumeau" | data.gouv.fr gives Santé publique France as publisher | Santé publique France |
-| `dgs` 11222023 | DSSG Portugal | right for the compilation; the DGS is absent | add Direção-Geral da Saúde (DataCollector, or in the description) |
-
-The other records pyvoa reads name their producer correctly.
-
-**The pyvoa team as contributor** is written three ways: the organisation
-"PyCoa" (DataCurator) on every record of account 43047, the 2026 versions of
-`spf` and `sciensano` included; "Pyvoa" on the 2026 versions of `owid` only;
-nothing on `jhu-usa` nor on any record of account 1008528 (Chile,
-covidtracking, covid19india, sumeau, measles-usa). One rule for all data
-records: the three authors as DataCurator, with ORCID and affiliation — or,
-failing that, the organisation "pyvoa", spelt alike everywhere.
-
-**Our own identity.** Bulk (23212632 and its earlier versions) names "Beau,
-Tristan", affiliation "pyvoa.org", no ORCID; `geo` and `measles-usa` carry the
-ORCID but no affiliation. Bulk being a compilation of third-party files whose
-credits its description gives per file, name the three authors as its
-creators, with ORCID and affiliation as in `AUTHORS` — or at least complete
-Beau's. `geo` is derived by us: Beau as creator is right, add the affiliation.
-
-**The software record 21829902** has the right authors and ORCIDs but
-shortened affiliations; it stays as it is (see the decisions), the next release
-being the first consistent deposit.
-
-**Lesser points.** Titles mix the database key (`dgs`, `sumeau`) and free
-descriptions ("Covid 19 data for Chile", "Covid Tracking USA"); a common form
-would be "`<key>` — `<description>` (mirror for pyvoa)". Publication dates are
-mostly the deposit date, but some give the data period (18772757
-`2020-09-05/2023-02-11`, 18682655 2023, Bulk 18773027 2021). `coadata`
-11198165 is credited to "PyCoa", a PyCoA-era record that no code reads: it
-was made private in the community on 2026-10-08.
-
-
-## 5. Moving `contextily` to `pyvoa-full`
+## 4. Moving `contextily` to `pyvoa-full`
 
 `contextily` is a hard dependency, imported once, inside the matplotlib map
 (`visu_matplotlib.py`), for the basemap tiles; it is only needed once a chart
@@ -225,6 +174,11 @@ release time.
   style (`CONTRIBUTING.md` §5).
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.
 - **`CHANGELOG.md` does not follow Keep a Changelog** (`CONTRIBUTING.md` §4.7).
+- **The changelog lists user-visible changes only**, grouped by theme as in
+  the 0.5.0 entry. The manuscript, metadata, tests, lint and internal
+  refactors stay out, and so do fixes of regressions no release shipped. The
+  *Unreleased* entry was cut from about 400 lines to 76 on that basis on
+  2026-10-09 (`d81e0e6`); a new entry is a line or two, not a paragraph.
 - **`requirements.txt` is kept**: mybinder.org builds from it.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases**; the
   exact count lives in the README's table.
@@ -277,6 +231,14 @@ release time.
   acknowledgements, just before the references: Claude for consistency checks
   and editing, ChatGPT for the English phrasing. Recheck Elsevier's page at
   submission; its wording has changed three times.
+- **Zenodo creators linked to a ROR entry keep the ROR's name** (2026-10-09):
+  `measles-usa` stays "Johns Hopkins University" rather than its Measles
+  Tracking Team, `sumeau` "Santé Publique France" with the capital *P* —
+  renaming them would put the displayed name at odds with the identifier.
+- **Dates of the Zenodo data records follow DataCite** (2026-10-09): the
+  *publication date* is the deposit date of the version; the first and last
+  dates in the data go in a single `dates` entry of type *Collected*. The
+  download date (2023-10-31 on the 2023–2024 versions) was dropped.
 - **pyvoa dates from 2023** (2026-10-08): the project took the name in 2023
   and was developed in a branch of the pycoa repository until March 2025, when
   it moved to a repository of its own and the code took the name. The
@@ -353,8 +315,42 @@ release time.
   update those four places. A lightweight tag would give a `swh:1:rev:`
   instead: tag annotated.
 
+- **Two data.gouv.fr reuses, both ours, both under the organisation
+  `python-covid-analysis`.** They show where pyvoa is used, but they are
+  not third-party adoption: §4 of the manuscript cites the pyvoa one as the
+  authors' own page, and must keep doing so. `docs/_static/img/map_spf_metropole.png` is the image embedded in
+  the pyvoa reuse, served by GitHub Pages: do not remove or rename it. Editing
+  the reuses goes through the data.gouv.fr API (`/api/1/reuses/<id>/`, key in
+  the `X-API-KEY` header, read from `~/.datagouv_token`).
+
 ## History
 
+- **The data.gouv.fr reuses were updated on 2026-10-09.** The 2021 PyCoa reuse
+  became [pyvoa](https://www.data.gouv.fr/reuses/pyvoa-ex-pycoa-python-virus-open-analysis)
+  (id `603c9fb5aee027e6de724e33`). The old slug redirects to the new one, and
+  the views since 2021 are kept. It got a new text, a matplotlib example drawing
+  the map of hospital deaths per 1000 inhabitants in metropolitan France, the
+  pyvoa logo and the type `application`. Its eleven PyCoa-era datasets were
+  replaced by the six pyvoa reads or illustrates: the five behind `spf`,
+  `spfnational` and `sumeau`, and the Insee death records. A second reuse,
+  [Décès journaliers en France depuis 2000](https://www.data.gouv.fr/reuses/deces-journaliers-en-france-depuis-2000-vus-par-pyvoa)
+  (id `6ac90c777cbe1b9e85e73df9`, type `visualization`), presents
+  `examples/notebooks/PyvoaFront-withINSEE.ipynb` and its script twin
+  `examples/pyfiles/insee_deaths.py`, whose figure it shows: the one of the
+  2026-08-05 Bluesky post, redrawn with matplotlib and its arrows placed by
+  code. The Insee resource titled `deces-2026-m09.txt` serves
+  `deces-2025-m09.txt`; both examples leave it out by name, to be lifted
+  once Insee fixes it.
+
+- **The Zenodo records were brought in line on 2026-10-09**, metadata only, no
+  new version: data producers credited (Risklayer was wrong on every `rki`
+  version), the three authors with ORCID and affiliation on Bulk and Beau on
+  `geo`, `pyvoa.org` as the one DataCurator of the 44 data records, titles of
+  the form `<key> — <description> (mirror for pyvoa)`, the period of the data
+  as the *Collected* date, three stray drafts deleted. Records read by no code
+  were left as they are: `ebolardc data` 23165598, `SentinellesIRA` 18790187,
+  "Who Europe from RiskLayer" 18789238, the test deposits "PYVOA - GEO 6/7",
+  `coadata` 11198165. How to edit them is in `CLAUDE.local.md`.
 - **The journal was JOSS until 2026-08-13**; the repository work carried over,
   only the manuscript format changed.
 - **Every tag is an ancestor of `main` again, since 2026-09-12.** Before, `v0.1.0`
