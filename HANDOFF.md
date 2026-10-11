@@ -188,6 +188,11 @@ release time.
   *Unreleased* entry was cut from about 400 lines to 76 on that basis on
   2026-10-09 (`d81e0e6`); a new entry is a line or two, not a paragraph.
 - **`requirements.txt` is kept**: mybinder.org builds from it.
+- **The test suite draws on matplotlib's Agg backend** (2026-10-11,
+  `ea7c6a9`), set in `tests/conftest.py`: run from a terminal with a display,
+  the two plots of `test_front.py` opened windows the run waited on. Do not
+  call `setbatch()` in a test instead: it sets the `front` singleton for the
+  rest of the session, with no way back.
 - **The workflows use the Node 24 majors of the GitHub actions** (2026-10-11,
   `2706e27`): `checkout` and `setup-python` v7, `upload-artifact` v7,
   `upload-pages-artifact` and `deploy-pages` v5. GitHub forces Node 20 actions
