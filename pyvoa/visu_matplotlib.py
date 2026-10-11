@@ -27,6 +27,7 @@ from pyvoa.tools import (
     equal_area_projection,
     min_max_range,
     projection_half_extent,
+    scientific_label,
 )
 
 
@@ -575,10 +576,8 @@ class visu_matplotlib:
                 # keep only the points inside the visible window
                 if not (minx <= pt.x <= maxx and miny <= pt.y <= maxy):
                     continue
-                # 3 significant digits with thousands separators, no
-                # scientific notation: the labels bokeh writes
                 ax.annotate(
-                    format(float(f"{value:.3g}"), ",.10g"),
+                    scientific_label(value),
                     xy=(pt.x, pt.y),
                     ha='center',
                     va='center',

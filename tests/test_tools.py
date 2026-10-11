@@ -965,6 +965,24 @@ def test_shorten_locations_never_cuts_below_five_letters():
 
 
 @pytest.mark.parametrize(
+    "value, expected",
+    [
+        (54_900_000, "5.49×10⁷"),
+        (570, "5.70×10²"),
+        (1449.6, "1.45×10³"),
+        (0.0123, "1.23×10⁻²"),
+        (-38_000, "-3.80×10⁴"),
+        (4.5, "4.50"),
+        (0, "0"),
+        (float("nan"), ""),
+        (None, ""),
+    ],
+)
+def test_scientific_label(value, expected):
+    assert tools.scientific_label(value) == expected
+
+
+@pytest.mark.parametrize(
     "variables, expected",
     [
         (["tot_cases", "tot_deaths"], "tot_deaths"),

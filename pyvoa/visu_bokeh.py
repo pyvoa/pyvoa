@@ -55,7 +55,13 @@ from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, PyvoaWarning, min_max_range, verb
+from pyvoa.tools import (
+    PyvoaError,
+    PyvoaWarning,
+    min_max_range,
+    scientific_label,
+    verb,
+)
 
 
 def safe_output_notebook():
@@ -883,12 +889,6 @@ class visu_bokeh:
             if 'show_values' in kwargs.get('typeofmap'):
                 from bokeh.models import CustomJS, LabelSet
 
-                def _fmt(v):
-                    # 3 significant digits with thousands separators, no scientific notation
-                    if v is None or np.isnan(v):
-                        return ''
-                    return format(float(f"{v:.3g}"), ",.10g")
-
                 # same coordinates as the patches drawn above (not gdf, which is
                 # reprojected only to measure the extent)
                 pts = input.geometry.representative_point()
@@ -896,7 +896,7 @@ class visu_bokeh:
                     'x': pts.x.tolist(),
                     'y': pts.y.tolist(),
                     'where': input['where'].tolist(),
-                    'label': [_fmt(v) for v in input_dates.set_index('where')[which]
+                    'label': [scientific_label(v) for v in input_dates.set_index('where')[which]
                               .reindex(input['where']).tolist()],
                 })
                 bokeh_figure_map.add_layout(LabelSet(

@@ -276,6 +276,37 @@ def shorten_locations(where, maxletters):
     # the labels are unique, so an ordered Categorical keeps its order
     return where.map(dict(zip(names, cut)))
 
+_SUPERSCRIPTS = str.maketrans('-0123456789', '⁻⁰¹²³⁴⁵⁶⁷⁸⁹')
+
+def scientific_label(value, digits=3):
+    """Write a value in scientific notation, as a map label.
+
+    The mantissa keeps ``digits`` significant figures and the power of ten is
+    written in superscript, ``5.49×10⁷``, the way the colour bars of the maps
+    write it. A power of ten of zero is left out.
+
+    Parameters
+    ----------
+    value : float
+        The value to write.
+    digits : int, optional
+        The number of significant figures; 3 by default.
+
+    Returns
+    -------
+    str
+        The label: '' for a missing value, '0' for zero.
+    """
+    if value is None or not np.isfinite(value):
+        return ''
+    if value == 0:
+        return '0'
+    mantissa, exponent = f"{float(value):.{digits - 1}e}".split('e')
+    exponent = int(exponent)
+    if exponent == 0:
+        return mantissa
+    return mantissa + '×10' + str(exponent).translate(_SUPERSCRIPTS)
+
 def fill_missing_dates(p, date_field='date', loc_field='where',
                        d1=None, d2=None):
     """Fill the input pandas dataframe p with missing dates.
