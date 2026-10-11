@@ -945,8 +945,16 @@ class front:
             a table of your own sets the current database to 'in-house data'.
             ``when`` cuts it as it cuts a database, and the table itself is
             never modified; a frame returned by :meth:`get` can be passed back.
-        typeofmap : {'not dense', 'dense', 'show_values'}, optional
-            How the geography is drawn; :meth:`listmap` lists them.
+        typeofmap : str or list of str, optional
+            How the geography is drawn, among 'not dense', 'dense' and
+            'show_values'; :meth:`listmap` lists them. 'show_values' writes
+            the value of each location on the map, at a point that always
+            lies inside its shape, rounded to three significant figures: in
+            scientific notation under matplotlib (``5.49e+07``), in full with
+            thousands separators under bokeh (``54,900,000``). A location
+            with no value, or outside the visible extent, is left unlabelled.
+            It combines with the other values in a list, as in
+            ``typeofmap=['dense', 'show_values']``.
         tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
