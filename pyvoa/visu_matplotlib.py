@@ -13,12 +13,12 @@ https://pyvoa.org/
 
 import matplotlib.dates as mdates
 import matplotlib.image as mpimg
+import matplotlib.patheffects as pe
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import FuncFormatter
 from PIL import Image
-import matplotlib.patheffects as pe
 
 from pyvoa.__version__ import __version__
 from pyvoa.kwargs_options import InputOption

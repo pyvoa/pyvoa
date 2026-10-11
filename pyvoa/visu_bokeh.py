@@ -881,7 +881,7 @@ class visu_bokeh:
             """)
             bokeh_figure_map.add_layout(color_bar, 'below')
             if 'show_values' in kwargs.get('typeofmap'):
-                from bokeh.models import LabelSet, CustomJS
+                from bokeh.models import CustomJS, LabelSet
 
                 def _fmt(v):
                     # 3 significant digits with thousands separators, no scientific notation
