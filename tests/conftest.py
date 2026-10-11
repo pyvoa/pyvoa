@@ -7,12 +7,19 @@ Two invariants are enforced here for every test that is *not* marked
   the availability of an upstream server;
 * the pyvoa cache directory points inside the test's own tmp_path, so a
   test run never reads nor pollutes ``~/.cache/pyvoa.data_<user>``.
+
+matplotlib draws on the non-interactive Agg backend for the whole suite, so
+a test that draws a chart never opens a window a terminal run would wait on.
 """
 
 import socket
 from pathlib import Path
 
+import matplotlib
 import pytest
+
+# before pyplot is imported anywhere: conftest is read before the test modules
+matplotlib.use("Agg")
 
 from pyvoa import tools
 
