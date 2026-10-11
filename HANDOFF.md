@@ -12,8 +12,8 @@ is in `CLAUDE.local.md`, machine-local and deliberately not checked in. The
 decisions already taken, the notes for whoever edits the manuscript, and the
 history of the repository are at the end.
 
-**Status, 2026-10-08.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
-`minimum`, `paper` and `docs`. The suite is at 381 passed, 94 deselected
+**Status, 2026-10-11.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
+`minimum`, `paper` and `docs`. The suite is at 394 passed, 94 deselected
 (network, 69 of them in `tests/test_sources.py`, which compares every database
 with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
 `10.5281/zenodo.21829901`) and archived by Software Heritage (release
@@ -52,8 +52,8 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
   characters each, in a file named with "highlights". Graphical abstract:
   531 x 1328 px (h x w) or proportionally larger, readable at 5 x 13 cm.
-  `paper/figures/architecture.png` (portrait, 1500 x 1934) is the closest thing,
-  and would need recomposing.
+  The schema, `paper/figures/schema_PYVOA_vertical.pdf` (portrait, A4), is the
+  closest thing, and would need recomposing.
 
 ## 2. Merging locations: a merge sums the raw dates as they are
 
@@ -149,7 +149,15 @@ release time.
 
 - **The figures are produced, not drawn.** `examples/pyfiles/paper_examples.py`
   writes them into `paper/figures/` (`make figures`); run `--check` first.
-  `architecture.png` is the exception, a drawing supplied by the authors.
+  `schema_PYVOA_vertical.pdf` is the exception, a drawing supplied by the
+  authors.
+- **The documentation's landing page shows PNG copies of three of them**:
+  `docs/_static/img/fig2_timeseries_weu.png`, `fig3_map_g20.png` and
+  `architecture.png` (the schema), with the paper's listings beside them in
+  `docs/index.rst`. Nothing regenerates them: when a figure or a listing
+  changes, render the PDF again (`pdftocairo -png -singlefile -scale-to-x 1700
+  -scale-to-y -1`, 1500 for the schema) and align the listing and the
+  captions. They had drifted until 2026-10-11 (`376c486`).
 - **Page count.** `make final` gives a reading layout (`preprint,12pt`);
   Elsevier's `final,5p,times,twocolumn` gives 6 pages, the layout the limit
   refers to.
@@ -180,6 +188,12 @@ release time.
   *Unreleased* entry was cut from about 400 lines to 76 on that basis on
   2026-10-09 (`d81e0e6`); a new entry is a line or two, not a paragraph.
 - **`requirements.txt` is kept**: mybinder.org builds from it.
+- **The workflows use the Node 24 majors of the GitHub actions** (2026-10-11,
+  `2706e27`): `checkout` and `setup-python` v7, `upload-artifact` v7,
+  `upload-pages-artifact` and `deploy-pages` v5. GitHub forces Node 20 actions
+  onto Node 24 with a warning. The one warning left, `punycode` (DEP0040) in
+  the `github pages` job, comes from `deploy-pages@v5.0.1` itself and goes
+  away with its next release.
 - **`SUPPORT.md` and `bug_report.yml` say "about two dozen" databases**; the
   exact count lives in the README's table.
 - **French Guiana and French Polynesia are no longer merged into France** in
