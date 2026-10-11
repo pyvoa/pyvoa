@@ -47,19 +47,19 @@ Mapping a grouping
 .. code-block:: python
 
    pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
-   pf.map(which='tot_confirmed', where='G20',
-          what='daily', when='31/12/2021')
+   pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
 
 One keyword selects the G20 member states and the geolocation layer supplies
-their geometries; countries outside the grouping are left unpainted.
+their geometries; countries outside the grouping are left unpainted. Without
+``what``, a ``tot_`` variable is mapped at its cumulative value.
 
 .. figure:: _static/img/fig3_map_g20.png
-   :alt: World map with the G20 member states shaded by daily confirmed
+   :alt: World map with the G20 member states shaded by total confirmed
          COVID-19 cases on 31 December 2021
    :width: 95%
    :align: center
 
-   The same four keywords, drawn geographically instead of against time.
+   Three keywords, drawn geographically instead of against time.
 
 Both listings are the first two examples of the `software paper
 <https://github.com/pyvoa/pyvoa/tree/main/paper>`_, and are run verbatim by
@@ -69,17 +69,19 @@ How it fits together
 --------------------
 
 .. figure:: _static/img/architecture.png
-   :alt: Open data sources feed a Zenodo archive, then pyvoa preprocessing,
-         then a unified Python interface, then charts, maps and tables
+   :alt: Open data sources are mirrored on Zenodo for perennial storage, or
+         read live; pyvoa preprocesses them into a unified Python interface,
+         whose outputs are DataFrames, charts, maps and CSV or XLSX tables
    :width: 60%
    :align: center
    :name: fig-architecture
 
    Each database is described by a JSON file rather than by code, so the
    catalogue grows without the library changing. The sources are mirrored on
-   Zenodo, which is what makes a given release reproducible; the geolocation
-   layer reconciles the location identifiers; and the result is one pandas
-   DataFrame that any of the backends can draw.
+   Zenodo, which is what makes a given release reproducible, and can also be
+   read live from their providers; the geolocation layer reconciles the
+   location identifiers; and the result is one pandas DataFrame that any of
+   the backends can draw.
 
 .. toctree::
    :maxdepth: 2
