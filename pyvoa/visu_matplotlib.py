@@ -563,8 +563,7 @@ class visu_matplotlib:
             }
         )
 
-         # values written on the map
-        print('show_values',show_values)
+        # values written on the map
         if show_values:
             # representative_point() is always inside the polygon, unlike the
             # centroid, which can fall outside a concave shape (France with
@@ -576,12 +575,14 @@ class visu_matplotlib:
                 # keep only the points inside the visible window
                 if not (minx <= pt.x <= maxx and miny <= pt.y <= maxy):
                     continue
+                # 3 significant digits with thousands separators, no
+                # scientific notation: the labels bokeh writes
                 ax.annotate(
-                    f"{value:,.3g}",
+                    format(float(f"{value:.3g}"), ",.10g"),
                     xy=(pt.x, pt.y),
                     ha='center',
                     va='center',
-                    fontsize=kwargs.get('value_fontsize', 6),
+                    fontsize=6,
                     color='black',
                     path_effects=[pe.withStroke(linewidth=1.5, foreground='white')],
                 )
