@@ -19,13 +19,13 @@ from functools import wraps
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
     PyvoaWarning,
+    gather_others,
     rank_locations,
     shorten_locations,
     verb,
@@ -202,7 +202,10 @@ class AllVisu:
         asked for), ranks the locations (by decreasing value, ties by name:
         ``tools.rank_locations``), caps a histogram by location at
         ``maxcountrydisplayed`` of them, and gathers the rest into a
-        'SumOthers' slice for a histogram by value or a pie chart.
+        'SumOthers' slice for a histogram by value or a pie chart
+        (``tools.gather_others``). Each location of a histogram or a pie chart
+        is given the colour front gave it over the whole frame, so that it
+        keeps it from one date to another; 'SumOthers' is white.
         """
         @wraps(func)
         def inner_hm(self, **kwargs):
@@ -234,31 +237,20 @@ class AllVisu:
             if title == InputOption().d_graphicsinput_args['title']:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
             maxcountry = self.maxcountry(kwargs)
+            # one colour per location, the one front gave it over the whole
+            # frame ('color'), so that a location keeps it from one date to
+            # another, with or without the date slider, and on both backends
+            if func.__name__ != 'map' and 'color' in input.columns:
+                input['colors'] = [c if isinstance(c, str) else matplotlib.colors.rgb2hex(c)
+                                   for c in input['color']]
             if not kwargs['dateslider']:
                 input = rank_locations(input[input.date==input.date.max()], which)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
                     input = input.head(maxcountry)
 
                 if typeofhist == 'value' or typeofhist == 'pie':
-                    top = input.iloc[:maxcountry].copy()
-                    # one colour per slice, as many as the cap asked for, and
-                    # fewer locations than that when few are asked for
-                    colors = plt.cm.tab20(np.linspace(0, 1, maxcountry))
-                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in colors[:len(top)]]
-                    others = input.iloc[maxcountry:]
-                    rest = {col: ['SumOthers'] for col in top.columns}
-
-                    total = others[which].apply(
-                        lambda x: x[0] if isinstance(x, list) else x
-                        ).sum()
-                    rest[which] = [total]
-                    if kwargs['kwargsuser']['vis'] == 'bokeh':
-                        rest["where"] = ["_".join(others["where"].astype(str).unique())]
-                    rest['date'] = [input['date'].iloc[0]]
-                    rest['colors'] = ['#FFFFFF']
-                    rest = pd.DataFrame(rest)
-                    input = pd.concat([top, rest], ignore_index=True)
-                    input = rank_locations(input, which)
+                    input = gather_others(input, which, maxcountry,
+                                          list_locations=kwargs['kwargsuser']['vis'] == 'bokeh')
 
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]

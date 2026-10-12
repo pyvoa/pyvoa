@@ -57,6 +57,7 @@ from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
     PyvoaError,
     PyvoaWarning,
+    gather_others,
     min_max_range,
     rank_locations,
     scientific_label,
@@ -158,16 +159,20 @@ class visu_bokeh:
         def innerdeco_bokeh(self,**kwargs):
             """Assign the location colours, build the figure, then draw."""
             input = kwargs.get('input')
-            # the 'SumOthers' slice of a pie chart, or bar of a histogram by
-            # value, stays white, as decohistomap and the slider callback
-            # paint it: it is not a location, and took a colour of the cycle.
-            # It is told by its code, its 'where' listing the locations it
-            # gathers under bokeh.
+            # the colours decohistomap gave a histogram or a pie chart, one per
+            # location over the whole frame, are kept: recomputed here from
+            # the order of the rows, they followed the rank at the date drawn,
+            # and differed with and without the date slider. A chart that
+            # comes without them gets one per location, in order of
+            # appearance. The 'SumOthers' slice stays white either way: it is
+            # not a location. It is told by its code, its 'where' listing the
+            # locations it gathers under bokeh.
             others = (input['code'].astype(str) == 'SumOthers') if 'code' in input.columns \
                 else pd.Series(False, index=input.index)
-            unique_where = input.loc[~others, 'where'].unique()
-            color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
-            input['colors'] = input['where'].map(color_map)
+            if 'colors' not in input.columns or input['colors'].isna().any():
+                unique_where = input.loc[~others, 'where'].unique()
+                color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
+                input['colors'] = input['where'].map(color_map)
             input.loc[others, 'colors'] = '#FFFFFF'
             kwargs['input'] = input
             logo = kwargs['logo']
@@ -970,18 +975,12 @@ class visu_bokeh:
                     # ranked by value and capped, as the slider callback does,
                     # not in alphabetical order with every location stacked
                     # on the maxcountrydisplayed slots
-                    ranked = rank_locations(input_dates, which)
-                    input_dates = ranked.head(maxcountrydisplayed)
-                    others = ranked.iloc[maxcountrydisplayed:]
-                    if func.__name__ == 'bokeh_pie' and not others.empty:
+                    if func.__name__ == 'bokeh_pie':
                         # the other locations make one slice, as without the
                         # slider, so that the shares are those of the whole
-                        rest = input_dates.iloc[[0]].copy()
-                        rest['where'] = 'SumOthers'
-                        rest['code'] = 'SumOthers'
-                        rest[which] = others[which].sum()
-                        rest['colors'] = '#FFFFFF'
-                        input_dates = rank_locations(pd.concat([input_dates, rest]), which)
+                        input_dates = gather_others(input_dates, which, maxcountrydisplayed)
+                    else:
+                        input_dates = rank_locations(input_dates, which).head(maxcountrydisplayed)
                     input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
                     input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
@@ -1146,42 +1145,27 @@ class visu_bokeh:
             return func(self, **kwargs)
         return inner_decodateslider
 
-    @deco_bokeh
-    def bokeh_histo(self, **kwargs):
-        """Create a 1D histogram by value according to arguments.
+    def value_histo(self, input, which, bins):
+        """Bin the values of one date for the histogram by value.
 
         Parameters
         ----------
         input : pd.DataFrame
-            The table the front end assembled: a 'date' column, a 'where' column,
-            one column per variable of ``which``, and the 'colors' column
-            ``deco_bokeh`` adds.
+            The rows of one date: the locations kept and their 'SumOthers'.
         which : str
-            The variable whose values are binned. The visualizer has already
-            reduced a list to its single element by this point.
-        bins : int
-            The number of bins. Defaults to the value declared in the keyword
-            catalogue, ten.
+            The column holding the value.
+        bins : int or None
+            The number of bins; 11 when None, 2 when every value is the same.
 
-        Notes
-        -----
-        The figures themselves and the logo watermark are not arguments a caller
-        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
-        under 'bokeh_figure_linear' and 'bokeh_figure_loglog'.
+        Returns
+        -------
+        pd.DataFrame
+            One row per bin: its 'left' and 'right' edges, 'middle_bin', the
+            count as 'top', the 'contributors' and the bar colour, the same
+            for a bin of a given rank at every date.
         """
-        input = kwargs.get('input')
-        bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
-        which  = kwargs.get('which')
-        if isinstance(which,list):
-            which = which[0]
-
-        dfigures = {
-                    'linear':kwargs.get('bokeh_figure_linear'),
-                    'loglog':kwargs.get('bokeh_figure_loglog')
-                    }
-
         min_val = input[which].min()
-        max_val =  input[which].max()
+        max_val = input[which].max()
 
         if not bins:
             if len(input[which].unique()) == 1:
@@ -1213,13 +1197,13 @@ class visu_bokeh:
                 rank = bins - 1
 
             contributors[rank].append(
-                input.iloc[i]['where']
+                str(input.iloc[i]['where'])
             )
 
         contributors = dict(sorted(contributors.items()))
 
         lcolors = itertools.cycle(self.lcolors)
-        frame_histo = pd.DataFrame({
+        return pd.DataFrame({
                 'left': interval[:-1],
                 'right': interval[1:],
                 'middle_bin': [
@@ -1239,6 +1223,68 @@ class visu_bokeh:
                     for _ in range(bins)
                 ]
             })
+
+    @deco_bokeh
+    def bokeh_histo(self, **kwargs):
+        """Create a 1D histogram by value according to arguments.
+
+        With 'dateslider', the histogram of every date is binned beforehand,
+        from the locations ``tools.gather_others`` keeps at that date, as
+        without the slider; the chart opens on the last date, and the slider
+        swaps the bins, the axes and the date of the default title.
+
+        Parameters
+        ----------
+        input : pd.DataFrame
+            The table the front end assembled: a 'date' column, a 'where' column,
+            one column per variable of ``which``, and the 'colors' column
+            ``deco_bokeh`` adds. One date, the locations kept and their
+            'SumOthers', without the slider; every date and location with it.
+        which : str
+            The variable whose values are binned. The visualizer has already
+            reduced a list to its single element by this point.
+        bins : int
+            The number of bins. Defaults to the value declared in the keyword
+            catalogue, ten.
+        dateslider : bool
+            Add a slider over the dates.
+        maxcountrydisplayed : int
+            How many locations are binned at a date with the slider, the
+            others making 'SumOthers'.
+
+        Notes
+        -----
+        The figures themselves and the logo watermark are not arguments a caller
+        provides: ``deco_bokeh`` builds one figure per axis type and passes them in,
+        under 'bokeh_figure_linear' and 'bokeh_figure_loglog'.
+        """
+        input = kwargs.get('input')
+        bins = kwargs.get('bins', self.av.d_graphicsinput_args['bins'])
+        which  = kwargs.get('which')
+        if isinstance(which,list):
+            which = which[0]
+        dateslider = kwargs.get('dateslider')
+
+        dfigures = {
+                    'linear':kwargs.get('bokeh_figure_linear'),
+                    'loglog':kwargs.get('bokeh_figure_loglog')
+                    }
+
+        if dateslider:
+            list_locations = kwargs.get('kwargsuser', {}).get('vis') == 'bokeh'
+            days = sorted(input['date'].unique())
+            dates = [pd.Timestamp(d).strftime("%d/%m/%Y") for d in days]
+            frames = [self.value_histo(
+                          gather_others(input[input['date'] == d], which,
+                                        kwargs['maxcountrydisplayed'],
+                                        list_locations=list_locations),
+                          which, bins)
+                      for d in days]
+            frame_histo = frames[-1]
+        else:
+            frame_histo = self.value_histo(input, which, bins)
+        source = ColumnDataSource(frame_histo)
+
         #tooltips = """
         #<div style="width: 400px">
         #<b>Middle value:</b> @middle_bin <br>
@@ -1264,18 +1310,49 @@ class visu_bokeh:
                 axis_type_title = 'loglog'
 
             fig.add_tools(hover_tool)
-            fig.x_range = Range1d(interval[0], interval[-1])
+            fig.x_range = Range1d(frame_histo['left'].iloc[0], frame_histo['right'].iloc[-1])
             fig.y_range = Range1d(0, 1.05 * frame_histo['top'].max())
 
             if y_axis_type == "log":
                 bottom = 0.0001
                 fig.y_range = Range1d(0.001, 10 * frame_histo['top'].max())
 
-            fig.quad(source=ColumnDataSource(frame_histo), top='top', bottom=bottom, left='left', \
+            fig.quad(source=source, top='top', bottom=bottom, left='left', \
                              right='right', fill_color='colors')
             panel = TabPanel(child=Row(fig,kwargs['watermark']), title=axis_type_title)
             panels.append(panel)
         tabs = Tabs(tabs=panels)
+
+        if dateslider:
+            from bokeh.models import CustomJS, Slider
+
+            # the default title ends on the date drawn: it follows the slider
+            title = kwargs.get('title') or ''
+            last = '(' + dates[-1] + ')'
+            titleprefix = title[:-len(last)] if title.endswith(last) else ''
+            slider = Slider(start=0, end=max(0, len(frames)-1), value=max(0, len(frames)-1),
+                            step=1, title="Date index", width=300)
+            date_display = Div(text=f"<b>{dates[-1]}</b>", width=300)
+            jsfile = Path(__file__).parent / "js/histo_value_callback.js"
+            with open(jsfile) as f:
+                slider_code = f.read()
+            slider.js_on_change('value', CustomJS(
+                args={
+                    'frames': [frame.to_dict(orient='list') for frame in frames],
+                    'source': source,
+                    'dates': dates,
+                    'div': date_display,
+                    'figlinear': dfigures['linear'],
+                    'figlog': dfigures['loglog'],
+                    'titleprefix': titleprefix,
+                },
+                code=slider_code))
+            toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
+            jsfile = Path(__file__).parent / "js/animation_callback.js"
+            with open(jsfile) as f:
+                animation_code = f.read()
+            toggl.js_on_change('active', CustomJS(args={'slider': slider}, code=animation_code))
+            tabs = column(column(toggl, slider, date_display), tabs)
         return tabs
 
     ''' VERTICAL HISTO '''

@@ -301,8 +301,13 @@ class visu_matplotlib:
             color=input['colors']
         else:
             color=kwargs.get('plt').get_cmap('Paired').colors
-        ax =  input.plot(kind="pie",y=which, color=color, autopct='%1.1f%%', legend=True,
-        title=title, ylabel='', labeldistance=None,ax=ax)
+        # 'colors', not 'color', is what a pandas pie chart reads: under the
+        # latter the slices took the default cycle, and the colour of each
+        # location and the white of 'SumOthers' were lost. The thin edge keeps
+        # the white slice visible.
+        ax =  input.plot(kind="pie",y=which, colors=list(color), autopct='%1.1f%%', legend=True,
+        title=title, ylabel='', labeldistance=None,ax=ax,
+        wedgeprops={'edgecolor': '#BBBBBB', 'linewidth': 0.5})
         ax.legend(bbox_to_anchor=(1., 0.9), loc='upper left',title=which)
         ax.set_title(title)
         if return_pltaxis:

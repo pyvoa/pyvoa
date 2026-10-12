@@ -972,6 +972,20 @@ def test_rank_locations_breaks_ties_by_name_whatever_the_dtype():
     assert list(ranked.index) == [0, 1, 2, 3, 4]
 
 
+def test_gather_others_keeps_the_first_and_sums_the_rest_in_white():
+    frame = pd.DataFrame({"where": ["A", "B", "C", "D"], "code": ["A", "B", "C", "D"],
+                          "v": [1.0, 9.0, 3.0, 5.0], "colors": ["#a", "#b", "#c", "#d"]})
+    out = tools.gather_others(frame, "v", 2)
+    # B and D kept, A and C summed, ranked among them by value
+    assert list(out["where"]) == ["B", "D", "SumOthers"]
+    assert list(out["v"]) == [9.0, 5.0, 4.0]
+    assert list(out["colors"]) == ["#b", "#d", "#FFFFFF"]
+    assert out["code"].iloc[-1] == "SumOthers"
+    assert tools.gather_others(frame, "v", 2, list_locations=True)["where"].iloc[-1] == "C_A"
+    # nothing left over, no empty slice
+    assert list(tools.gather_others(frame, "v", 4)["where"]) == ["B", "D", "C", "A"]
+
+
 def test_shorten_locations_never_cuts_below_five_letters():
     assert list(tools.shorten_locations(pd.Series(["Luxembourg"]), 2)) == ["Luxem..."]
 

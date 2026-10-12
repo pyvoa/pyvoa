@@ -641,17 +641,11 @@ class front:
             if 'get' not in func.__name__:
                 z = { **self.getkwargsvisu(), **kwargs }
             if self.getvis() is not None:
-                # the date slider moves the date of a histogram by location, a
-                # pie chart or a map. A time series has every date drawn
-                # already, and a histogram by value has no slider of its own:
-                # both used to take the keyword and ignore it, and the
-                # histogram by value then counted every date of every location
-                if z.get('dateslider'):
-                    if func.__name__ == 'plot':
-                        raise PyvoaError("dateslider is available for hist() and map() only, not for plot()")
-                    if func.__name__ == 'hist' and z.get('typeofhist') == 'value':
-                        raise PyvoaError("dateslider is not available for typeofhist='value'; "
-                                         "use typeofhist='location' or 'pie'")
+                # the date slider moves the date of a histogram, a pie chart or
+                # a map. A time series has every date drawn already: plot()
+                # used to take the keyword and ignore it
+                if z.get('dateslider') and func.__name__ == 'plot':
+                    raise PyvoaError("dateslider is available for hist() and map() only, not for plot()")
                 if func.__name__ in ['hist','map']:
                     if z['dateslider'] and self.vis != 'bokeh':
                         raise PyvoaError('dateslider available only visu Bokeh')
@@ -1131,8 +1125,7 @@ class front:
             Under matplotlib, return the axes the chart was drawn on, the
             default, rather than None. The other backends ignore it.
         dateslider : bool, optional
-            Add a slider over the dates. Bokeh only, and for a histogram by
-            location or a pie chart: a histogram by value has none.
+            Add a slider over the dates. Bokeh only.
 
         Returns
         -------
@@ -1147,9 +1140,8 @@ class front:
         ------
         PyvoaError
             If no backend has been set up, if ``which`` names more than one
-            variable, if a keyword or one of its values is not recognised, if
-            ``typeofplot`` is passed, which belongs to :meth:`plot`, or if
-            ``dateslider`` is asked for with ``typeofhist='value'``.
+            variable, if a keyword or one of its values is not recognised, or if
+            ``typeofplot`` is passed, which belongs to :meth:`plot`.
 
         Notes
         -----

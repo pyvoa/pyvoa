@@ -128,7 +128,8 @@ def test_bokeh_dateslider_pie_gathers_the_other_locations():
 
 def test_bokeh_pie_paints_sumothers_white():
     # deco_bokeh gave the 'SumOthers' slice a colour of the cycle, over the
-    # white decohistomap and the slider callback give it
+    # white decohistomap and the slider callback give it, and recoloured the
+    # locations after the order of the rows
     pytest.importorskip("bokeh")
     from importlib.resources import files
 
@@ -140,7 +141,7 @@ def test_bokeh_pie_paints_sumothers_white():
     frame = pd.DataFrame({
         "date": pd.to_datetime(["2026-10-09"] * 3), "where": ["A_B", "C", "D"],
         "code": ["SumOthers", "C", "D"], "from_db": True,
-        "tot_deaths": [5.0, 4.0, 3.0], "colors": ["#FFFFFF", "#000000", "#000000"],
+        "tot_deaths": [5.0, 4.0, 3.0], "colors": ["#123456", "#ff7f0e", "#2ca02c"],
     })
     fig = visu_bokeh().bokeh_pie(
         input=frame, which="tot_deaths", title="", pyvoalogo=False,
@@ -151,8 +152,45 @@ def test_bokeh_pie_paints_sumothers_white():
                   if isinstance(m, ColumnDataSource) and "angle" in m.data)
     colors = dict(zip(source.data["code"], source.data["colors"]))
     assert colors["SumOthers"] == "#FFFFFF"
-    # the locations keep the first colours of the cycle
-    assert colors["C"] == "#1f77b4" and colors["D"] == "#aec7e8"
+    # the locations keep the colours they come with, one per location
+    assert colors["C"] == "#ff7f0e" and colors["D"] == "#2ca02c"
+
+
+def test_bokeh_dateslider_histogram_by_value_bins_every_date_as_without():
+    # the histogram by value took dateslider, drew no slider and binned every
+    # date of every location together
+    pytest.importorskip("bokeh")
+    from importlib.resources import files
+
+    import pandas as pd
+    from bokeh.models import CustomJS, Slider
+
+    from pyvoa.tools import gather_others
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    dates = pd.to_datetime(["2026-08-31", "2026-10-09"])
+    where = [f"L{i:02d}" for i in range(15)]
+    frame = pd.DataFrame([
+        {"date": d, "where": w, "code": w, "from_db": True,
+         "tot_deaths": float(k * (i + 1) ** 2), "colors": "#000000"}
+        for k, d in enumerate(dates, 1) for i, w in enumerate(where)
+    ])
+    fig = visu_bokeh().bokeh_histo(
+        input=frame, which="tot_deaths", title="T (09/10/2026)", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"), bins=None,
+        dateslider=True, maxcountrydisplayed=12, typeofmap=["not dense"])
+    callback = next(m for m in fig.references()
+                    if isinstance(m, CustomJS) and "frames" in m.args and "source" in m.args)
+    frames = callback.args["frames"]
+    assert callback.args["dates"] == ["31/08/2026", "09/10/2026"]
+    assert callback.args["titleprefix"] == "T "
+    for d, got in zip(dates, frames):
+        expected = visu_bokeh().value_histo(
+            gather_others(frame[frame["date"] == d], "tot_deaths", 12), "tot_deaths", None)
+        assert got == expected.to_dict(orient="list")
+    # the chart opens on the last date
+    assert callback.args["source"].data["top"].tolist() == frames[-1]["top"]
+    assert [s.value for s in fig.select({"type": Slider})] == [1]
 
 
 def test_bokeh_dateslider_map_holds_one_shape_per_location():

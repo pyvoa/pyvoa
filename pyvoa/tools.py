@@ -302,6 +302,45 @@ def rank_locations(frame, which):
         key=lambda c: c.astype(str) if c.name == 'where' else c,
     ).reset_index(drop=True)
 
+def gather_others(frame, which, keep, list_locations=False):
+    """Keep the first locations of one date, and gather the others into 'SumOthers'.
+
+    What a pie chart or a histogram by value draws, with or without a date
+    slider: the ``keep`` first locations of :func:`rank_locations`, then one
+    row 'SumOthers' summing the others, ranked among them by its value. Its
+    code is 'SumOthers' and its colour white, whatever its 'where' says.
+
+    Parameters
+    ----------
+    frame : pandas.DataFrame
+        The rows of one date, with 'where' and, if any, 'colors'.
+    which : str
+        The column holding the value.
+    keep : int
+        How many locations are kept.
+    list_locations : bool, optional
+        Name the 'SumOthers' row after the locations it gathers, joined by
+        '_', for a bokeh tooltip; 'SumOthers' otherwise (the default).
+
+    Returns
+    -------
+    pandas.DataFrame
+        The rows kept and, when any location is left over, the 'SumOthers'
+        one, ranked.
+    """
+    ranked = rank_locations(frame, which)
+    top, others = ranked.iloc[:keep], ranked.iloc[keep:]
+    if others.empty:
+        return top
+    rest = {col: ['SumOthers'] for col in ranked.columns}
+    rest[which] = [others[which].apply(lambda x: x[0] if isinstance(x, list) else x).sum()]
+    if list_locations:
+        rest['where'] = ['_'.join(others['where'].astype(str).unique())]
+    if 'date' in ranked.columns:
+        rest['date'] = [ranked['date'].iloc[0]]
+    rest['colors'] = ['#FFFFFF']
+    return rank_locations(pd.concat([top, pd.DataFrame(rest)], ignore_index=True), which)
+
 _SUPERSCRIPTS = str.maketrans('-0123456789', '⁻⁰¹²³⁴⁵⁶⁷⁸⁹')
 
 def scientific_label(value, digits=3):

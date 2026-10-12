@@ -60,6 +60,10 @@ Maps and charts:
   chart gathers the other locations into 'SumOthers' as it does without. The
   title follows the slider, and the colour bar of a map labels its ticks
   legibly at every date.
+- the date slider covers the histogram by value too, which took
+  `dateslider=True` and binned every date together. A location keeps its
+  colour in every histogram and pie chart, from one date to another and with
+  or without the slider, and 'SumOthers' is white.
 
 Behaviour changes:
 
@@ -72,8 +76,7 @@ Behaviour changes:
   doing nothing, and `reload=False` really reads the pickles back without
   parsing (`owid` in 0.6 s instead of 9.4 s).
 - `listwhom(detailed=True)` no longer lists the variables: see `listwhich()`.
-- `plot()` and `hist(typeofhist='value')` refuse `dateslider`, which they
-  ignored; the histogram by value then counted every date of every location.
+- `plot()` refuses `dateslider`, which it ignored.
 - `saveoutput()` writes `pyvoa_out.*` by default, instead of `pycoa.ut.*`.
 - `pf.set_verbose_mode()` and `pf.get_verbose_mode()` are front methods again.
 

@@ -59,16 +59,12 @@ def test_map_listers_ask_for_setvis_first(monkeypatch, lister):
 
 
 @pytest.mark.parametrize('vis', ['matplotlib', 'bokeh'])
-@pytest.mark.parametrize('chart', [
-    lambda z: pf.plot(input=z, which='cur_rea', dateslider=True),
-    lambda z: pf.hist(input=z, which='cur_rea', typeofhist='value', dateslider=True),
-])
-def test_dateslider_is_refused_where_there_is_none(in_house_frame, chart, vis):
-    # plot() and the histogram by value used to take it and ignore it, and the
-    # histogram by value then counted every date of every location
+def test_plot_refuses_the_dateslider(in_house_frame, vis):
+    # a time series draws every date already: plot() used to take the keyword
+    # and ignore it
     if vis == 'bokeh':
         pytest.importorskip('bokeh')
     pf.setvis(vis)
     z = pf.get(input=in_house_frame, which='cur_rea')
     with pytest.raises(pf.PyvoaError, match='dateslider'):
-        chart(z)
+        pf.plot(input=z, which='cur_rea', dateslider=True)
