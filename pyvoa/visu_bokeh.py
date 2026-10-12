@@ -820,8 +820,12 @@ class visu_bokeh:
         """Decorate adding a date slider to a chart.
 
         Wires a slider to the figure so the drawn date can be moved through the
-        series. Histograms are not covered: the slider is declined there, with
-        a message. Bokeh only; front refuses 'dateslider' for other backends.
+        series: maps, histograms by location and pie charts. The chart opens on
+        the last date, with the slider at its end, and a histogram or a pie
+        chart shows the maxcountrydisplayed locations ranked by value at every
+        date. The histogram by value does not go through this decorator and
+        ignores the slider. Bokeh only; front refuses 'dateslider' for other
+        backends.
         """
         @wraps(func)
         def inner_decodateslider(self, **kwargs):
@@ -937,8 +941,16 @@ class visu_bokeh:
                             frame[c] = []
                     frames.append(frame)
 
-                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
+                # the last date in time: the dates are strings by now, and the
+                # max() of '31/08/2026' and '09/10/2026' is the August one
+                input_dates = input_dates.loc[input_dates.date==unique_dates[-1]]
                 if func.__name__ in lhist:
+                    # the chart drawn before the slider moves: the locations
+                    # ranked by value and capped, as the slider callback does,
+                    # not in alphabetical order with every location stacked
+                    # on the maxcountrydisplayed slots
+                    input_dates = (input_dates.sort_values(by=which, ascending=False)
+                                   .head(maxcountrydisplayed).reset_index(drop=True))
                     input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
                     input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
@@ -946,7 +958,8 @@ class visu_bokeh:
                 columndatasrc = ColumnDataSource(data = input_dates)
 
                 from bokeh.models import CustomJS, Div, Slider
-                slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
+                # the slider starts on the date drawn, the last one
+                slider = Slider(start=0, end=max(0, len(frames)-1), value=max(0, len(frames)-1), step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
                 jsfile = Path(__file__).parent / "js/slider_callback.js"

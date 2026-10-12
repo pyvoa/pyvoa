@@ -15,6 +15,10 @@ About :
 */
 if (cb_obj.active) {
 	if (!window._bokeh_play_interval) {
+		// started on the last date, where the slider opens: play from the first
+		if (slider.value >= slider.end) {
+			slider.value = slider.start;
+		}
 		window._bokeh_play_interval = setInterval(function() {
 			let v = slider.value + 1;
 

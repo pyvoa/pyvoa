@@ -55,6 +55,8 @@ Maps and charts:
   backend is set, and a backend named by `MPLBACKEND`, such as Agg, is no
   longer switched to TkAgg at the first matplotlib chart.
 - fix: `savefig()` saved the previous bokeh figure instead of the last one.
+- fix: a bokeh histogram or pie chart with `dateslider` opened on the wrong
+  date, and mixed its bars up once the slider moved.
 
 Behaviour changes:
 

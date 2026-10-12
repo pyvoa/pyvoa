@@ -63,3 +63,33 @@ def test_visu_matplotlib_keeps_the_backend_mplbackend_names():
 
     visu_matplotlib()
     assert matplotlib.get_backend().lower() == "agg"
+
+
+def test_bokeh_dateslider_histogram_opens_ranked_capped_on_the_last_date():
+    # the source drawn before the slider moves used to hold every location in
+    # alphabetical order, stacked on the maxcountrydisplayed slots, on the
+    # date whose '%d/%m/%Y' string sorts last (31/08 over 09/10)
+    pytest.importorskip("bokeh")
+    from importlib.resources import files
+
+    import pandas as pd
+    from bokeh.models import ColumnDataSource, Slider
+
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    dates = pd.to_datetime(["2026-08-31", "2026-10-09"])
+    where = [f"L{i:02d}" for i in range(15)]
+    frame = pd.DataFrame([
+        {"date": d, "where": w, "code": w, "from_db": True,
+         "tot_deaths": float(k * (i + 1)), "colors": "#000000"}
+        for k, d in enumerate(dates, 1) for i, w in enumerate(where)
+    ]).sort_values("tot_deaths", ascending=False).reset_index(drop=True)
+    fig = visu_bokeh().bokeh_horizonhisto(
+        input=frame, which="tot_deaths", title="", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"),
+        dateslider=True, maxcountrydisplayed=12, typeofmap=["not dense"])
+    source = next(m for m in fig.select({"type": ColumnDataSource}) if "top" in m.data)
+    assert list(source.data["where"]) == [f"L{i:02d}" for i in range(14, 2, -1)]
+    assert set(source.data["date"]) == {"09/10/2026"}
+    # the slider opens on that date, the last one
+    assert [s.value for s in fig.select({"type": Slider})] == [1]

@@ -31,62 +31,90 @@ for (let j = 0; j < frame[which].length; j++) {
 // ====================================================
 // MAP
 // ====================================================
-for (const k of keys) {
-    sourcemap.data[k] = rows.map(r => r[k]);
+// a histogram or a pie chart is handed its own source as 'sourcemap' too:
+// the map part only applies to a map
+if (sourcemap !== sourcehisto) {
+    for (const k of keys) {
+        sourcemap.data[k] = rows.map(r => r[k]);
+    }
+    sourcemap.data["cases"] = sourcemap.data[which];
+    const values = sourcemap.data["cases"].filter(v => Number.isFinite(Number(v)));
+    if (values.length > 0) {
+        color_mapperjs.low  = Math.min(...values);
+        color_mapperjs.high = Math.max(...values);
+    }
+    sourcemap.change.emit();
+    div.text = "<b>" + dates[i] + "</b>";
+    return;
 }
-sourcemap.data["cases"] = sourcemap.data[which];
-const values = sourcemap.data["cases"].filter(v => Number.isFinite(Number(v)));
-if (values.length > 0) {
-    color_mapperjs.low  = Math.min(...values);
-    color_mapperjs.high = Math.max(...values);
-}
-sourcemap.change.emit();
 
 // ====================================================
-// HISTOGRAM — tri et slice
+// HISTOGRAM AND PIE — ranked, capped at maxcountrydisplayed
 // ====================================================
-const len = sourcehisto.data[which].length;
+// the frame holds every location of the date: only the first
+// maxcountrydisplayed of them by value are drawn, so that none is left
+// stacked on the slots of the others
 const sorted_rows = [...rows].sort(
     (a, b) => (Number(b[which]) || 0) - (Number(a[which]) || 0)
 );
+const len = Math.min(maxcountrydisplayed, sorted_rows.length);
 const limited = sorted_rows.slice(0, len);
-if (limited.length === 0) return;
+if (len === 0) return;
 
-// Colonnes qui viennent de la frame
-const frameColumns = Object.keys(frame);
-for (const col of frameColumns) {
-    sourcehisto.data[col] = limited.map(r => r[col]);
+// every column gets a new array of the same length: the frame's own columns,
+// then the drawing ones computed below, then whatever else the source holds
+const data = {};
+for (const col of keys) {
+    data[col] = limited.map(r => r[col]);
 }
 
-// ====================================================
-// Labels and derived quantities
-// ====================================================
-const labelMap = new Map();
-const ytick_loc = [];
 const total = limited
     .map(r => Number(r[which]) || 0)
     .reduce((a, b) => a + b, 0);
+const step = ymax / maxcountrydisplayed;
+data["top"] = [];
+data["bottom"] = [];
+data["horihistotexty"] = [];
+data["left"] = [];
+data["right"] = [];
+data["horihistotextx"] = [];
+data["percentage"] = [];
+data["angle"] = [];
+data["textdisplayed"] = [];
+data["textdisplayed2"] = [];
 
-for (let j = 0; j < maxcountrydisplayed; j++) {
+const labelMap = new Map();
+const ytick_loc = [];
+for (let j = 0; j < len; j++) {
     const value = Number(limited[j][which]) || 0;
-    const w = String(limited[j]["shortenwhere"] || "");
+    // 'where' is cut to maxlettersdisplayed already, by decohistomap
+    const w = String(limited[j]["where"] || "");
 
-    const top_pos    = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed + 0.5 * ymax / maxcountrydisplayed;
-    const bottom_pos = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed - 0.5 * ymax / maxcountrydisplayed;
-    const tick_pos   = parseInt(bottom_pos + 0.5 * ymax / maxcountrydisplayed);  // = ymax * (maxcountrydisplay - j) / maxcountrydisplay
+    const top_pos    = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed + 0.5 * step;
+    const bottom_pos = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed - 0.5 * step;
+    const tick_pos   = parseInt(bottom_pos + 0.5 * step);
 
-    sourcehisto.data["top"][j]            = top_pos;
-    sourcehisto.data["bottom"][j]         = bottom_pos;
-    sourcehisto.data["horihistotexty"][j] = tick_pos;
-    sourcehisto.data["angle"][j]          = total > 0 ? (value / total) * 2 * Math.PI : 0;
-    sourcehisto.data["textdisplayed"][j]  = String(w).padStart(36, " "); // this is for pie
-    sourcehisto.data["textdisplayed2"][j] = total > 0
-        ? (100 * value / total).toFixed(1) + "%"
-        : "0.0%";
+    data["top"].push(top_pos);
+    data["bottom"].push(bottom_pos);
+    data["horihistotexty"].push(tick_pos);
+    data["left"].push(Math.min(value, 0));
+    data["right"].push(Math.max(value, 0));
+    data["horihistotextx"].push(Math.max(value, 0));
+    data["percentage"].push(total > 0 ? value / total : 0);
+    data["angle"].push(total > 0 ? (value / total) * 2 * Math.PI : 0);
+    data["textdisplayed"].push(w.padStart(36, " "));   // this is for pie
+    data["textdisplayed2"].push(total > 0 ? (100 * value / total).toFixed(1) + "%" : "0.0%");
 
     ytick_loc.push(tick_pos);
-    labelMap.set(tick_pos, sourcehisto.data["textdisplayed"][j]);
+    labelMap.set(tick_pos, w);
 }
+for (const col of Object.keys(sourcehisto.data)) {
+    if (!(col in data)) {
+        const old = sourcehisto.data[col];
+        data[col] = Array.from({length: len}, (_, j) => old[Math.min(j, old.length - 1)]);
+    }
+}
+sourcehisto.data = data;
 
 // ====================================================
 // Axis update
@@ -94,10 +122,6 @@ for (let j = 0; j < maxcountrydisplayed; j++) {
 ylabellinear.ticker.ticks          = ytick_loc;
 ylabellog.ticker.ticks             = ytick_loc;
 ylabellinear.major_label_overrides = labelMap;
+ylabellog.major_label_overrides    = labelMap;
 
-// ====================================================
-// Refresh
-// ====================================================
-sourcehisto.change.emit();
-console.log(sourcehisto.data["angle"]);
 div.text = "<b>" + dates[i] + "</b>";
