@@ -93,3 +93,45 @@ def test_bokeh_dateslider_histogram_opens_ranked_capped_on_the_last_date():
     assert set(source.data["date"]) == {"09/10/2026"}
     # the slider opens on that date, the last one
     assert [s.value for s in fig.select({"type": Slider})] == [1]
+
+
+def test_bokeh_dateslider_map_holds_one_shape_per_location():
+    # every location was serialised with its geometry at every date, pink ones
+    # included: hundreds of megabytes for spf, and a source the slider callback
+    # could not match its frames against
+    pytest.importorskip("bokeh")
+    import json
+    from importlib.resources import files
+
+    import geopandas as gpd
+    import pandas as pd
+    from bokeh.models import CustomJS, GeoJSONDataSource
+    from shapely.geometry import Polygon
+
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    dates = pd.to_datetime(["2026-08-31", "2026-09-30", "2026-10-09"])
+    frame = gpd.GeoDataFrame([
+        {"date": d, "where": w, "code": w, "from_db": w != "C",
+         "tot_deaths": float(k + i),
+         "geometry": Polygon([(i, 0), (i + 1, 0), (i + 1, 1), (i, 1)])}
+        for k, d in enumerate(dates) for i, w in enumerate("ABC")
+    ], crs="EPSG:4326")
+    fig = visu_bokeh().bokeh_map(
+        input=frame, which="tot_deaths", title="T (09/10/2026)", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"),
+        dateslider=True, maxcountrydisplayed=12, typeofmap=["dense"],
+        tile="openstreet")
+    shapes = {}
+    for source in fig.references():
+        if isinstance(source, GeoJSONDataSource):
+            for feature in json.loads(source.geojson)["features"]:
+                shapes.setdefault(feature["properties"]["where"], []).append(
+                    feature["properties"].get("tot_deaths"))
+    # one shape each, the pink C included; A and B carry the last date's value
+    assert {w: len(v) for w, v in shapes.items()} == {"A": 1, "B": 1, "C": 1}
+    assert (shapes["A"], shapes["B"]) == ([2.0], [3.0])
+    # the default title follows the slider: what precedes its date
+    callback = next(m for m in fig.references()
+                    if isinstance(m, CustomJS) and "titleprefix" in m.args)
+    assert callback.args["titleprefix"] == "T "

@@ -823,7 +823,12 @@ class visu_bokeh:
         series: maps, histograms by location and pie charts. The chart opens on
         the last date, with the slider at its end, and a histogram or a pie
         chart shows the maxcountrydisplayed locations ranked by value at every
-        date. The histogram by value does not go through this decorator and
+        date. A map holds one shape per location, which the callback colours
+        with the value of its own location at the date chosen. The default
+        title, which ends on the date, follows the slider, and the colour bar
+        labels its ticks from the range of that date: plainly between 0.001
+        and 999, over a power of ten otherwise. The histogram by value does
+        not go through this decorator and
         ignores the slider. Bokeh only; front refuses 'dateslider' for other
         backends.
         """
@@ -864,7 +869,11 @@ class visu_bokeh:
                 input['cases']=input[which]
                 input_dates = input.drop(columns='geometry').copy()
                 if 'date' in input.columns:
-                    input = input.drop(columns='date')
+                    # one feature per location, on the last date: the slider
+                    # brings the values of the other dates from its frames,
+                    # matched on 'where'. Every date with its geometry made
+                    # the page hundreds of megabytes long.
+                    input = input[input['date'] == input['date'].max()].drop(columns='date')
                 geocolumndatasrc = GeoJSONDataSource(geojson = input.to_json())
             else:
                 input_dates = input.copy()
@@ -876,22 +885,24 @@ class visu_bokeh:
             color_bar = ColorBar(title=which,color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal',
                              ticker=BasicTicker())
-            bokeh_figure_map.add_layout(color_bar, 'below')
 
-            #color_bar.formatter = BasicTickFormatter(use_scientific=True, precision=1, power_limit_low=int(max_col))
-            max_val = np.nanmax(input[which])
-            if max_val > 0 and not np.isnan(max_val):
-                exp = int(np.floor(np.log10(abs(max_val))))
-                divisor = 10 ** exp
-            else:
-                exp = 0
-                divisor = 1
-
-            color_bar.formatter = CustomJSTickFormatter(
-                args={'divisor': divisor, 'exp': exp},
-                code="""
-                const val = (tick / divisor).toFixed(1);
-                return val + " ×10" + exp.toString().split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || d).join('');
+            # The labels are worked out from the ticks drawn, not from the
+            # maximum of the first date: the slider moves the range, and a
+            # power of ten and one decimal fixed beforehand wrote a small range
+            # as 0.0×10³ 0.0×10³ 0.1×10³. As scientific_label() does for the
+            # map labels, the ticks are written plainly while the largest lies
+            # between 0.001 and 999, and over one power of ten otherwise; the
+            # decimals are those the spacing of the ticks needs.
+            color_bar.formatter = CustomJSTickFormatter(code="""
+                const top = Math.max(...ticks.map(t => Math.abs(t)));
+                const exp = (top === 0) ? 0 : Math.floor(Math.log10(top));
+                const plain = (exp >= -3 && exp <= 2);
+                const scale = plain ? 1 : Math.pow(10, exp);
+                const step = ticks.length > 1 ? Math.abs(ticks[1] - ticks[0]) / scale : 1;
+                const decimals = step > 0 ? Math.min(6, Math.max(0, -Math.floor(Math.log10(step) + 1e-9))) : 0;
+                const val = (tick / scale).toFixed(decimals);
+                if (plain) return val;
+                return val + "×10" + String(exp).split('').map(d => '⁰¹²³⁴⁵⁶⁷⁸⁹'[d] || '⁻').join('');
             """)
             bokeh_figure_map.add_layout(color_bar, 'below')
             if 'show_values' in kwargs.get('typeofmap'):
@@ -966,6 +977,18 @@ class visu_bokeh:
                 with open(jsfile) as f:
                     slider_code = f.read()
 
+                # the default title ends on the date drawn, '(09/10/2026)': it
+                # follows the slider. A title of the caller's own is left as is.
+                # The figures go to the callback, not their Title objects, which
+                # the drawing methods replace when they set the title again.
+                title = kwargs.get('title') or ''
+                last = '(' + unique_dates[-1] + ')'
+                titleprefix = title[:-len(last)] if title.endswith(last) else ''
+                if func.__name__ == 'bokeh_map':
+                    titlefigs = [bokeh_figure_map]
+                else:
+                    titlefigs = [bokeh_figure_linear, bokeh_figure_log]
+
                 slider_callback = CustomJS(
                         args={
                             'frames': frames,
@@ -978,7 +1001,9 @@ class visu_bokeh:
                             'ylabellinear': bokeh_figure_linear.yaxis[0],
                             'ylabellog': bokeh_figure_log.yaxis[0],
                             'ymax': ymax,
-                            'color_mapperjs': color_mapper
+                            'color_mapperjs': color_mapper,
+                            'titlefigs': titlefigs,
+                            'titleprefix': titleprefix,
                         },
                         code=slider_code)
 
@@ -1053,7 +1078,8 @@ class visu_bokeh:
 
                 _min_col, _max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
                 if not input_missing.empty:
-                    input_missing=input_missing.drop(columns='date')
+                    # one pink shape per location, not one per date
+                    input_missing=input_missing.drop_duplicates(subset='where').drop(columns='date')
                     geo_missing = GeoJSONDataSource(
                         geojson=input_missing.to_json()
                     )

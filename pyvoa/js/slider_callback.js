@@ -18,6 +18,13 @@ const i = cb_obj.value;
 const frame = frames[i];
 const keys = Object.keys(frame);
 
+// the default title, 'SPF database (31/12/2020)', follows the date drawn
+if (titleprefix) {
+    for (const f of titlefigs) {
+        f.title.text = titleprefix + "(" + dates[i] + ")";
+    }
+}
+
 // ====================================================
 // Build rows
 // ====================================================
@@ -34,11 +41,25 @@ for (let j = 0; j < frame[which].length; j++) {
 // a histogram or a pie chart is handed its own source as 'sourcemap' too:
 // the map part only applies to a map
 if (sourcemap !== sourcehisto) {
+    // the source holds one shape per location, in its own order: each value
+    // of the frame goes to the shape of its location, not to the row of the
+    // same rank, and a location the frame lacks is left without a value
+    const where = sourcemap.data["where"];
+    const pos = new Map();
+    for (let j = 0; j < where.length; j++) pos.set(where[j], j);
+    const data = {...sourcemap.data};
     for (const k of keys) {
-        sourcemap.data[k] = rows.map(r => r[k]);
+        if (k === "where") continue;
+        const col = new Array(where.length).fill(NaN);
+        for (const r of rows) {
+            const j = pos.get(r["where"]);
+            if (j !== undefined) col[j] = r[k];
+        }
+        data[k] = col;
     }
-    sourcemap.data["cases"] = sourcemap.data[which];
-    const values = sourcemap.data["cases"].filter(v => Number.isFinite(Number(v)));
+    data["cases"] = data[which];
+    sourcemap.data = data;
+    const values = data["cases"].filter(v => Number.isFinite(Number(v)));
     if (values.length > 0) {
         color_mapperjs.low  = Math.min(...values);
         color_mapperjs.high = Math.max(...values);
