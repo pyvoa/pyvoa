@@ -1528,8 +1528,11 @@ class front:
         Raises
         ------
         PyvoaError
-            If the current backend draws no map at all.
+            If no backend has been set, or if the current backend draws no
+            map at all.
         """
+        if self.vis is None:
+            raise PyvoaError('Vis has not be set !')
         if self.av.pdcharts[self.vis]['map']:
             return self.ltiles
         else:
@@ -1549,8 +1552,11 @@ class front:
         Raises
         ------
         PyvoaError
-            If the current backend draws no map at all.
+            If no backend has been set, or if the current backend draws no
+            map at all.
         """
+        if self.vis is None:
+            raise PyvoaError('Vis has not be set !')
         if self.av.pdcharts[self.vis]['map']:
             if self.vis == 'bokeh':
                 return ['mercator']

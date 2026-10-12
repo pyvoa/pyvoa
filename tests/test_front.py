@@ -48,3 +48,11 @@ def test_when_cuts_an_in_house_frame(cache_dir):
     z = pf.get(input=frame, which='cur_rea', option='sumall', what='daily')
     z = pf.get(input=z, when='03/03/2021:05/03/2021')
     assert sorted(z['date'].unique()) == list(pd.date_range('2021-03-03', '2021-03-05'))
+
+
+@pytest.mark.parametrize('lister', [pf.listtile, pf.listprojection])
+def test_map_listers_ask_for_setvis_first(monkeypatch, lister):
+    # used to fail on self.av.pdcharts[None] with a bare KeyError
+    monkeypatch.setattr(pf.__pyvoafront_instance__, 'vis', None)
+    with pytest.raises(pf.PyvoaError, match='Vis has not be set'):
+        lister()
