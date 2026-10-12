@@ -960,6 +960,18 @@ def test_shorten_locations_keeps_the_order_of_a_categorical():
     assert cut.cat.ordered
 
 
+def test_rank_locations_breaks_ties_by_name_whatever_the_dtype():
+    frame = pd.DataFrame({
+        "where": pd.Categorical(["Oicha", "Bambu", "Rwampara", "Adja", "Nia Nia"],
+                                categories=["Rwampara", "Oicha", "Nia Nia", "Bambu", "Adja"]),
+        "v": [2.0, 2.0, 13.0, float("nan"), 1.0],
+    })
+    ranked = tools.rank_locations(frame, "v")
+    # equal values by name, not by the order of the categories; missing last
+    assert list(ranked["where"].astype(str)) == ["Rwampara", "Bambu", "Oicha", "Nia Nia", "Adja"]
+    assert list(ranked.index) == [0, 1, 2, 3, 4]
+
+
 def test_shorten_locations_never_cuts_below_five_letters():
     assert list(tools.shorten_locations(pd.Series(["Luxembourg"]), 2)) == ["Luxem..."]
 

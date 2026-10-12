@@ -75,11 +75,29 @@ if (sourcemap !== sourcehisto) {
 // the frame holds every location of the date: only the first
 // maxcountrydisplayed of them by value are drawn, so that none is left
 // stacked on the slots of the others
-const sorted_rows = [...rows].sort(
-    (a, b) => (Number(b[which]) || 0) - (Number(a[which]) || 0)
-);
-const len = Math.min(maxcountrydisplayed, sorted_rows.length);
-const limited = sorted_rows.slice(0, len);
+// ranked as tools.rank_locations ranks them without the slider: decreasing
+// value, a missing one last, ties by location name compared as strings, so
+// that the locations kept at equal values are the same ones
+const val = r => { const n = Number(r[which]); return Number.isFinite(n) ? n : -Infinity; };
+const byname = (a, b) => {
+    const x = String(a["where"]), y = String(b["where"]);
+    return x < y ? -1 : (x > y ? 1 : 0);
+};
+const rank = (a, b) => (val(b) - val(a)) || byname(a, b);
+const sorted_rows = [...rows].sort(rank);
+let limited = sorted_rows.slice(0, maxcountrydisplayed);
+const others = sorted_rows.slice(maxcountrydisplayed);
+if (ispie && others.length > 0) {
+    // the other locations make one slice, as without the slider, so that the
+    // shares are those of the whole
+    const rest = {...limited[0]};
+    rest["where"] = "SumOthers";
+    rest["code"] = "SumOthers";
+    rest[which] = others.reduce((a, r) => a + (Number.isFinite(Number(r[which])) ? Number(r[which]) : 0), 0);
+    rest["colors"] = "#FFFFFF";
+    limited = [...limited, rest].sort(rank);
+}
+const len = limited.length;
 if (len === 0) return;
 
 // every column gets a new array of the same length: the frame's own columns,

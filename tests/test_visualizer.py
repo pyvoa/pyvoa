@@ -95,6 +95,37 @@ def test_bokeh_dateslider_histogram_opens_ranked_capped_on_the_last_date():
     assert [s.value for s in fig.select({"type": Slider})] == [1]
 
 
+def test_bokeh_dateslider_pie_gathers_the_other_locations():
+    # with the slider, the pie used to keep the first maxcountrydisplayed
+    # locations only, and its shares were those of their own total
+    pytest.importorskip("bokeh")
+    from importlib.resources import files
+
+    import pandas as pd
+    from bokeh.models import ColumnDataSource
+
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    dates = pd.to_datetime(["2026-08-31", "2026-10-09"])
+    where = [f"L{i:02d}" for i in range(15)]
+    frame = pd.DataFrame([
+        {"date": d, "where": w, "code": w, "from_db": True,
+         "tot_deaths": float(k * (i + 1)), "colors": "#000000"}
+        for k, d in enumerate(dates, 1) for i, w in enumerate(where)
+    ])
+    fig = visu_bokeh().bokeh_pie(
+        input=frame, which="tot_deaths", title="", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"),
+        dateslider=True, maxcountrydisplayed=12, typeofmap=["not dense"],
+        mode="mouse")
+    source = next(m for m in fig.references()
+                  if isinstance(m, ColumnDataSource) and "angle" in m.data)
+    values = dict(zip(source.data["where"], source.data["tot_deaths"]))
+    # L00 to L02, 2 + 4 + 6 on the last date, make the thirteenth slice
+    assert len(values) == 13 and values["SumOthers"] == 12.0
+    assert abs(sum(source.data["percentage"]) - 1) < 1e-9
+
+
 def test_bokeh_dateslider_map_holds_one_shape_per_location():
     # every location was serialised with its geometry at every date, pink ones
     # included: hundreds of megabytes for spf, and a source the slider callback

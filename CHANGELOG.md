@@ -56,8 +56,10 @@ Maps and charts:
   longer switched to TkAgg at the first matplotlib chart.
 - fix: `savefig()` saved the previous bokeh figure instead of the last one.
 - fix: a bokeh histogram or pie chart with `dateslider` opened on the wrong
-  date, and mixed its bars up once the slider moved. The title follows the
-  slider, and the colour bar of a map labels its ticks legibly at every date.
+  date, and mixed its bars up once the slider moved; with the slider, a pie
+  chart gathers the other locations into 'SumOthers' as it does without. The
+  title follows the slider, and the colour bar of a map labels its ticks
+  legibly at every date.
 
 Behaviour changes:
 

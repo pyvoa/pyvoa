@@ -58,6 +58,7 @@ from pyvoa.tools import (
     PyvoaError,
     PyvoaWarning,
     min_max_range,
+    rank_locations,
     scientific_label,
     verb,
 )
@@ -823,7 +824,9 @@ class visu_bokeh:
         series: maps, histograms by location and pie charts. The chart opens on
         the last date, with the slider at its end, and a histogram or a pie
         chart shows the maxcountrydisplayed locations ranked by value at every
-        date. A map holds one shape per location, which the callback colours
+        date, ties by name as ``tools.rank_locations`` ranks them, and a pie
+        chart gathers the other locations into a 'SumOthers' slice, as it does
+        without the slider. A map holds one shape per location, which the callback colours
         with the value of its own location at the date chosen. The default
         title, which ends on the date, follows the slider, and the colour bar
         labels its ticks from the range of that date: plainly between 0.001
@@ -936,8 +939,7 @@ class visu_bokeh:
                 #unique_dates = unique_dates[::-1]
 
                 for d in unique_dates:
-                    df_d = input_dates[input_dates['date'] == d].copy()
-                    df_d=df_d.sort_values(by=which,ascending=False)
+                    df_d = rank_locations(input_dates[input_dates['date'] == d], which)
                     df_d = df_d[cols]
                     if df_d.empty:
                         frame = {c: [] for c in cols}
@@ -960,8 +962,18 @@ class visu_bokeh:
                     # ranked by value and capped, as the slider callback does,
                     # not in alphabetical order with every location stacked
                     # on the maxcountrydisplayed slots
-                    input_dates = (input_dates.sort_values(by=which, ascending=False)
-                                   .head(maxcountrydisplayed).reset_index(drop=True))
+                    ranked = rank_locations(input_dates, which)
+                    input_dates = ranked.head(maxcountrydisplayed)
+                    others = ranked.iloc[maxcountrydisplayed:]
+                    if func.__name__ == 'bokeh_pie' and not others.empty:
+                        # the other locations make one slice, as without the
+                        # slider, so that the shares are those of the whole
+                        rest = input_dates.iloc[[0]].copy()
+                        rest['where'] = 'SumOthers'
+                        rest['code'] = 'SumOthers'
+                        rest[which] = others[which].sum()
+                        rest['colors'] = '#FFFFFF'
+                        input_dates = rank_locations(pd.concat([input_dates, rest]), which)
                     input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
                     input_dates = self.addcolumnspie(input_dates,which)
                     yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
@@ -1003,6 +1015,7 @@ class visu_bokeh:
                             'ymax': ymax,
                             'color_mapperjs': color_mapper,
                             'titlefigs': titlefigs,
+                            'ispie': func.__name__ == 'bokeh_pie',
                             'titleprefix': titleprefix,
                         },
                         code=slider_code)

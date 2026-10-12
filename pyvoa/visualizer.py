@@ -23,7 +23,13 @@ import pandas as pd
 
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
-from pyvoa.tools import PyvoaError, PyvoaWarning, shorten_locations, verb
+from pyvoa.tools import (
+    PyvoaError,
+    PyvoaWarning,
+    rank_locations,
+    shorten_locations,
+    verb,
+)
 
 # The four imports below only probe whether an optional backend is installed;
 # the backends themselves are imported lazily, hence the noqa on three of them.
@@ -193,7 +199,8 @@ class AllVisu:
 
         Cuts the location names to ``maxlettersdisplayed`` for the labels,
         legends and tooltips, keeps the last date (unless a date slider is
-        asked for), ranks the locations, caps a histogram by location at
+        asked for), ranks the locations (by decreasing value, ties by name:
+        ``tools.rank_locations``), caps a histogram by location at
         ``maxcountrydisplayed`` of them, and gathers the rest into a
         'SumOthers' slice for a histogram by value or a pie chart.
         """
@@ -228,7 +235,7 @@ class AllVisu:
                 kwargs['title'] = self.database_name.upper() + ' database' + ' ('+drawn.strftime('%d/%m/%Y')+')'
             maxcountry = self.maxcountry(kwargs)
             if not kwargs['dateslider']:
-                input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
+                input = rank_locations(input[input.date==input.date.max()], which)
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
                     input = input.head(maxcountry)
 
@@ -251,7 +258,7 @@ class AllVisu:
                     rest['colors'] = ['#FFFFFF']
                     rest = pd.DataFrame(rest)
                     input = pd.concat([top, rest], ignore_index=True)
-                    input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
+                    input = rank_locations(input, which)
 
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
@@ -269,8 +276,8 @@ class AllVisu:
     def decohistopie(func):
         """Decorate preparing the data of a histogram or a pie chart.
 
-        Sorts the locations by decreasing value so the chart is drawn in rank
-        order, and resolves 'what' to the single column the chart needs when a
+        Sorts the locations by decreasing value, ties by name, so the chart is
+        drawn in rank order, and resolves 'what' to the single column the chart needs when a
         daily or weekly series was asked for.
         """
         @wraps(func)
@@ -284,7 +291,7 @@ class AllVisu:
             which = kwargs.get('which')
             # vis = kwargs.get('vis')
             input['where'].unique()
-            input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
+            input = rank_locations(input, which)
             kwargs['input'] = input
             return func(self,**kwargs)
         return inner_decohistopie

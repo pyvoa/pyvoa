@@ -276,6 +276,32 @@ def shorten_locations(where, maxletters):
     # the labels are unique, so an ordered Categorical keeps its order
     return where.map(dict(zip(names, cut)))
 
+def rank_locations(frame, which):
+    """Rank the rows of a frame by decreasing value, ties by location name.
+
+    The histograms and pie charts keep their first locations in this order,
+    with or without a date slider: the slider callback ranks a date the same
+    way, so that the locations kept at equal values are the same ones. The
+    names are compared as strings, whatever the dtype of 'where' (a
+    Categorical sorts by its categories), and a missing value comes last.
+
+    Parameters
+    ----------
+    frame : pandas.DataFrame
+        The rows to rank, with a 'where' column.
+    which : str
+        The column holding the value.
+
+    Returns
+    -------
+    pandas.DataFrame
+        The rows ranked, with a fresh index.
+    """
+    return frame.sort_values(
+        by=[which, 'where'], ascending=[False, True], na_position='last',
+        key=lambda c: c.astype(str) if c.name == 'where' else c,
+    ).reset_index(drop=True)
+
 _SUPERSCRIPTS = str.maketrans('-0123456789', '⁻⁰¹²³⁴⁵⁶⁷⁸⁹')
 
 def scientific_label(value, digits=3):
