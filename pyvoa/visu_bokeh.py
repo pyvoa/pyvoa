@@ -1504,6 +1504,12 @@ class visu_bokeh:
         not drawn. The pyvoa logo is laid over the figure only when
         'pyvoalogo' is True, as on the other charts.
 
+        The map is framed on every location, pink ones included, as the
+        matplotlib map is. Its plot frame, not counting the colour bar and the
+        notes below it, keeps the proportions of that extent: its short side
+        is 350 px, unless the long side would then pass 800 px, which is then
+        held at 800 px.
+
         Parameters
         ----------
         **kwargs

@@ -949,10 +949,12 @@ class front:
             How the geography is drawn, among 'not dense', 'dense' and
             'show_values'; :meth:`listmap` lists them. 'show_values' writes
             the value of each location on the map, at a point that always
-            lies inside its shape, in scientific notation with three
-            significant figures (``5.49×10⁷``), on both backends. A location
-            with no value, or outside the visible extent, is left unlabelled. It combines with the other values in a list, as in
-            ``typeofmap=['dense', 'show_values']``.
+            lies inside its shape, with three significant figures: plainly
+            between 0.001 and 999 (``570``, ``0.0123``), in scientific
+            notation otherwise (``5.49×10⁷``), on both backends. A location
+            with no value, no geometry of its own, or outside the visible
+            extent, is left unlabelled. It combines with the other values in
+            a list, as in ``typeofmap=['dense', 'show_values']``.
         tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
