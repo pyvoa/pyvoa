@@ -49,6 +49,11 @@ Maps and charts:
   plainly between 0.001 and 999 (`570`, `0.0123`) and in scientific notation
   otherwise (`5.49×10⁷`), under matplotlib and bokeh alike;
   `typeofmap` takes a list to combine it, as in `['dense', 'show_values']`.
+- fix: bokeh maps were squashed by their colour bar; they keep their
+  proportions now, and are framed like matplotlib's, pink locations included.
+- fix: `listtile()` and `listprojection()` raise a `PyvoaError` when no
+  backend is set, and a backend named by `MPLBACKEND`, such as Agg, is no
+  longer switched to TkAgg at the first matplotlib chart.
 - fix: `savefig()` saved the previous bokeh figure instead of the last one.
 
 Behaviour changes:

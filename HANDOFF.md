@@ -12,8 +12,8 @@ is in `CLAUDE.local.md`, machine-local and deliberately not checked in. The
 decisions already taken, the notes for whoever edits the manuscript, and the
 history of the repository are at the end.
 
-**Status, 2026-10-11.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
-`minimum`, `paper` and `docs`. The suite is at 394 passed, 94 deselected
+**Status, 2026-10-13.** CI is green — `lint`, `test` on Python 3.10 to 3.14,
+`minimum`, `paper` and `docs`. The suite is at 404 passed, 94 deselected
 (network, 69 of them in `tests/test_sources.py`, which compares every database
 with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and on Zenodo (concept
 `10.5281/zenodo.21829901`) and archived by Software Heritage (release
@@ -192,7 +192,12 @@ release time.
   `ea7c6a9`), set in `tests/conftest.py`: run from a terminal with a display,
   the two plots of `test_front.py` opened windows the run waited on. Do not
   call `setbatch()` in a test instead: it sets the `front` singleton for the
-  rest of the session, with no way back.
+  rest of the session, with no way back. `matplotlib.use("Agg")` alone did not
+  hold: `visu_matplotlib()` switched to TkAgg outside a notebook at every
+  chart. Since 2026-10-13 (`90030bb`) it leaves alone a backend named by
+  `MPLBACKEND`, which `conftest.py` sets as well, and a test guards it. A
+  script drawing on Agg is no longer switched either. `visu_seaborn()` still
+  forces TkAgg, but only under `vis='seaborn'`, which is parked.
 - **The workflows use the Node 24 majors of the GitHub actions** (2026-10-11,
   `2706e27`): `checkout` and `setup-python` v7, `upload-artifact` v7,
   `upload-pages-artifact` and `deploy-pages` v5. GitHub forces Node 20 actions
@@ -280,7 +285,26 @@ release time.
   whether the problem shows with the archived or the live data
   (`pf.getlive()`, `pf.setlive()`), as SUPPORT.md's third check does.
 - **`tile='openstreet'` is the default** of both backends; matplotlib sends a
-  pyvoa User-Agent, without which OpenStreetMap serves a blocked image.
+  pyvoa User-Agent, without which OpenStreetMap serves a blocked image. Bokeh
+  fetches the tiles over https from `tile.openstreetmap.org` (2026-10-13,
+  `552a488`): plain http is blocked in a notebook served over https (Colab),
+  and OSM no longer recommends the `a/b/c` subdomains. A plain bokeh map had
+  lost its tiles on 2026-10-10 (`2de0629` inverted the `'dense'` test when
+  `typeofmap` became a list); no release shipped that.
+- **A map is framed on every location, pink ones included, on both backends**
+  (2026-10-13, `552a488`). Bokeh used to measure the extent on the locations
+  with data only, so `ebolardc` zoomed on the north-east of the DRC. The bokeh
+  plot frame (`frame_width`/`frame_height`, not the canvas, which the colour
+  bar and the notes below eat into) keeps the proportions of the extent: short
+  side 350 px, long side held at 800 px when it would pass it (Malaysia,
+  800 × 266). The aspect still differs from matplotlib's, by design: Mercator
+  there, Eckert IV here, which stretches north–south about 1.4 at the equator.
+- **`show_values` writes a label plainly between 0.001 and 999**, in
+  scientific notation otherwise (2026-10-13, `426ecde`), judged on the value
+  rounded to three significant figures, so 999.6 is `1.00×10³`. A location
+  without a geometry of its own (`owid`'s continents) gets no label
+  (`632908f`): its empty point made the matplotlib map fail. Labels overlap on
+  a world map, in Europe and West Africa; not addressed.
 - **matplotlib maps are equal-area (Eckert IV) by default; bokeh stays Web
   Mercator**, its tiles existing in that projection only. An equal-area bokeh
   map would have no basemap: set aside on 2026-10-07.
