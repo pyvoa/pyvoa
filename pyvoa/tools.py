@@ -279,11 +279,13 @@ def shorten_locations(where, maxletters):
 _SUPERSCRIPTS = str.maketrans('-0123456789', '⁻⁰¹²³⁴⁵⁶⁷⁸⁹')
 
 def scientific_label(value, digits=3):
-    """Write a value in scientific notation, as a map label.
+    """Write a value as a map label.
 
-    The mantissa keeps ``digits`` significant figures and the power of ten is
-    written in superscript, ``5.49×10⁷``, the way the colour bars of the maps
-    write it. A power of ten of zero is left out.
+    The value keeps ``digits`` significant figures. Once rounded, a value
+    between 0.001 and 999 in magnitude is written plainly, without its
+    trailing zeros (``570``, ``4.5``, ``0.0123``); any other is written in
+    scientific notation, the power of ten in superscript, ``5.49×10⁷``, the
+    way the colour bars of the maps write it.
 
     Parameters
     ----------
@@ -303,8 +305,9 @@ def scientific_label(value, digits=3):
         return '0'
     mantissa, exponent = f"{float(value):.{digits - 1}e}".split('e')
     exponent = int(exponent)
-    if exponent == 0:
-        return mantissa
+    # on the rounded value: 999.6 rounds to 1.00×10³, out of the plain range
+    if -3 <= exponent <= 2:
+        return f"{float(mantissa) * 10**exponent:.{digits}g}"
     return mantissa + '×10' + str(exponent).translate(_SUPERSCRIPTS)
 
 def fill_missing_dates(p, date_field='date', loc_field='where',

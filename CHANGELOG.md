@@ -45,8 +45,9 @@ Maps and charts:
 - new keywords: `pyvoalogo` (the logo is no longer stamped unasked),
   `return_pltaxis` and `maxcountrydisplayed`; `maxlettersdisplayed` defaults
   to 20. Locations missing from the parsed database are shown in pink.
-- `map(typeofmap='show_values')` writes each location's value on the map, in
-  scientific notation (`5.49×10⁷`), under matplotlib and bokeh alike;
+- `map(typeofmap='show_values')` writes each location's value on the map,
+  plainly between 0.001 and 999 (`570`, `0.0123`) and in scientific notation
+  otherwise (`5.49×10⁷`), under matplotlib and bokeh alike;
   `typeofmap` takes a list to combine it, as in `['dense', 'show_values']`.
 - fix: `savefig()` saved the previous bokeh figure instead of the last one.
 
