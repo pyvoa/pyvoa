@@ -49,7 +49,15 @@ class visu_matplotlib:
         itself fails. Where Tk cannot load, without a display, the backend
         matplotlib resolved by itself is kept. Doing this at construction keeps
         the choice out of the drawing methods.
+
+        A backend named by the ``MPLBACKEND`` environment variable, matplotlib's
+        own way of asking for one, is left alone. Without that, a script
+        drawing on Agg (to write png files) or the test suite was switched to
+        TkAgg at every chart, and where a display is available each plt.show()
+        then opened a window and waited for it to be closed.
         """
+        import os
+
         import matplotlib
         self.av = InputOption()
         def use_tkagg():
@@ -64,7 +72,13 @@ class visu_matplotlib:
             except ImportError:
                 pass
         def set_matplotlib_backend():
-            """Select the backend: inline under a Jupyter kernel, TkAgg otherwise."""
+            """Select the backend: inline under a Jupyter kernel, TkAgg otherwise.
+
+            Nothing is selected when ``MPLBACKEND`` names a backend already:
+            the caller has chosen it.
+            """
+            if os.environ.get("MPLBACKEND"):
+                return
             try:
                 from IPython import get_ipython
                 ipy = get_ipython()

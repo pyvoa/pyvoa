@@ -10,8 +10,12 @@ Two invariants are enforced here for every test that is *not* marked
 
 matplotlib draws on the non-interactive Agg backend for the whole suite, so
 a test that draws a chart never opens a window a terminal run would wait on.
+Selecting Agg is not enough on its own: ``visu_matplotlib()`` picks TkAgg
+outside a notebook, at every chart, unless ``MPLBACKEND`` names a backend, so
+the variable is set as well.
 """
 
+import os
 import socket
 from pathlib import Path
 
@@ -19,6 +23,7 @@ import matplotlib
 import pytest
 
 # before pyplot is imported anywhere: conftest is read before the test modules
+os.environ["MPLBACKEND"] = "Agg"
 matplotlib.use("Agg")
 
 from pyvoa import tools

@@ -52,3 +52,14 @@ def test_matplotlib_show_values_skips_a_location_without_geometry():
                              return_pltaxis=True, pyvoalogo=False)
     assert sorted(t.get_text() for t in ax.texts) == ["12", "570"]
     plt.close("all")
+
+
+def test_visu_matplotlib_keeps_the_backend_mplbackend_names():
+    # it used to switch to TkAgg, and the plots of test_front.py then opened
+    # windows a terminal run had to close by hand
+    import matplotlib
+
+    from pyvoa.visu_matplotlib import visu_matplotlib
+
+    visu_matplotlib()
+    assert matplotlib.get_backend().lower() == "agg"
