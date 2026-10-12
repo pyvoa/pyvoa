@@ -573,6 +573,10 @@ class visu_matplotlib:
             for pt, value in zip(points, input[which]):
                 if value is None or np.isnan(value):
                     continue
+                # a location without a geometry of its own (owid's continents,
+                # the world) has an empty point, whose x and y GEOS refuses
+                if pt.is_empty:
+                    continue
                 # keep only the points inside the visible window
                 if not (minx <= pt.x <= maxx and miny <= pt.y <= maxy):
                     continue
