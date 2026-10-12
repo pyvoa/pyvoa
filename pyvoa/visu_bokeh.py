@@ -14,7 +14,6 @@ https://pyvoa.org/
 import base64
 import bisect
 import itertools
-import json
 from functools import wraps
 from pathlib import Path
 
@@ -197,42 +196,44 @@ class visu_bokeh:
             return func(self, **kwargs)
         return innerdeco_bokeh
 
-    @staticmethod
-    def geosource_bounds(geosource):
-        """Return the bounding box of every geometry in a GeoJSON source.
-
-        Parameters
-        ----------
-        geosource : GeoJSONDataSource
-            the source to measure.
-
-        Returns
-        -------
-        tuple
-            (x_min, y_min, x_max, y_max).
-
-        Raises
-        ------
-        ValueError
-            if the source holds no usable geometry.
-        """
-        from shapely.geometry import shape
-
-        data = json.loads(geosource.geojson)
-        xs, ys = [], []
-        for feature in data["features"]:
-            geom_json = feature.get("geometry")
-            if geom_json is None:
-                continue
-            geom = shape(geom_json)
-            if geom.is_empty:
-                continue
-            x_min, y_min, x_max, y_max = geom.bounds
-            xs.extend([x_min, x_max])
-            ys.extend([y_min, y_max])
-        if not xs:
-            raise ValueError("No valid geometries found in GeoJSONDataSource")
-        return min(xs), min(ys), max(xs), max(ys)
+    # no longer used: the map is framed on input.total_bounds, pink locations
+    # included, in decodateslider
+    #@staticmethod
+    #def geosource_bounds(geosource):
+    #    """Return the bounding box of every geometry in a GeoJSON source.
+    #
+    #    Parameters
+    #    ----------
+    #    geosource : GeoJSONDataSource
+    #        the source to measure.
+    #
+    #    Returns
+    #    -------
+    #    tuple
+    #        (x_min, y_min, x_max, y_max).
+    #
+    #    Raises
+    #    ------
+    #    ValueError
+    #        if the source holds no usable geometry.
+    #    """
+    #    from shapely.geometry import shape
+    #
+    #    data = json.loads(geosource.geojson)
+    #    xs, ys = [], []
+    #    for feature in data["features"]:
+    #        geom_json = feature.get("geometry")
+    #        if geom_json is None:
+    #            continue
+    #        geom = shape(geom_json)
+    #        if geom.is_empty:
+    #            continue
+    #        x_min, y_min, x_max, y_max = geom.bounds
+    #        xs.extend([x_min, x_max])
+    #        ys.extend([y_min, y_max])
+    #    if not xs:
+    #        raise ValueError("No valid geometries found in GeoJSONDataSource")
+    #    return min(xs), min(ys), max(xs), max(ys)
 
     @staticmethod
     def bokeh_legend(bkfigure):
@@ -833,6 +834,9 @@ class visu_bokeh:
             bokeh_figure_log = kwargs.get('bokeh_figure_log')
             bokeh_figure_map = kwargs.get('bokeh_figure_map')
 
+            # the map is framed on every location, pink ones included, as the
+            # matplotlib map is
+            input_all = input
             input_missing = input[
                 ~input['from_db'].astype(bool)
                 ]
@@ -993,19 +997,14 @@ class visu_bokeh:
                 columndatasrc = ColumnDataSource(data = input_dates)
 
             if func.__name__ == 'bokeh_map':
-                xmin, ymin, xmax, ymax = visu_bokeh().geosource_bounds(geocolumndatasrc)
-                gdf = input.to_crs(epsg=3857)
+                # total_bounds skips the empty geometries
+                xmin, ymin, xmax, ymax = input_all.total_bounds
                 pad_x,pad_y=0.,0.
-                if len(gdf) > 10:
+                if len(input_all) > 10:
                     pad_x = (xmax - xmin) * 0.05
                     pad_y = (ymax - ymin) * 0.05
                     bokeh_figure_map.x_range.bounds = (xmin - pad_x, xmax + pad_x)
                     bokeh_figure_map.y_range.bounds = (ymin - pad_y, ymax + pad_y)
-                    ratio = (ymax + pad_y - (ymin - pad_y)) / (xmax + pad_x - (xmin - pad_x))
-                    if ratio < 1:  # Wider than tall
-                        bokeh_figure_map.width = int(bokeh_figure_map.height / ratio)
-                    else:  # Taller than wide
-                        bokeh_figure_map.height = int(bokeh_figure_map.width * ratio)
                 else:
                     zoom = 2
                     dx = (xmax - xmin)
@@ -1021,6 +1020,23 @@ class visu_bokeh:
                 bokeh_figure_map.x_range.end   = xmax + pad_x
                 bokeh_figure_map.y_range.start = ymin - pad_y
                 bokeh_figure_map.y_range.end   = ymax + pad_y
+                # the frame, not the canvas, gets the ratio of the extent: the
+                # colour bar and the note laid out below take their height from
+                # the canvas, which squashed the map, and match_aspect does not
+                # apply to ranges given explicitly
+                # the short side is 350 px, unless that would take the long
+                # side past 800 px, which is then held at 800 px
+                ratio = (ymax - ymin + 2 * pad_y) / (xmax - xmin + 2 * pad_x)
+                short, longest = 350, 800
+                stretch = max(ratio, 1 / ratio)
+                long_side = min(short * stretch, longest)
+                short_side = long_side / stretch
+                if ratio < 1:  # wider than tall
+                    bokeh_figure_map.frame_width = int(long_side)
+                    bokeh_figure_map.frame_height = int(short_side)
+                else:          # taller than wide
+                    bokeh_figure_map.frame_width = int(short_side)
+                    bokeh_figure_map.frame_height = int(long_side)
 
                 _min_col, _max_col = min_max_range(np.nanmin(input_dates[which]),np.nanmax(input_dates[which]))
                 if not input_missing.empty:
@@ -1503,7 +1519,7 @@ class visu_bokeh:
         bokeh_figure = kwargs['bokeh_figure_map']
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
-        if 'dense' in kwargs['typeofmap'] :
+        if 'dense' not in kwargs['typeofmap']:
             tile = visu_bokeh.convert_tile(tile)
             wmt = WMTSTileSource(url = tile)
             bokeh_figure.add_tile(wmt, retina=True)
@@ -1547,7 +1563,7 @@ class visu_bokeh:
         """Return tiles url according to folium or bokeh resquested."""
         tile = ''
         if tilename == 'openstreet':
-            tile = r'http://c.tile.openstreetmap.org/{Z}/{X}/{Y}.png'
+            tile = r'https://tile.openstreetmap.org/{Z}/{X}/{Y}.png'
         elif tilename == 'esri':
             tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
         # withdrawn: CartoDB displays a request for an API key over the map
