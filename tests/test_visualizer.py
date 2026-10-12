@@ -126,6 +126,35 @@ def test_bokeh_dateslider_pie_gathers_the_other_locations():
     assert abs(sum(source.data["percentage"]) - 1) < 1e-9
 
 
+def test_bokeh_pie_paints_sumothers_white():
+    # deco_bokeh gave the 'SumOthers' slice a colour of the cycle, over the
+    # white decohistomap and the slider callback give it
+    pytest.importorskip("bokeh")
+    from importlib.resources import files
+
+    import pandas as pd
+    from bokeh.models import ColumnDataSource
+
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    frame = pd.DataFrame({
+        "date": pd.to_datetime(["2026-10-09"] * 3), "where": ["A_B", "C", "D"],
+        "code": ["SumOthers", "C", "D"], "from_db": True,
+        "tot_deaths": [5.0, 4.0, 3.0], "colors": ["#FFFFFF", "#000000", "#000000"],
+    })
+    fig = visu_bokeh().bokeh_pie(
+        input=frame, which="tot_deaths", title="", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"),
+        dateslider=False, maxcountrydisplayed=12, typeofmap=["not dense"],
+        mode="mouse")
+    source = next(m for m in fig.references()
+                  if isinstance(m, ColumnDataSource) and "angle" in m.data)
+    colors = dict(zip(source.data["code"], source.data["colors"]))
+    assert colors["SumOthers"] == "#FFFFFF"
+    # the locations keep the first colours of the cycle
+    assert colors["C"] == "#1f77b4" and colors["D"] == "#aec7e8"
+
+
 def test_bokeh_dateslider_map_holds_one_shape_per_location():
     # every location was serialised with its geometry at every date, pink ones
     # included: hundreds of megabytes for spf, and a source the slider callback

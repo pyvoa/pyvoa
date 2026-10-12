@@ -72,6 +72,8 @@ Behaviour changes:
   doing nothing, and `reload=False` really reads the pickles back without
   parsing (`owid` in 0.6 s instead of 9.4 s).
 - `listwhom(detailed=True)` no longer lists the variables: see `listwhich()`.
+- `plot()` and `hist(typeofhist='value')` refuse `dateslider`, which they
+  ignored; the histogram by value then counted every date of every location.
 - `saveoutput()` writes `pyvoa_out.*` by default, instead of `pycoa.ut.*`.
 - `pf.set_verbose_mode()` and `pf.get_verbose_mode()` are front methods again.
 

@@ -158,9 +158,17 @@ class visu_bokeh:
         def innerdeco_bokeh(self,**kwargs):
             """Assign the location colours, build the figure, then draw."""
             input = kwargs.get('input')
-            unique_where = input['where'].unique()
+            # the 'SumOthers' slice of a pie chart, or bar of a histogram by
+            # value, stays white, as decohistomap and the slider callback
+            # paint it: it is not a location, and took a colour of the cycle.
+            # It is told by its code, its 'where' listing the locations it
+            # gathers under bokeh.
+            others = (input['code'].astype(str) == 'SumOthers') if 'code' in input.columns \
+                else pd.Series(False, index=input.index)
+            unique_where = input.loc[~others, 'where'].unique()
             color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
             input['colors'] = input['where'].map(color_map)
+            input.loc[others, 'colors'] = '#FFFFFF'
             kwargs['input'] = input
             logo = kwargs['logo']
             kwargs['which']

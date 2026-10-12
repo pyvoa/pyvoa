@@ -56,3 +56,19 @@ def test_map_listers_ask_for_setvis_first(monkeypatch, lister):
     monkeypatch.setattr(pf.__pyvoafront_instance__, 'vis', None)
     with pytest.raises(pf.PyvoaError, match='Vis has not be set'):
         lister()
+
+
+@pytest.mark.parametrize('vis', ['matplotlib', 'bokeh'])
+@pytest.mark.parametrize('chart', [
+    lambda z: pf.plot(input=z, which='cur_rea', dateslider=True),
+    lambda z: pf.hist(input=z, which='cur_rea', typeofhist='value', dateslider=True),
+])
+def test_dateslider_is_refused_where_there_is_none(in_house_frame, chart, vis):
+    # plot() and the histogram by value used to take it and ignore it, and the
+    # histogram by value then counted every date of every location
+    if vis == 'bokeh':
+        pytest.importorskip('bokeh')
+    pf.setvis(vis)
+    z = pf.get(input=in_house_frame, which='cur_rea')
+    with pytest.raises(pf.PyvoaError, match='dateslider'):
+        chart(z)
