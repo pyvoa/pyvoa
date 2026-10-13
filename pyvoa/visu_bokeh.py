@@ -844,18 +844,7 @@ class visu_bokeh:
                 input['from_db'].astype(bool)
                 ]
 
-            if isinstance(which,list):
-                which = which[0]
-                kwargs['which'] = which
-
-            lhist = ['bokeh_pie','bokeh_horizonhisto']
-
             ymax = self.figure_height
-
-            if func.__name__ in lhist:
-                input = self.addcolumnshisto(input,which,maxcountrydisplayed)
-                yrange = Range1d(min(input['bottom']), max(input['top']))
-
             if func.__name__ == 'bokeh_map':
                 input['cases']=input[which]
                 input_dates = input.drop(columns='geometry').copy()
@@ -867,7 +856,6 @@ class visu_bokeh:
 
             invViridis256 = Viridis256[::-1]
             maxi = float('nan') if input_dates.empty else max(input_dates[which])
-
             color_mapper = LinearColorMapper(palette = invViridis256, low=0, high=maxi, nan_color='#ffffff')
             color_bar = ColorBar(title=which,color_mapper=color_mapper, label_standoff=4, bar_line_cap='round',
                              border_line_color=None, location=(0, 0), orientation='horizontal',
@@ -891,8 +879,6 @@ class visu_bokeh:
             """)
             bokeh_figure_map.add_layout(color_bar, 'below')
             if 'show_values' in kwargs.get('typeofmap'):
-                from bokeh.models import CustomJS, LabelSet
-
                 # same coordinates as the patches drawn above (not gdf, which is
                 # reprojected only to measure the extent)
                 pts = input.geometry.representative_point()
@@ -911,41 +897,21 @@ class visu_bokeh:
                 ))
 
             if dateslider:
-                input_dates = input_dates.sort_values(by=['date', 'where'])
                 input_dates['date'] = input_dates['date'].dt.strftime("%d/%m/%Y")
-                unique_dates = input_dates['date'].drop_duplicates().tolist()
-                # unique_where = input_dates['where'].unique().tolist()
+                unique_dates = input_dates['date'].unique().tolist()[::-1]
                 frames = []
-                cols = list(input_dates.columns)
-                frames = []
-                #unique_dates = unique_dates[::-1]
-
                 for d in unique_dates:
                     df_d = input_dates[input_dates['date'] == d].copy()
-                    df_d=df_d.sort_values(by=which,ascending=False)
-                    df_d = df_d[cols]
-                    if df_d.empty:
-                        frame = {c: [] for c in cols}
-                        frames.append(frame)
-                        continue
+                    df_d = df_d.sort_values(by=which, ascending=False)
+                    df_d = self.addcolumnshisto(df_d,which,maxcountrydisplayed)
+                    df_d = self.addcolumnspie(df_d,which)
+                    df_d = df_d.head(n=maxcountrydisplayed)
+                    frames.append({c: df_d[c].tolist() for c in df_d.columns})
 
-                    frame = {}
-                    for c in list(df_d.columns):
-                        if c in df_d.columns:
-                            frame[c] = df_d[c].tolist()
-                        else:
-                            frame[c] = []
-                    frames.append(frame)
+                yrange = Range1d(min(df_d['bottom']), max(df_d['top']))
+                columndatasrc = ColumnDataSource(data = df_d)
 
-                input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
-                if func.__name__ in lhist:
-                    input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
-                    input_dates = self.addcolumnspie(input_dates,which)
-                    yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
-
-                columndatasrc = ColumnDataSource(data = input_dates)
-
-                from bokeh.models import CustomJS, Div, Slider
+                from bokeh.models import Slider
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
@@ -978,14 +944,12 @@ class visu_bokeh:
                 toggle_callback = CustomJS(args={'slider': slider, 'frames': frames}, code=animation_code)
                 toggl.js_on_change('active', toggle_callback)
 
-                from bokeh.models import Div
                 date_display = Div(text=f"<b>{unique_dates[-1]}</b>", width=300)
                 # Mettre à jour le Div depuis le slider (JS)
                 slider_date_div_cb = CustomJS(args={'div': date_display, 'dates': unique_dates},
                 code="""
                   const i = cb_obj.value;
                   div.text = "<b>" + dates[i] + "</b>";
-                  console.log(frames[i])
                   """)
 
                 slider.js_on_change('value', slider_date_div_cb)
@@ -993,9 +957,10 @@ class visu_bokeh:
                 kwargs['controls'] = controls
             else:
                 input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
+                input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
                 input_dates = self.addcolumnspie(input_dates,which)
+                yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
                 columndatasrc = ColumnDataSource(data = input_dates)
-
             if func.__name__ == 'bokeh_map':
                 # total_bounds skips the empty geometries
                 xmin, ymin, xmax, ymax = input_all.total_bounds
@@ -1076,6 +1041,7 @@ class visu_bokeh:
                 kwargs['main_renderer'] = main_renderer
                 kwargs['geocolumndatasrc'] = geocolumndatasrc
 
+            lhist = ['bokeh_pie','bokeh_horizonhisto']
             if func.__name__ in lhist:
                 kwargs['yrange']=yrange
 
@@ -1240,9 +1206,6 @@ class visu_bokeh:
         """
         which=kwargs['which']
         columndatasrc = kwargs.get('columndatasrc')
-        # which = kwargs.get('which')
-
-        # mode = kwargs.get('mode')
         dateslider = kwargs.get('dateslider')
         controls = kwargs.get('controls', None)
         title = kwargs['title']
@@ -1274,7 +1237,10 @@ class visu_bokeh:
             maxx = 1.15*max(columndatasrc.data['right'])
             fig.x_range.start = minn
             fig.x_range.end = maxx
-            fig.title = title
+            if dateslider:
+                fig.title =''
+            else:
+                fig.title = title
             fig.quad(
                 source=columndatasrc,
                 top='top',
