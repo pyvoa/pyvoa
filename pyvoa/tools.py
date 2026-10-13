@@ -302,13 +302,14 @@ def rank_locations(frame, which):
         key=lambda c: c.astype(str) if c.name == 'where' else c,
     ).reset_index(drop=True)
 
-def gather_others(frame, which, keep, list_locations=False):
+def gather_others(frame, which, keep):
     """Keep the first locations of one date, and gather the others into 'SumOthers'.
 
     What a pie chart or a histogram by value draws, with or without a date
     slider: the ``keep`` first locations of :func:`rank_locations`, then one
     row 'SumOthers' summing the others, ranked among them by its value. Its
-    code is 'SumOthers' and its colour white, whatever its 'where' says.
+    'where' and its code are 'SumOthers', on both backends and with or
+    without the slider, and its colour is white.
 
     Parameters
     ----------
@@ -318,9 +319,6 @@ def gather_others(frame, which, keep, list_locations=False):
         The column holding the value.
     keep : int
         How many locations are kept.
-    list_locations : bool, optional
-        Name the 'SumOthers' row after the locations it gathers, joined by
-        '_', for a bokeh tooltip; 'SumOthers' otherwise (the default).
 
     Returns
     -------
@@ -334,8 +332,6 @@ def gather_others(frame, which, keep, list_locations=False):
         return top
     rest = {col: ['SumOthers'] for col in ranked.columns}
     rest[which] = [others[which].apply(lambda x: x[0] if isinstance(x, list) else x).sum()]
-    if list_locations:
-        rest['where'] = ['_'.join(others['where'].astype(str).unique())]
     if 'date' in ranked.columns:
         rest['date'] = [ranked['date'].iloc[0]]
     rest['colors'] = ['#FFFFFF']

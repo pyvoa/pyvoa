@@ -249,8 +249,7 @@ class AllVisu:
                     input = input.head(maxcountry)
 
                 if typeofhist == 'value' or typeofhist == 'pie':
-                    input = gather_others(input, which, maxcountry,
-                                          list_locations=kwargs['kwargsuser']['vis'] == 'bokeh')
+                    input = gather_others(input, which, maxcountry)
 
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]

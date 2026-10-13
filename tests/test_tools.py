@@ -981,7 +981,6 @@ def test_gather_others_keeps_the_first_and_sums_the_rest_in_white():
     assert list(out["v"]) == [9.0, 5.0, 4.0]
     assert list(out["colors"]) == ["#b", "#d", "#FFFFFF"]
     assert out["code"].iloc[-1] == "SumOthers"
-    assert tools.gather_others(frame, "v", 2, list_locations=True)["where"].iloc[-1] == "C_A"
     # nothing left over, no empty slice
     assert list(tools.gather_others(frame, "v", 4)["where"]) == ["B", "D", "C", "A"]
 

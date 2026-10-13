@@ -165,8 +165,8 @@ class visu_bokeh:
             # and differed with and without the date slider. A chart that
             # comes without them gets one per location, in order of
             # appearance. The 'SumOthers' slice stays white either way: it is
-            # not a location. It is told by its code, its 'where' listing the
-            # locations it gathers under bokeh.
+            # not a location. It is told by its code, which tools.gather_others
+            # sets, as it sets its 'where'.
             others = (input['code'].astype(str) == 'SumOthers') if 'code' in input.columns \
                 else pd.Series(False, index=input.index)
             if 'colors' not in input.columns or input['colors'].isna().any():
@@ -1043,7 +1043,6 @@ class visu_bokeh:
                 code="""
                   const i = cb_obj.value;
                   div.text = "<b>" + dates[i] + "</b>";
-                  console.log(frames[i])
                   """)
 
                 slider.js_on_change('value', slider_date_div_cb)
@@ -1271,13 +1270,11 @@ class visu_bokeh:
                     }
 
         if dateslider:
-            list_locations = kwargs.get('kwargsuser', {}).get('vis') == 'bokeh'
             days = sorted(input['date'].unique())
             dates = [pd.Timestamp(d).strftime("%d/%m/%Y") for d in days]
             frames = [self.value_histo(
                           gather_others(input[input['date'] == d], which,
-                                        kwargs['maxcountrydisplayed'],
-                                        list_locations=list_locations),
+                                        kwargs['maxcountrydisplayed']),
                           which, bins)
                       for d in days]
             frame_histo = frames[-1]
