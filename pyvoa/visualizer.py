@@ -229,30 +229,71 @@ class AllVisu:
             maxcountry = self.maxcountry(kwargs)
             if not kwargs['dateslider']:
                 input = input[input.date==input.date.max()].sort_values(by = which, ascending=False).reset_index(drop=True)
+
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
                     input = input.head(maxcountry)
 
-                if typeofhist == 'value' or typeofhist == 'pie':
-                    top = input.iloc[:maxcountry].copy()
-                    # one colour per slice, as many as the cap asked for, and
-                    # fewer locations than that when few are asked for
-                    colors = plt.cm.tab20(np.linspace(0, 1, maxcountry))
-                    top['colors'] = [matplotlib.colors.rgb2hex(c) for c in colors[:len(top)]]
-                    others = input.iloc[maxcountry:]
-                    rest = {col: ['SumOthers'] for col in top.columns}
+            def topwithothers(df, which, maxcountry, vis):
+                """Keep the maxcountry largest rows of ONE date and add a 'SumOthers' row.
 
-                    total = others[which].apply(
-                        lambda x: x[0] if isinstance(x, list) else x
-                        ).sum()
-                    rest[which] = [total]
-                    if kwargs['kwargsuser']['vis'] == 'bokeh':
-                        rest["where"] = ["_".join(others["where"].astype(str).unique())]
-                    rest['date'] = [input['date'].iloc[0]]
-                    rest['colors'] = ['#FFFFFF']
-                    rest = pd.DataFrame(rest)
-                    input = pd.concat([top, rest], ignore_index=True)
-                    input = input.sort_values(by=which, ascending=False).reset_index(drop=True)
+                Parameters
+                ----------
+                df : pd.DataFrame
+                    rows of a single date (one row per location).
+                which : str
+                    the column holding the value.
+                maxcountry : int
+                    number of locations kept before grouping the rest.
+                vis : str
+                    visualisation backend ('bokeh', ...).
 
+                Returns
+                -------
+                pd.DataFrame
+                    at most maxcountry + 1 rows, with a 'colors' column.
+                """
+                df = df.copy()
+
+                def scalar(x):
+                    return x[0] if isinstance(x, list) else x
+
+                # sort by value so that iloc[:maxcountry] really is the top
+                df['_key'] = df[which].apply(scalar)
+                df = df.sort_values(by='_key', ascending=False).drop(columns='_key')
+
+                top = df.iloc[:maxcountry].copy()
+                others = df.iloc[maxcountry:]
+
+                # one colour per slice (fewer locations than maxcountry is fine)
+                colors = plt.cm.tab20(np.linspace(0, 1, maxcountry))
+                top['colors'] = [matplotlib.colors.rgb2hex(c) for c in colors[:len(top)]]
+
+                if others.empty:
+                    return top.reset_index(drop=True)
+
+                # SumOthers row: text columns get 'SumOthers', numeric ones stay empty
+                rest = {}
+                for col in top.columns:
+                    if pd.api.types.is_numeric_dtype(top[col]):
+                        rest[col] = [np.nan]
+                    else:
+                        rest[col] = ['SumOthers']
+
+                rest[which] = [others[which].apply(scalar).sum()]
+                if vis == 'bokeh':
+                    rest['where'] = ["_".join(others['where'].astype(str).unique())]
+                rest['date'] = [df['date'].iloc[0]]
+                rest['colors'] = ['#FFFFFF']
+
+                out = pd.concat([top, pd.DataFrame(rest)], ignore_index=True)
+                out = out.sort_values(by=which, ascending=False).reset_index(drop=True)
+                return out
+
+            if typeofhist == 'value' or typeofhist == 'pie':
+                 vis = kwargs['kwargsuser']['vis']
+                 parts = [topwithothers(g, which, maxcountry, vis)
+                          for _, g in input.groupby('date')]          # chronological order
+                 input = pd.concat(parts, ignore_index=True)
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]
                kwargs['what'] = cols
@@ -262,7 +303,6 @@ class AllVisu:
                 kwargs['legend'] = 'sum all location'
             kwargs['maxcountrydisplayed'] = maxcountry
             kwargs['input'] = input
-
             return func(self, **kwargs)
         return inner_hm
     ''' DECORATORS FOR HISTO VERTICAL, HISTO HORIZONTAL, PIE '''

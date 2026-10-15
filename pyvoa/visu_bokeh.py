@@ -904,13 +904,13 @@ class visu_bokeh:
                     df_d = input_dates[input_dates['date'] == d].copy()
                     df_d = df_d.sort_values(by=which, ascending=False)
                     df_d = self.addcolumnshisto(df_d,which,maxcountrydisplayed)
-                    df_d = self.addcolumnspie(df_d,which)
-                    df_d = df_d.head(n=maxcountrydisplayed)
+                    df_d = self.addcolumnspie(df_d,which,maxcountrydisplayed)
+
+                    #df_d = df_d.head(n=maxcountrydisplayed)
                     frames.append({c: df_d[c].tolist() for c in df_d.columns})
 
                 yrange = Range1d(min(df_d['bottom']), max(df_d['top']))
-                columndatasrc = ColumnDataSource(data = df_d)
-
+                columndatasrc = ColumnDataSource(data = frames[-1])
                 from bokeh.models import Slider
                 slider = Slider(start=0, end=max(0, len(frames)-1), value=0, step=1, title="Date index", width=300)
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
@@ -958,7 +958,7 @@ class visu_bokeh:
             else:
                 input_dates = input_dates.loc[input_dates.date==input_dates.date.max()]
                 input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
-                input_dates = self.addcolumnspie(input_dates,which)
+                input_dates = self.addcolumnspie(input_dates,which,maxcountrydisplayed)
                 yrange = Range1d(min(input_dates['bottom']), max(input_dates['top']))
                 columndatasrc = ColumnDataSource(data = input_dates)
             if func.__name__ == 'bokeh_map':
@@ -1048,7 +1048,6 @@ class visu_bokeh:
             kwargs['columndatasrc'] = columndatasrc
             kwargs['color_mapper'] = color_mapper
             kwargs['input'] = input
-
             return func(self, **kwargs)
         return inner_decodateslider
 
@@ -1224,12 +1223,7 @@ class visu_bokeh:
             ytick_loc = [int(i) for i in columndatasrc.data['horihistotexty']]
             fig.yaxis[0].ticker = ytick_loc
             label_dict = dict(zip(ytick_loc,[x for x in columndatasrc.data['where']]))
-
-            #if kwargs['kwargsuser']['where']==[''] and 'sumall' in kwargs['kwargsuser']['option']:
-            #    label_dict = {ytick_loc[0]:'sum all location'}
-
             fig.yaxis[0].major_label_overrides = label_dict
-
 
             left = 0.01 if axis_type == 'log' else 'left'
             epslion = 0.01 if axis_type == 'log' and min(columndatasrc.data['left']) == 0 else 0.0
@@ -1252,19 +1246,6 @@ class visu_bokeh:
                 line_width=1,
                 hover_line_width=2,
             )
-            '''
-            labels = LabelSet(
-                x='horihistotextx',
-                y='horihistotexty',
-                x_offset=5,
-                y_offset=-4,
-                text='horihistotext',
-                source=columndatasrc,
-                text_font_size='10px',
-                text_color='black'
-            )
-            fig.add_layout(labels)
-            '''
             visu_bokeh().rollerJS()
             hover_tool = HoverTool(
                 tooltips=[('where', '@where'), ('cases', '@right{0,0}')]
@@ -1329,11 +1310,12 @@ class visu_bokeh:
         return mypd
 
     ''' PIE '''
-    def addcolumnspie(self,df,column_name):
-        """Add the angle columns a pie chart needs.
+    def addcolumnspie(self, df, column_name, maxcountrydisplayed):
+        """Add the angle columns a pie chart needs, with a 'SumOthers' wedge.
 
-        Turns each value into its share of the total and into the start and end
-        angles of its wedge.
+        Keeps the maxcountrydisplayed rows with the largest values and sums
+        every other row into a single 'SumOthers' row. Turns each value into
+        its share of the total and into the start and end angles of its wedge.
 
         Parameters
         ----------
@@ -1341,32 +1323,40 @@ class visu_bokeh:
             one row per location.
         column_name : str
             the column holding the value.
+        maxcountrydisplayed : int
+            number of locations kept before grouping the rest in 'SumOthers'.
 
         Returns
         -------
         pd.DataFrame
-            df with 'percentage', 'angle', 'starts' and 'ends'.
+            at most maxcountrydisplayed + 1 rows, with 'percentage', 'angle',
+            'starts' and 'ends'.
         """
-        df = df.copy()
-        column_sum = df[column_name].sum()
-        df['percentage'] = df[column_name]/column_sum
+        df = df.sort_values(by=column_name, ascending=False).copy()
 
-        percentages = [0]  + df['percentage'].cumsum().tolist()
-        df['angle'] = (df[column_name]/column_sum)*2 * np.pi
+        column_sum = df[column_name].sum()
+        if column_sum == 0:
+            column_sum = 1   # avoid division by zero, all angles will be 0
+
+        df['percentage'] = df[column_name] / column_sum
+        percentages = [0] + df['percentage'].cumsum().tolist()
+        df['angle'] = (df[column_name] / column_sum) * 2 * np.pi
         df['starts'] = [p * 2 * np.pi for p in percentages[:-1]]
         df['ends'] = [p * 2 * np.pi for p in percentages[1:]]
         df['diff'] = (df['ends'] - df['starts'])
-        df['middle'] = df['starts']+np.abs(df['ends']-df['starts'])/2.
+        df['middle'] = df['starts'] + np.abs(df['ends'] - df['starts']) / 2.
         df['cos'] = np.cos(df['middle']) * 0.9
         df['sin'] = np.sin(df['middle']) * 0.9
 
         df['text_size'] = '8pt'
 
-        df['textdisplayed'] = df['where'].str.pad(36, side = "left")
-        df['textdisplayed2'] =  ['      '+str(round(100*i,1))+'%' for i in df['percentage']]
+        df['textdisplayed'] = df['where'].astype(str).str.pad(36, side="left")
+        df['textdisplayed2'] = ['      ' + str(round(100 * i, 1)) + '%'
+                                for i in df['percentage']]
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed']=''
         #df.loc[df['diff'] <= np.pi/20,'textdisplayed2']=''
         return df
+
 
     @deco_bokeh
     @decodateslider

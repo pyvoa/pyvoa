@@ -39,7 +39,7 @@ if (sourcemap !== sourcehisto) {
         color_mapperjs.high = Math.max(...values);
     }
 }
-
+maxcountrydisplayed+=1
 // ====================================================
 // HISTOGRAM — sort and limit
 // ====================================================
