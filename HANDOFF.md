@@ -48,12 +48,14 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   risklayer), and the live mode came after 0.5.0. Release first, then update
   those places together with the release's DOIs and SWHID; note 1 of the
   manuscript says the same.
-- **Highlights and a graphical abstract** — both *encouraged*, neither written,
+- **Highlights and a graphical abstract** — both *encouraged*, both drafted (highlights in `paper/highlights.txt`),
   both submitted as separate files. Highlights: 3 to 5 bullets, at most 85
   characters each, in a file named with "highlights". Graphical abstract:
   531 x 1328 px (h x w) or proportionally larger, readable at 5 x 13 cm.
-  The schema, `paper/figures/schema_PYVOA_vertical.pdf` (portrait, A4), is the
-  closest thing, and would need recomposing.
+  Graphical abstract: `paper/figures/graphical_abstract.{tiff,png,pdf}`
+  (2656 x 1062 px), in the schema's Work Sans and colours. Its HTML source,
+  render script and font are kept locally, out of git.
+  Elsevier asks for an AI-use disclosure on images made with AI tools.
 
 ## 2. Merging locations: a merge sums the raw dates as they are
 
