@@ -1,0 +1,5 @@
+One Python interface to 23 epidemiological databases: COVID-19, mpox, measles, Ebola
+Data are normalised into one pandas table, with geometries for each location
+Five shared keywords retrieve data and draw time series, bar charts and maps
+Reproducible by default from a Zenodo archive, or live for ongoing outbreaks
+Each database is described in a JSON file: adding one involves no Python code
