@@ -197,9 +197,12 @@ for (let j = 0; j < len; j++) {
     // 'where' is cut to maxlettersdisplayed already, by decohistomap
     const w = String(limited[j]["where"] || "");
 
-    // the j-th location takes the j-th slot from the top, one step high
-    const top_pos    = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed + 0.5 * step;
-    const bottom_pos = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed - 0.5 * step;
+    // the j-th location takes the j-th slot from the top, one step high; the
+    // SumOthers slice of a pie, one past the last slot, wraps round to the
+    // first, as in addcolumnshisto (a pie draws no bar: only the columns agree)
+    const slot       = j % maxcountrydisplayed;
+    const top_pos    = ymax * (maxcountrydisplayed - slot) / maxcountrydisplayed + 0.5 * step;
+    const bottom_pos = ymax * (maxcountrydisplayed - slot) / maxcountrydisplayed - 0.5 * step;
     const tick_pos   = parseInt(bottom_pos + 0.5 * step);
 
     data["top"].push(top_pos);
@@ -214,7 +217,7 @@ for (let j = 0; j < len; j++) {
     // the labels of a pie slice: its name, padded on the left as
     // addcolumnspie pads it, and its share
     data["textdisplayed"].push(w.padStart(36, " "));
-    data["textdisplayed2"].push(total > 0 ? (100 * value / total).toFixed(1) + "%" : "0.0%");
+    data["textdisplayed2"].push("      " + (total > 0 ? (100 * value / total).toFixed(1) : "0.0") + "%");
 
     // a tick at the middle of each bar, labelled with its location
     ytick_loc.push(tick_pos);

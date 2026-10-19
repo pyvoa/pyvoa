@@ -47,8 +47,9 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"     # editable install, with the test tools
 ```
 
-The `dev` extra pulls in pytest and the pinned ruff used by CI, so the checks
-below run exactly as they do on a pull request.
+The `dev` extra pulls in pytest, the pinned ruff used by CI and node (for
+`tests/test_js.py`, which runs the bokeh callbacks of `pyvoa/js/`), so the
+checks below run exactly as they do on a pull request.
 
 pyvoa requires Python >= 3.10 and is designed to run inside a
 [Jupyter](https://jupyter.org/) environment, locally or on a remote server

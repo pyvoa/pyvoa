@@ -64,6 +64,8 @@ Maps and charts:
   `dateslider=True` and binned every date together. A location keeps its
   colour in every histogram and pie chart, from one date to another and with
   or without the slider, and 'SumOthers' is white.
+- fix: two bokeh charts with a date slider in one notebook shared a single
+  Play timer, so that pausing one stopped the other.
 
 Behaviour changes:
 
@@ -87,6 +89,9 @@ Packaging and documentation:
   2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26); `beautifulsoup4` replaces
   `bs4`.
 - the API documentation is published at <https://pyvoa.github.io/pyvoa/>.
+- the bokeh callbacks of `pyvoa/js/` are run in node by the test suite, and
+  checked against the Python they mirror; the `dev` extra brings node with
+  `nodejs-wheel-binaries`.
 - `GeoCountry` converts region and subregion codes to names and back.
 - a welcome banner is printed when `pyvoa.front` is imported.
 - a new example reads the Insee death records into a DataFrame and plots them

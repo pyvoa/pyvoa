@@ -1033,7 +1033,7 @@ class visu_bokeh:
                 jsfile = Path(__file__).parent / "js/animation_callback.js"
                 with open(jsfile) as f:
                     animation_code = f.read()
-                toggle_callback = CustomJS(args={'slider': slider, 'frames': frames}, code=animation_code)
+                toggle_callback = CustomJS(args={'slider': slider}, code=animation_code)
                 toggl.js_on_change('active', toggle_callback)
 
                 from bokeh.models import Div

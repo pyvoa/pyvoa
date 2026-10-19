@@ -6,6 +6,10 @@ tests check the two claims that can be verified mechanically, both of which
 had drifted in the past: a documented parameter must exist, and a docstring
 must not be followed by the string it replaced.
 
+The bokeh callbacks of pyvoa/js/ are held to the same two rules: the comment
+they open on ends with the common block, and documents the names the CustomJS
+of visu_bokeh.py hands them, no more and no fewer.
+
 They read the source with ``ast`` -- no import of the package, no network --
 so they run in the default offline job.
 """
@@ -146,3 +150,75 @@ def test_module_docstring_opens_the_file(module: Path):
     while lines[end + blanks].strip() == "":
         blanks += 1
     assert blanks == 1, f"{module.name} has {blanks} blank lines after its docstring, not 1"
+
+
+# The bokeh callbacks in pyvoa/js/ open on a /* */ comment shaped like a module
+# docstring: a summary, the prose, the numpydoc sections, the common block. Their
+# Parameters are the variables the callback is handed, which are not in any
+# signature: they are the keys of the args= of the CustomJS that loads the file,
+# plus the names bokeh adds of its own.
+JS_FILES = sorted((PACKAGE / "js").glob("*.js"))
+JS_IMPLICIT = {
+    "CustomJS": {"cb_obj", "cb_data"},
+    "CustomJSHover": {"value", "format", "special_vars"},
+}
+
+
+def js_header(path: Path) -> str:
+    """Return the text of the comment a callback file opens on."""
+    text = path.read_text(encoding="utf-8")
+    assert text.startswith("/*\n"), f"{path.name} does not open with a /* comment"
+    return text[3:text.index("*/")].rstrip()
+
+
+def js_arguments() -> dict[str, tuple[str, set[str]]]:
+    """Map each callback file to the CustomJS class loading it and the names it is handed.
+
+    In visu_bokeh.py a file is named in an assignment ``jsfile = ... / "js/x.js"``,
+    then read and handed to a CustomJS or CustomJSHover, whose ``code`` is not a
+    literal string. A file loaded more than once gets the union of the names.
+    """
+    tree = ast.parse((PACKAGE / "visu_bokeh.py").read_text(encoding="utf-8"))
+    named = sorted(
+        (node.lineno, node.value.right.value.removeprefix("js/"))
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign) and isinstance(node.value, ast.BinOp)
+        and isinstance(node.value.right, ast.Constant)
+        and str(node.value.right.value).startswith("js/")
+    )
+    found: dict[str, tuple[str, set[str]]] = {}
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and getattr(node.func, "id", None) in JS_IMPLICIT):
+            continue
+        kw = {k.arg: k.value for k in node.keywords}
+        if isinstance(kw.get("code"), ast.Constant):
+            continue
+        name = [f for line, f in named if line < node.lineno][-1]
+        args = kw.get("args")
+        keys = {k.value for k in args.keys} if isinstance(args, ast.Dict) else set()
+        found.setdefault(name, (node.func.id, set()))[1].update(keys)
+    return found
+
+
+@pytest.mark.parametrize("path", JS_FILES, ids=lambda p: p.name)
+def test_js_header_is_the_common_one(path: Path):
+    lines = js_header(path).splitlines()
+    assert lines[0].strip() and lines[0].endswith("."), (
+        f"{path.name} does not open on a one-line summary ending with a period")
+    assert lines[1] == "", f"{path.name}: no blank line after the summary"
+    assert "\n".join(lines).endswith(HEADER), (
+        f"{path.name} does not end with the common header block:\n" + "\n".join(lines[-5:]))
+
+
+@pytest.mark.parametrize("path", JS_FILES, ids=lambda p: p.name)
+def test_js_documents_the_names_it_is_handed(path: Path):
+    loaded = js_arguments()
+    assert path.name in loaded, f"{path.name} is loaded by no CustomJS of visu_bokeh.py"
+    kind, passed = loaded[path.name]
+    # the common block is not a section: without the cut, its lines would read as
+    # parameters of a file whose last section is Parameters
+    documented = set(documented_parameters(js_header(path).removesuffix(HEADER)))
+    ghosts = documented - passed - JS_IMPLICIT[kind]
+    missing = passed - documented
+    assert not ghosts, f"{path.name} documents names it is not handed: {sorted(ghosts)}"
+    assert not missing, f"{path.name} does not document {sorted(missing)}"

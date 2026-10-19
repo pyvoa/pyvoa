@@ -66,6 +66,10 @@ dev = [
     # the declared python floor and dependency list. 3.11 has tomllib in the
     # standard library; on 3.10 the tests would silently skip without this.
     "tomli>=2.0; python_version < '3.11'",
+    # tests/test_js.py runs the bokeh callbacks of pyvoa/js/ in node. The wheel
+    # ships the binary, so that the tests do not depend on a node of the machine
+    # or of the CI runner.
+    "nodejs-wheel-binaries>=22.12",
 ]
 
 [project.urls]
