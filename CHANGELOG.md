@@ -88,7 +88,10 @@ Packaging and documentation:
 - every dependency has a lower bound, tested by a `minimum` CI job (pandas
   2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26); `beautifulsoup4` replaces
   `bs4`.
-- the API documentation is published at <https://pyvoa.github.io/pyvoa/>.
+- fix: the wheel of 0.5.0 left out `pyvoa/js/`, so that a bokeh chart raised
+  `FileNotFoundError` on an installed copy; the callbacks are shipped again.
+- the API documentation is published at <https://pyvoa.github.io/pyvoa/>,
+  the bokeh callbacks of `pyvoa/js/` included.
 - the bokeh callbacks of `pyvoa/js/` are run in node by the test suite, and
   checked against the Python they mirror; the `dev` extra brings node with
   `nodejs-wheel-binaries`.

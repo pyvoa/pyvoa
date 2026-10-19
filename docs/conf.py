@@ -13,6 +13,8 @@ from importlib.metadata import version as _dist_version
 # The package is documented from the working tree, not from an installed copy,
 # so that the docs always describe the checkout they are built in.
 sys.path.insert(0, os.path.abspath(".."))
+# The extensions of this project: _ext/jscallbacks.py documents pyvoa/js/.
+sys.path.insert(0, os.path.abspath("_ext"))
 
 # -- Project information -----------------------------------------------------
 
@@ -36,6 +38,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.viewcode",
     "sphinx.ext.intersphinx",
+    "jscallbacks",
 ]
 
 templates_path = ["_templates"]

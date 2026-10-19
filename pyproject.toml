@@ -83,8 +83,11 @@ version = { attr = "pyvoa.__version__.__version__" }
 [tool.setuptools.packages.find]
 include = ["pyvoa*"]
 
+# Every file of pyvoa/ that is not python must be listed here, or it is left out
+# of the wheel: 0.5.0 shipped without js/, and bokeh charts failed on an
+# installed copy. tests/test_packaging.py checks the list against git.
 [tool.setuptools.package-data]
-pyvoa = ["data/*.json", "data/*.png"]
+pyvoa = ["data/*.json", "data/*.png", "js/*.js"]
 
 [tool.ruff]
 target-version = "py310"

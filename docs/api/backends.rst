@@ -4,7 +4,8 @@ Visualisation backends
 Three backends draw the charts, and they do not all offer the same ones:
 ``compare`` and ``spiral`` plots and the date slider exist only in bokeh, and
 seaborn has no map. :class:`pyvoa.visualizer.AllVisu` routes each request to
-the right one according to the ``vis`` argument.
+the right one according to the ``vis`` argument. The javascript the bokeh
+backend hands to the browser is documented in :doc:`js`.
 
 pyvoa.visu_matplotlib
 ---------------------

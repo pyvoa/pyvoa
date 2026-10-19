@@ -1,7 +1,8 @@
 API reference
 =============
 
-Every page below is generated from the docstrings in ``pyvoa/``. They follow
+Every page below is generated from the docstrings in ``pyvoa/``, and the
+bokeh callbacks from the header comments of ``pyvoa/js/``. They follow
 the NumPy convention, which ruff enforces, and are read here by
 :mod:`sphinx.ext.napoleon`.
 
@@ -20,4 +21,5 @@ exposes every method of the front singleton at module level, so ``pf.get()``,
    kwargs_options
    visualizer
    backends
+   js
    help
