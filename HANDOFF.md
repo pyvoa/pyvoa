@@ -114,12 +114,11 @@ dependencies — until then `pip install pyvoa` installs 0.5.0, without bokeh:
 1. **PyPI.** Publish `pyvoa-full` 0.2.0, depending on that pyvoa alone, its
    description saying that `pip install pyvoa` is now enough. Do not delete
    the project: the deletion cannot be undone, breaks every install pinning
-   `pyvoa-full`, and frees the name for anyone. No PyPI token is on this
-   machine.
+   `pyvoa-full`, and frees the name for anyone.
 2. **GitHub.** Then archive `pyvoa/pyvoa_full`, its README pointing to pyvoa.
 3. **pyvoa.org.** The home page (WordPress page 218) has a sentence on
    `pyvoa_full` and three buttons, to its zip, its repository and its PyPI
-   page; they are edited in WordPress, which no credential here reaches.
+   page; they are edited by hand, in WordPress.
 
 ---
 
@@ -345,9 +344,7 @@ dependencies — until then `pip install pyvoa` installs 0.5.0, without bokeh:
   `python-covid-analysis`.** They show where pyvoa is used, but they are
   not third-party adoption: §4 of the manuscript cites the pyvoa one as the
   authors' own page, and must keep doing so. `docs/_static/img/map_spf_metropole.png` is the image embedded in
-  the pyvoa reuse, served by GitHub Pages: do not remove or rename it. Editing
-  the reuses goes through the data.gouv.fr API (`/api/1/reuses/<id>/`, key in
-  the `X-API-KEY` header, read from `~/.datagouv_token`).
+  the pyvoa reuse, served by GitHub Pages: do not remove or rename it.
 
 ## History
 
