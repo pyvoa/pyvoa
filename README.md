@@ -22,13 +22,12 @@ Pyvoa provides access to multiple databases and delivers data in a standardized 
 pyvoa requires Python ≥ 3.10 and is published on PyPI:
 
 ```bash
-pip install pyvoa          # the library: data access, standardisation, geolocation
-pip install pyvoa-full     # the same, plus the matplotlib and bokeh plotting backends
+pip install pyvoa
 ```
 
-Install `pyvoa-full` if you want charts and maps: `pyvoa` on its own gives you
-the data as pandas or geopandas objects, and the plotting backends are optional
-imports that pyvoa detects at runtime.
+That one package gives the data, as pandas or geopandas objects, and the charts
+and maps: the matplotlib and bokeh backends are installed with it. seaborn and
+folium are optional, and detected at run time when installed.
 
 To work from a clone instead, see [CONTRIBUTING.md §3](CONTRIBUTING.md#3-development-setup).
 
@@ -46,7 +45,7 @@ df = pf.get(where=['France', 'Italy', 'Spain'],
             what='daily',
             output='pandas')
 
-# the same selection, as a chart (needs pyvoa-full)
+# the same selection, as a chart
 pf.setvis('matplotlib')     # or 'bokeh'
 pf.plot(where=['France', 'Italy', 'Spain'], which='total_deaths', what='daily')
 pf.map(which='total_deaths')   # every place the database covers, on a map

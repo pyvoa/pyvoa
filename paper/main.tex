@@ -183,8 +183,8 @@ pandas~$\geq$~2.1.1, geopandas~$\geq$~1.0, shapely~$\geq$~2.0.2,
 beautifulsoup4~$\geq$~4.11, numpy~$\geq$~1.26, pycountry~$\geq$~22.3.5,
 pycountry\_convert~$\geq$~0.7.2, requests~$\geq$~2.28, unidecode~$\geq$~1.3,
 lxml~$\geq$~4.9.3, IPython~$\geq$~8.10, contextily~$\geq$~1.3,
-html5lib~$\geq$~1.1. Plotting backends (matplotlib, bokeh) are optional and
-detected at run time; \texttt{pip install pyvoa-full} installs them. Runs on
+html5lib~$\geq$~1.1, and the two plotting backends, matplotlib~$\geq$~3.8.4
+and bokeh~$\geq$~3.1. Runs on
 Linux, macOS and Windows, in a script, a console or a Jupyter notebook. \\
 \hline
 C7 & If available, link to developer documentation/manual &
@@ -473,10 +473,8 @@ comparing locations (Section~\ref{sec:ex-hist}), histograms of the values, or
 pie charts (Section~\ref{sec:ex-beyond}); \texttt{map()} draws choropleth maps
 (Section~\ref{sec:ex-map}), on an equal-area projection with matplotlib and
 with a date slider with bokeh. Titles, legends and the export to image files
-(\texttt{pf.savefig()}) behave alike with both. The backends are detected at
-run time: one that is not installed is reported when it is selected, rather
-than breaking the import, and the \texttt{pyvoa-full} distribution installs
-them both.
+(\texttt{pf.savefig()}) behave alike with both, and both are installed with
+the package.
 
 \textbf{Discovering the vocabulary.} Every accepted value can be listed at
 run time: \texttt{listwhom()}, \texttt{listwhich()}, \texttt{listwhere()},
@@ -553,7 +551,7 @@ les DOI et le SWHID de la version.}
 \label{sec:examples}
 
 The four examples below are taken from the notebooks and scripts shipped with
-the package; each runs as printed after \texttt{pip install pyvoa-full}.
+the package; each runs as printed after \texttt{pip install pyvoa}.
 
 \subsection{Comparing countries through time series}
 \label{sec:ex-timeseries}
@@ -784,7 +782,7 @@ concernées. « Utilisé en cours depuis 2020 » sans quantification sera lu com
 autopromotion ; « environ N étudiants par an dans l'UE X » ne le sera pas.
 \textbf{(c)}~\emph{Des chiffres
 d'adoption} : au 9 octobre 2026, 0~étoile et 0~fork sur GitHub, et 49 téléchargements
-PyPI le mois écoulé pour \texttt{pyvoa}, 26 pour \texttt{pyvoa-full}
+PyPI le mois écoulé pour \texttt{pyvoa}
 (\url{https://pypistats.org/packages/pyvoa}). Trop faibles pour être cités ; un
 relecteur peut les constater. \textbf{(d)}~Le nombre de vues de la réutilisation
 data.gouv.fr (5\,452 le 9 octobre 2026, API data.gouv.fr) est à relire avant
@@ -902,8 +900,7 @@ déclaration. Revérifier la page au moment de la soumission.}
 S1 & Current software version & v0.5.0 \\
 \hline
 S2 & Permanent link to executables of this version &
-\url{https://pypi.org/project/pyvoa/0.5.0/} \newline
-\url{https://pypi.org/project/pyvoa-full/} \\
+\url{https://pypi.org/project/pyvoa/0.5.0/} \\
 \hline
 S3 & Legal Software License & MIT License \\
 \hline
@@ -912,8 +909,7 @@ any platform running Python~$\geq$~3.10, including hosted notebook services
 (Google Colaboratory, Binder) \\
 \hline
 S5 & Installation requirements \& dependencies &
-\texttt{pip install pyvoa} (library) or \texttt{pip install pyvoa-full}
-(library and plotting backends) \\
+\texttt{pip install pyvoa} (library and plotting backends) \\
 \hline
 S6 & If available, link to user manual &
 \url{https://pyvoa.org} \newline

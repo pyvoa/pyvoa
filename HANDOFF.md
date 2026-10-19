@@ -28,7 +28,7 @@ with a direct read of its files); `ruff check` is clean. v0.5.0 is on PyPI and o
 | 1 | Manuscript: §4 adoption evidence, a new release to describe, highlights and graphical abstract. | submission |
 | 2 | Merging locations sums raw dates as they are; none shipped is shown to suffer from it. | no |
 | 3 | `ebolardc` has no mirror until the INSP agrees to one; the Ebola figure is pinned by `when='01/10/2026'` meanwhile. | no |
-| 4 | Moving `contextily` from `pyvoa` to `pyvoa-full`: considered, to decide; `import pyvoa.front` breaks without matplotlib as things stand. | no |
+| 4 | Retiring `pyvoa-full`, at the next pyvoa release: a last `pyvoa-full` 0.2.0, then the archiving of `pyvoa/pyvoa_full`, and pyvoa.org. | release |
 
 ---
 
@@ -103,47 +103,23 @@ that Fig. 5 does not follow the latest report; it would still change if the
 provider revised past reports, or withdrew them. INRB/UMIE's own deposit (10.5281/zenodo.21223302, cited
 as `bdbv2026`) is also labelled MIT; that is theirs to settle.
 
-## 4. Moving `contextily` to `pyvoa-full`
+## 4. Retiring `pyvoa-full`
 
-`contextily` is a hard dependency, imported once, inside the matplotlib map
-(`visu_matplotlib.py`), for the basemap tiles; it is only needed once a chart
-is asked for. Moving it to `pyvoa-full` would make `pip install pyvoa` truly
-free of plotting libraries — what §2.2 of the manuscript claims — but
-matplotlib reaches a plain `pip install pyvoa` through contextily alone
-(geopandas and pandas ask for it as an extra only), so it would go too.
-Considered on 2026-10-08, left for a later decision. What it takes:
+matplotlib and bokeh are dependencies of `pyvoa` since 2026-10-19, and the
+repository no longer mentions `pyvoa-full` (nor do the Zenodo records, and
+the data.gouv.fr reuse says `pip install pyvoa` since that day). What is left
+is outside the repository, and waits for a pyvoa release carrying the two
+dependencies — until then `pip install pyvoa` installs 0.5.0, without bokeh:
 
-1. **`import pyvoa.front` would fail.** `front.py` (l. 36) and `visualizer.py`
-   (l. 20) import `matplotlib.pyplot` at module level, unconditionally. Make
-   those imports lazy; `MATPLOTLIB_AVAILABLE` in `visualizer.py`, which can
-   never be False today, would then mean something.
-2. **matplotlib serves outside the charts.** The `tab20` colour map is read
-   when `AllVisu` is built — which `get()` does on a user's own frame — and in
-   the decorator of `front.py` that gives each location a colour. Hard-code the
-   twenty colours, or defer the lookup.
-3. **`pyvoa-full` must ship with it.** It lives in its own repository
-   (`pyvoa/pyvoa_full`); 0.1.3 requires `pyvoa>=0.5.0`, `matplotlib>=3.8.4` and
-   `bokeh>=3.1`, not contextily. Release a `pyvoa-full` adding `contextily>=1.3`
-   and requiring the new pyvoa together with it: a 0.1.3 next to the new pyvoa
-   would draw no tiles, and `tile='openstreet'` is the default. Raise a
-   `PyvoaError` naming contextily when matplotlib is there without it.
-4. **CI.** The `test` job installs `.[dev]`, and `tests/test_visualizer.py`
-   imports `AllVisu`: add matplotlib and contextily to `dev` (or a `plot`
-   extra). Keep a tested floor for contextily in the `minimum` job.
-5. **Docs.** The build imports the real modules: add `matplotlib` and
-   `contextily` to `autodoc_mock_imports` in `docs/conf.py`, or the `-W` build
-   fails.
-6. **Binder.** `requirements.txt` installs `.` only, and the notebooks draw:
-   add matplotlib, bokeh and contextily there.
-7. **Manuscript.** Row C6 lists contextily among the required dependencies,
-   and `test_paper.py` checks C6 against `pyproject.toml`: update both. The
-   §2.2 sentence on a lightweight core then becomes true as written.
-8. **`pyvoa.geo` alone.** `GeoCountry('FRA').get_data().plot()`, shown in the
-   paper notebook as drawn "by geopandas alone", needs matplotlib, which a
-   plain `pip install pyvoa` would no longer bring.
-
-Points 1, 2 and 4 to 7 are in this repository; 3 is in `pyvoa_full`, at
-release time.
+1. **PyPI.** Publish `pyvoa-full` 0.2.0, depending on that pyvoa alone, its
+   description saying that `pip install pyvoa` is now enough. Do not delete
+   the project: the deletion cannot be undone, breaks every install pinning
+   `pyvoa-full`, and frees the name for anyone. No PyPI token is on this
+   machine.
+2. **GitHub.** Then archive `pyvoa/pyvoa_full`, its README pointing to pyvoa.
+3. **pyvoa.org.** The home page (WordPress page 218) has a sentence on
+   `pyvoa_full` and three buttons, to its zip, its repository and its PyPI
+   page; they are edited in WordPress, which no credential here reaches.
 
 ---
 
@@ -180,6 +156,11 @@ release time.
 - **The manuscript word limit is 4000, not 3000**, and keywords number 1 to 7;
   `tests/test_paper.py` asserts both.
 - **Dependencies carry lower bounds only**; the `minimum` job proves every floor.
+- **matplotlib and bokeh are dependencies of `pyvoa`** (2026-10-19): a plain
+  `pip install pyvoa` draws, and `pyvoa-full`, which only added those two, is
+  retired. This settles the other way the question of moving `contextily`
+  out to `pyvoa-full`, considered on 2026-10-08. seaborn and folium stay
+  optional backends.
 - **`ruff format` is deliberately not run**; contributors match the surrounding
   style (`CONTRIBUTING.md` §5).
 - **No `PULL_REQUEST_TEMPLATE.md`** — the checklist stays in `CONTRIBUTING.md` §4.

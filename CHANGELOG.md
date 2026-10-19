@@ -81,6 +81,8 @@ Behaviour changes:
 - `plot()` refuses `dateslider`, which it ignored.
 - `saveoutput()` writes `pyvoa_out.*` by default, instead of `pycoa.ut.*`.
 - `pf.set_verbose_mode()` and `pf.get_verbose_mode()` are front methods again.
+- `pip install pyvoa` brings the matplotlib and bokeh backends with it;
+  `pyvoa-full`, which only added them, is no longer needed.
 
 Packaging and documentation:
 

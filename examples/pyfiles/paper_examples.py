@@ -9,7 +9,7 @@ and writes the manuscript figures.
 
 Usage
 -----
-    pip install pyvoa-full
+    pip install pyvoa
     python paper_examples.py                 # everything, into paper/figures/
     python paper_examples.py --example 2     # one listing only
     python paper_examples.py --vis bokeh     # other backend
@@ -50,7 +50,7 @@ def _default_figdir() -> Path:
     Inside a checkout the figures belong next to the manuscript that includes
     them, so ``\\includegraphics{figures/...}`` resolves with no path juggling
     in the .tex. Run on its own — the script is meant to be downloadable and
-    runnable after ``pip install pyvoa-full`` — it falls back to ./figures.
+    runnable after ``pip install pyvoa`` — it falls back to ./figures.
     """
     root = Path(__file__).resolve().parents[2]
     if (root / "paper" / "main.tex").exists():
@@ -404,7 +404,7 @@ def main() -> int:
         import pyvoa.front as pf
         import pyvoa.tools as pt
     except ImportError:
-        print("pyvoa is not installed.  pip install pyvoa-full", file=sys.stderr)
+        print("pyvoa is not installed.  pip install pyvoa", file=sys.stderr)
         return 2
 
     pt.set_verbose_mode(args.verbose)

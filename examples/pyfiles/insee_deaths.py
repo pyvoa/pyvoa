@@ -16,7 +16,7 @@ https://www.data.gouv.fr/reuses/deces-journaliers-en-france-depuis-2000-vus-par-
 
 Usage
 -----
-    pip install pyvoa-full
+    pip install pyvoa
     python insee_deaths.py                  # writes insee_deaths.png
     python insee_deaths.py -o deaths.pdf    # elsewhere, or in another format
 

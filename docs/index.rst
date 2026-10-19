@@ -11,8 +11,8 @@ It is meant to be usable by non-specialists — high-school and university
 students, science journalists, researchers unfamiliar with data extraction —
 while remaining scriptable for advanced Python users.
 
-Install with ``pip install pyvoa``, or ``pip install pyvoa-full`` for every
-visualisation backend.
+Install with ``pip install pyvoa``, which brings the matplotlib and bokeh
+backends with it.
 
 Comparing countries
 -------------------
