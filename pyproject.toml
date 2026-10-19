@@ -70,6 +70,10 @@ dev = [
     # ships the binary, so that the tests do not depend on a node of the machine
     # or of the CI runner.
     "nodejs-wheel-binaries>=22.12",
+    # an optional backend for a user, but the date slider tests compare its
+    # javascript with visu_bokeh, and the bokeh tests skip without it. The floor
+    # is the one pyvoa-full requires.
+    "bokeh>=3.1",
 ]
 
 [project.urls]

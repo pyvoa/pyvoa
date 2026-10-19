@@ -29,7 +29,6 @@ import pandas as pd
 import pytest
 
 from pyvoa.tools import gather_others, rank_locations
-from pyvoa.visu_bokeh import visu_bokeh
 
 JS = Path(__file__).resolve().parents[1] / "pyvoa" / "js"
 
@@ -223,6 +222,9 @@ def python_side(frame: pd.DataFrame, maxcountrydisplayed: int, ispie: bool) -> p
         drawn = gather_others(frame, "tot", maxcountrydisplayed)
     else:
         drawn = rank_locations(frame, "tot").head(maxcountrydisplayed)
+    pytest.importorskip("bokeh")
+    from pyvoa.visu_bokeh import visu_bokeh
+
     v = visu_bokeh()
     drawn = v.addcolumnshisto(drawn, "tot", maxcountrydisplayed)
     return v.addcolumnspie(drawn, "tot")

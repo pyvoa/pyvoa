@@ -94,7 +94,7 @@ Packaging and documentation:
   the bokeh callbacks of `pyvoa/js/` included.
 - the bokeh callbacks of `pyvoa/js/` are run in node by the test suite, and
   checked against the Python they mirror; the `dev` extra brings node with
-  `nodejs-wheel-binaries`.
+  `nodejs-wheel-binaries`, and bokeh, so that CI runs the bokeh tests too.
 - `GeoCountry` converts region and subregion codes to names and back.
 - a welcome banner is printed when `pyvoa.front` is imported.
 - a new example reads the Insee death records into a DataFrame and plots them
