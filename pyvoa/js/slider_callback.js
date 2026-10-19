@@ -1,17 +1,53 @@
 /*
-Project : PyvoA
-Date :    april 2020 - november 2025
-Authors : Olivier Dadoun, Julien Browaeys, Tristan Beau
+The date slider of the bokeh maps, histograms and pie charts.
+
+On a map, each value of the selected frame goes to the shape of its location
+and the colour scale is fitted to them. On a histogram or a pie chart, the
+locations are ranked as ``tools.rank_locations`` ranks them, the first
+``maxcountrydisplayed`` drawn, the others gathered into one ``SumOthers``
+slice of a pie. The title and the date label follow the date drawn.
+
+Parameters
+----------
+cb_obj : Slider
+    the date slider, whose value is the index of the date drawn.
+frames : list of dict
+    one frame per date, a column name to its list of values, holding every
+    location of that date.
+sourcemap : ColumnDataSource
+    on a map, the source of the shapes, one per location; on a histogram or
+    a pie chart, the same object as ``sourcehisto``, which is how the callback
+    tells the two apart.
+sourcehisto : ColumnDataSource
+    the source of the bars or of the slices.
+which : str
+    the column drawn.
+dates : list of str
+    the dates, in the order of ``frames``.
+div : Div
+    the label showing the date drawn, under the slider.
+maxcountrydisplayed : int
+    the number of locations drawn on a histogram or a pie chart.
+ylabellinear, ylabellog : Axis
+    the y axes of the linear and the log figures, whose ticks carry the names
+    of the locations of a horizontal histogram.
+ymax : float
+    the height the bars of a horizontal histogram are spread over.
+color_mapperjs : ColorMapper
+    the colour scale of a map.
+titlefigs : list of figure
+    the figures whose title follows the date.
+ispie : bool
+    whether the chart is a pie chart, the only one to gather the others.
+titleprefix : str
+    the default title less its trailing ``(date)``, or empty when the caller
+    gave a title of their own, which is then left as it is.
+
+Project : pyvoa
+Authors : Tristan Beau, Julien Browaeys, Olivier Dadoun
 Copyright ©pyvoa_org
-License: See joint LICENSE file
+License : see the joint LICENSE file
 https://pyvoa.org/
-
-Module : js/slider_callback.js
-
-About :
--------
-
-
 */
 
 const i = cb_obj.value;
@@ -28,6 +64,8 @@ if (titleprefix) {
 // ====================================================
 // Build rows
 // ====================================================
+// the frame is column-wise, as a ColumnDataSource is: turned into one object
+// per location, it can be matched to the shapes and ranked
 const rows = [];
 for (let j = 0; j < frame[which].length; j++) {
     let r = {};
@@ -57,14 +95,18 @@ if (sourcemap !== sourcehisto) {
         }
         data[k] = col;
     }
+    // the colour of the shapes is read from 'cases', not from 'which'
     data["cases"] = data[which];
     sourcemap.data = data;
+    // the colour scale spans the values of the date drawn, the missing ones
+    // left out
     const values = data["cases"].filter(v => Number.isFinite(Number(v)));
     if (values.length > 0) {
         color_mapperjs.low  = Math.min(...values);
         color_mapperjs.high = Math.max(...values);
     }
     sourcemap.change.emit();
+    // the title is set already: the histogram part below is skipped
     div.text = "<b>" + dates[i] + "</b>";
     return;
 }
@@ -95,9 +137,11 @@ if (ispie && others.length > 0) {
     rest["code"] = "SumOthers";
     rest[which] = others.reduce((a, r) => a + (Number.isFinite(Number(r[which])) ? Number(r[which]) : 0), 0);
     rest["colors"] = "#FFFFFF";
+    // ranked with the others, as gather_others ranks it in Python
     limited = [...limited, rest].sort(rank);
 }
 const len = limited.length;
+// no location has a value at this date: the chart is left as it is
 if (len === 0) return;
 
 // every column gets a new array of the same length: the frame's own columns,
@@ -107,16 +151,40 @@ for (const col of keys) {
     data[col] = limited.map(r => r[col]);
 }
 
+// the columns the drawing methods read, computed as addcolumnshisto and
+// addcolumnspie compute them in Python: the slot of each bar, from the top
+// down, its extent, and the share and angle of each slice
 const total = limited
     .map(r => Number(r[which]) || 0)
     .reduce((a, b) => a + b, 0);
 const step = ymax / maxcountrydisplayed;
+// the text of a bar's value label, as _fmt in addcolumnshisto writes it:
+// '0' for zero, three significant figures in Python's '.3g' for a value of
+// 10000 or more or below 0.01, str(round(v, 2)) otherwise
+const fmt = v => {
+    if (v === 0) return "0";
+    if (Math.abs(v) >= 1e4 || Math.abs(v) < 0.01) {
+        // '.3g' writes 5.49e+07 for a large value but 0.005 for a small one:
+        // the exponent form only outside [1e-4, 1e3), trailing zeros dropped
+        const [m, e] = v.toExponential(2).split("e");
+        const exp = Number(e);
+        if (exp < -4 || exp >= 3) {
+            const mant = m.replace(/\.?0+$/, "");
+            return mant + "e" + (exp < 0 ? "-" : "+") + String(Math.abs(exp)).padStart(2, "0");
+        }
+        return String(Number(v.toPrecision(3)));
+    }
+    // str() of a float keeps one decimal at least: 5.0, not 5
+    const r = Math.round(v * 100) / 100;
+    return Number.isInteger(r) ? r.toFixed(1) : String(r);
+};
 data["top"] = [];
 data["bottom"] = [];
 data["horihistotexty"] = [];
 data["left"] = [];
 data["right"] = [];
 data["horihistotextx"] = [];
+data["horihistotext"] = [];
 data["percentage"] = [];
 data["angle"] = [];
 data["textdisplayed"] = [];
@@ -129,6 +197,7 @@ for (let j = 0; j < len; j++) {
     // 'where' is cut to maxlettersdisplayed already, by decohistomap
     const w = String(limited[j]["where"] || "");
 
+    // the j-th location takes the j-th slot from the top, one step high
     const top_pos    = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed + 0.5 * step;
     const bottom_pos = ymax * (maxcountrydisplayed - j) / maxcountrydisplayed - 0.5 * step;
     const tick_pos   = parseInt(bottom_pos + 0.5 * step);
@@ -139,14 +208,21 @@ for (let j = 0; j < len; j++) {
     data["left"].push(Math.min(value, 0));
     data["right"].push(Math.max(value, 0));
     data["horihistotextx"].push(Math.max(value, 0));
+    data["horihistotext"].push(fmt(value));
     data["percentage"].push(total > 0 ? value / total : 0);
     data["angle"].push(total > 0 ? (value / total) * 2 * Math.PI : 0);
-    data["textdisplayed"].push(w.padStart(36, " "));   // this is for pie
+    // the labels of a pie slice: its name, padded on the left as
+    // addcolumnspie pads it, and its share
+    data["textdisplayed"].push(w.padStart(36, " "));
     data["textdisplayed2"].push(total > 0 ? (100 * value / total).toFixed(1) + "%" : "0.0%");
 
+    // a tick at the middle of each bar, labelled with its location
     ytick_loc.push(tick_pos);
     labelMap.set(tick_pos, w);
 }
+// a column the source holds and nothing above recomputes keeps its values,
+// the last one repeated when there are more rows than before: every column of
+// a ColumnDataSource must have the same length
 for (const col of Object.keys(sourcehisto.data)) {
     if (!(col in data)) {
         const old = sourcehisto.data[col];
@@ -158,6 +234,8 @@ sourcehisto.data = data;
 // ====================================================
 // Axis update
 // ====================================================
+// the y ticks of a horizontal histogram carry the names of the locations: they
+// follow the new ranking, on both figures
 ylabellinear.ticker.ticks          = ytick_loc;
 ylabellog.ticker.ticks             = ytick_loc;
 ylabellinear.major_label_overrides = labelMap;
