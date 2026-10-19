@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>pyvoa — graphical abstract</title>
+<!--
+  Graphical abstract for the SoftwareX submission (see HANDOFF.md §1):
+  1328 x 531 px (w x h), readable at 13 x 5 cm. Rendered by make_graphical_abstract.sh.
+  Typography and colours follow schema_PYVOA_vertical.pdf: Work Sans,
+  red #ff0000 and burgundy #8a1338. Every statement is taken from paper/main.tex.
+-->
+<style>
+  @font-face { font-family: "Work Sans"; src: url("fonts/WorkSans.ttf") format("truetype");
+               font-weight: 100 900; }
+  :root {
+    --red: #ff0000;
+    --burgundy: #8a1338;
+    --ink: #2a1a20;
+    --muted: #5e4a52;
+    --line: #e4d9dd;
+    --band: #f6f1f3;
+    /* grid: 36 | 370 | 73 | 370 | 73 | 370 | 36 = 1328 */
+    --m: 36px; --col: 370px; --gut: 73px;
+  }
+  @page { size: 1328px 531px; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1328px; height: 531px; background: #fff; overflow: hidden; }
+  body { font-family: "Work Sans", sans-serif; font-weight: 500; color: var(--ink);
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .canvas { position: relative; width: 1328px; height: 531px; padding: 0 var(--m); }
+
+  /* 1 — title */
+  header { height: 112px; display: flex; align-items: center; gap: 34px;
+           border-bottom: 2px solid var(--line); }
+  header img { height: 62px; display: block; }
+  header h1 { font-weight: 700; font-size: 35px; line-height: 1.1; color: var(--burgundy);
+              letter-spacing: -0.01em; }
+  header h1 em { font-style: normal; color: var(--red); }
+
+  /* 2 — the essential: data → query → outputs */
+  .flow { display: grid; grid-template-columns: var(--col) var(--gut) var(--col) var(--gut) var(--col);
+          height: 318px; padding-top: 22px; padding-bottom: 16px; }
+  .step { display: flex; flex-direction: column; }
+  .step > .note { margin-top: auto; }
+  .data > .note { margin-top: 8px; }
+  .step h2 { font-size: 22px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+             color: var(--red); height: 34px; }
+  .arrow { display: flex; align-items: center; justify-content: center; padding-top: 34px; }
+
+  /* data */
+  .data-head { display: flex; align-items: center; gap: 18px; height: 112px; }
+  .big { font-size: 92px; font-weight: 700; line-height: 1; color: var(--burgundy); letter-spacing: -0.03em; }
+  .big-label { font-size: 28px; font-weight: 600; line-height: 1.1; color: var(--burgundy); }
+  .diseases { font-size: 22px; margin-top: auto !important; white-space: nowrap; font-weight: 600; margin-top: 14px; color: var(--ink); }
+  .note { font-size: 22px; color: var(--muted); margin-top: 8px; line-height: 1.25; }
+
+  /* query */
+  .call { font-size: 28px; font-weight: 600; color: var(--burgundy); height: 40px; margin-top: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+  .chip { font-size: 25px; font-weight: 600; color: #fff; background: var(--burgundy);
+          border-radius: 26px; padding: 7px 20px 9px; line-height: 1; }
+
+  /* outputs */
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .tile { height: 92px; border-radius: 10px; background: #fff; border: 1.5px solid var(--line);
+          box-shadow: 0 3px 8px rgba(138, 19, 56, 0.12);
+          display: flex; align-items: center; gap: 14px; padding: 0 16px; }
+  .tile svg { flex: none; }
+  .tile span { font-size: 25px; font-weight: 600; color: var(--burgundy); }
+
+  /* 3 — complements */
+  footer { position: absolute; left: 0; right: 0; bottom: 0; height: 86px; background: var(--band);
+           border-top: 2px solid var(--line);
+           display: grid; grid-template-columns: var(--col) var(--gut) var(--col) var(--gut) var(--col);
+           padding: 0 var(--m); align-items: center; }
+  .extra { display: flex; align-items: center; gap: 14px; font-size: 22px; line-height: 1.2; color: var(--ink); }
+  .extra svg { flex: none; }
+  .extra b { font-weight: 700; color: var(--burgundy); }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <header>
+    <img src="../../pyvoa/data/logo-pyvoa.png" alt="pyvoa">
+    <h1>One Python interface to open epidemiological data</h1>
+  </header>
+
+  <section class="flow">
+
+    <div class="step data">
+      <h2>Open data</h2>
+      <div class="data-head">
+        <!-- database cylinders, as in the schema -->
+        <svg width="96" height="104" viewBox="0 0 96 104" aria-hidden="true">
+          <defs>
+            <linearGradient id="cyl" x1="0" x2="1">
+              <stop offset="0" stop-color="#8a1338"/><stop offset="0.55" stop-color="#ff0000"/><stop offset="1" stop-color="#c20a2a"/>
+            </linearGradient>
+          </defs>
+          <g transform="translate(36 2)">
+            <path d="M0 10 v26 a28 9 0 0 0 56 0 v-26z" fill="url(#cyl)"/><ellipse cx="28" cy="10" rx="28" ry="9" fill="#ff0000"/>
+          </g>
+          <g transform="translate(2 30)">
+            <path d="M0 10 v26 a28 9 0 0 0 56 0 v-26z" fill="url(#cyl)"/><ellipse cx="28" cy="10" rx="28" ry="9" fill="#ff0000"/>
+          </g>
+          <g transform="translate(38 56)">
+            <path d="M0 10 v26 a28 9 0 0 0 56 0 v-26z" fill="url(#cyl)"/><ellipse cx="28" cy="10" rx="28" ry="9" fill="#ff0000"/>
+          </g>
+        </svg>
+        <div class="big">23</div>
+        <div class="big-label">databases</div>
+      </div>
+      <p class="diseases">COVID-19 · mpox · measles · Ebola</p>
+      <p class="note">from Our World in Data to national agencies</p>
+    </div>
+
+    <div class="arrow">
+      <svg width="48" height="64" viewBox="0 0 48 64" aria-hidden="true"><path d="M0 18 h22 v-18 l26 32 l-26 32 v-18 h-22z" fill="#8a1338"/></svg>
+    </div>
+
+    <div class="step query">
+      <h2>One query</h2>
+      <p class="call">five shared keywords</p>
+      <div class="chips">
+        <span class="chip">where</span><span class="chip">which</span><span class="chip">what</span>
+        <span class="chip">when</span><span class="chip">option</span>
+      </div>
+      <p class="note">one standardised pandas table,<br>with geometries</p>
+    </div>
+
+    <div class="arrow">
+      <svg width="48" height="64" viewBox="0 0 48 64" aria-hidden="true"><path d="M0 18 h22 v-18 l26 32 l-26 32 v-18 h-22z" fill="#8a1338"/></svg>
+    </div>
+
+    <div class="step outputs">
+      <h2>Outputs</h2>
+      <div class="tiles">
+        <div class="tile">
+          <!-- table -->
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+            <rect x="2" y="4" width="40" height="36" rx="3" fill="none" stroke="#8a1338" stroke-width="3"/>
+            <rect x="2" y="4" width="40" height="10" rx="3" fill="#8a1338"/>
+            <path d="M2 23 h40 M2 31 h40 M15 14 v26 M29 14 v26" stroke="#8a1338" stroke-width="2"/>
+          </svg>
+          <span>get()</span>
+        </div>
+        <div class="tile">
+          <!-- time series -->
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+            <path d="M3 3 v38 h38" fill="none" stroke="#8a1338" stroke-width="3"/>
+            <path d="M7 34 l6 -4 l5 -14 l5 9 l5 -17 l5 12 l6 -6" fill="none" stroke="#ff0000" stroke-width="3" stroke-linejoin="round"/>
+          </svg>
+          <span>plot()</span>
+        </div>
+        <div class="tile">
+          <!-- bars -->
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+            <path d="M3 3 v38 h38" fill="none" stroke="#8a1338" stroke-width="3"/>
+            <rect x="9" y="10" width="6" height="29" fill="#ff0000"/>
+            <rect x="18" y="18" width="6" height="21" fill="#ff0000"/>
+            <rect x="27" y="25" width="6" height="14" fill="#8a1338"/>
+            <rect x="36" y="31" width="5" height="8" fill="#8a1338"/>
+          </svg>
+          <span>hist()</span>
+        </div>
+        <div class="tile">
+          <!-- choropleth -->
+          <svg width="44" height="44" viewBox="0 0 44 44" aria-hidden="true">
+            <path d="M3 8 l12 -4 l7 6 l-3 10 l-13 2z" fill="#ff0000"/>
+            <path d="M22 10 l9 -6 l10 5 l-2 12 l-12 1 l-8 -2z" fill="#8a1338"/>
+            <path d="M6 22 l13 -2 l2 10 l-7 11 l-9 -6z" fill="#8a1338" opacity="0.55"/>
+            <path d="M21 20 l12 -1 l6 0 l1 12 l-9 9 l-10 -2 l-2 -8z" fill="#ff0000" opacity="0.6"/>
+          </svg>
+          <span>map()</span>
+        </div>
+      </div>
+      <p class="note">matplotlib or bokeh</p>
+    </div>
+
+  </section>
+
+  <footer>
+    <div class="extra">
+      <!-- archive -->
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <rect x="2" y="5" width="36" height="9" rx="2" fill="#8a1338"/>
+        <path d="M5 14 v20 a2 2 0 0 0 2 2 h26 a2 2 0 0 0 2 -2 v-20" fill="none" stroke="#8a1338" stroke-width="3"/>
+        <path d="M14 21 h12" stroke="#ff0000" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <span><b>Zenodo archive</b> by default,<br>live sources on demand</span>
+    </div>
+    <div></div>
+    <div class="extra">
+      <!-- json -->
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <text x="20" y="29" text-anchor="middle" font-family="Work Sans" font-weight="700" font-size="26" fill="#8a1338">{ }</text>
+      </svg>
+      <span><b>One JSON file</b> per database,<br>no code to change</span>
+    </div>
+    <div></div>
+    <div class="extra">
+      <!-- package -->
+      <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
+        <path d="M20 3 l16 8 v18 l-16 8 l-16 -8 v-18z" fill="none" stroke="#8a1338" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M4 11 l16 8 l16 -8 M20 19 v18" fill="none" stroke="#8a1338" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+      <span><b>MIT</b> licence · on PyPI<br>pip install pyvoa</span>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

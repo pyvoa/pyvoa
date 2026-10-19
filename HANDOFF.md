@@ -53,8 +53,11 @@ All in `paper/main.tex`, as `\attn` / `\attnpar` annotations unless stated:
   characters each, in a file named with "highlights". Graphical abstract:
   531 x 1328 px (h x w) or proportionally larger, readable at 5 x 13 cm.
   Graphical abstract: `paper/figures/graphical_abstract.{tiff,png,pdf}`
-  (2656 x 1062 px), in the schema's Work Sans and colours. Its HTML source,
-  render script and font are kept locally, out of git.
+  (2656 x 1062 px), in the schema's Work Sans and colours. It is produced, like
+  the other figures: edit `paper/figures/graphical_abstract.html`, then run
+  `paper/figures/make_graphical_abstract.sh` (headless Chrome, and Pillow for
+  the TIFF), and commit the three images with their source. The font is in
+  `paper/figures/fonts/`, with its SIL Open Font License.
   Elsevier asks for an AI-use disclosure on images made with AI tools.
 
 ## 2. Merging locations: a merge sums the raw dates as they are
