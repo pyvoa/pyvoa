@@ -351,6 +351,21 @@ dependencies — until then `pip install pyvoa` installs 0.5.0, without bokeh:
 
 ## History
 
+- **GitHub no longer emails pushes, since 2026-10-15.** The push email
+  notifications of the repository (*Settings → Email notifications*) stopped
+  that day: GitHub retired the feature for every repository ("Email
+  notifications for repository push events have been retired", confirmed by
+  GitHub support on 2026-10-20). Nothing on our side caused it — git, hooks,
+  webhooks, workflows, recipient addresses and push credentials were all ruled
+  out — and nothing there will bring it back. GitHub's replacement, a
+  workflow on `push` sending mail through an SMTP server of our own, is
+  `.github/workflows/push-email.yml` since 2026-10-20: every push, on any
+  branch, mails `contact@pyvoa.org` in the layout of the retired emails,
+  through OVH's `ssl0.ovh.net` with the repository secrets `SMTP_USERNAME`
+  and `SMTP_PASSWORD`. The SMTP login is the full mailbox address, not the
+  `NNNN-NNNN-NN/name` login of OVH's web interface. Without the secrets the
+  job warns and sends nothing. The branch `test/push-email` holds the empty
+  commits of that diagnosis and can be deleted.
 - **The data.gouv.fr reuses were updated on 2026-10-09.** The 2021 PyCoa reuse
   became [pyvoa](https://www.data.gouv.fr/reuses/pyvoa-ex-pycoa-python-virus-open-analysis)
   (id `603c9fb5aee027e6de724e33`). The old slug redirects to the new one, and

@@ -1,0 +1,123 @@
+name: Push email
+
+# GitHub retired its push email notifications on 2026-10-15: this workflow
+# sends them instead, through the SMTP server of pyvoa.org (OVH). Kept apart
+# from ci.yml because it is the only one holding the SMTP secrets.
+#
+# push without filters covers every branch and every tag: creation, update,
+# force push, merge. A release is an event of its own.
+on:
+  push:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  mail:
+    name: push email
+    # The secrets live on pyvoa/pyvoa only; a fork has nothing to send with.
+    if: github.repository == 'pyvoa/pyvoa'
+    runs-on: ubuntu-latest
+    steps:
+      # The standard library alone, and the runner's own python: no checkout,
+      # no third-party action ever sees the SMTP password.
+      - name: Send the push email
+        env:
+          SMTP_HOST: ssl0.ovh.net
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          MAIL_FROM: pyvoa <contact@pyvoa.org>
+          MAIL_TO: contact@pyvoa.org
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'EOF'
+          import json
+          import os
+          import smtplib
+          import ssl
+          import urllib.request
+          from email.message import EmailMessage
+
+          if not os.environ['SMTP_USERNAME'] or not os.environ['SMTP_PASSWORD']:
+              print('::warning::SMTP_USERNAME / SMTP_PASSWORD are not set: no mail sent')
+              raise SystemExit(0)
+
+          event = json.load(open(os.environ['GITHUB_EVENT_PATH']))
+          repo = event['repository']['full_name']
+          home = event['repository']['html_url']
+
+
+          def changed_paths(sha):
+              """Return the 'A path' / 'M path' / 'D path' lines of one commit.
+
+              The push payload given to Actions carries no added / modified /
+              removed lists, unlike the webhook one: they come from the API.
+              """
+              request = urllib.request.Request(
+                  f'{os.environ["GITHUB_API_URL"]}/repos/{repo}/commits/{sha}',
+                  headers={'Authorization': f'Bearer {os.environ["GITHUB_TOKEN"]}',
+                           'Accept': 'application/vnd.github+json'})
+              try:
+                  files = json.load(urllib.request.urlopen(request, timeout=30))['files']
+              except Exception as error:  # the mail matters more than the list
+                  return [f'    (not available: {error})']
+              flags = {'added': 'A', 'removed': 'D', 'renamed': 'R'}
+              return [f'    {flags.get(f["status"], "M")} {f["filename"]}' for f in files]
+
+
+          if os.environ['GITHUB_EVENT_NAME'] == 'release':
+              release = event['release']
+              subject = f'[{repo}] Release {release["tag_name"]}: {release["name"] or release["tag_name"]}'
+              lines = [f'  Release: {release["html_url"]}',
+                       f'  Tag:     {release["tag_name"]}',
+                       f'  Author:  {release["author"]["login"]}',
+                       f'  Home:    {home}',
+                       '', '  Notes:', '  ------']
+              lines += [f'  {line}'.rstrip() for line in (release['body'] or '').splitlines()]
+          else:
+              ref = event['ref']
+              kind = 'Tag' if ref.startswith('refs/tags/') else 'Branch'
+              name = ref.split('/', 2)[2]
+              pusher = event['pusher']['name']
+              lines = [f'  {kind}: {ref}', f'  Home:   {home}']
+              if event['deleted']:
+                  subject = f'[{repo}] {kind.lower()} {name} deleted by {pusher}'
+              else:
+                  head = event['head_commit'] or {}
+                  summary = (head.get('message') or '').splitlines()[:1]
+                  subject = f'[{repo}] {event["after"][:7]}: {summary[0] if summary else ""}'
+                  if event['created']:
+                      subject += f' ({kind.lower()} {name} created)'
+                      lines.append(f'  Created by {pusher}')
+                  if event['forced']:
+                      lines.append(f'  Forced push by {pusher}, from {event["before"][:7]}')
+                  # A new branch or tag on a commit already known has no new
+                  # commit: show the commit it points to.
+                  commits = event['commits'] or ([head] if head else [])
+                  for commit in commits:
+                      author = commit['author']
+                      lines += ['',
+                                f'  Commit: {commit["id"]}',
+                                f'      {commit["url"]}',
+                                f'  Author: {author["name"]} <{author.get("email", "")}>',
+                                f'  Date:   {commit["timestamp"]}',
+                                '',
+                                '  Changed paths:']
+                      lines += changed_paths(commit['id'])
+                      lines += ['', '  Log Message:', '  -----------']
+                      lines += [f'  {line}'.rstrip() for line in commit['message'].splitlines()]
+                  lines += ['', '', f'Compare: {event["compare"]}']
+
+          msg = EmailMessage()
+          msg['From'] = os.environ['MAIL_FROM']
+          msg['To'] = os.environ['MAIL_TO']
+          msg['Subject'] = subject
+          msg.set_content('\n'.join(lines) + '\n')
+          with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], 465,
+                                context=ssl.create_default_context(), timeout=60) as smtp:
+              smtp.login(os.environ['SMTP_USERNAME'], os.environ['SMTP_PASSWORD'])
+              smtp.send_message(msg)
+          print(f'sent: {subject}')
+          EOF
