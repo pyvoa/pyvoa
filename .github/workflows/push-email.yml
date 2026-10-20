@@ -41,6 +41,7 @@ jobs:
           import ssl
           import urllib.request
           from email.message import EmailMessage
+          from email.utils import formatdate, make_msgid
 
           if not os.environ['SMTP_USERNAME'] or not os.environ['SMTP_PASSWORD']:
               print('::warning::SMTP_USERNAME / SMTP_PASSWORD are not set: no mail sent')
@@ -120,6 +121,10 @@ jobs:
           msg['From'] = os.environ['MAIL_FROM']
           msg['To'] = os.environ['MAIL_TO']
           msg['Subject'] = subject
+          # Neither is added by the email module, and a mail without them was
+          # scored 99 by OVH's filter and held 9 minutes in its queue.
+          msg['Date'] = formatdate(localtime=False)
+          msg['Message-ID'] = make_msgid(domain='pyvoa.org')
           msg.set_content('\n'.join(lines) + '\n')
           with smtplib.SMTP_SSL(os.environ['SMTP_HOST'], 465,
                                 context=ssl.create_default_context(), timeout=60) as smtp:
