@@ -359,8 +359,10 @@ dependencies — until then `pip install pyvoa` installs 0.5.0, without bokeh:
   webhooks, workflows, recipient addresses and push credentials were all ruled
   out — and nothing there will bring it back. GitHub's replacement, a
   workflow on `push` sending mail through an SMTP server of our own, is
-  `.github/workflows/push-email.yml` since 2026-10-20: every push, on any
-  branch, mails `contact@pyvoa.org` in the layout of the retired emails,
+  `.github/workflows/push-email.yml` since 2026-10-20: every push on a branch
+  or a tag, every deletion of one (an event of its own: a deletion does not
+  trigger `push`) and every published release mail `contact@pyvoa.org`, the
+  pushes in the layout of the retired emails,
   through OVH's `ssl0.ovh.net` with the repository secrets `SMTP_USERNAME`
   and `SMTP_PASSWORD`. The SMTP login is the full mailbox address, not the
   `NNNN-NNNN-NN/name` login of OVH's web interface. Without the secrets the

@@ -5,9 +5,11 @@ name: Push email
 # from ci.yml because it is the only one holding the SMTP secrets.
 #
 # push without filters covers every branch and every tag: creation, update,
-# force push, merge. A release is an event of its own.
+# force push, merge. A deletion does not trigger push (checked on
+# 2026-10-20), nor does a release: both are events of their own.
 on:
   push:
+  delete:
   release:
     types: [published]
 
@@ -76,6 +78,10 @@ jobs:
                        f'  Home:    {home}',
                        '', '  Notes:', '  ------']
               lines += [f'  {line}'.rstrip() for line in (release['body'] or '').splitlines()]
+          elif os.environ['GITHUB_EVENT_NAME'] == 'delete':
+              kind = event['ref_type']
+              subject = f'[{repo}] {kind} {event["ref"]} deleted by {event["sender"]["login"]}'
+              lines = [f'  {kind.capitalize()}: {event["ref"]} (deleted)', f'  Home:   {home}']
           else:
               ref = event['ref']
               kind = 'Tag' if ref.startswith('refs/tags/') else 'Branch'
