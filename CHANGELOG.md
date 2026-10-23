@@ -32,7 +32,7 @@ Data sources:
   redistribution. 23 databases are shipped; the README gives each one's
   licence, set by its provider.
 - live mode: `pf.setlive(True)` reads the upstream files instead of the frozen
-  Zenodo copies (now record 23599920), `pf.getlive()` tells which is in use.
+  Zenodo copies (now record 23601685), `pf.getlive()` tells which is in use.
 - new keys in the database descriptions: `names` (csv with no header line),
   `splitwhere` (composite locations), `cumulative` and `fillmissing` (sources
   reporting increments), `dateformat` (day-first dates).
