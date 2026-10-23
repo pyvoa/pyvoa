@@ -6,8 +6,8 @@
 # implementation or scientific direction.
 #
 # It is distinct from:
-#   - LICENSE          : the MIT License, whose copyright holder, "the pyvoa
-#                        team", is the authors listed here
+#   - LICENSE          : the MIT licence governing reuse of the software;
+#                        "the pyvoa team" refers to the authors listed here
 #   - CITATION.cff     : machine-readable citation metadata
 #   - CONTRIBUTORS.md  : all contributions, including occasional ones
 #
@@ -35,8 +35,8 @@ Olivier Dadoun <dadoun@in2p3.fr>
 
 ## History
 
-pyvoa is the third name of one continuous project, developed throughout by the
-same authors:
+The project has been developed continuously by the same authors under three
+successive names:
 
   CoCoA  Covid Collaborative Analysis, 2020
          started during the Covid Hackathon of April 2020
@@ -48,8 +48,8 @@ same authors:
          https://github.com/pyvoa/pyvoa
 
 Earlier contributions are recorded in the git histories of those repositories.
-CHANGELOG.md carries a summary of both, which is the only public record of the
-pycoa years.
+CHANGELOG.md summarises the CoCoA and PyCoA phases of the project and provides
+a public account of its development during the PyCoA years.
 
 ## Institutional support
 
@@ -57,7 +57,7 @@ Université Paris Cité — https://u-pariscite.fr
 LPNHE - Laboratoire de Physique Nucléaire et de Hautes Énergies (Université Paris Cité and Sorbonne Université, CNRS/IN2P3), UMR 7585 — https://lpnhe.in2p3.fr
 MSC — Matière et Systèmes Complexes (Université Paris Cité, CNRS), UMR 7057 — https://msc.u-paris.fr
 
-## Funding — required acknowledgement
+## Funding
 
 This work was supported by the IdEx « Université Paris Cité 2022 », funded by
 the French State under the « Investissements d'avenir » programme [grant number
@@ -66,7 +66,8 @@ Paris Cité.
 
 Institut Covid-19 Ad Memoriam: https://institut-ad-memoriam.u-pariscite.fr/
 
-Both must be acknowledged in any publication, presentation, poster or derived
-material about pyvoa. This is a condition of the funding, not a courtesy: keep
-the sentence above intact when reusing it, and add it to the software paper and
-to any release announcement.
+The pyvoa team is required to acknowledge both funding sources in its
+publications, presentations, posters and other project materials.
+
+Users who reuse pyvoa or publish results obtained with it are not required
+to acknowledge these funding sources.
