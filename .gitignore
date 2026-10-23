@@ -25,6 +25,8 @@ coverage.xml
 
 # per-machine Claude Code notes, not shared with contributors
 CLAUDE.local.md
+# the maintainers' working plan and task status, kept out of the repository
+HANDOFF.local.md
 
 # LaTeX build products of the software paper. The sources (main.tex, the
 # Makefile) and the figures are tracked; the PDFs are rebuilt with `make`.

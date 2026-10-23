@@ -84,8 +84,7 @@ with the accepted manuscript.
 weak. They are invisible in `make final`, but anyone can read the source, and a
 reviewer who follows the repository link in metadata C2 will land here.
 
-That is a deliberate trade, and the same one `HANDOFF.md` already makes. If it
-is judged too candid for the review period, the remedy is to move the notes into
-`paper/notes.tex`, `\input` it under the same toggle, and gitignore that one
-file — at the cost of the notes no longer sitting next to what they annotate.
-Decide once, before submission.
+That is a deliberate trade. If it is judged too candid for the review period,
+the remedy is to move the notes into `paper/notes.tex`, `\input` it under the
+same toggle, and gitignore that one file — at the cost of the notes no longer
+sitting next to what they annotate. Decide once, before submission.
