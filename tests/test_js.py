@@ -68,8 +68,12 @@ function out(x) { process.stdout.write(JSON.stringify(x)); }
 
 def run(script: str):
     """Run a script in node after the prelude and return what it printed, as JSON."""
+    # The script goes in on stdin and comes back on stdout, both in utf-8: on
+    # Windows, text=True alone decodes with cp1252, and the callbacks print
+    # characters such as '►' and the narrow no-break space of fr-FR numbers.
     done = subprocess.run(
-        [NODE, "-e", PRELUDE + script], capture_output=True, text=True, timeout=60, check=False,
+        [NODE, "-"], input=PRELUDE + script, capture_output=True,
+        encoding="utf-8", timeout=60, check=False,
     )
     assert done.returncode == 0, done.stderr
     return json.loads(done.stdout) if done.stdout else None

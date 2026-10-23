@@ -27,7 +27,7 @@ DATA = Path(__file__).parent / "data"
 # --------------------------------------------------------------------------
 
 def _load(name):
-    with open(DATA / name) as handle:
+    with open(DATA / name, encoding="utf-8") as handle:
         return json.load(handle)
 
 
@@ -162,7 +162,7 @@ def test_every_shipped_dataset_declares_a_live_source():
     """
     missing = []
     for path in sorted((Path(__file__).parents[1] / "pyvoa" / "data").glob("*.json")):
-        with open(path) as handle:
+        with open(path, encoding="utf-8") as handle:
             metadata = json.load(handle)
         for index, dataset in enumerate(metadata.get("datasets", [])):
             if not dataset.get("urlparent"):
@@ -305,7 +305,7 @@ class _FakeGeoInfo:
 @pytest.fixture
 def offline_parser(monkeypatch):
     """Build a DataParser from tests/data/good_db.json and tests/data/tiny.csv."""
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
 
     monkeypatch.setattr(
@@ -416,7 +416,7 @@ def test_dataparser_from_db_is_a_bool_column(monkeypatch):
     merge with a missing value; from_db must still be a bool column, not an
     object one holding True and False.
     """
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     metadata["geoinfo"]["iso3"] = "WLD"
 
@@ -458,7 +458,7 @@ def _parse_recording_the_url(monkeypatch, metadata):
 
 
 def _metadata_with_a_live_source():
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     metadata["datasets"][0]["urlparent"] = "https://upstream.example.org/live.csv"
     return metadata
@@ -477,7 +477,7 @@ def test_dataparser_reads_the_urlparent_in_live_mode(monkeypatch):
 
 def test_dataparser_reads_an_unmirrored_dataset_live_in_archive_mode(monkeypatch):
     """A urldata that is not a Zenodo file has no mirror, so it is read live."""
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     upstream = "https://upstream.example.org/live.csv"
     metadata["datasets"][0]["urldata"] = upstream
@@ -502,7 +502,7 @@ def test_dataparser_reads_an_unmirrored_dataset_live_in_archive_mode(monkeypatch
 
 def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
     """A dataset with no live source keeps using urldata, and warns about it."""
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     assert "urlparent" not in metadata["datasets"][0]
 
@@ -523,7 +523,7 @@ def test_dataparser_reads_a_csv_without_a_header_line(monkeypatch):
     The key names the columns of a csv shipped without a header line, as the
     DRC Ebola long files are.
     """
-    with open(DATA / "headerless_db.json") as handle:
+    with open(DATA / "headerless_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
 
     monkeypatch.setattr(
@@ -544,7 +544,7 @@ def test_dataparser_reads_a_csv_without_a_header_line(monkeypatch):
 
 
 def _increments_parser(monkeypatch):
-    with open(DATA / "increments_db.json") as handle:
+    with open(DATA / "increments_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     monkeypatch.setattr(
         MetaInfo, "getcurrentmetadata", lambda self, namedb: metadata
@@ -590,7 +590,7 @@ def test_dataparser_fills_the_missing_dates(monkeypatch, tmp_path):
         "2020-05-01,FRA,100,10\n"
         "2020-05-04,FRA,210,15\n"
     )
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
 
     monkeypatch.setattr(
@@ -622,7 +622,7 @@ def test_dataparser_reads_the_dates_with_the_declared_format(monkeypatch, tmp_pa
         "12/3/2020,FRA,150,12\n"
         "13/3/2020,FRA,210,15\n"
     )
-    with open(DATA / "good_db.json") as handle:
+    with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
     metadata["datasets"][0]["dateformat"] = "%d/%m/%Y"
 
