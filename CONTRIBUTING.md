@@ -47,9 +47,53 @@ python -m pip install --upgrade pip
 python -m pip install -e ".[dev]"     # editable install, with the test tools
 ```
 
-The `dev` extra pulls in pytest, the pinned ruff used by CI and node (for
-`tests/test_js.py`, which runs the bokeh callbacks of `pyvoa/js/`), so the
-checks below run exactly as they do on a pull request.
+Line by line:
+
+1. `git clone …` downloads the repository, with its whole history, into a new
+   `pyvoa/` directory. If you mean to submit a change, clone your own fork
+   instead (see §4).
+2. `cd pyvoa` moves into that directory; the remaining commands are run from it.
+3. `python -m venv .venv` creates a *virtual environment*, a private copy of
+   Python in `.venv/`, so that pyvoa and its dependencies are installed apart
+   from the system Python and from your other projects. `source
+   .venv/bin/activate` (or `.venv\Scripts\activate` on Windows) switches the
+   current shell to it: `python` and `pip` now refer to that environment until
+   you run `deactivate` or close the shell. Activate it again in every new
+   shell.
+4. `python -m pip install --upgrade pip` updates pip itself inside the
+   environment; the copy `venv` provides can be too old to install a project
+   described by `pyproject.toml` alone, as pyvoa is.
+5. `python -m pip install -e ".[dev]"` installs pyvoa from the current
+   directory (`.`) together with its dependencies. `-e` (*editable*) links the
+   environment to your working tree instead of copying the package, so a change
+   to a file of `pyvoa/` takes effect at the next `import` without
+   reinstalling. `[dev]` adds the optional group of development tools declared
+   in `pyproject.toml`. The quotes keep shells such as zsh from reading the
+   brackets as a filename pattern.
+
+Writing `python -m pip` rather than `pip` makes sure the pip that runs belongs
+to the `python` you are using, i.e. to the activated environment.
+
+The `dev` extra installs the tools the continuous integration uses, so that the
+checks below run exactly as they do on a pull request, and you know before
+opening one whether it will pass:
+
+- **pytest** runs the test suite (`pytest`; see §4 for what it selects).
+- **pytest-cov** measures how much of the code the tests cover; CI uses it for
+  the coverage report written to the job summary and the `coverage.xml`
+  artefact.
+- **ruff** checks the style and the NumPy-convention docstrings
+  (`ruff check .`). Its version is pinned, as in the CI workflow, because a new
+  ruff release widens its default rule set and would start failing the check
+  without any change to the code.
+- **tomli** is installed on Python 3.10 only, whose standard library lacks
+  `tomllib`. `tests/test_paper.py` needs it to read `pyproject.toml` and check
+  the manuscript against the declared dependencies; without it those tests
+  would be skipped silently.
+- **nodejs-wheel-binaries** ships a node executable. `tests/test_js.py` uses it
+  to run the bokeh callbacks of `pyvoa/js/` and check that they compute the
+  same thing as their Python counterparts, without depending on a node
+  installed on the machine.
 
 pyvoa requires Python >= 3.10 and is designed to run inside a
 [Jupyter](https://jupyter.org/) environment, locally or on a remote server
@@ -63,7 +107,9 @@ using the examples in `examples/`.
    Suggested prefixes: `feat/`, `fix/`, `docs/`, `test/`, `refactor/`.
 2. **Keep the change focused.** One pull request, one concern.
 3. **Add tests** covering the new behaviour or the fixed bug.
-4. **Run the checks locally** before pushing:
+4. **Run the checks locally** before pushing. Both tools come with the `dev`
+   extra installed in §3 (into `.venv/bin/`, or `.venv\Scripts\` on Windows),
+   so run them from a shell where that environment is activated:
 
    ```bash
    pytest                 # test suite (offline; this is what CI runs)
@@ -96,7 +142,8 @@ never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 - [ ] Tests added or updated, and the suite passes.
 - [ ] New tests run offline, using a fixture rather than a live download.
-- [ ] Public functions carry a docstring ([PEP 257](https://peps.python.org/pep-0257/)).
+- [ ] Public functions carry a docstring following the NumPy convention (§5),
+      and `ruff check .` reports no findings.
 - [ ] User-facing documentation and notebook examples updated if relevant.
 - [ ] `CHANGELOG.md` updated.
 - [ ] The change is compatible with the supported Python versions.
