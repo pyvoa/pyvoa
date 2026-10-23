@@ -145,6 +145,75 @@ def test_geoinfo_adds_a_population_column():
 
 
 # --------------------------------------------------------------------------
+# every geographic reference comes from the archive
+# --------------------------------------------------------------------------
+
+# Files the geography may read outside the Zenodo archive, as {url: reason}.
+# Keep it empty: a file read upstream breaks on a fresh install the day it
+# moves, as the ONS lookup of the English regions did (063df0d), while a warm
+# cache hides it. The cure is to deposit the file in a new version of the
+# Bulk record and to bump its id in tools.get_local_from_url().
+NOT_ARCHIVED = {}
+
+
+def _build_every_geography():
+    """Build every geographic object pyvoa offers, as the databases do."""
+    geo.GeoManager()
+    info = geo.GeoInfo()
+    for field in info.get_list_field():
+        info.add_field(
+            input=pd.DataFrame({"where": ["France", "Italy"]}),
+            field=field, geofield="where",
+        )
+    region = geo.GeoRegion()
+    for name in region.get_region_list():
+        region.get_countries_from_region(name)
+    for code in geo.GeoCountry("FRA").get_list_countries():
+        country = geo.GeoCountry(code)
+        country.get_data()
+        country.get_data(True)
+
+
+@pytest.mark.parametrize("live", [False, True], ids=["archive", "live"])
+def test_every_geographic_reference_comes_from_the_archive(cache_dir, monkeypatch, live):
+    """Read no geographic file outside Zenodo, in either data source mode.
+
+    The cache starts empty, so that every file is actually downloaded: on a
+    warm cache, a file gone upstream still looks available.
+    """
+    from pyvoa import tools
+
+    fetched = []
+    real_get = tools.requests.get
+
+    def recording_get(url, *args, **kwargs):
+        response = real_get(url, *args, **kwargs)
+        fetched.append((url, response.status_code))
+        return response
+
+    monkeypatch.setattr(tools.requests, "get", recording_get)
+    tools.set_live_mode(live)
+    _build_every_geography()
+
+    assert fetched, "nothing was downloaded: the cache was not empty"
+    outside = sorted(
+        {url for url, _ in fetched if not url.startswith("https://zenodo.org/")}
+        - set(NOT_ARCHIVED)
+    )
+    # a file missing from the archive answers 404 and is then fetched from
+    # its provider; any other error is Zenodo failing, which a rerun settles
+    zenodo_errors = [
+        (url, status) for url, status in fetched
+        if url.startswith("https://zenodo.org/") and status != 200
+    ]
+    assert not outside, (
+        "read outside the Zenodo archive, so not reproducible and bound to "
+        f"break when the provider moves it: {outside}; Zenodo answered "
+        f"{zenodo_errors}"
+    )
+
+
+# --------------------------------------------------------------------------
 # database parsers, end to end
 # --------------------------------------------------------------------------
 
