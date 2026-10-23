@@ -6,7 +6,8 @@
 # implementation or scientific direction.
 #
 # It is distinct from:
-#   - LICENSE          : copyright holders (MIT License)
+#   - LICENSE          : the MIT License, whose copyright holder, "the pyvoa
+#                        team", is the authors listed here
 #   - CITATION.cff     : machine-readable citation metadata
 #   - CONTRIBUTORS.md  : all contributions, including occasional ones
 #
