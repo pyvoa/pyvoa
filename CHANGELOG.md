@@ -120,6 +120,12 @@ Packaging and documentation:
   "AxesImage.set() got an unexpected keyword argument 'headers'" when
   contextily was older than 1.7, as it can be in an Anaconda installation.
   contextily 1.7 is now the declared minimum.
+- fix: with pycountry older than 23.12.7, the `jhu` database failed to parse,
+  since those releases do not know Türkiye, the name JHU uses. pycountry
+  23.12.7 is now the declared minimum.
+- fix: an error page served by a busy server (a 429 or a 503 of Zenodo) was
+  cached as if it were the data, and in archive mode never downloaded again.
+  It is now refused, and the download fails with a `PyvoaError`.
 - fix: the wheel of 0.5.0 left out `pyvoa/js/`, so that a bokeh chart raised
   `FileNotFoundError` on an installed copy; the callbacks are shipped again.
 - the API documentation is published at <https://pyvoa.github.io/pyvoa/>,

@@ -588,6 +588,10 @@ class _FakeResponse:
         self.content = content
         self.ok = ok
 
+    def raise_for_status(self):
+        if not self.ok:
+            raise tools.requests.exceptions.HTTPError("503 Service Unavailable")
+
 
 def test_get_local_from_url_downloads_and_caches(cache_dir, monkeypatch):
     calls = []
@@ -640,6 +644,25 @@ def test_get_local_from_url_uses_a_distinct_file_per_url(cache_dir, monkeypatch)
     first = tools.get_local_from_url("https://example.org/a.csv")
     second = tools.get_local_from_url("https://example.org/b.csv")
     assert first != second
+
+
+def test_get_local_from_url_does_not_cache_an_error_page(cache_dir, monkeypatch):
+    # Zenodo under load answers with an html page longer than the 1000
+    # characters threshold: cached, it would stand for the data for good
+    error_page = b"<!DOCTYPE html>" + b" " * 2000
+    monkeypatch.setattr(
+        tools.requests, "get", lambda url, **kwargs: _FakeResponse(error_page, ok=False)
+    )
+    with pytest.raises(PyvoaError):
+        tools.get_local_from_url("https://zenodo.org/records/1/files/data.csv")
+    assert list(cache_dir.iterdir()) == []
+
+    monkeypatch.setattr(
+        tools.requests, "get", lambda url, **kwargs: _FakeResponse(b"x" * 2000)
+    )
+    path = tools.get_local_from_url("https://zenodo.org/records/1/files/data.csv")
+    with open(path, "rb") as handle:
+        assert handle.read() == b"x" * 2000
 
 
 def test_live_mode_defaults_to_the_archive():

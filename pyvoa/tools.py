@@ -653,6 +653,10 @@ def get_local_from_url(url,expiration_time=0,suffix='',live=None):
                 urlfile = None
         if urlfile is None:
             urlfile = requests.get(url, allow_redirects=True,headers=headers) # adding headers for server which does not accept no browser presentation
+            # an error page (a 429 or a 503 of Zenodo under load) must not be
+            # cached as if it were the data : in archive mode it would never be
+            # downloaded again
+            urlfile.raise_for_status()
         with open(local_filename,'wb') as fp:
             fp.write(urlfile.content)
         verb('Download content of '+url+' . Locally stored as cached data in '+local_filename)
