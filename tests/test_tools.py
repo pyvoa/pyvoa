@@ -48,7 +48,8 @@ def cp1252_stdout(monkeypatch):
     sys.stdout between the setup of a fixture and the test.
     """
     raw = io.BytesIO()
-    stream = io.TextIOWrapper(raw, encoding="cp1252", errors="strict")
+    # newline="\n": on Windows the default would write each "\n" as "\r\n"
+    stream = io.TextIOWrapper(raw, encoding="cp1252", errors="strict", newline="\n")
     monkeypatch.setattr(sys, "stdout", stream)
     def written():
         stream.flush()
