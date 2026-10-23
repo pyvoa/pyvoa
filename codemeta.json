@@ -15,7 +15,10 @@
     "installUrl": "https://pypi.org/project/pyvoa/",
     "developmentStatus": "https://www.repostatus.org/#active",
     "applicationCategory": "Epidemiology",
-    "programmingLanguage": "Python",
+    "programmingLanguage": [
+        "Python",
+        "JavaScript"
+    ],
     "runtimePlatform": [
         "Python 3.10",
         "Python 3.11",

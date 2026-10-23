@@ -20,11 +20,18 @@
         "https://github.com/pyvoa/pyvoa"
     ],
     "applicationCategory": "Epidemiology",
-    "programmingLanguage": {
-        "@type": "ComputerLanguage",
-        "name": "Python",
-        "url": "https://www.python.org"
-    },
+    "programmingLanguage": [
+        {
+            "@type": "ComputerLanguage",
+            "name": "Python",
+            "url": "https://www.python.org"
+        },
+        {
+            "@type": "ComputerLanguage",
+            "name": "JavaScript",
+            "url": "https://tc39.es/ecma262/"
+        }
+    ],
     "runtimePlatform": [
         "Python 3.10",
         "Python 3.11",
