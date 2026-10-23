@@ -109,6 +109,10 @@ Packaging and documentation:
   database descriptions, the bokeh callbacks and a scraped page were read in
   the locale's encoding, cp1252 there, instead of utf-8, and a description
   that failed to read stopped the import instead of being set aside.
+- fix: a script whose output went to a file or a pipe on Windows could see a
+  `UnicodeEncodeError` in place of a `PyvoaError`, when the message held a
+  character cp1252 lacks (an emoji, a Greek or Japanese name). Such a
+  character is now printed as `?`, and the error is the one raised.
 - every dependency has a lower bound, tested by a `minimum` CI job (pandas
   2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26); `beautifulsoup4` replaces
   `bs4`.

@@ -6,6 +6,7 @@ creation fail.
 """
 
 import datetime
+import io
 import subprocess
 import sys
 
@@ -38,6 +39,43 @@ def test_info_and_verb_honour_the_verbosity(capsys, mode, expect_info, expect_ve
     out = capsys.readouterr().out
     assert ("an info message" in out) is expect_info
     assert ("a debug message" in out) is expect_verb
+
+
+def cp1252_stdout(monkeypatch):
+    """Replace stdout by what a redirected Windows script writes to: cp1252.
+
+    Called from the test itself: pytest puts its own capture back on
+    sys.stdout between the setup of a fixture and the test.
+    """
+    raw = io.BytesIO()
+    stream = io.TextIOWrapper(raw, encoding="cp1252", errors="strict")
+    monkeypatch.setattr(sys, "stdout", stream)
+    def written():
+        stream.flush()
+        return raw.getvalue().decode("cp1252")
+    return written
+
+
+def test_printable_keeps_what_stdout_can_encode(monkeypatch):
+    cp1252_stdout(monkeypatch)
+    assert tools.printable("Côte d'Ivoire") == "Côte d'Ivoire"
+    assert tools.printable("Αθήνα \U0001F914") == "????? ?"
+
+
+def test_an_error_banner_stdout_cannot_encode_still_raises_pyvoaerror(monkeypatch):
+    written = cp1252_stdout(monkeypatch)
+    # it raised UnicodeEncodeError from inside the banner, the message lost
+    with pytest.raises(PyvoaError, match="selected"):
+        raise PyvoaError("Does a Database has been selected ? \U0001F914")
+    assert "Does a Database has been selected ? ?" in written()
+
+
+def test_info_and_verb_print_what_stdout_cannot_encode(monkeypatch):
+    written = cp1252_stdout(monkeypatch)
+    tools.set_verbose_mode(2)
+    tools.info("Αθήνα")
+    tools.verb("東京")
+    assert written() == "?????\n??\n"
 
 
 # --------------------------------------------------------------------------

@@ -106,21 +106,46 @@ def set_live_mode(live=True):
     _live_mode = bool(live)
     return get_live_mode()
 
+def printable(text):
+    """Return text with what stdout cannot encode replaced by '?'.
+
+    A Windows script whose output goes to a file or a pipe writes in cp1252,
+    which has no Greek, no Japanese and no emoji: printing such a message
+    raised UnicodeEncodeError, and a PyvoaError then surfaced as that error
+    instead of its own. A terminal, a notebook or Linux and macOS write utf-8
+    and get the text unchanged.
+
+    Parameters
+    ----------
+    text : str
+        the text about to be written to sys.stdout.
+
+    Returns
+    -------
+    str
+        the same text, each character stdout's encoding lacks made a '?'.
+    """
+    encoding = getattr(sys.stdout, 'encoding', None) or 'utf-8'
+    try:
+        return text.encode(encoding, errors='replace').decode(encoding)
+    except LookupError:
+        return text
+
 def info(*args):
     """Print to stdout, if the verbosity is 1 or more.
 
-    Takes the same arguments as the builtin print function.
+    Takes the positional arguments of the builtin print function.
     """
     if _verbose_mode > 0:
-        print(*args)
+        print(printable(' '.join(str(a) for a in args)))
 
 def verb(*args):
     """Print to stdout, if the verbosity is 2 (debug).
 
-    Takes the same arguments as the builtin print function.
+    Takes the positional arguments of the builtin print function.
     """
     if _verbose_mode > 1:
-        print(*args)
+        print(printable(' '.join(str(a) for a in args)))
 
 def kwargs_keystesting(given_args, expected_args, error_string):
     """Test that the given kwargs keys are the expected ones.
@@ -1164,8 +1189,8 @@ def blinking_centered_text(typemsg, message, blinking=False, text_color="white",
         except Exception:
             columns = 80
 
-        sys.stdout.write(f'{ansi_start}{typemsg.center(columns)}{ansi_reset}\n')
-        sys.stdout.write(f'{ansi_start}{message.center(columns)}{ansi_reset}\n')
+        sys.stdout.write(printable(f'{ansi_start}{typemsg.center(columns)}{ansi_reset}\n'))
+        sys.stdout.write(printable(f'{ansi_start}{message.center(columns)}{ansi_reset}\n'))
 
 def PyvoaInfo(message):
     """Print an informational banner, if the verbosity is 2 (debug).
