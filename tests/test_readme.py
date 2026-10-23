@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 README = ROOT / "README.md"
 DATADIR = ROOT / "pyvoa" / "data"
 
-READ_FROM = {"both", "both (prefer live)", "archive only", "live only"}
+READ_FROM = {"both", "both (live recommended)", "archive only", "live only"}
 
 
 @pytest.fixture(scope="module")
@@ -49,10 +49,14 @@ def test_table_lists_every_shipped_database(rows: dict[str, list[str]]) -> None:
 
 
 def test_announced_count_matches_the_table(readme: str, rows: dict) -> None:
-    m = re.search(r"(\d+)\s+databases are shipped with pyvoa", readme)
+    m = re.search(
+        r"(\d+)\s+databases are shipped with pyvoa|pyvoa includes\s+(\d+)\s+databases",
+        readme,
+    )
     assert m, "README no longer announces how many databases ship"
-    assert int(m.group(1)) == len(rows), (
-        f"README announces {m.group(1)} databases and tables {len(rows)}"
+    announced = int(m.group(1) or m.group(2))
+    assert announced == len(rows), (
+        f"README announces {announced} databases and tables {len(rows)}"
     )
 
 
