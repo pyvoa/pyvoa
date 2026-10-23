@@ -993,7 +993,7 @@ class visu_bokeh:
                 date_display = Div(text=f"<b>{unique_dates[0]}</b>", width=300)
 
                 jsfile = Path(__file__).parent / "js/slider_callback.js"
-                with open(jsfile) as f:
+                with open(jsfile, encoding='utf-8') as f:
                     slider_code = f.read()
 
                 # the default title ends on the date drawn, '(09/10/2026)': it
@@ -1031,7 +1031,7 @@ class visu_bokeh:
                 toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
                 # CustomJS pour démarrer/arrêter l'animation
                 jsfile = Path(__file__).parent / "js/animation_callback.js"
-                with open(jsfile) as f:
+                with open(jsfile, encoding='utf-8') as f:
                     animation_code = f.read()
                 toggle_callback = CustomJS(args={'slider': slider}, code=animation_code)
                 toggl.js_on_change('active', toggle_callback)
@@ -1331,7 +1331,7 @@ class visu_bokeh:
                             step=1, title="Date index", width=300)
             date_display = Div(text=f"<b>{dates[-1]}</b>", width=300)
             jsfile = Path(__file__).parent / "js/histo_value_callback.js"
-            with open(jsfile) as f:
+            with open(jsfile, encoding='utf-8') as f:
                 slider_code = f.read()
             slider.js_on_change('value', CustomJS(
                 args={
@@ -1346,7 +1346,7 @@ class visu_bokeh:
                 code=slider_code))
             toggl = Toggle(label='► Play', active=False, button_type="success", height=30, width=70)
             jsfile = Path(__file__).parent / "js/animation_callback.js"
-            with open(jsfile) as f:
+            with open(jsfile, encoding='utf-8') as f:
                 animation_code = f.read()
             toggl.js_on_change('active', CustomJS(args={'slider': slider}, code=animation_code))
             tabs = column(column(toggl, slider, date_display), tabs)

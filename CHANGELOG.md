@@ -105,6 +105,10 @@ Behaviour changes:
 Packaging and documentation:
 
 - Python 3.13 and 3.14 are supported and tested.
+- fix: on Windows, `import pyvoa.front` failed with `KeyError: 1`. The
+  database descriptions, the bokeh callbacks and a scraped page were read in
+  the locale's encoding, cp1252 there, instead of utf-8, and a description
+  that failed to read stopped the import instead of being set aside.
 - every dependency has a lower bound, tested by a `minimum` CI job (pandas
   2.1.1, geopandas 1.0, shapely 2.0.2, numpy 1.26); `beautifulsoup4` replaces
   `bs4`.

@@ -1292,7 +1292,7 @@ class GeoCountry:
             self._country_data.drop(['DRAWSEQ','STATE_FIPS'],axis=1,inplace=True)
 
             # Adding informations from wikipedia
-            with open(get_local_from_url(self._source_dict['USA']['Subregion informations'],0), 'r') as f_us:
+            with open(get_local_from_url(self._source_dict['USA']['Subregion informations'],0), 'r', encoding='utf-8') as f_us:
                 content_us = f_us.read()
             soup_us = bs4.BeautifulSoup(content_us,'lxml')
             for img in soup_us.find_all('img'):  # need to convert <img tags to pyvoa content for pandas_read

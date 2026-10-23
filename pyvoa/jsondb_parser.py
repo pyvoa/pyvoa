@@ -94,7 +94,7 @@ class MetaInfo:
     if check_file:
         sig, msg = 1, ''
         try:
-            with open(file, 'r') as fp:
+            with open(file, 'r', encoding='utf-8') as fp:
                 data = json.load(fp)
                 sig, msg = MetaInfo.checkmetadatastructure(data)
                 if sig == 0:
@@ -137,7 +137,7 @@ class MetaInfo:
          try:
              meta = metadata[1]
              valide = 'GOOD'
-         except IndexError:
+         except KeyError:
              meta = metadata[0]
              valide = 'BAD'
          tmp=pd.DataFrame([[name,valide,meta]],columns=col)

@@ -9,6 +9,7 @@ while the test suite, run from the checkout, saw the files.
 
 from __future__ import annotations
 
+import ast
 import fnmatch
 import subprocess
 import sys
@@ -44,3 +45,28 @@ def test_every_data_file_of_the_package_is_in_package_data():
     assert not left_out, (
         "files of pyvoa/ the wheel would leave out, to add to "
         f"[tool.setuptools.package-data]: {left_out}")
+
+
+def test_every_text_file_of_the_package_is_opened_with_an_encoding():
+    """open() in text mode names its encoding, or Windows decodes with cp1252.
+
+    pyvoa's json descriptions, its javascript callbacks and the pages it
+    scrapes are utf-8. Without ``encoding=``, open() decodes them with the
+    locale's encoding, which is utf-8 on Linux and macOS and cp1252 on most
+    Windows machines, where ``import pyvoa.front`` failed.
+    """
+    unnamed = []
+    for path in sorted((ROOT / "pyvoa").rglob("*.py")):
+        if any(part.startswith(".") for part in path.relative_to(ROOT).parts):
+            continue  # .ipynb_checkpoints and the like, not part of the package
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                    and node.func.id == "open"):
+                continue
+            mode = node.args[1] if len(node.args) > 1 else next(
+                (k.value for k in node.keywords if k.arg == "mode"), None)
+            if isinstance(mode, ast.Constant) and "b" in str(mode.value):
+                continue
+            if len(node.args) < 4 and not any(k.arg == "encoding" for k in node.keywords):
+                unnamed.append(f"{path.relative_to(ROOT)}:{node.lineno}")
+    assert not unnamed, f"open() in text mode without an encoding: {unnamed}"

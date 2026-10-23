@@ -118,6 +118,42 @@ def test_every_shipped_database_description_is_valid():
     )
 
 
+def test_shipped_descriptions_read_alike_under_a_windows_locale(monkeypatch):
+    """The descriptions are utf-8, whatever the locale says.
+
+    open() without an encoding decodes with the locale's, cp1252 on most
+    Windows machines: escovid19data and imed then failed to decode, and
+    ``import pyvoa.front`` raised KeyError: 1. The others decoded into
+    mojibake, 'Ã©' for 'é'. Defaulting open() to cp1252 here does what Windows
+    does.
+    """
+    reference = MetaInfo.getallmetadata()
+
+    def windows_open(file, mode="r", *args, **kwargs):
+        if "b" not in mode and len(args) < 2:
+            kwargs.setdefault("encoding", "cp1252")
+        return open(file, mode, *args, **kwargs)
+
+    monkeypatch.setattr(jsondb_parser, "open", windows_open, raising=False)
+    under_windows = MetaInfo.getallmetadata()
+    assert list(under_windows.validejson) == list(reference.validejson)
+    assert list(under_windows.parsingjson) == list(reference.parsingjson)
+
+
+def test_an_invalid_description_is_marked_bad_rather_than_raising(monkeypatch):
+    """A description parsejson rejects is listed as BAD, not raised.
+
+    parsejson answers {0: message} for a bad file, and getallmetadata() caught
+    IndexError, which a dict never raises, so a single bad description made the
+    import of the front fail with KeyError: 1.
+    """
+    monkeypatch.setattr(MetaInfo, "parsejson",
+                        staticmethod(lambda file: {0: "Invalid json file"}))
+    catalogue = MetaInfo.getallmetadata()
+    assert set(catalogue.validejson) == {"BAD"}
+    assert set(catalogue.parsingjson) == {"Invalid json file"}
+
+
 def test_every_shipped_dataset_declares_a_live_source():
     """Live mode reads urlparent, so every dataset must carry one.
 
