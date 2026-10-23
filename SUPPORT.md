@@ -47,7 +47,12 @@ The issue form asks for these, and they are what makes a report actionable
 (see also [CONTRIBUTING.md §2](CONTRIBUTING.md#2-reporting-a-bug)):
 
 1. **Versions** — pyvoa (`python -c "import pyvoa; print(pyvoa.__version__)"`),
-   Python, and the operating system.
+   Python, and the operating system. If you run pyvoa from a clone of the
+   repository rather than from a release, add the commit as well: run
+   `git describe --tags --always --dirty` in the clone (`v0.5.0-399-g89fbbc9`
+   reads 399 commits after 0.5.0, at commit `89fbbc9`; a trailing `-dirty` means
+   local changes), since the version number alone stays the same between two
+   releases.
 2. **A minimal reproducible example** — the shortest snippet that triggers the
    problem, including the database (`setwhom`) and the visualisation backend
    (`setvis`).
@@ -62,6 +67,9 @@ The issue form asks for these, and they are what makes a report actionable
 
 ## Documentation
 
+- <https://pyvoa.github.io/pyvoa/> — the API documentation: every public
+  function, its keywords and examples, built from the docstrings of the
+  current `main`.
 - [README.md](README.md) — installation, a first example, and the table of
   supported databases.
 - [`examples/`](examples/) — Jupyter notebooks covering the common workflows,

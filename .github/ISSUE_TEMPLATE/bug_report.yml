@@ -37,11 +37,15 @@ body:
       description: >-
         pyvoa, Python and operating system. Run
         `python -c "import pyvoa, sys, platform; print(pyvoa.__version__,
-        sys.version, platform.platform())"` and paste the output.
+        sys.version, platform.platform())"` and paste the output. If you run
+        pyvoa from a clone of the repository rather than from a release, add
+        the output of `git describe --tags --always --dirty`, run in the
+        clone: the version number alone does not change between two releases.
       placeholder: |
         pyvoa X.Y.Z
         Python X.Y.Z
         Linux-X.Y.Z-generic-x86_64
+        vX.Y.Z-N-gHASH (clone only, optional)
       render: text
     validations:
       required: true
