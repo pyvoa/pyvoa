@@ -1,8 +1,26 @@
 # Unreleased
-Since 0.5.0 (2026-08-06). Two databases come in and two go out, the data can
-be read live from their providers, and a pass over every source brings the
-parsed series back to their providers' totals. A few defaults changed: see
-*Behaviour changes*.
+Since 0.5.0 (2026-08-06), in short:
+
+- data sources: `measles-usa` and `ebolardc` come in, `sentinellesIRA` and
+  `risklayer` go out for licence reasons (23 databases, each one's licence in
+  the README); `pf.setlive(True)` reads the providers' files instead of the
+  frozen Zenodo copies; five new keys in the database descriptions; Kosovo is
+  left out, and France no longer includes French Guiana and French Polynesia.
+- parsing: day-first dates are read right in `govcy` and `dgs`, locations
+  that were lost are matched again (`rki`, `minciencia` and four more), and
+  `tests/test_sources.py` checks every database against its files.
+- maps and charts: matplotlib maps are drawn in Eckert IV and both backends
+  use OpenStreetMap tiles; `show_values` writes the values on the map; many
+  bokeh fixes, to the map proportions, the date slider, the colours and
+  `savefig()`.
+- behaviour changes: whole location names from `get()`, `'tot_cases smooth7'`
+  with a space, the death count as default `which`, `setwhom(reload=False)`
+  without parsing, and `pip install pyvoa` brings matplotlib and bokeh, making
+  `pyvoa-full` unnecessary.
+- packaging: Python 3.13 and 3.14, tested lower bounds for every dependency,
+  `pyvoa/js/` back in the wheel, and the API documentation published online.
+
+The details follow.
 
 Data sources:
 
