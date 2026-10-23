@@ -13,7 +13,9 @@ permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # the event is part of the group, so that a manual dispatch or the weekly
+  # cron does not cancel the run of a push on the same branch
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
