@@ -1112,7 +1112,7 @@ class GeoCountry:
                     'IND':{'Basics':_country_info_dict['IND']},\
                     'DEU':{'Basics':_country_info_dict['DEU']},\
                     'ESP':{'Basics':_country_info_dict['ESP']},\
-                    'GBR':{'Basics':_country_info_dict['GBR'],'Regions':'http://geoportal1-ons.opendata.arcgis.com/datasets/0c3a9643cc7c4015bb80751aad1d2594_0.csv'},\
+                    'GBR':{'Basics':_country_info_dict['GBR'],'Regions':'https://hub.arcgis.com/api/download/v1/items/cfdf077b80ce493e8ac7b8d030d50591/csv?redirect=true&layers=0'},\
                     'BEL':{'Basics':_country_info_dict['BEL']},\
                     'PRT':{'Basics':_country_info_dict['PRT']},\
                     #,'District':'https://raw.githubusercontent.com/JoaoFOliveira/portuguese-municipalities/master/municipalities.json'},\

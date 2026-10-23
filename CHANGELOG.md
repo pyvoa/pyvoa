@@ -32,7 +32,7 @@ Data sources:
   redistribution. 23 databases are shipped; the README gives each one's
   licence, set by its provider.
 - live mode: `pf.setlive(True)` reads the upstream files instead of the frozen
-  Zenodo copies (now record 23212632), `pf.getlive()` tells which is in use.
+  Zenodo copies (now record 23599920), `pf.getlive()` tells which is in use.
 - new keys in the database descriptions: `names` (csv with no header line),
   `splitwhere` (composite locations), `cumulative` and `fillmissing` (sources
   reporting increments), `dateformat` (day-first dates).
@@ -126,6 +126,11 @@ Packaging and documentation:
 - fix: an error page served by a busy server (a 429 or a 503 of Zenodo) was
   cached as if it were the data, and in archive mode never downloaded again.
   It is now refused, and the download fails with a `PyvoaError`.
+- fix: the nine regions of England (North East, London, …) were missing from
+  the United Kingdom's geography, every English district falling under
+  "England": the ONS lookup of districts to regions had moved, and its error
+  message was read in its place. It is read at its new address, and archived
+  in the Zenodo record 23599920.
 - fix: the wheel of 0.5.0 left out `pyvoa/js/`, so that a bokeh chart raised
   `FileNotFoundError` on an installed copy; the callbacks are shipped again.
 - the API documentation is published at <https://pyvoa.github.io/pyvoa/>,

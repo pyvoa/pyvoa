@@ -642,7 +642,7 @@ def get_local_from_url(url,expiration_time=0,suffix='',live=None):
         headers = {'User-Agent': 'Wget/1.16.3 (darwin14.3.0)'}
         urlfile = None
         if not live and 'zenodo.org' not in url:
-            archived='https://zenodo.org/api/records/23212632/files/'+local_base_filename+'/content'
+            archived='https://zenodo.org/api/records/23599920/files/'+local_base_filename+'/content'
             verb('Instead of using original URL '+url)
             verb('using zenodo archived file '+archived)
             urlfile = requests.get(archived, allow_redirects=True,headers=headers)
