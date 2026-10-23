@@ -53,7 +53,7 @@ dependencies = [
     "unidecode>=1.3",
     "lxml>=4.9.3",
     "IPython>=8.10",
-    "contextily>=1.3",
+    "contextily>=1.7",
     "html5lib>=1.1",
     # the two plotting backends: a plain `pip install pyvoa` draws, there is no
     # separate distribution for them any more. seaborn and folium stay optional.

@@ -54,6 +54,47 @@ def test_matplotlib_show_values_skips_a_location_without_geometry():
     plt.close("all")
 
 
+@pytest.mark.parametrize("tile", ["openstreet", "esri"])
+def test_matplotlib_map_draws_its_tiles_with_the_installed_contextily(monkeypatch, tile):
+    """The basemap goes through contextily, its download alone stubbed out.
+
+    pyvoa passes ``headers=`` to add_basemap for OpenStreetMap, a keyword
+    contextily takes from 1.7 only: before, it fell through to imshow, and
+    every matplotlib map failed with "AxesImage.set() got an unexpected
+    keyword argument 'headers'". The ``minimum`` CI job runs this test at the
+    declared floor.
+    """
+    import contextily.plotting
+    import geopandas as gpd
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from shapely.geometry import Polygon
+
+    from pyvoa.visu_matplotlib import visu_matplotlib
+
+    def no_download(left, bottom, right, top, **kwargs):
+        return np.zeros((4, 4, 3), dtype=np.uint8), (left, right, bottom, top)
+
+    monkeypatch.setattr(contextily.plotting, "bounds2img", no_download)
+    monkeypatch.setattr(contextily.plotting, "warp_tiles",
+                        lambda image, extent, **kwargs: (image, extent))
+    frame = gpd.GeoDataFrame({
+        "where": ["A", "B"],
+        "cases": [12.0, 570.0],
+        "from_db": [True, True],
+        "geometry": [Polygon([(0, 0), (1, 0), (1, 1), (0, 1)]),
+                     Polygon([(2, 0), (3, 0), (3, 1), (2, 1)])],
+    }, crs="EPSG:4326")
+    # no __init__: it would switch matplotlib to TkAgg
+    visu = visu_matplotlib.__new__(visu_matplotlib)
+    # 'not dense': a dense map draws no tiles
+    ax = visu.matplotlib_map(input=frame, which="cases", title="", tile=tile,
+                             typeofmap=["not dense"], return_pltaxis=True,
+                             pyvoalogo=False)
+    assert len(ax.images) == 1
+    plt.close("all")
+
+
 def test_visu_matplotlib_keeps_the_backend_mplbackend_names():
     # it used to switch to TkAgg, and the plots of test_front.py then opened
     # windows a terminal run had to close by hand
