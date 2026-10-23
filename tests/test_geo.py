@@ -448,3 +448,54 @@ def test_append_empty_geometries_adds_a_drawless_but_joinable_location():
     assert added.is_empty
     assert not completed.geometry.isna().any()
     assert len(completed.dropna(subset=["geometry"])) == 2
+
+
+# --------------------------------------------------------------------------
+# zipped shapefiles, read the way GeoCountry reads its cached downloads
+# --------------------------------------------------------------------------
+
+def _zipped_shapefile(directory, names, encoding, inside=""):
+    """Write a two-polygon shapefile into a zip, under the folder ``inside``."""
+    import zipfile
+
+    frame = gpd.GeoDataFrame(
+        {"name": names},
+        geometry=[sg.box(0, 0, 1, 1), sg.box(1, 0, 2, 1)],
+        crs="EPSG:4326",
+    )
+    shp = directory / "layer"
+    shp.mkdir()
+    frame.to_file(shp / "layer.shp", encoding=encoding)
+    archive = directory / "download.zip"
+    with zipfile.ZipFile(archive, "w") as z:
+        for part in sorted(shp.iterdir()):
+            z.write(part, f"{inside}/{part.name}" if inside else part.name)
+    return archive
+
+
+@pytest.fixture
+def cache_like_dir(tmp_path):
+    """Return a directory named like a Windows home can be: a space, an accent."""
+    directory = tmp_path / "Hélène Dupont" / ".cache"
+    directory.mkdir(parents=True)
+    return directory
+
+
+def test_a_zipped_shapefile_reads_from_its_local_path(cache_like_dir):
+    """'zip://' + the local path, as ESP, BEL, PRT and CHL read theirs.
+
+    On Windows the path starts with a drive letter and runs on backslashes,
+    which is the case this test exists for on the CI.
+    """
+    archive = _zipped_shapefile(cache_like_dir, ["Álava", "Coruña, A"], "utf-8")
+    read = gpd.read_file('zip://' + str(archive), encoding='utf-8')
+    assert sorted(read["name"]) == ["Coruña, A", "Álava"]
+
+
+def test_a_shapefile_in_a_folder_of_the_zip_reads_after_a_bang(cache_like_dir):
+    """'zip://' + path + '!folder', in its own encoding, as GRC reads nomoi_okxe."""
+    archive = _zipped_shapefile(cache_like_dir, ["ΑΤΤΙΚΗΣ", "ΚΡΗΤΗΣ"],
+                                "ISO-8859-7", inside="nomoi_okxe")
+    read = gpd.read_file('zip://' + str(archive) + '!nomoi_okxe',
+                         encoding='ISO-8859-7')
+    assert sorted(read["name"]) == ["ΑΤΤΙΚΗΣ", "ΚΡΗΤΗΣ"]
