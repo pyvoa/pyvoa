@@ -131,6 +131,15 @@ Packaging and documentation:
   "England": the ONS lookup of districts to regions had moved, and its error
   message was read in its place. It is read at its new address, and archived
   in the Zenodo record 23599920.
+- fix: every bokeh time series (`plot()`) failed with "Cannot setitem on a
+  Categorical with a new category (#FFFFFF)" since the white of 'SumOthers'
+  came in, `where` being a Categorical.
+- fix: a bokeh map with `typeofmap='show_values'` and the date slider failed
+  with "cannot reindex on an axis with duplicate labels"; its labels give the
+  last date, the one the map opens on.
+- every chart, of each backend, is drawn and written to a file by the
+  offline test suite, its tiles alone stubbed out, so that a new release of
+  matplotlib, bokeh, contextily or pandas that breaks one fails in CI.
 - fix: live mode read the geographic references upstream as well, where
   several have moved or changed shape: on an empty cache, every world
   database failed to load (the UN M49 table of Wikipedia no longer parses),

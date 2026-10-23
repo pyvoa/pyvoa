@@ -1,0 +1,171 @@
+"""Draw every chart for real, offline, and write it to a file.
+
+The other tests check what pyvoa computes. These check that matplotlib,
+bokeh, contextily and pandas still take what pyvoa hands them: a release of
+one of them that renames a keyword or tightens a type breaks a chart only
+when it is drawn, as contextily before 1.7 did with ``headers=`` (aab95a0),
+or as a Categorical refusing the white of 'SumOthers' did with every bokeh
+time series (aaf0a9b). The ``test`` job runs them at the newest releases,
+the ``minimum`` job at the declared floors. Only the map tiles, which are
+downloads, are stubbed out.
+"""
+
+import json
+
+import geopandas as gpd
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import pytest
+from shapely.geometry import Polygon
+
+import pyvoa.front as pf
+
+WHERE = ["Ain", "Aisne", "Allier"]
+
+
+@pytest.fixture
+def frame(cache_dir):
+    """Return eighteen months of two daily series for three locations."""
+    days = pd.date_range("2020-01-01", "2021-06-30")
+    rng = np.random.default_rng(0)
+    yield pd.DataFrame({
+        "date": days.repeat(len(WHERE)),
+        "where": WHERE * len(days),
+        "cur_rea": rng.uniform(0, 100, len(days) * len(WHERE)),
+        "cur_hosp": rng.uniform(0, 500, len(days) * len(WHERE)),
+    })
+    plt.close("all")
+
+
+def _saved(tmp_path, vis):
+    """Write the last chart through front.savefig() and return the file."""
+    name = tmp_path / "chart.png"
+    pf.savefig(str(name))
+    # bokeh writes an html page, and appends the extension itself
+    saved = tmp_path / "chart.png.html" if vis == "bokeh" else name
+    assert saved.stat().st_size > 0
+    return saved
+
+
+# --------------------------------------------------------------------------
+# time series and histograms, through front
+# --------------------------------------------------------------------------
+
+PLOTS = [
+    ("matplotlib", {"which": "cur_rea"}),
+    ("matplotlib", {"which": ["cur_rea", "cur_hosp"], "typeofplot": "versus"}),
+    ("matplotlib", {"which": "cur_rea", "typeofplot": "yearly", "single": True}),
+    ("bokeh", {"which": "cur_rea"}),
+    ("bokeh", {"which": ["cur_rea", "cur_hosp"], "typeofplot": "versus"}),
+    ("bokeh", {"which": "cur_rea", "typeofplot": "yearly", "single": True}),
+    ("bokeh", {"which": "cur_rea", "typeofplot": "spiral", "single": True}),
+]
+
+
+@pytest.mark.parametrize(("vis", "kwargs"), PLOTS)
+def test_plot_is_drawn_and_saved(frame, tmp_path, vis, kwargs):
+    kwargs = dict(kwargs)
+    if kwargs.pop("single", False):
+        # yearly and spiral plots draw one location only
+        frame = frame[frame["where"] == WHERE[0]]
+    pf.setvis(vis)
+    # from get(), as a user would: 'where' then comes out as a Categorical
+    pf.plot(input=pf.get(input=frame, which=kwargs["which"]), **kwargs)
+    _saved(tmp_path, vis)
+
+
+@pytest.mark.parametrize("vis", ["matplotlib", "bokeh"])
+@pytest.mark.parametrize("typeofhist", ["location", "value", "pie"])
+def test_hist_is_drawn_and_saved(frame, tmp_path, vis, typeofhist):
+    pf.setvis(vis)
+    pf.hist(input=pf.get(input=frame, which="cur_rea"), which="cur_rea",
+            typeofhist=typeofhist)
+    _saved(tmp_path, vis)
+
+
+def test_bokeh_hist_with_its_date_slider_is_saved(frame, tmp_path):
+    pf.setvis("bokeh")
+    pf.hist(input=pf.get(input=frame, which="cur_rea"), which="cur_rea",
+            dateslider=True)
+    _saved(tmp_path, "bokeh")
+
+
+# --------------------------------------------------------------------------
+# maps, straight from the backends: front.map() needs a database geography
+# --------------------------------------------------------------------------
+
+def _map_frame(dates):
+    """Return a GeoDataFrame of three squares in France, one row per date."""
+    return gpd.GeoDataFrame([
+        {"date": d, "where": w, "code": w, "from_db": True,
+         "cur_rea": float(10 * k + i + 1),
+         "geometry": Polygon([(2 + i, 45), (3 + i, 45), (3 + i, 46), (2 + i, 46)])}
+        for k, d in enumerate(dates) for i, w in enumerate(WHERE)
+    ], crs="EPSG:4326")
+
+
+@pytest.fixture
+def no_tile_download(monkeypatch):
+    """Hand contextily a blank tile instead of downloading one."""
+    import contextily.plotting
+
+    def blank(left, bottom, right, top, **kwargs):
+        return np.zeros((4, 4, 3), dtype=np.uint8), (left, right, bottom, top)
+
+    monkeypatch.setattr(contextily.plotting, "bounds2img", blank)
+    monkeypatch.setattr(contextily.plotting, "warp_tiles",
+                        lambda image, extent, **kwargs: (image, extent))
+
+
+@pytest.mark.parametrize("projection", ["eckert4", "mercator"])
+@pytest.mark.parametrize(("typeofmap", "tile"), [
+    (["not dense"], "openstreet"),
+    (["not dense"], "esri"),
+    (["dense"], None),
+    (["dense", "show_values"], None),
+])
+def test_matplotlib_map_is_drawn_and_saved(no_tile_download, tmp_path,
+                                           typeofmap, tile, projection):
+    from pyvoa.visu_matplotlib import visu_matplotlib
+
+    ax = visu_matplotlib().matplotlib_map(
+        input=_map_frame(["2021-03-01"]), which="cur_rea", title="",
+        tile=tile, typeofmap=typeofmap, projection=projection,
+        return_pltaxis=True, pyvoalogo=False)
+    # a tile, when asked for, is drawn under the shapes
+    assert len(ax.images) == (1 if tile else 0)
+    name = tmp_path / "map.png"
+    ax.figure.savefig(name, bbox_inches="tight")
+    assert name.stat().st_size > 0
+    plt.close("all")
+
+
+@pytest.mark.parametrize("dateslider", [False, True])
+@pytest.mark.parametrize(("typeofmap", "tile"), [
+    (["not dense"], "openstreet"),
+    (["not dense"], "esri"),
+    (["dense"], "openstreet"),
+    (["dense", "show_values"], "openstreet"),
+])
+def test_bokeh_map_is_drawn_and_saved(tmp_path, typeofmap, tile, dateslider):
+    from importlib.resources import files
+
+    from bokeh.embed import file_html
+    from bokeh.resources import CDN
+
+    from pyvoa.visu_bokeh import visu_bokeh
+
+    fig = visu_bokeh().bokeh_map(
+        input=_map_frame(pd.to_datetime(["2021-03-01", "2021-03-02"])),
+        which="cur_rea", title="", pyvoalogo=False,
+        logo=str(files("pyvoa") / "data" / "logo-pyvoa.png"),
+        dateslider=dateslider, maxcountrydisplayed=12, typeofmap=typeofmap,
+        tile=tile)
+    # serialising validates every model and property against this bokeh,
+    # which building the figure in python does not
+    page = file_html(fig, CDN)
+    name = tmp_path / "map.html"
+    name.write_text(page, encoding="utf-8")
+    # the page carries the document, its three shapes included
+    assert json.dumps("Allier")[1:-1] in page

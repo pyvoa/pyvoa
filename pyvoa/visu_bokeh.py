@@ -173,6 +173,10 @@ class visu_bokeh:
                 unique_where = input.loc[~others, 'where'].unique()
                 color_map = {w: self.lcolors[i % 20] for i, w in enumerate(unique_where)}
                 input['colors'] = input['where'].map(color_map)
+            # get() hands 'where' out as a Categorical, and so is the colour
+            # mapped from it, which refuses the white below, even on an empty
+            # selection
+            input['colors'] = input['colors'].astype(object)
             input.loc[others, 'colors'] = '#FFFFFF'
             kwargs['input'] = input
             logo = kwargs['logo']
@@ -927,11 +931,15 @@ class visu_bokeh:
                 # same coordinates as the patches drawn above (not gdf, which is
                 # reprojected only to measure the extent)
                 pts = input.geometry.representative_point()
+                # with the date slider input_dates holds every date, and a
+                # location then appears once per date: the labels give the
+                # last one, the date the map opens on
+                last_date = input_dates.loc[input_dates['date'] == input_dates['date'].max()]
                 labelsrc = ColumnDataSource(data={
                     'x': pts.x.tolist(),
                     'y': pts.y.tolist(),
                     'where': input['where'].tolist(),
-                    'label': [scientific_label(v) for v in input_dates.set_index('where')[which]
+                    'label': [scientific_label(v) for v in last_date.set_index('where')[which]
                               .reindex(input['where']).tolist()],
                 })
                 bokeh_figure_map.add_layout(LabelSet(
