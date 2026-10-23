@@ -440,11 +440,11 @@ def test_dataparser_exposes_the_parsed_urls(offline_parser):
 
 
 def _parse_recording_the_url(monkeypatch, metadata):
-    """Build a DataParser on the given metadata, returning the urls fetched."""
+    """Build a DataParser on the given metadata, returning (url, live) fetched."""
     calls = []
 
-    def fake_download(url, *args, **kwargs):
-        calls.append(url)
+    def fake_download(url, *args, live=False, **kwargs):
+        calls.append((url, live))
         return str(DATA / "tiny.csv")
 
     monkeypatch.setattr(
@@ -460,19 +460,20 @@ def _parse_recording_the_url(monkeypatch, metadata):
 def _metadata_with_a_live_source():
     with open(DATA / "good_db.json", encoding="utf-8") as handle:
         metadata = json.load(handle)
+    metadata["datasets"][0]["urldata"] = "https://zenodo.org/records/1/files/tiny.csv"
     metadata["datasets"][0]["urlparent"] = "https://upstream.example.org/live.csv"
     return metadata
 
 
 def test_dataparser_reads_the_archive_by_default(monkeypatch):
     calls = _parse_recording_the_url(monkeypatch, _metadata_with_a_live_source())
-    assert calls == ["https://example.org/frozen/tiny.csv"]
+    assert calls == [("https://zenodo.org/records/1/files/tiny.csv", False)]
 
 
 def test_dataparser_reads_the_urlparent_in_live_mode(monkeypatch):
     tools.set_live_mode(True)
     calls = _parse_recording_the_url(monkeypatch, _metadata_with_a_live_source())
-    assert calls == ["https://upstream.example.org/live.csv"]
+    assert calls == [("https://upstream.example.org/live.csv", True)]
 
 
 def test_dataparser_reads_an_unmirrored_dataset_live_in_archive_mode(monkeypatch):
@@ -512,7 +513,7 @@ def test_dataparser_falls_back_to_the_archive_without_a_urlparent(monkeypatch):
     )
     tools.set_live_mode(True)
     calls = _parse_recording_the_url(monkeypatch, metadata)
-    assert calls == ["https://example.org/frozen/tiny.csv"]
+    assert calls == [("https://example.org/frozen/tiny.csv", True)]
     assert len(warnings) == 1
     assert "good_db" in warnings[0]
 

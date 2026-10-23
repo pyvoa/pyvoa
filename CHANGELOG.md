@@ -131,6 +131,12 @@ Packaging and documentation:
   "England": the ONS lookup of districts to regions had moved, and its error
   message was read in its place. It is read at its new address, and archived
   in the Zenodo record 23599920.
+- fix: live mode read the geographic references upstream as well, where
+  several have moved or changed shape: on an empty cache, every world
+  database failed to load (the UN M49 table of Wikipedia no longer parses),
+  and so did the geographies of Chile, India and Malaysia. Live mode now
+  applies to the data files of the databases alone; the geography is read
+  from the archive in both modes.
 - fix: the wheel of 0.5.0 left out `pyvoa/js/`, so that a bokeh chart raised
   `FileNotFoundError` on an installed copy; the callbacks are shipped again.
 - the API documentation is published at <https://pyvoa.github.io/pyvoa/>,

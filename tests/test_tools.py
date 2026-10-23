@@ -694,9 +694,23 @@ def test_get_local_from_url_keeps_the_original_url_in_live_mode(cache_dir, monke
         tools.requests, "get",
         lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
     )
+    tools.get_local_from_url("https://example.org/data.csv", live=True)
+    assert calls == ["https://example.org/data.csv"]
+
+
+def test_get_local_from_url_reads_the_archive_whatever_the_global_mode(
+    cache_dir, monkeypatch
+):
+    """Only the database parser follows the live mode, never geo.py."""
+    calls = []
+    monkeypatch.setattr(
+        tools.requests, "get",
+        lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
+    )
     tools.set_live_mode(True)
     tools.get_local_from_url("https://example.org/data.csv")
-    assert calls == ["https://example.org/data.csv"]
+    assert len(calls) == 1
+    assert calls[0].startswith("https://zenodo.org/api/records/")
 
 
 def test_get_local_from_url_ignores_the_expiration_out_of_live_mode(cache_dir, monkeypatch):
@@ -718,9 +732,8 @@ def test_get_local_from_url_honours_the_expiration_in_live_mode(cache_dir, monke
         tools.requests, "get",
         lambda url, **kwargs: calls.append(url) or _FakeResponse(b"x" * 2000),
     )
-    tools.set_live_mode(True)
-    tools.get_local_from_url("https://example.org/data.csv", -1)
-    tools.get_local_from_url("https://example.org/data.csv", -1)
+    tools.get_local_from_url("https://example.org/data.csv", -1, live=True)
+    tools.get_local_from_url("https://example.org/data.csv", -1, live=True)
     assert len(calls) == 2
 
 
@@ -744,8 +757,7 @@ def test_get_local_from_url_caches_the_two_modes_apart(cache_dir, monkeypatch):
         lambda url, **kwargs: _FakeResponse(b"x" * 2000),
     )
     archived = tools.get_local_from_url("https://example.org/data.csv")
-    tools.set_live_mode(True)
-    live = tools.get_local_from_url("https://upstream.example.org/data.csv")
+    live = tools.get_local_from_url("https://upstream.example.org/data.csv", live=True)
     assert archived != live
 
 

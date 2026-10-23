@@ -97,10 +97,12 @@ def get_live_mode():
 def set_live_mode(live=True):
     """Set the data source mode.
 
-    If live is True, downloads are made from the original upstream sources,
-    which give the most recent data available but may have moved, changed
-    format or disappeared. If live is False (default), everything is read from
-    the frozen Zenodo archive, which guarantees reproducible results.
+    If live is True, the data files of the databases are downloaded from the
+    original upstream sources, which give the most recent data available but
+    may have moved, changed format or disappeared. If live is False (default),
+    they are read from the frozen Zenodo archive, which guarantees
+    reproducible results. The geographic references are read from the archive
+    in both modes.
     """
     global _live_mode
     _live_mode = bool(live)
@@ -584,7 +586,7 @@ def exists_from_url(path):
     r = requests.head(path)
     return r.status_code == requests.codes.ok
 
-def get_local_from_url(url,expiration_time=0,suffix='',live=None):
+def get_local_from_url(url,expiration_time=0,suffix='',live=False):
     """"Download data from the given url and store it into a local file.
 
     If the expiration time is 0 (default), the data will never be downloaded anymore if available.
@@ -594,12 +596,13 @@ def get_local_from_url(url,expiration_time=0,suffix='',live=None):
 
     One may add a suffix to the local filename if known.
 
-    live overrides the global live mode for this one download: True for a
-    file pyvoa has no archived copy of, which is always fetched from its
-    provider. None, the default, follows get_live_mode().
+    live, False by default, serves the file from the frozen Zenodo record.
+    True fetches it from its provider, honouring the expiration time. The
+    global live mode is not read here: only the parser of the databases
+    follows it, and passes live=True for the data files it reads upstream.
+    Every other download, the geographic references above all, comes from
+    the archive whatever the mode.
     """
-    if live is None:
-        live = _live_mode
     # Archived files never change, so they are downloaded once and for all.
     # In live mode the caller's expiration time is honoured, so that upstream
     # updates are eventually seen.

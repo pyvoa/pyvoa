@@ -313,15 +313,17 @@ class DataParser:
 
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
-          # a dataset whose urldata is not a Zenodo file has no mirror: it is
-          # read from its provider whatever the mode, and kept up to date
-          live = get_live_mode() or 'zenodo.org' not in url
           if get_live_mode():
               if datasets.get('urlparent'):
                   url = datasets['urlparent']
               else:
                   PyvoaWarning('No live source (urlparent) for one dataset of '
                                +self.db+'. Using the archived data instead.')
+          # live or not follows the file actually read, never the mode alone:
+          # an upstream file, the urlparent in live mode or a urldata with no
+          # Zenodo mirror, is read from its provider and kept up to date; a
+          # Zenodo file is frozen
+          live = 'zenodo.org' not in url
           pdatatemp = pd.DataFrame(datasets['columns'])
 
           if 'alias' in list(pdatatemp.columns):

@@ -188,7 +188,7 @@ def test_measles_usa_cumulates_the_reported_increments():
         frame = DataParser("measles-usa").get_maingeopandas()
         source = pd.read_csv(get_local_from_url(
             "https://raw.githubusercontent.com/CSSEGISandData/measles_data/"
-            "main/measles_county_all_updates.csv"))
+            "main/measles_county_all_updates.csv", live=True))
     finally:
         set_live_mode(False)
 

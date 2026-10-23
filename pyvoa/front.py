@@ -206,7 +206,10 @@ class front:
 
         The live sources are the most recent ones, but they may have moved,
         changed format or disappeared. Some datasets have no live source
-        declared; those keep using the archive and a warning is issued.
+        declared; those keep using the archive and a warning is issued. The
+        geographic references (borders, populations, regions) are read from
+        the archive in both modes, since a moved upstream page would break
+        every database built on them.
 
         Parameters
         ----------
