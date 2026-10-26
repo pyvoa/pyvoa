@@ -371,6 +371,9 @@ class visu_bokeh:
             dicof['y_axis_type' ] = axis_type
             fig.xaxis.axis_label = which[0]
             fig.yaxis.axis_label = which[1]
+            # both axes carry values here: the ×10 notation of the time series
+            fig.xaxis.formatter = visu_bokeh.timestenformatter()
+            fig.yaxis.formatter = visu_bokeh.timestenformatter()
             fig.add_tools(HoverTool(
                 tooltips=[('where', '@where'), ('date', '@date{%F}'),
                           (which[0], '@{casesx}' + '{custom}'),

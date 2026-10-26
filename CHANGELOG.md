@@ -146,8 +146,8 @@ Packaging and documentation:
 - fix: `plot(typeofplot='compare')` of a table of one's own (`input=`)
   failed with "'AllVisu' object has no attribute 'granularity'": it read the
   granularity of a database, for a fallback no granularity ever triggered.
-- the y axis of the bokeh `compare` plot is written in the ×10 notation
-  of the other time series (4×10²), no longer as 4.00e+2.
+- the axes of the bokeh `compare` and `versus` plots are written in the ×10
+  notation of the other time series (4×10²), no longer as 4.00e+2.
 - fix: `where` was ignored for a table of one's own (`input=`): every
   location came back, and `option='sumall'` added them all up. The table is
   now cut to the locations asked for, compared regardless of case, and a
