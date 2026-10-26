@@ -163,8 +163,12 @@ Most of these databases contain COVID-19 series. The exceptions are `mpoxgh`, wh
   and `PyvoaFront-withINSEE.ipynb` shows how to use pyvoa’s visualisation
   tools with an external dataset.
 - [`examples/pyfiles/`](examples/pyfiles/) — Python scripts:
+  `pyvoa_for_beginners.py` and `geo_by_examples.py`, the script
+  equivalents of the first two notebooks, write their charts to files;
   `insee_deaths.py`, the script equivalent of `PyvoaFront-withINSEE.ipynb`,
   passes pyvoa a DataFrame built from INSEE death records;
+  `stress_test.py` runs many combinations of options on every database,
+  as `PyvoaFrontStressTest.ipynb` does, and gathers the charts in a page;
   `paper_example` reproduces the examples presented in a forthcoming
   software paper.
 - [pyvoa.org](https://pyvoa.org) — the project website.
