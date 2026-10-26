@@ -137,6 +137,9 @@ Packaging and documentation:
 - fix: a bokeh map with `typeofmap='show_values'` and the date slider failed
   with "cannot reindex on an axis with duplicate labels"; its labels give the
   last date, the one the map opens on.
+- fix: `map(input=...)` of a GeoDataFrame of one's own failed with an
+  `AttributeError` when no database was loaded, although its docstring
+  offers it; the docstring now says the table needs a `geometry` column.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

@@ -92,7 +92,7 @@ def test_bokeh_hist_with_its_date_slider_is_saved(frame, tmp_path):
 
 
 # --------------------------------------------------------------------------
-# maps, straight from the backends: front.map() needs a database geography
+# maps
 # --------------------------------------------------------------------------
 
 def _map_frame(dates):
@@ -169,3 +169,18 @@ def test_bokeh_map_is_drawn_and_saved(tmp_path, typeofmap, tile, dateslider):
     name.write_text(page, encoding="utf-8")
     # the page carries the document, its three shapes included
     assert json.dumps("Allier")[1:-1] in page
+
+
+@pytest.mark.parametrize("vis", ["matplotlib", "bokeh"])
+def test_map_of_an_in_house_frame_needs_no_database(no_tile_download, cache_dir,
+                                                    monkeypatch, tmp_path, vis):
+    """Draw a GeoDataFrame of one's own, as the docstring of map() offers.
+
+    With no database loaded, map() read the geography of the database, None,
+    and failed with an AttributeError.
+    """
+    monkeypatch.setattr(pf.__pyvoafront_instance__, "gpdbuilder", None)
+    pf.setvis(vis)
+    frame = _map_frame(pd.to_datetime(["2021-03-01", "2021-03-02"]))
+    pf.map(input=frame.drop(columns="code"), which="cur_rea")
+    _saved(tmp_path, vis)

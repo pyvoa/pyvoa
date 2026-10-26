@@ -850,7 +850,9 @@ class front:
             # where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)
-            if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
+            # a table of one's own may be drawn with no database loaded: then
+            # there is no national geography to make dense
+            if self.gpdbuilder is not None and isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
                 mapoption = kwargs.get('typeofmap','not dense')
             else:
                 #PyvoaWarning('typeofmap not compatible with this db, dummy argument')
@@ -953,6 +955,8 @@ class front:
             a table of your own sets the current database to 'in-house data'.
             ``when`` cuts it as it cuts a database, and the table itself is
             never modified; a frame returned by :meth:`get` can be passed back.
+            Drawn without a database, it needs a 'geometry' column as well,
+            as a GeoDataFrame has.
         typeofmap : str or list of str, optional
             How the geography is drawn, among 'not dense', 'dense' and
             'show_values'; :meth:`listmap` lists them. 'show_values' writes
