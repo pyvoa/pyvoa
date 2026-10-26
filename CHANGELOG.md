@@ -146,6 +146,8 @@ Packaging and documentation:
 - fix: `plot(typeofplot='compare')` of a table of one's own (`input=`)
   failed with "'AllVisu' object has no attribute 'granularity'": it read the
   granularity of a database, for a fallback no granularity ever triggered.
+- the y axis of the bokeh `compare` plot is written in the ×10 notation
+  of the other time series (4×10²), no longer as 4.00e+2.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

@@ -39,7 +39,6 @@ from bokeh.models import (
     Legend,
     LegendItem,
     LinearColorMapper,
-    PrintfTickFormatter,
     Range1d,
     Row,
     Select,
@@ -123,6 +122,30 @@ class visu_bokeh:
         from pathlib import Path
         jsfile = Path(__file__).parent / "js/rollover_callback.js"
         return CustomJSHover(code=jsfile.read_text(encoding="utf-8"))
+
+    @staticmethod
+    def timestenformatter():
+        """Return the tick formatter of the time series, in ×10 notation.
+
+        A tick is written as its mantissa, to one decimal, times a power of
+        ten in superscript (5×10², 1.5×10⁴, or 10³ for a mantissa of 1), and
+        0 as 0.
+
+        Returns
+        -------
+        CustomJSTickFormatter
+            the formatter, for the y axis.
+        """
+        return CustomJSTickFormatter(code="""
+            if (tick === 0) return '0';
+            const exp = Math.floor(Math.log10(Math.abs(tick)));
+            const mantissa = tick / Math.pow(10, exp);
+            const superscripts = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+            const expStr = exp.toString().split('').map(d => superscripts[parseInt(d)] || d).join('');
+            const mant = parseFloat(mantissa.toFixed(1));
+            if (mant === 1) return '10' + expStr;
+            return mant + '×10' + expStr;
+        """)
 
     @staticmethod
     def pyvoalogo(logo):
@@ -491,16 +514,7 @@ class visu_bokeh:
             panels.append(panel)
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
-            fig.yaxis.formatter = CustomJSTickFormatter(code="""
-                if (tick === 0) return '0';
-                const exp = Math.floor(Math.log10(Math.abs(tick)));
-                const mantissa = tick / Math.pow(10, exp);
-                const superscripts = '⁰¹²³⁴⁵⁶⁷⁸⁹';
-                const expStr = exp.toString().split('').map(d => superscripts[parseInt(d)] || d).join('');
-                const mant = parseFloat(mantissa.toFixed(1));
-                if (mant === 1) return '10' + expStr;
-                return mant + '×10' + expStr;
-            """)
+            fig.yaxis.formatter = visu_bokeh.timestenformatter()
             visu_bokeh().bokeh_legend(fig)
 
             listfigs.append(fig)
@@ -680,7 +694,8 @@ class visu_bokeh:
         panels = []
         for axis_type in self.av.d_graphicsinput_args['scale']:
             fig = dbokeh_figure[axis_type]
-            fig.yaxis[0].formatter = PrintfTickFormatter(format = "%4.2e")
+            # 8.00e+1 otherwise: the ×10 notation of the other time series
+            fig.yaxis[0].formatter = visu_bokeh.timestenformatter()
             fig.xaxis.formatter = DatetimeTickFormatter(
                 days = "%d/%m/%y", months = "%d/%m/%y", years = "%b %Y")
 
