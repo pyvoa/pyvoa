@@ -68,3 +68,25 @@ def test_plot_refuses_the_dateslider(in_house_frame, vis):
     z = pf.get(input=in_house_frame, which='cur_rea')
     with pytest.raises(pf.PyvoaError, match='dateslider'):
         pf.plot(input=z, which='cur_rea', dateslider=True)
+
+
+def test_where_selects_the_locations_of_an_in_house_frame(in_house_frame):
+    # 'where' was ignored for a table of one's own: every location came back
+    z = pf.get(input=in_house_frame, which='cur_rea', where='Ain')
+    assert list(z['where'].astype(str).unique()) == ['Ain']
+    # compared upper-cased, as the locations of a database are
+    z = pf.get(input=in_house_frame, which='cur_rea', where=['aisne'])
+    assert list(z['where'].astype(str).unique()) == ['Aisne']
+
+
+def test_sumall_adds_up_the_selected_locations_of_an_in_house_frame(in_house_frame):
+    frame = pd.concat([in_house_frame, in_house_frame.assign(
+        where='Allier', cur_rea=in_house_frame['cur_rea'] * 10)], ignore_index=True)
+    z = pf.get(input=frame, which='cur_rea', where=['Ain', 'Aisne'], option='sumall')
+    assert list(z['where'].unique()) == ['Ain,Aisne']
+    assert z.set_index('date')['cur_rea sumall'].tolist() == [3.0, 7.0]
+
+
+def test_where_names_what_an_in_house_frame_lacks(in_house_frame):
+    with pytest.raises(pf.PyvoaError, match='Not in your table: Paris'):
+        pf.get(input=in_house_frame, which='cur_rea', where=['Ain', 'Paris'])

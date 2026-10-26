@@ -756,7 +756,9 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them.
+            holds; :meth:`listwhere` lists them. In a table passed as
+            ``input``, the names are those of its 'where' column, compared
+            regardless of case.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -931,7 +933,9 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them.
+            holds; :meth:`listwhere` lists them. In a table passed as
+            ``input``, the names are those of its 'where' column, compared
+            regardless of case.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -1074,7 +1078,9 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them.
+            holds; :meth:`listwhere` lists them. In a table passed as
+            ``input``, the names are those of its 'where' column, compared
+            regardless of case.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -1219,7 +1225,9 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them.
+            holds; :meth:`listwhere` lists them. In a table passed as
+            ``input``, the names are those of its 'where' column, compared
+            regardless of case.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',

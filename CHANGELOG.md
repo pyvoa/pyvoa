@@ -148,6 +148,10 @@ Packaging and documentation:
   granularity of a database, for a fallback no granularity ever triggered.
 - the y axis of the bokeh `compare` plot is written in the ×10 notation
   of the other time series (4×10²), no longer as 4.00e+2.
+- fix: `where` was ignored for a table of one's own (`input=`): every
+  location came back, and `option='sumall'` added them all up. The table is
+  now cut to the locations asked for, compared regardless of case, and a
+  name it lacks raises a `PyvoaError` that lists those it has.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

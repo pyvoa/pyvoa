@@ -681,6 +681,16 @@ class GPDBuilder:
           input = self.whereclustered(**kwargs)
        else:
           input = kwargs['input'].copy()
+          # a table of one's own has no geography to resolve 'where' against:
+          # its locations are kept by name, compared upper-cased as
+          # whereclustered() does. 'where' was ignored, every location kept.
+          asked = [str(w).upper() for w in flat_list(kwargs['where'])]
+          known = input['where'].astype(str).str.upper()
+          missing = [w for w in flat_list(kwargs['where']) if str(w).upper() not in set(known)]
+          if missing:
+              raise PyvoaError('Not in your table: '+', '.join(str(w) for w in missing)
+                               +'. Its locations are '+', '.join(sorted(input['where'].astype(str).unique()))+'.')
+          input = input.loc[known.isin(asked)]
 
        prefix = ['date', 'where']
        suffix = ['code','geometry']
