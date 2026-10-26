@@ -184,3 +184,19 @@ def test_map_of_an_in_house_frame_needs_no_database(no_tile_download, cache_dir,
     frame = _map_frame(pd.to_datetime(["2021-03-01", "2021-03-02"]))
     pf.map(input=frame.drop(columns="code"), which="cur_rea")
     _saved(tmp_path, vis)
+
+
+def test_savefig_leaves_the_next_bokeh_chart_out_of_its_file(frame, tmp_path):
+    """Write the file savefig() names, and that one only.
+
+    It went through output_file(), which names the file of every chart
+    shown afterwards in the session: the next one was written over it.
+    """
+    from bokeh.io.state import curstate
+
+    pf.setvis("bokeh")
+    pf.plot(input=pf.get(input=frame, which="cur_rea"), which="cur_rea")
+    before = curstate().file
+    saved = _saved(tmp_path, "bokeh")
+    assert curstate().file == before
+    assert "cur_rea" in saved.read_text(encoding="utf-8")

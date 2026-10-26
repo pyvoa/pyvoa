@@ -140,6 +140,9 @@ Packaging and documentation:
 - fix: `map(input=...)` of a GeoDataFrame of one's own failed with an
   `AttributeError` when no database was loaded, although its docstring
   offers it; the docstring now says the table needs a `geometry` column.
+- fix: under bokeh, `savefig()` named its file for the rest of the session
+  (through `output_file()`), so that in a script the next chart shown was
+  written over the one saved.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

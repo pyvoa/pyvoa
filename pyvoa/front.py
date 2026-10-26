@@ -1876,9 +1876,13 @@ class front:
                     raise PyvoaError('selenium is needed ... pip install selenium')
                 export_png(self.outcome, filename=name)
                 '''
-                from bokeh.plotting import output_file, save
-                output_file(name+'.html')
-                save(self.outcome)
+                from bokeh.io import save
+                from bokeh.resources import CDN
+
+                # the file is named here rather than by output_file(), which
+                # sets it for the whole session: the next chart shown would
+                # then be written into it, over the one saved
+                save(self.outcome, filename=name+'.html', resources=CDN, title='pyvoa')
             else:
                     # bbox_inches='tight': the location histogram puts its
                     # labels outside the axes and the legend to the right of

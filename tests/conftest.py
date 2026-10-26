@@ -10,6 +10,8 @@ Two invariants are enforced here for every test that is *not* marked
 
 matplotlib draws on the non-interactive Agg backend for the whole suite, so
 a test that draws a chart never opens a window a terminal run would wait on.
+For the same reason pyvoa is kept in batch mode: under bokeh, a chart shown
+outside a notebook is written to an html file and opened in the browser.
 Selecting Agg is not enough on its own: ``visu_matplotlib()`` picks TkAgg
 outside a notebook, at every chart, unless ``MPLBACKEND`` names a backend, so
 the variable is set as well.
@@ -55,6 +57,14 @@ def quiet_verbosity():
     tools.set_verbose_mode(0)
     yield
     tools.set_verbose_mode(previous)
+
+
+@pytest.fixture(autouse=True)
+def batch_charts(monkeypatch):
+    """Draw the charts without showing them, as setbatch() does."""
+    import pyvoa.front as pf
+
+    monkeypatch.setattr(pf.__pyvoafront_instance__, "batch", True)
 
 
 @pytest.fixture(autouse=True)
