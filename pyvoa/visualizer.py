@@ -350,13 +350,15 @@ class AllVisu:
             elif typeofplot == 'versus':
                 fig = visu_bokeh().bokeh_versus_plot(**kwargs)
             elif typeofplot == 'compare':
-                if self.granularity == 'nation' and self.granularity != 'World':
-                    print('typeofplot is compare with a national DB granularity, use date plot instead ...')
-                    fig = visu_bokeh().plot(*kwargs)
-                else:
-                    if len(kwargs['which']) > 1:
-                        PyvoaWarning('typeofplot is compare but dim(which)>1, take first one '+kwargs['which'][0])
-                    fig = visu_bokeh().bokeh_menu_plot(**kwargs)
+                # the granularity was read here, which a table of one's own has
+                # not ('in-house data'), to fall back to a date plot on 'nation':
+                # no database has that granularity, so the branch never ran
+                # if self.granularity == 'nation' and self.granularity != 'World':
+                #     print('typeofplot is compare with a national DB granularity, use date plot instead ...')
+                #     fig = visu_bokeh().plot(*kwargs)
+                if len(kwargs['which']) > 1:
+                    PyvoaWarning('typeofplot is compare but dim(which)>1, take first one '+kwargs['which'][0])
+                fig = visu_bokeh().bokeh_menu_plot(**kwargs)
             elif typeofplot == 'yearly':
                 if input.date.max()-input.date.min() <= dt.timedelta(days=365):
                     print("Yearly will not be used since the time covered is less than 1 year")

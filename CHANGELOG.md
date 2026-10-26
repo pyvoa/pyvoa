@@ -143,6 +143,9 @@ Packaging and documentation:
 - fix: under bokeh, `savefig()` named its file for the rest of the session
   (through `output_file()`), so that in a script the next chart shown was
   written over the one saved.
+- fix: `plot(typeofplot='compare')` of a table of one's own (`input=`)
+  failed with "'AllVisu' object has no attribute 'granularity'": it read the
+  granularity of a database, for a fallback no granularity ever triggered.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

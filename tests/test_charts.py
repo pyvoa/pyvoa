@@ -60,6 +60,8 @@ PLOTS = [
     ("bokeh", {"which": ["cur_rea", "cur_hosp"], "typeofplot": "versus"}),
     ("bokeh", {"which": "cur_rea", "typeofplot": "yearly", "single": True}),
     ("bokeh", {"which": "cur_rea", "typeofplot": "spiral", "single": True}),
+    # its menu picks one location among those of the frame
+    ("bokeh", {"which": "cur_rea", "typeofplot": "compare"}),
 ]
 
 
