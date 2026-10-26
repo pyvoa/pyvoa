@@ -50,3 +50,5 @@ docs/_build/
 # manuscript is written. It is Elsevier copyright: read it, cite it, do not
 # redistribute it from a public repository.
 paper/Guide for authors*.pdf
+# written by examples/pyfiles/stress_test.py
+stress_test_output/
