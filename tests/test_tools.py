@@ -1156,3 +1156,17 @@ def test_projection_half_extent_of_eckert_iv():
         "+proj=eck4 +lon_0=0 +datum=WGS84 +units=m +no_defs")
     assert half_width == pytest.approx(16.92e6, rel=1e-3)
     assert half_height == pytest.approx(8.46e6, rel=1e-3)
+
+
+def test_verbose_mode_leaves_alone_the_option_pandas_4_removes(monkeypatch):
+    """Set 'mode.chained_assignment' under pandas 2 only.
+
+    pandas 3 deprecated the option, with a Pandas4Warning at each use, and
+    pandas 4 removes it: setting it would fail, and the import of pyvoa
+    with it. A stand-in for pandas without options shows it is not touched.
+    """
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(tools, "pd", SimpleNamespace(__version__="4.0.0"))
+    tools.set_verbose_mode(0)
+    tools.set_verbose_mode(1)

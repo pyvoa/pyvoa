@@ -152,6 +152,9 @@ Packaging and documentation:
   location came back, and `option='sumall'` added them all up. The table is
   now cut to the locations asked for, compared regardless of case, and a
   name it lacks raises a `PyvoaError` that lists those it has.
+- pandas' `mode.chained_assignment` option is set under pandas 2 only:
+  pandas 3.1 warns at each use (Pandas4Warning), and pandas 4 removes it,
+  which would make `import pyvoa` fail.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

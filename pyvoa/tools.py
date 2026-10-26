@@ -69,12 +69,23 @@ def get_verbose_mode():
     """Return the verbose mode."""
     return _verbose_mode
 
+def _quiet_chained_assignment():
+    """Silence the warning of pandas on chained assignment, where it has one.
+
+    pandas 2 warns through the 'mode.chained_assignment' option. pandas 3
+    dropped that warning and deprecated the option, with a Pandas4Warning at
+    each use, and pandas 4 removes it: setting it then fails, and with it the
+    import of pyvoa.
+    """
+    if int(pd.__version__.split('.')[0]) < 3:
+        pd.options.mode.chained_assignment = None  # default='warn'
+
 def set_verbose_mode(v):
     """Set the verbose mode."""
     global _verbose_mode
     _verbose_mode=v
     if (v < 2) :
-        pd.options.mode.chained_assignment = None  # default='warn'
+        _quiet_chained_assignment()
 
     if (v < 2) :
         warnings.simplefilter("ignore")

@@ -26,6 +26,7 @@ from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
    PyvoaError,
    PyvoaWarning,
+   _quiet_chained_assignment,
    dumppkl,
    extract_dates,
    flat_list,
@@ -36,7 +37,7 @@ from pyvoa.tools import (
    verb,
 )
 
-pd.options.mode.chained_assignment = None  # default='warn'
+_quiet_chained_assignment()
 
 
 class GPDBuilder:
