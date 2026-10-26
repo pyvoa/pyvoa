@@ -167,6 +167,59 @@ jobs:
       - name: Run the offline test suite
         run: pytest -q
 
+  conda:
+    name: pytest (windows, conda ${{ matrix.channel }})
+    # On Windows, pyvoa is often pip-installed into a conda environment whose
+    # scientific stack, GDAL included, comes from conda rather than PyPI: an
+    # Anaconda installation (the defaults channel) or a conda-forge one. That
+    # is how a contextily older than our floor broke the matplotlib maps of a
+    # user (aab95a0) while the PyPI-only jobs were green. The stack is taken
+    # from the channel, and pip adds on top only what pyvoa's floors require,
+    # as it would for that user. Slow to set up, so weekly and on demand.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # contextily is not on defaults: pip brings it, as for an Anaconda user
+          - channel: defaults
+            packages: pandas geopandas shapely numpy matplotlib bokeh requests lxml beautifulsoup4 html5lib unidecode pycountry ipython
+          - channel: conda-forge
+            packages: pandas geopandas shapely numpy matplotlib bokeh contextily requests lxml beautifulsoup4 html5lib unidecode pycountry ipython
+    defaults:
+      run:
+        # a login shell, so that the environment set up below is active
+        shell: bash -el {0}
+    env:
+      # the defaults channel refuses to install until its terms are accepted
+      CONDA_PLUGINS_AUTO_ACCEPT_TOS: 'yes'
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: conda-incubator/setup-miniconda@v4
+        with:
+          miniconda-version: latest
+          activate-environment: pyvoa
+          # the newest python pyvoa declares that both channels carry
+          python-version: '3.13'
+          channels: ${{ matrix.channel }}
+          conda-remove-defaults: ${{ matrix.channel != 'defaults' }}
+
+      - name: Install the scientific stack from ${{ matrix.channel }}
+        run: conda install -y ${{ matrix.packages }}
+
+      # pip upgrades a conda package only when it is below a floor of pyvoa
+      - name: Install pyvoa on top, as a user would
+        run: python -m pip install -e ".[dev]"
+
+      - name: Show where each package came from
+        run: conda list
+
+      # cp1252 is kept here too: an Anaconda prompt does not switch to utf-8
+      - name: Run the offline test suite
+        run: pytest -q
+
   network:
     name: pytest -m network (${{ matrix.deps }} dependencies)
     # Upstream outages must never block a pull request, so the tests that
