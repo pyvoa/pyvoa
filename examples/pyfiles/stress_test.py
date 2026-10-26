@@ -29,7 +29,9 @@ Usage
 Then open stress_test_output/index.html: one row per case, its status, its
 error if any, and its chart — a thumbnail for matplotlib, a link for bokeh.
 report.csv holds the same table, log.txt what pyvoa printed. The exit code is
-1 when a case ends in ``error``.
+1 when a case ends in ``error``. All three are written as the run goes —
+report.csv at every case, index.html every ten — so that a run stopped
+half-way keeps what it did, and a long one can be followed in the browser.
 
 The first run downloads every database into ~/.cache/pyvoa.data_<user>/ and
 takes a long while; later runs read the cache. Without ``--reload``, a
@@ -60,6 +62,9 @@ import pyvoa.front as pf
 from pyvoa.tools import PyvoaError
 
 SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get']
+FIELDS = ['n', 'section', 'db', 'vis', 'call', 'status', 'seconds', 'file', 'detail']
+# index.html is rewritten every so many cases; report.csv takes each case as it ends
+INDEX_EVERY = 10
 
 
 class StressTest:
@@ -74,6 +79,20 @@ class StressTest:
         # open for the whole run, closed by report()
         self.log = open(self.outdir / 'log.txt', 'w', encoding='utf-8')  # noqa: SIM115
         self.db = None
+        # written as the run goes, so that a run stopped half-way, by the
+        # system short of memory for one, keeps what it did
+        with open(self.outdir / 'report.csv', 'w', newline='', encoding='utf-8') as f:
+            csv.DictWriter(f, fieldnames=FIELDS).writeheader()
+        self.write_index(finished=False)
+
+    def record(self, row):
+        """Keep a case: in memory, in report.csv at once, in index.html now and then."""
+        self.rows.append(row)
+        with open(self.outdir / 'report.csv', 'a', newline='', encoding='utf-8') as f:
+            csv.DictWriter(f, fieldnames=FIELDS).writerow(row)
+        self.log.flush()
+        if len(self.rows) % INDEX_EVERY == 0:
+            self.write_index(finished=False)
 
     def setwhom(self, section, db, reload=False):
         """Select a database, unless it is the current one; say whether it worked.
@@ -87,9 +106,9 @@ class StressTest:
                 pf.setwhom(db, reload=reload)
         except Exception as e:
             self.log.write(traceback.format_exc())
-            self.rows.append({'n': len(self.rows) + 1, 'section': section, 'db': db, 'vis': '',
-                              'call': f'setwhom({db!r})', 'status': 'error', 'seconds': '',
-                              'file': '', 'detail': f'{type(e).__name__}: {e}'})
+            self.record({'n': len(self.rows) + 1, 'section': section, 'db': db, 'vis': '',
+                         'call': f'setwhom({db!r})', 'status': 'error', 'seconds': '',
+                         'file': '', 'detail': f'{type(e).__name__}: {e}'})
             print(f'[{len(self.rows):4d}] {section:9s} {db:13s} setwhom  -> error')
             self.db = None
             return False
@@ -124,7 +143,7 @@ class StressTest:
             pf.__pyvoafront_instance__.outcome = None
         row['seconds'] = f'{time.perf_counter() - start:.1f}'
         print(f'  -> {row["status"]}')
-        self.rows.append(row)
+        self.record(row)
         if n % 20 == 0:
             gc.collect()
 
@@ -138,14 +157,13 @@ class StressTest:
         pf.savefig(str(self.figdir / f'{name}.png'))
         return f'figures/{name}.png'
 
-    def report(self):
-        """Write report.csv and index.html, and return the count per status."""
-        fields = ['n', 'section', 'db', 'vis', 'call', 'status', 'seconds', 'file', 'detail']
-        with open(self.outdir / 'report.csv', 'w', newline='', encoding='utf-8') as f:
-            writer = csv.DictWriter(f, fieldnames=fields)
-            writer.writeheader()
-            writer.writerows(self.rows)
-        counts = {s: sum(r['status'] == s for r in self.rows) for s in ('ok', 'refused', 'error')}
+    def counts(self):
+        """Return the number of cases per status."""
+        return {s: sum(r['status'] == s for r in self.rows) for s in ('ok', 'refused', 'error')}
+
+    def write_index(self, finished):
+        """Write index.html from the cases so far."""
+        counts = self.counts()
         lines = []
         for r in self.rows:
             if r['file'].endswith('.png'):
@@ -160,12 +178,17 @@ class StressTest:
                 f'<td>{html.escape(str(r["db"]))}</td><td>{r["vis"]}</td>'
                 f'<td><code>{html.escape(r["call"])}</code></td><td>{r["status"]}</td>'
                 f'<td>{r["seconds"]}</td><td>{html.escape(r["detail"])}</td><td>{chart}</td></tr>')
-        page = INDEX.format(
-            summary=', '.join(f'{v} {k}' for k, v in counts.items()),
-            rows='\n'.join(lines))
+        summary = ', '.join(f'{v} {k}' for k, v in counts.items())
+        if not finished:
+            summary = f'Not finished, {len(self.rows)} cases so far: {summary}'
+        page = INDEX.format(summary=summary, rows='\n'.join(lines))
         (self.outdir / 'index.html').write_text(page, encoding='utf-8')
+
+    def report(self, finished=True):
+        """Write index.html one last time, close the log, and return the counts."""
+        self.write_index(finished)
         self.log.close()
-        return counts
+        return self.counts()
 
 
 INDEX = """<!doctype html>
@@ -338,13 +361,18 @@ def main():
     rng = random.Random(args.seed)
     dbs = args.db or pf.listwhom()
     t = StressTest(args.outdir, figures=not args.no_figures)
-    for section in args.sections:
-        print(f'\n=== {section}')
-        if section in ('databases', 'sumall'):
-            globals()[section](t, dbs, args.reload, rng)
-        else:
-            globals()[section](t, args.reload, rng)
-    counts = t.report()
+    finished = False
+    try:
+        for section in args.sections:
+            print(f'\n=== {section}')
+            if section in ('databases', 'sumall'):
+                globals()[section](t, dbs, args.reload, rng)
+            else:
+                globals()[section](t, args.reload, rng)
+        finished = True
+    finally:
+        # an interrupted run (Ctrl-C, an exception of the script) still gets its page
+        counts = t.report(finished)
     print(f'\n{len(t.rows)} cases: ' + ', '.join(f'{v} {k}' for k, v in counts.items()))
     print(f'report: {t.outdir / "index.html"}')
     raise SystemExit(1 if counts['error'] else 0)
