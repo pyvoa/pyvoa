@@ -61,7 +61,7 @@ class InputOption:
                         'typeofplot':['date','compare','versus','spiral','yearly'],
                         'typeofmap':['not dense','dense','folium','show_values'],\
                         'bins':10,\
-                        'vis':['matplotlib','bokeh','seaborn'],\
+                        'vis':['matplotlib','bokeh'],\
                         'tile' : ['openstreet','esri'],\
                         'orientation':['horizontal','vertical'],\
                         'dateslider':[False,True],\
