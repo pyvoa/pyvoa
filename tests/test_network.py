@@ -361,3 +361,21 @@ def test_get_normalize_hands_out_the_normalised_values():
     rate = _by_where(normed, "cur_hosp normalize:pop1M")
     # Paris is a department whose name pyvoa keeps unchanged
     assert rate["Paris"] == pytest.approx(count["Paris"] / population["Paris"] * 1e6)
+
+
+def test_sumall_with_normalize_hands_out_the_normalised_sum():
+    """The sum divided by the summed population, not the raw sum renamed."""
+    import pyvoa.front as pf
+
+    pf.setwhom("owid", reload=False)
+    options = ["sumall", "normalize:pop1M"]
+    normed = pf.get(which="total_cases", where="European Union", option=options,
+                    when="01/06/2022", output="pandas")
+    raw = pf.get(which="total_cases", where="European Union", option="sumall",
+                 when="01/06/2022", output="pandas")
+    value = normed["total_cases normalize:pop1M sumall"].iloc[0]
+    total = raw["total_cases sumall"].iloc[0]
+    # it came out as the raw sum, 142 M cases "per million"
+    assert value < 1e6
+    # some 450 million inhabitants in the European Union
+    assert 4e8 < total / value * 1e6 < 5e8

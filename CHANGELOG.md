@@ -193,6 +193,9 @@ Packaging and documentation:
   archive, whose live sources are gone, with a warning saying why, rather
   than failing to parse them; a new `archiveonly` key of the database
   description gives the reason.
+- fix: `option=['sumall', 'normalize:…']` handed out the raw sum under the
+  normalised name (142 M cases "per million" for the European Union): the
+  normalised column came out twice, as `_x` and `_y`, and went unread.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

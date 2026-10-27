@@ -759,7 +759,11 @@ class GPDBuilder:
                     temppd.loc[:,w+' '+bypop]=temppd[w]/temppd['population']*dpop[re.sub(r'normalize:', '', bypop)]
                if concatpd.empty:
                     concatpd = temppd
-               else:
+               elif temppd is not concatpd:
+                    # an option that worked on input in place has nothing to
+                    # merge: merged with itself, every column it had added came
+                    # out twice, _x and _y, and get() then handed out the raw
+                    # sum under the name of sumall + normalize
                     concatpd = pd.merge(concatpd, temppd,  how="right", on=basecolumns)
 
            if not concatpd.empty:
