@@ -88,7 +88,7 @@ def carry_merged_totals(frame, part, targets, running):
     as they are, France's total on a day only Guadeloupe reported would be
     Guadeloupe's. A running total holds until its next report, so each part's
     last value is carried forward over the dates the merged country has, before
-    the parts are summed. Values of the day ('cur_') are not carried.
+    the parts are summed. Values of the day (``cur_...``) are not carried.
 
     Parameters
     ----------
