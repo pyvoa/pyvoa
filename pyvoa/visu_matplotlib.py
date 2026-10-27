@@ -366,6 +366,11 @@ class visu_matplotlib:
         -------
         The matplotlib axes the histogram was drawn on, or None when
         'return_pltaxis' is False.
+
+        Raises
+        ------
+        PyvoaError
+            If no location has a value at the date drawn.
         """
         plt = kwargs.get('plt')
         ax = kwargs.get('ax')
@@ -376,11 +381,23 @@ class visu_matplotlib:
         # -------------------------
         # bins
         # -------------------------
-        min_val = input_df[which].min()
-        max_val = input_df[which].max()
+        values = input_df[which].dropna()
+        if values.empty:
+            raise PyvoaError('No value of '+which+' to draw at this date.')
+        min_val = values.min()
+        max_val = values.max()
 
         if not bins:
             bins = 11
+        if min_val == max_val:
+            # one value for every location (a single one under sumall, or
+            # only zeros): the edges would all coincide, which pd.cut refuses.
+            # Two bins from 0 to that value, as bokeh_histo does.
+            bins = 2
+            if min_val != 0:
+                min_val, max_val = min(0., min_val), max(0., max_val)
+            else:
+                min_val, max_val = -0.5, 0.5
 
         edges = np.linspace(min_val, max_val, bins + 1)
 

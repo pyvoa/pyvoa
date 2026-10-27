@@ -165,6 +165,11 @@ Packaging and documentation:
   locations asked for that have no population are named in a warning,
   rather than left silently empty, and a database whose geography has no
   population at all (`dpc`, `rki`, …) says so in plain words.
+- fix: `hist(typeofhist='value')` under matplotlib failed when every
+  location had the same value (one location under `sumall`, or only
+  zeros); it draws two bins from 0 to that value, as bokeh does. A pie
+  chart of negative values, or of values all zero, raises a `PyvoaError`
+  saying so on both backends: matplotlib failed, bokeh drew a wrong pie.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

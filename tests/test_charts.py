@@ -202,3 +202,41 @@ def test_savefig_leaves_the_next_bokeh_chart_out_of_its_file(frame, tmp_path):
     saved = _saved(tmp_path, "bokeh")
     assert curstate().file == before
     assert "cur_rea" in saved.read_text(encoding="utf-8")
+
+
+# --------------------------------------------------------------------------
+# histograms of values that do not spread
+# --------------------------------------------------------------------------
+
+def _last_date_frame(values):
+    """Return two dates of 'cur_rea', the last one holding the given values."""
+    where = WHERE[:len(values)]
+    return pd.DataFrame({
+        "date": pd.to_datetime(["2021-03-01"] * len(where) + ["2021-03-02"] * len(where)),
+        "where": where * 2,
+        "cur_rea": [1.0] * len(where) + list(values),
+    })
+
+
+@pytest.mark.parametrize("vis", ["matplotlib", "bokeh"])
+@pytest.mark.parametrize("values", [[35.0], [7.0, 7.0, 7.0], [0.0, 0.0, 0.0], [-155.0]],
+                         ids=["one location", "all equal", "all zero", "negative"])
+def test_hist_by_value_draws_values_that_are_all_equal(cache_dir, tmp_path, vis, values):
+    # matplotlib's bins then had edges that all coincided, which pd.cut refused
+    pf.setvis(vis)
+    pf.hist(input=_last_date_frame(values), which="cur_rea", typeofhist="value")
+    _saved(tmp_path, vis)
+    plt.close("all")
+
+
+@pytest.mark.parametrize("vis", ["matplotlib", "bokeh"])
+@pytest.mark.parametrize(("values", "message"), [
+    ([0.0, 0.0, 0.0], "zero or missing"),
+    ([10.0, -5.0, 3.0], "cannot show negative values"),
+])
+def test_pie_refuses_what_it_cannot_share(cache_dir, vis, values, message):
+    # matplotlib failed on both, and bokeh drew a wrong pie, or none
+    pf.setvis(vis)
+    with pytest.raises(pf.PyvoaError, match=message):
+        pf.hist(input=_last_date_frame(values), which="cur_rea", typeofhist="pie")
+    plt.close("all")

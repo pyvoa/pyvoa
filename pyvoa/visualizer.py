@@ -391,10 +391,32 @@ class AllVisu:
         Raises
         ------
         PyvoaError
-            If matplotlib is asked for a 'typeofhist' it does not draw.
+            If matplotlib is asked for a 'typeofhist' it does not draw, or if a
+            pie chart, without the date slider, is asked for negative values or
+            for values that are all zero or missing.
         """
         typeofhist = kwargs.get('typeofhist')
         vis = kwargs.get('vis')
+        if typeofhist == 'pie' and not kwargs.get('dateslider'):
+            # the same answer from every backend: matplotlib failed on these
+            # values, bokeh drew a wrong pie (negative angles) or none at all.
+            # With the date slider, the shares are worked out date by date in
+            # javascript, and none of this applies.
+            which = kwargs['which']
+            input = kwargs['input']
+            values = input[which]
+            negative = input.loc[values < 0, 'where'].astype(str).tolist()
+            if negative:
+                # under sumall the one location is every name joined by commas
+                named = 'the sum of the locations asked for' if ',' in negative[0] \
+                    else ', '.join(negative[:5]) + (', …' if len(negative) > 5 else '')
+                raise PyvoaError('A pie chart cannot show negative values ('+named
+                                 +'): use typeofhist=\'location\' or \'value\'.')
+            if not values.fillna(0).any():
+                raise PyvoaError('Every value of '+str(which)+' is zero or missing at this date: '
+                                 'a pie chart has nothing to share.')
+            # a missing value takes no slice
+            kwargs['input'] = input[values.notna()]
         if vis == 'matplotlib':
             if typeofhist == 'location':
                 fig = visu_matplotlib().matplotlib_horizontal_histo(**kwargs)

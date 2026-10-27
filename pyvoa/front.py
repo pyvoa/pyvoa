@@ -1106,7 +1106,8 @@ class front:
             never modified; a frame returned by :meth:`get` can be passed back.
         typeofhist : {'location', 'value', 'pie'}, optional
             The kind of histogram. Defaults to 'location'; :meth:`listhist` lists
-            them.
+            them. A pie chart takes no negative value, and needs one at least
+            that is not zero.
         bins : int, optional
             The number of bins. Defaults to 10.
         orientation : {'horizontal', 'vertical'}, optional
