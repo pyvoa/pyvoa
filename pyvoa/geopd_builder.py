@@ -560,8 +560,11 @@ class GPDBuilder:
                 # Canada, Chile, Greece, Norway seem to have geometry problems
                 # They can be drawn individually but not when 'sumall' is present
                 # buffer(0) fixe the problem.
-                temp["geometry"] = temp["geometry"].buffer(0)
-                geometryjoined = temp.loc[temp.date == temp.date.max()]["geometry"].unary_union
+                # only the last date's geometries are joined: repaired on every
+                # row, a detailed geography (347 Chilean communes over 285
+                # dates) took more memory than the machine had
+                # temp["geometry"] = temp["geometry"].buffer(0)
+                geometryjoined = temp.loc[temp.date == temp.date.max()]["geometry"].buffer(0).unary_union
                 temp = temp.groupby(['date'])[which].sum(min_count=1).reset_index()
                 temp['where'] = len(temp)*[wherejoined]
                 temp['code'] = len(temp)*[codejoined]

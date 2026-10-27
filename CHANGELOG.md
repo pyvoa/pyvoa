@@ -155,6 +155,10 @@ Packaging and documentation:
 - pandas' `mode.chained_assignment` option is set under pandas 2 only:
   pandas 3.1 warns at each use (Pandas4Warning), and pandas 4 removes it,
   which would make `import pyvoa` fail.
+- fix: `option='sumall'` repaired the geometry of every row of the database
+  before joining those of the last date: `minciencia` ran out of memory
+  (over 8 GB) and `owid` took about two minutes. Only the last date is
+  repaired now: 1.1 GB and 30 s for `minciencia`, under a second for `owid`.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.
