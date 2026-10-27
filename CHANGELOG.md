@@ -184,6 +184,9 @@ Packaging and documentation:
   matplotlib and bokeh draw every chart.
 - fix: `option='sumall'` counts a location with no value on a date with its
   last one, so that a histogram of the sum no longer drops it.
+- the Zenodo archives of `mpoxgh` and `dpc` are refreshed from their live
+  sources: mpox data now run to 2026-04-30 (from 2023-10-19), Italian data
+  to 2025-01-08 (from 2023-10-25).
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.
