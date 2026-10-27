@@ -367,7 +367,8 @@ def test_sumall_with_normalize_hands_out_the_normalised_sum():
     """The sum divided by the summed population, not the raw sum renamed."""
     import pyvoa.front as pf
 
-    pf.setwhom("owid", reload=False)
+    # parsed: on a fresh runner there is no local copy to read back
+    pf.setwhom("owid")
     options = ["sumall", "normalize:pop1M"]
     normed = pf.get(which="total_cases", where="European Union", option=options,
                     when="01/06/2022", output="pandas")
