@@ -38,6 +38,18 @@ report.csv holds the same table, log.txt what pyvoa printed. The exit code is
 report.csv at every case, index.html every ten — so that a run stopped
 half-way keeps what it did, and a long one can be followed in the browser.
 
+Serve the report rather than opening it as a file, so that the bokeh maps
+show their OpenStreetMap background:
+
+    python -m http.server -d stress_test_output     # then http://localhost:8000
+
+A page opened as file://… sends no Referer with its requests, and
+OpenStreetMap's tile servers answer such a browser request with an "Access
+blocked" tile (its tile usage policy); Firefox shows them so. A page served
+over http, as a notebook is by Jupyter, sends one and gets the map. The Esri
+tiles and the matplotlib maps, whose tiles contextily fetches with a pyvoa
+User-Agent, are not concerned.
+
 The first run downloads every database into ~/.cache/pyvoa.data_<user>/ and
 takes a long while; later runs read the cache. Without ``--reload``, a
 database already parsed on this machine is read back from its pickles.

@@ -974,7 +974,13 @@ class front:
         tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
-            matplotlib alike. A dense map is drawn without tiles.
+            matplotlib alike. A dense map is drawn without tiles. A bokeh map
+            saved with :meth:`savefig` and opened as a local file shows
+            OpenStreetMap's "Access blocked" tiles in some browsers (Firefox):
+            such a page sends no Referer, which OpenStreetMap's tile usage
+            policy requires. Serve the file instead (``python -m http.server``
+            in its directory, then ``http://localhost:8000``), as Jupyter serves
+            a notebook, or draw it with ``tile='esri'``.
         projection : {'eckert4', 'mercator'}, optional
             :meth:`listprojection` lists them. Under matplotlib, the
             projection of the map: 'eckert4', the
@@ -1870,6 +1876,15 @@ class front:
         PyvoaError
             If the last call was :meth:`get`, whose result is a table and belongs
             to :meth:`saveoutput` instead.
+
+        Notes
+        -----
+        A bokeh map on OpenStreetMap tiles, saved here and opened by double
+        click as a local file, may show "Access blocked" tiles instead of the
+        map: a page opened as ``file://`` sends no Referer, which
+        OpenStreetMap's tile usage policy requires of a browser. Serve it
+        (``python -m http.server`` in its directory, then
+        ``http://localhost:8000``), or draw the map with ``tile='esri'``.
         """
         if  self.getnamefunction() != 'get':
             if self.getvis() == 'bokeh':
