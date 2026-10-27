@@ -184,9 +184,11 @@ Packaging and documentation:
   matplotlib and bokeh draw every chart.
 - fix: `option='sumall'` counts a location with no value on a date with its
   last one, so that a histogram of the sum no longer drops it.
-- the Zenodo archives of `mpoxgh` and `dpc` are refreshed from their live
-  sources: mpox data now run to 2026-04-30 (from 2023-10-19), Italian data
-  to 2025-01-08 (from 2023-10-25).
+- the Zenodo archives of `mpoxgh`, `dpc` and `moh` are refreshed from their
+  live sources: mpox data now run to 2026-04-30 (from 2023-10-19), Italian
+  data to 2025-01-08 (from 2023-10-25), Malaysian cases and intensive care
+  to 2025-05-31 (from 2023-10-28; deaths and vaccination, whose upstream
+  files were renamed, stay as they were).
 - live mode reads `phe`, `minciencia` and two datasets of `moh` from their
   archive, whose live sources are gone, with a warning saying why, rather
   than failing to parse them; a new `archiveonly` key of the database
