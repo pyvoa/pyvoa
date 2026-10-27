@@ -86,3 +86,18 @@ def test_databases_with_no_mirror_are_marked_live_only(
             assert announced != "live only", (
                 f"{path.name} is mirrored on Zenodo but README says 'live only'"
             )
+
+
+def test_databases_whose_live_source_is_gone_are_marked_archive_only(
+    rows: dict[str, list[str]],
+) -> None:
+    """A descriptor with a dataset marked 'archiveonly' cannot be read live in full."""
+    for path in sorted(DATADIR.glob("*.json")):
+        with open(path, encoding="utf-8") as handle:
+            datasets = json.load(handle)["datasets"]
+        gone = any(d.get("archiveonly") for d in datasets)
+        announced = rows[path.stem][-1]
+        assert gone == (announced == "archive only"), (
+            f"{path.name}: README says {announced!r}, "
+            f"but {'a' if gone else 'no'} dataset is marked archiveonly"
+        )

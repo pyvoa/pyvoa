@@ -187,6 +187,10 @@ Packaging and documentation:
 - the Zenodo archives of `mpoxgh` and `dpc` are refreshed from their live
   sources: mpox data now run to 2026-04-30 (from 2023-10-19), Italian data
   to 2025-01-08 (from 2023-10-25).
+- live mode reads `phe`, `minciencia` and two datasets of `moh` from their
+  archive, whose live sources are gone, with a warning saying why, rather
+  than failing to parse them; a new `archiveonly` key of the database
+  description gives the reason.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

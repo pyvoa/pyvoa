@@ -65,6 +65,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 import pyvoa.front as pf
+from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.tools import PyvoaError
 
 SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get', 'sources']
@@ -439,6 +440,10 @@ def sources(t, dbs, reload, rng):
             flag = f'live newer by {newer} days'
         elif live[1] is None and archive[1] is not None:
             flag = 'live unreadable'
+        gone = sum(bool(d.get('archiveonly')) for d in MetaInfo().getcurrentmetadata(db)['datasets'])
+        if gone:
+            # read from the archive in live mode too, which pyvoa warns about
+            flag = (flag + ', ' if flag else '') + f'live source gone for {gone} dataset(s)'
         t.record_source({'db': db, 'archive_first': archive[0], 'archive_last': archive[1],
                          'live_first': live[0], 'live_last': live[1],
                          'live_newer_days': newer, 'flag': flag})

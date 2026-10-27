@@ -32,6 +32,7 @@
 {
          "urldata": "https://zenodo.org/records/11222014/files/moh_deaths_state.csv?content",
          "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/moh_deaths_state.csv",
+         "archiveonly":"the file was renamed upstream (epidemic/deaths_state.csv), its columns not yet checked",
          "separator":",",
          "columns": [
                         {
@@ -62,6 +63,7 @@
 	{
          "urldata": "https://zenodo.org/records/11222014/files/moh_vax_state.csv?content",
          "urlparent":"https://raw.githubusercontent.com/MoH-Malaysia/covid19-public/main/epidemic/moh_vax_state.csv",
+         "archiveonly":"the file was renamed upstream (vaccination/vax_state.csv), its columns not yet checked",
          "separator":",",
          "columns": [
                         {

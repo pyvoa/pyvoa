@@ -695,3 +695,16 @@ def test_merged_parts_carry_their_running_totals_over_the_country_dates():
     assert out["tot_cases"].tolist() == [10.0, 1010.0, 1030.0]
     # a value of the day is not carried
     assert out["cur_hosp"].tolist() == [1.0, 5.0, 2.0]
+
+
+def test_dataparser_reads_the_archive_of_a_live_source_known_gone(monkeypatch):
+    """A dataset marked archiveonly is read from Zenodo in live mode, and says why."""
+    metadata = _metadata_with_a_live_source()
+    metadata["datasets"][0]["archiveonly"] = "its host no longer resolves"
+    warnings = []
+    monkeypatch.setattr(jsondb_parser, "PyvoaWarning", warnings.append)
+    tools.set_live_mode(True)
+    calls = _parse_recording_the_url(monkeypatch, metadata)
+    assert calls == [("https://zenodo.org/records/1/files/tiny.csv", False)]
+    assert len(warnings) == 1
+    assert "its host no longer resolves" in warnings[0] and "Zenodo archive" in warnings[0]

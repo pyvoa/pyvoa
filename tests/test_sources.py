@@ -108,7 +108,7 @@ def read_raw(dataset, metadata):
 
     url = dataset["urldata"]
     live = get_live_mode() or "zenodo.org" not in url
-    if get_live_mode() and dataset.get("urlparent"):
+    if get_live_mode() and dataset.get("urlparent") and not dataset.get("archiveonly"):
         url = dataset["urlparent"]
     names = dataset.get("names")
     raw = pd.read_csv(get_local_from_url(url, 10000, live=live),

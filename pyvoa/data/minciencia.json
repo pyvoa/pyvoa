@@ -8,6 +8,7 @@
   "datasets": [
   	{	
 	 "urlparent":"https://raw.githubusercontent.com/MinCiencia/Datos-COVID19/master/output/producto1/Covid-19_std.csv",
+	 "archiveonly":"the file was withdrawn upstream",
 	 "urldata": "https://zenodo.org/records/18773580/files/Covid-19_std.csv?content",
 	 "separator":",",
   	 "columns": [

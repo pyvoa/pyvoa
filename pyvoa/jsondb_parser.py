@@ -423,10 +423,15 @@ class DataParser:
       self.keyword_url = {}
       pdata = pd.DataFrame()
 
+      gone = []
       for datasets in self.metadata['datasets']:
           url = datasets['urldata']
           if get_live_mode():
-              if datasets.get('urlparent'):
+              if datasets.get('archiveonly'):
+                  # a live source known to be gone: its archive is read, and
+                  # the reason is said once for the database, after the loop
+                  gone.append(datasets['archiveonly'])
+              elif datasets.get('urlparent'):
                   url = datasets['urlparent']
               else:
                   PyvoaWarning('No live source (urlparent) for one dataset of '
@@ -613,6 +618,10 @@ class DataParser:
               pandas_db = pandas_db.merge(pandas_temp, how = 'outer', on=['where','date'])
           self.url += [url]
 
+      if gone:
+          PyvoaWarning('The live source of '+self.db+' is gone for '+str(len(gone))+' of its '
+                       +str(len(self.metadata['datasets']))+' datasets: '+'; '.join(sorted(set(gone)))
+                       +'. They are read from the Zenodo archive instead.')
       pandas_db = fill_missing_dates(pandas_db)
       pandas_db['date'] = pd.to_datetime(pandas_db['date'], format='%d/%m/%Y', errors='coerce').dt.date
       # a source reporting increments says nothing on a day with no new count :
