@@ -206,10 +206,7 @@ class front:
 
         The live sources are the most recent ones, but they may have moved,
         changed format or disappeared. Some datasets have no live source
-        declared; those keep using the archive and a warning is issued. The
-        geographic references (borders, populations, regions) are read from
-        the archive in both modes, since a moved upstream page would break
-        every database built on them.
+        declared; those keep using the archive and a warning is issued.
 
         Parameters
         ----------
@@ -756,9 +753,7 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them. In a table passed as
-            ``input``, the names are those of its 'where' column, compared
-            regardless of case.
+            holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -852,9 +847,7 @@ class front:
             # where = kwargs.get('where')
 
             mapoption = kwargs.get('typeofmap',None)
-            # a table of one's own may be drawn with no database loaded: then
-            # there is no national geography to make dense
-            if self.gpdbuilder is not None and isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
+            if isinstance(self.gpdbuilder.gettypeofgeometry(), coge.GeoCountry):
                 mapoption = kwargs.get('typeofmap','not dense')
             else:
                 #PyvoaWarning('typeofmap not compatible with this db, dummy argument')
@@ -910,7 +903,7 @@ class front:
               kwargs.pop('pop')
             if self.getvis():
                 z = { **self.getkwargsvisu(), **kwargs  }
-                if self.getvis() not in ['bokeh','seaborn'] and typeofhist == 'location' :
+                if self.getvis() not in ['bokeh'] and typeofhist == 'location' :
                     return func(self,self.allvisu.hist(**z))
                 else:
                     return func(self,self.allvisu.hist(**z))
@@ -933,9 +926,7 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them. In a table passed as
-            ``input``, the names are those of its 'where' column, compared
-            regardless of case.
+            holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -959,8 +950,6 @@ class front:
             a table of your own sets the current database to 'in-house data'.
             ``when`` cuts it as it cuts a database, and the table itself is
             never modified; a frame returned by :meth:`get` can be passed back.
-            Drawn without a database, it needs a 'geometry' column as well,
-            as a GeoDataFrame has.
         typeofmap : str or list of str, optional
             How the geography is drawn, among 'not dense', 'dense' and
             'show_values'; :meth:`listmap` lists them. 'show_values' writes
@@ -983,7 +972,7 @@ class front:
             onto it, and stop at the 180th meridian, beyond which they do not
             exist. 'mercator' is Web Mercator. Bokeh, whose tiles exist in Web
             Mercator only, always draws Mercator and ignores it.
-        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+        vis : {'matplotlib', 'bokeh'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.
         title, copyright : str, optional
@@ -1078,9 +1067,7 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them. In a table passed as
-            ``input``, the names are those of its 'where' column, compared
-            regardless of case.
+            holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -1106,13 +1093,12 @@ class front:
             never modified; a frame returned by :meth:`get` can be passed back.
         typeofhist : {'location', 'value', 'pie'}, optional
             The kind of histogram. Defaults to 'location'; :meth:`listhist` lists
-            them. A pie chart takes no negative value, and needs one at least
-            that is not zero.
+            them.
         bins : int, optional
             The number of bins. Defaults to 10.
         orientation : {'horizontal', 'vertical'}, optional
             The direction the bars run in.
-        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+        vis : {'matplotlib', 'bokeh'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.
         title, copyright : str, optional
@@ -1226,9 +1212,7 @@ class front:
         ----------
         where : str or list of str, optional
             The location(s) to select. Defaults to every location the database
-            holds; :meth:`listwhere` lists them. In a table passed as
-            ``input``, the names are those of its 'where' column, compared
-            regardless of case.
+            holds; :meth:`listwhere` lists them.
         which : str or list of str, optional
             The variable(s) to read. Defaults to the death count when the
             database has one -- the first of 'tot_deaths', 'total_deaths',
@@ -1256,7 +1240,7 @@ class front:
             The kind of plot. Defaults to 'date'; :meth:`listplot` lists them.
             'compare' and 'spiral' are bokeh only, and 'versus' takes exactly two
             variables.
-        vis : {'matplotlib', 'bokeh', 'seaborn'}, optional
+        vis : {'matplotlib', 'bokeh'}, optional
             The backend to draw with; :meth:`listvis` gives the ones actually
             installed.
         title, copyright : str, optional
@@ -1370,12 +1354,8 @@ class front:
         Returns
         -------
         list of str
-            Those of 'matplotlib' and 'bokeh' that are installed. Seaborn is
-            dropped from the list here, and stays dropped for the rest of the
-            session, even when the package is installed.
+            Those of 'matplotlib' and 'bokeh' that are installed.
         """
-        if 'seaborn' in self.lvisu:
-            self.lvisu.remove('seaborn')
         return self.lvisu
 
     def listmap(self,):
@@ -1779,7 +1759,7 @@ class front:
         ----------
         vis : str
             The backend to draw with. :meth:`listvis` gives the ones actually
-            installed, among 'matplotlib', 'bokeh' and 'seaborn'.
+            installed, among 'matplotlib' and 'bokeh'.
 
         Raises
         ------
@@ -1885,13 +1865,9 @@ class front:
                     raise PyvoaError('selenium is needed ... pip install selenium')
                 export_png(self.outcome, filename=name)
                 '''
-                from bokeh.io import save
-                from bokeh.resources import CDN
-
-                # the file is named here rather than by output_file(), which
-                # sets it for the whole session: the next chart shown would
-                # then be written into it, over the one saved
-                save(self.outcome, filename=name+'.html', resources=CDN, title='pyvoa')
+                from bokeh.plotting import output_file, save
+                output_file(name+'.html')
+                save(self.outcome)
             else:
                     # bbox_inches='tight': the location histogram puts its
                     # labels outside the axes and the legend to the right of
