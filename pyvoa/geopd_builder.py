@@ -19,6 +19,7 @@ import re
 import geopandas as gpd
 import numpy as np
 import pandas as pd
+import pycountry
 
 import pyvoa.geo as coge
 import pyvoa.jsondb_parser as parser
@@ -604,6 +605,8 @@ class GPDBuilder:
        own, '<which> normalize:...'.
        """
        defaultargs = InputOption().d_batchinput_args
+       # normbypop() names the locations without a population once per call
+       self._nopop_warned = None
        option = kwargs.get('option',defaultargs['option'][0])
        kwargs_values_testing(option,defaultargs['option'],'option error ... ')
        output = kwargs['output']
@@ -806,7 +809,8 @@ class GPDBuilder:
         try:
             uniquepandy = self._gi.add_field(input = uniquepandy,field = 'population',overload=True)
         except Exception as e:
-            raise PyvoaError(self.db + ' has no information for what concern: '+pop_field) from e
+            raise PyvoaError('No population is known for the countries of '+self.db
+                             +': normalize is not available for it.') from e
     else:
         if not isinstance(self._gi,coge.GeoCountry) or self._gi.get_country() != self.geo.get_country():
             self._gi = None
@@ -816,13 +820,33 @@ class GPDBuilder:
         pop_field='population_subregion'
             # regsubreg={i:self.geo.get_subregions_from_region(name=i) for i in clust}
         if self.granularity in ('region', 'subregion'):
-            try:
-                uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
-            except Exception as e:
-                raise PyvoaError(self.db + ' has no information for what concern: '+pop_field) from e
+            if pop_field not in self._gi.get_list_properties():
+                # in the words of the database: its regions or its subregions,
+                # and the name of the country rather than its ISO code
+                iso3 = self._gi.get_country()
+                country = getattr(pycountry.countries.get(alpha_3=iso3), 'name', iso3)
+                raise PyvoaError('No population is known for the '+self.granularity+'s of '
+                                 +country+' in pyvoa: normalize is not available for '+self.db+'.')
+            # the parser upper-cases the codes, while a geography may keep them
+            # mixed-case (the INRB health zones of ebolardc: ADqfcJ05GHD), so
+            # that a plain join on 'code' found one zone out of 519. Both
+            # sides are compared title-cased.
+            # uniquepandy = self._gi.add_field(input=uniquepandy, field=pop_field, input_key='code',overload=True)
+            geo = self._gi.get_data()[['code_subregion', pop_field]]
+            geo = geo.assign(joinkey=geo['code_subregion'].astype(str).str.title())
+            uniquepandy = uniquepandy.drop(columns=[pop_field], errors='ignore')
+            uniquepandy = uniquepandy.assign(joinkey=uniquepandy['code'].astype(str).str.title()) \
+                .merge(geo[['joinkey', pop_field]], how='left', on='joinkey').drop(columns='joinkey')
         else:
             raise PyvoaError('This is not region nor subregion what is it ?!')
     uniquepandy = uniquepandy[['where',pop_field]]
+    # the locations asked for that come out without a population: their
+    # normalised value is empty, which is said once rather than left silent
+    nopop = sorted(uniquepandy.loc[uniquepandy[pop_field].isna(), 'where'].astype(str).unique())
+    if nopop and nopop != getattr(self, '_nopop_warned', None):
+        PyvoaWarning('No population is known for '+', '.join(nopop)
+                     +': their normalised values are left empty.')
+    self._nopop_warned = nopop
     if pop_field not in pandy.columns:
         pandy = pd.merge(pandy,uniquepandy,on='where',how='outer')
     if not isinstance(val2norm, list):

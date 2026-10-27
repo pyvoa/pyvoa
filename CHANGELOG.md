@@ -159,6 +159,12 @@ Packaging and documentation:
   before joining those of the last date: `minciencia` ran out of memory
   (over 8 GB) and `owid` took about two minutes. Only the last date is
   repaired now: 1.1 GB and 30 s for `minciencia`, under a second for `owid`.
+- fix: `option='normalize:pop…'` left 518 of the 519 health zones of
+  `ebolardc` empty: the parser upper-cases the codes, the INRB geography
+  keeps them mixed-case. They are now compared regardless of case. The
+  locations asked for that have no population are named in a warning,
+  rather than left silently empty, and a database whose geography has no
+  population at all (`dpc`, `rki`, …) says so in plain words.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.
