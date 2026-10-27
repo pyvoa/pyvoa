@@ -2,7 +2,7 @@
 
 ``AllVisu`` holds the drawing settings that do not depend on the backend -- the
 colour cycle, the logos, how many locations a chart shows and how long a name
-may be -- then routes each request to matplotlib, bokeh or seaborn according to
+may be -- then routes each request to matplotlib or bokeh according to
 ``vis``, and to the routine matching ``typeofplot``, ``typeofhist`` or
 ``typeofmap``. The backends do not all offer the same charts.
 
@@ -47,11 +47,6 @@ try:
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
 
-try:
-    import seaborn  # noqa: F401
-    SEABORN_AVAILABLE = True
-except ImportError:
-    SEABORN_AVAILABLE = False
 
 try:
     import folium  # noqa: F401
@@ -61,9 +56,6 @@ except ImportError:
 
 if MATPLOTLIB_AVAILABLE:
     from pyvoa.visu_matplotlib import visu_matplotlib
-
-if SEABORN_AVAILABLE:
-    from pyvoa.visu_seaborn import visu_seaborn
 
 if BOKEH_AVAILABLE:
     from pyvoa.visu_bokeh import visu_bokeh
@@ -291,7 +283,7 @@ class AllVisu:
     def plot(self,**kwargs):
         """Draw a time series with whichever backend is selected.
 
-        Dispatches to matplotlib, bokeh or seaborn according to 'vis', and
+        Dispatches to matplotlib or bokeh according to 'vis', and
         within each to the routine matching 'typeofplot'. The backends do not
         all offer the same plots: 'compare' and 'spiral' exist only in bokeh.
 
@@ -333,15 +325,6 @@ class AllVisu:
                 fig = visu_matplotlib().matplotlib_yearly_plot(**kwargs)
             else:
                 raise PyvoaError('For display: '+ vis +' unknown typeofplot '+typeofplot)
-        elif vis =='seaborn':
-            if typeofplot == 'date':
-                fig = visu_seaborn().seaborn_date_plot(**kwargs)
-            elif  typeofplot == 'versus':
-                fig = visu_seaborn().seaborn_versus_plot(**kwargs)
-            elif  typeofplot == 'yearly':
-                fig = visu_seaborn().seaborn_yearly_plot(**kwargs)
-            else:
-                raise PyvoaError(typeofplot + ' not implemented in ' + vis)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
             if typeofplot == 'date':
                 fig = visu_bokeh().bokeh_date_plot(**kwargs)
@@ -374,7 +357,7 @@ class AllVisu:
     def hist(self,**kwargs):
         """Draw a histogram or a pie chart with whichever backend is selected.
 
-        Dispatches to matplotlib, bokeh or seaborn according to 'vis', and
+        Dispatches to matplotlib or bokeh according to 'vis', and
         within each to the routine matching 'typeofhist': 'location' (one bar
         per location), 'value' (the locations binned by value) or 'pie'.
 
@@ -435,15 +418,6 @@ class AllVisu:
             elif typeofhist == 'pie':
                 kwargs['logo'] = self.logosmall
                 fig = visu_bokeh().bokeh_pie(**kwargs)
-        elif vis == 'seaborn':
-            if typeofhist == 'location':
-                fig = visu_seaborn().seaborn_hist_horizontal(**kwargs)
-            elif typeofhist == 'pie':
-                fig = visu_seaborn().seaborn_pie(**kwargs)
-            elif typeofhist == 'value':
-                fig = visu_seaborn().seaborn_hist_value( **kwargs)
-            else:
-                print(typeofhist + ' not implemented in ' + vis)
         else:
             print( "\n not yet implemented \n")
         return fig
@@ -453,7 +427,7 @@ class AllVisu:
     def map(self,**kwargs):
         """Draw a map with whichever backend is selected.
 
-        Dispatches to matplotlib, bokeh, seaborn or folium according to 'vis'.
+        Dispatches to matplotlib or bokeh or folium according to 'vis'.
         A single variable is drawn: a list given as 'which' is reduced to its
         first element.
 
@@ -487,8 +461,6 @@ class AllVisu:
             raise PyvoaError('No geometry in you pandas, map can not be called ...')
         if vis == 'matplotlib':
             fig = visu_matplotlib().matplotlib_map(**kwargs)
-        elif vis == 'seaborn':
-            fig = visu_seaborn().seaborn_heatmap(**kwargs)
         elif vis == 'bokeh' and BOKEH_AVAILABLE:
                 # a location with no geometry of its own carries an empty one,
                 # serialised as null in the GeoJSON, which BokehJS fails on
