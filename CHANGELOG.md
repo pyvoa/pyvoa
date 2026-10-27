@@ -213,7 +213,8 @@ Packaging and documentation:
   checked against the Python they mirror; the `dev` extra brings node with
   `nodejs-wheel-binaries`, and bokeh, so that CI runs the bokeh tests too.
 - `GeoCountry` converts region and subregion codes to names and back.
-- a welcome banner is printed when `pyvoa.front` is imported.
+- a welcome banner is printed when `pyvoa.front` is imported. In a notebook its icon is a
+  small image, which no monospace font can tear apart.
 - a new example reads the Insee death records into a DataFrame and plots them
   through `input=`: `PyvoaFront-withINSEE.ipynb` and
   `examples/pyfiles/insee_deaths.py`.

@@ -38,8 +38,13 @@ icon is downscaled this far.
 Two renderers share this single ``_ICON`` source of truth:
 
 * :func:`render_ansi` -- raw ANSI escapes, for a real terminal.
-* :func:`render_html` -- the same cells re-emitted as inline-styled
-  ``<span>`` elements, for Jupyter/IPython front-ends.
+* :func:`render_html` -- the same cells drawn as a small PNG image, for
+  Jupyter/IPython front-ends. Not as text: the browser draws a notebook's
+  text with its own monospace font, and one lacking the quadrant glyphs
+  borrows them from another font of a different width, which tore the icon
+  apart. The image depends on no font. It is written with the standard
+  library alone (``zlib``), each quadrant twice as tall as it is wide, as a
+  terminal draws it.
 
 Why two renderers instead of always emitting ANSI: ``sys.stdout`` inside an
 IPython kernel is ``ipykernel.iostream.OutStream``, whose ``isatty()``
@@ -65,10 +70,13 @@ License : see the joint LICENSE file
 https://pyvoa.org/
 """
 
+import base64
 import html
 import os
 import re
+import struct
 import sys
+import zlib
 
 _RESET = "\033[0m"
 _SGR_RE = re.compile(r"\033\[([0-9;]*)m")
@@ -204,9 +212,83 @@ def _icon_to_html_rows():
     return [_ansi_line_to_html(line) for line in _ICON]
 
 
+# the sub-pixels each quadrant glyph draws: top-left, top-right, bottom-left,
+# bottom-right
+_QUADRANTS = {
+    " ": (0, 0, 0, 0), "▘": (1, 0, 0, 0), "▝": (0, 1, 0, 0), "▖": (0, 0, 1, 0),
+    "▗": (0, 0, 0, 1), "▀": (1, 1, 0, 0), "▄": (0, 0, 1, 1), "▌": (1, 0, 1, 0),
+    "▐": (0, 1, 0, 1), "▚": (1, 0, 0, 1), "▞": (0, 1, 1, 0), "▛": (1, 1, 1, 0),
+    "▜": (1, 1, 0, 1), "▙": (1, 0, 1, 1), "▟": (0, 1, 1, 1), "█": (1, 1, 1, 1),
+}
+
+
+def _icon_cells(line):
+    """Return one icon line as (glyph, foreground, background) per cell.
+
+    Reads the same small SGR vocabulary as :func:`_ansi_line_to_html`.
+    """
+    cells, fg, bg, pos = [], None, None, 0
+    for m in list(_SGR_RE.finditer(line)) + [None]:
+        end = m.start() if m else len(line)
+        cells += [(c, fg, bg) for c in line[pos:end]]
+        if m is None:
+            break
+        codes = m.group(1).split(";") if m.group(1) else ["0"]
+        i = 0
+        while i < len(codes):
+            c = codes[i]
+            if c in ("", "0"):
+                fg = bg = None
+            elif c == "49":
+                bg = None
+            elif c == "38" and codes[i + 1] == "2":
+                fg = tuple(int(v) for v in codes[i + 2:i + 5])
+                i += 4
+            elif c == "48" and codes[i + 1] == "2":
+                bg = tuple(int(v) for v in codes[i + 2:i + 5])
+                i += 4
+            i += 1
+        pos = m.end()
+    return cells
+
+
+def _icon_png(scale=4):
+    """Return ``_ICON`` as PNG bytes, ``scale`` pixels per sub-pixel across.
+
+    A quadrant is ``scale`` pixels wide and twice as tall, the proportions a
+    terminal cell gives it; an off sub-pixel takes the cell's background, or
+    stays transparent.
+    """
+    rows = [_icon_cells(line) for line in _ICON]
+    width = 2 * max(len(r) for r in rows) * scale
+    raw = bytearray()
+    for cells in rows:
+        for half in (0, 1):                      # top, then bottom sub-pixels
+            line = bytearray()
+            for glyph, fg, bg in cells:
+                bits = _QUADRANTS.get(glyph, (0, 0, 0, 0))
+                for side in (0, 1):              # left, then right
+                    colour = fg if bits[2 * half + side] else bg
+                    pixel = bytes((*colour, 255)) if colour else bytes(4)
+                    line += pixel * scale
+            line += bytes(4) * (width - len(line) // 4)
+            raw += (b"\0" + bytes(line)) * (2 * scale)
+    height = len(rows) * 2 * 2 * scale
+
+    def chunk(kind, data):
+        return (struct.pack(">I", len(data)) + kind + data
+                + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF))
+
+    return (b"\x89PNG\r\n\x1a\n"
+            + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 6, 0, 0, 0))
+            + chunk(b"IDAT", zlib.compress(bytes(raw), 9))
+            + chunk(b"IEND", b""))
+
+
 def render_html(version: str) -> str:
     """Return the welcome banner as a self-contained HTML snippet."""
-    icon_rows = _icon_to_html_rows()
+    png = _icon_png()
+    width, height = struct.unpack(">II", png[16:24])
     caption = [
         "",
         (
@@ -218,13 +300,14 @@ def render_html(version: str) -> str:
         '<a href="https://pyvoa.org">https://pyvoa.org</a>',
         "",
     ]
-    body = "".join(
-        f'<div>{icon}<span style="display:inline-block;width:1.4em"></span>{cap}</div>'
-        for icon, cap in _rows(icon_rows, caption, version)
-    )
+    image = (f'<img alt="pyvoa" width="{width}" height="{height}" '
+             f'src="data:image/png;base64,{base64.b64encode(png).decode()}">')
+    text = "<br>".join(line for line in caption if line is not None)
     return (
-        '<div style="font-family:ui-monospace,Menlo,Consolas,monospace;'
-        f'line-height:1.15;white-space:pre">{body}</div>'
+        '<table style="border-collapse:collapse"><tr>'
+        f'<td style="padding:0 1.4em 0 0;vertical-align:middle">{image}</td>'
+        f'<td style="vertical-align:middle;text-align:left">{text}</td>'
+        '</tr></table>'
     )
 
 

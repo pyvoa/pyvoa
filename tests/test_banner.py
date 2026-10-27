@@ -233,8 +233,10 @@ def test_icon_to_html_rows_forgets_the_background_on_reset(monkeypatch):
     assert _banner._icon_to_html_rows() == ["<span>X</span>"]
 
 
-def test_render_html_is_one_div_per_icon_row():
-    assert _banner.render_html("1.2.3").count("<div>") == len(_banner._ICON)
+def test_render_html_is_one_image_beside_its_caption():
+    out = _banner.render_html("1.2.3")
+    assert out.count("<img") == 1
+    assert out.count("<td") == 2
 
 
 def test_render_html_advertises_the_version_and_the_url():
@@ -319,3 +321,23 @@ def test_importing_the_banner_pulls_in_nothing_heavy():
         [sys.executable, "-c", code], cwd=ROOT, capture_output=True, text=True, check=True
     ).stdout
     assert out.strip() == "[]"
+
+
+def test_icon_png_is_a_png_of_the_icon_size():
+    import struct
+
+    png = _banner._icon_png(scale=2)
+    assert png.startswith(b"\x89PNG\r\n\x1a\n")
+    width, height = struct.unpack(">II", png[16:24])
+    # two sub-pixels per cell across, two down, a sub-pixel twice as tall as wide
+    assert width == 2 * 16 * 2
+    assert height == 2 * len(_banner._ICON) * 2 * 2
+
+
+def test_render_html_draws_the_icon_as_an_image_not_as_glyphs():
+    # a notebook draws text in the browser's monospace font, and one lacking
+    # the quadrant glyphs (Liberation Mono, Consolas…) tore the icon apart
+    page = _banner.render_html("9.9.9")
+    assert 'src="data:image/png;base64,' in page
+    assert not set(page) & set(_banner._QUADRANTS) - {" "}
+    assert "9.9.9" in page and "https://pyvoa.org" in page
