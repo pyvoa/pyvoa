@@ -1306,6 +1306,12 @@ class GeoCountry:
             h_us.columns=['flag_subregion','code_subregion','town_subregion','population_subregion','area_subregion']
             h_us['flag_subregion'] = [ h.split('\xa0')[0] for h in h_us['flag_subregion'] ]
             self._country_data=self._country_data.merge(h_us,how='left',on='code_subregion')
+            # the District of Columbia is not a state, hence not in that table:
+            # its 2020 census figures, as the states' are (US Census Bureau,
+            # population on April 1, 2020; total area in km², as the table's)
+            dc = self._country_data['code_subregion'] == 'DC'
+            self._country_data.loc[dc, ['town_subregion', 'population_subregion', 'area_subregion']] = \
+                ['Washington', 689545., 177.]
 
             # the states file has no territory, while jhu-usa and covidtracking report
             # them; they get a census region of their own, which the file does not have

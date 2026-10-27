@@ -170,6 +170,8 @@ Packaging and documentation:
   zeros); it draws two bins from 0 to that value, as bokeh does. A pie
   chart of negative values, or of values all zero, raises a `PyvoaError`
   saying so on both backends: matplotlib failed, bokeh drew a wrong pie.
+- the District of Columbia has a population (2020 census, 689,545) in the
+  geography of the United States, so that `normalize` covers it.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

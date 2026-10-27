@@ -118,6 +118,14 @@ def test_geocountry_france_knows_its_departments():
     assert country.is_subregion("Ain") or country.is_subregion("01")
 
 
+def test_geocountry_usa_knows_the_population_of_the_district_of_columbia():
+    """DC is not a state, hence missing from the table the states come from."""
+    data = geo.GeoCountry("USA").get_data().set_index("code_subregion")
+    assert data.loc["DC", "population_subregion"] == 689545
+    # the five territories are still without one
+    assert data["population_subregion"].isna().sum() == 5
+
+
 def test_geocountry_drc_maps_its_health_zones():
     """COD is the geography the DRC Ebola sitreps are indexed by."""
     country = geo.GeoCountry("COD")
