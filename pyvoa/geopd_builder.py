@@ -814,6 +814,16 @@ class GPDBuilder:
         except Exception as e:
             raise PyvoaError('No population is known for the countries of '+self.db
                              +': normalize is not available for it.') from e
+        # a country the database merged other locations into counts their
+        # inhabitants too: France its overseas territories, the United Kingdom
+        # Jersey and Guernsey ('merge' key of the JSON description)
+        merge = getattr(self, 'currentmetadata', {}).get('merge', {})
+        if merge and 'code' in uniquepandy.columns:
+            for target, sources in merge.items():
+                parts = self._gi.add_field(input=pd.DataFrame({'where': sources}),
+                                           field='population', geofield='where')['population']
+                into = uniquepandy['code'].astype(str).str.upper() == target
+                uniquepandy.loc[into, 'population'] = uniquepandy.loc[into, 'population'] + parts.sum()
     else:
         if not isinstance(self._gi,coge.GeoCountry) or self._gi.get_country() != self.geo.get_country():
             self._gi = None

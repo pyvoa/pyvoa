@@ -643,3 +643,55 @@ def test_dataparser_reads_the_dates_with_the_declared_format(monkeypatch, tmp_pa
     assert [str(d) for d in pd.to_datetime(frame["date"]).dt.date] == [
         "2020-03-11", "2020-03-12", "2020-03-13"]
     assert list(frame["tot_cases"]) == [100, 150, 210]
+
+
+def test_sum_rows_averages_the_intensive_columns_of_a_merge():
+    """A merged country adds its counts, and weighs its rates by population."""
+    frame = pd.DataFrame({
+        "date": ["2021-01-01"] * 4,
+        "where": ["FRA", "FRA", "FRA", "ITA"],
+        "cases": [100.0, 20.0, 5.0, 7.0],
+        "per_million": [10.0, 30.0, None, 4.0],
+    })
+    # FRA, then two of its territories merged into it, the second with no
+    # rate; ITA alone, whose population is unknown here
+    weight = pd.Series([100.0, 50.0, 10.0, None])
+    merged = pd.Series([False, True, True, False])
+    out = jsondb_parser.sum_rows(frame, ["date", "where"], ["per_million"], weight, merged)
+    out = out.set_index("where")
+    assert out.loc["FRA", "cases"] == 125.0
+    assert out.loc["FRA", "per_million"] == pytest.approx((10 * 100 + 30 * 50) / 150)
+    # a place nothing was merged into keeps its rate, weight or not
+    assert out.loc["ITA", "per_million"] == 4.0
+
+
+def test_sum_rows_without_intensive_columns_is_a_plain_sum():
+    frame = pd.DataFrame({"date": ["d", "d"], "where": ["A", "A"], "rate": [1.0, 2.0]})
+    out = jsondb_parser.sum_rows(frame, ["date", "where"])
+    assert out["rate"].tolist() == [3.0]
+
+
+def test_sum_rows_sums_a_place_listed_twice_as_it_did():
+    """Sum a place the source lists twice, as owid does East Timor: no merge."""
+    frame = pd.DataFrame({"date": ["d", "d"], "where": ["TLS", "TLS"],
+                          "per_million": [1.0, 2.0]})
+    out = jsondb_parser.sum_rows(frame, ["date", "where"], ["per_million"],
+                                 pd.Series([None, None]), pd.Series([False, False]))
+    assert out["per_million"].tolist() == [3.0]
+
+
+def test_merged_parts_carry_their_running_totals_over_the_country_dates():
+    """France reports on day 2 only, Guadeloupe on day 1 and 3: day 3 is not GLP's alone."""
+    frame = pd.DataFrame({
+        "date": pd.to_datetime(["2021-01-02", "2021-01-01", "2021-01-03"]),
+        "where": ["FRA", "FRA", "FRA"],
+        "tot_cases": [1000.0, 10.0, 30.0],
+        "cur_hosp": [5.0, 1.0, 2.0],
+    })
+    part = pd.Series(["FRA", "GLP", "GLP"])
+    frame, part = jsondb_parser.carry_merged_totals(frame, part, {"FRA"}, ["tot_cases"])
+    out = jsondb_parser.sum_rows(frame, ["date", "where"]).set_index("date")
+    # France's 1000 holds on day 3, Guadeloupe's 10 on day 2; nothing before a first report
+    assert out["tot_cases"].tolist() == [10.0, 1010.0, 1030.0]
+    # a value of the day is not carried
+    assert out["cur_hosp"].tolist() == [1.0, 5.0, 2.0]

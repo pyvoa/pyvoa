@@ -654,6 +654,17 @@ class GeoInfo:
                         self._gm.to_standard(self._data_population['country'].tolist(),\
                         db='worldometers')
 
+                    # Jersey and Guernsey are not in that table: their census
+                    # counts of 21 March 2021 (Statistics Jersey, 2021 Census;
+                    # States of Guernsey, Rolling Electronic Census), so that
+                    # the United Kingdom they are merged into counts them
+                    known = set(self._data_population['iso3_tmp2'])
+                    channel = pd.DataFrame({'iso3_tmp2': ['JEY', 'GGY'],
+                                            'population': [103267, 63463]})
+                    self._data_population = pd.concat(
+                        [self._data_population, channel[~channel['iso3_tmp2'].isin(known)]],
+                        ignore_index=True)
+
                 p=p.merge(self._data_population[["iso3_tmp2",f]],how='left',\
                         left_on='iso3_tmp',right_on='iso3_tmp2',\
                         suffixes=('','_tmp')).drop(['iso3_tmp2'],axis=1)

@@ -172,6 +172,18 @@ Packaging and documentation:
   saying so on both backends: matplotlib failed, bokeh drew a wrong pie.
 - the District of Columbia has a population (2020 census, 689,545) in the
   geography of the United States, so that `normalize` covers it.
+- France in `owid`, `europa` and `mpoxgh` now counts its overseas
+  territories (Guadeloupe, Martinique, French Guiana, Réunion, Mayotte,
+  French Polynesia), and the United Kingdom Jersey and Guernsey, as `jhu`
+  already did: a new `merge` key of the database description folds them in.
+  Each part's running totals are carried over the days it does not report
+  before they are summed, rates per inhabitant (`intensive` columns) are
+  averaged weighted by population, and `normalize` divides by the population
+  of the whole. Jersey and Guernsey get a population (2021 censuses).
+- removed: the seaborn backend, which `listvis()` no longer offered;
+  matplotlib and bokeh draw every chart.
+- fix: `option='sumall'` counts a location with no value on a date with its
+  last one, so that a histogram of the sum no longer drops it.
 - every chart, of each backend, is drawn and written to a file by the
   offline test suite, its tiles alone stubbed out, so that a new release of
   matplotlib, bokeh, contextily or pandas that breaks one fails in CI.

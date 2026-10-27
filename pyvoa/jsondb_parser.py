@@ -38,6 +38,95 @@ from pyvoa.tools import (
 )
 
 
+def sum_rows(frame, keys, intensive=(), weight=None, merged=None):
+    """Sum the rows that share their keys, averaging the intensive columns.
+
+    Rows sharing a date and a place are what a merge of locations leaves, as
+    well as a source listing one place several times. Counts add up; a rate
+    per inhabitant does not, and is averaged weighted by population instead,
+    over the rows that have both a value and a weight.
+
+    Parameters
+    ----------
+    frame : pd.DataFrame
+        the rows, numeric but for the keys.
+    keys : list of str
+        the columns the rows are grouped on, 'date' and 'where'.
+    intensive : list of str, optional
+        the columns averaged rather than summed where rows were merged.
+    weight : pd.Series, optional
+        the population of the place each row came from, aligned on frame.
+    merged : pd.Series of bool, optional
+        the rows a merge folded into another place, aligned on frame. Only
+        the groups holding one are averaged: a source listing a place twice
+        (owid's East Timor) is summed as it was.
+
+    Returns
+    -------
+    pd.DataFrame
+        one row per group, keys as columns.
+    """
+    grouped = frame.groupby(keys)
+    out = grouped.sum(min_count=1)
+    cols = [c for c in intensive if c in frame.columns]
+    if cols and weight is not None and merged is not None:
+        valid = frame[cols].notna() & weight.notna().to_numpy()[:, None]
+        num = frame[cols].mul(weight, axis=0).where(valid)
+        den = valid.astype(float).mul(weight, axis=0).where(valid)
+        by = [frame[k] for k in keys]
+        ratio = num.groupby(by).sum(min_count=1) / den.groupby(by).sum(min_count=1)
+        averaged = merged.groupby(by).any()
+        if averaged.any():
+            out.loc[averaged, cols] = ratio.loc[averaged, cols]
+    return out.reset_index()
+
+
+def carry_merged_totals(frame, part, targets, running):
+    """Carry the running totals of each merged part over its country's dates.
+
+    France and its overseas territories do not report on the same days: summed
+    as they are, France's total on a day only Guadeloupe reported would be
+    Guadeloupe's. A running total holds until its next report, so each part's
+    last value is carried forward over the dates the merged country has, before
+    the parts are summed. Values of the day ('cur_') are not carried.
+
+    Parameters
+    ----------
+    frame : pd.DataFrame
+        the rows, 'where' already set to the country merged into.
+    part : pd.Series
+        the location each row came from, aligned on frame.
+    targets : set of str
+        the countries other locations are merged into.
+    running : list of str
+        the running totals, carried forward.
+
+    Returns
+    -------
+    tuple
+        the frame and its part, aligned, with the rows the carrying added.
+    """
+    into = frame['where'].isin(targets)
+    if not running or not into.any():
+        return frame, part
+    rest = frame[~into]
+    sub = frame[into].assign(part=part[into])
+    values = [c for c in sub.columns if c not in ('date', 'where', 'part')]
+    sub = sub.groupby(['where', 'date', 'part'])[values].sum(min_count=1).reset_index()
+    pieces = []
+    for target, group in sub.groupby('where'):
+        full = pd.MultiIndex.from_product([sorted(group['date'].dropna().unique()),
+                                           group['part'].unique()], names=['date', 'part'])
+        group = group.set_index(['date', 'part']).reindex(full)
+        group['where'] = target
+        group[running] = group[running].groupby(level='part').ffill()
+        pieces.append(group.reset_index())
+    sub = pd.concat(pieces, ignore_index=True)
+    out = pd.concat([rest, sub.drop(columns='part')], ignore_index=True)
+    outpart = pd.concat([part[~into], sub['part']], ignore_index=True)
+    return out, outpart
+
+
 class MetaInfo:
   """The catalogue of the databases pyvoa ships.
 
@@ -279,6 +368,25 @@ class DataParser:
             raise PyvoaError("An error occured while parsing data of "+self.db+". This may be due to a data format modification. "
                 "You may contact contact@pyvoa.org . Thanks.") from e
 
+  def merge_populations(self):
+        """Return the population of every location the 'merge' key names.
+
+        Both the countries merged into and the locations merged, by the code
+        the source uses: the weights of the intensive columns of a merge.
+
+        Returns
+        -------
+        dict
+            code -> population, NaN where none is known.
+        """
+        if getattr(self, '_merge_populations', None) is None:
+            merge = self.metadata.get('merge', {})
+            codes = sorted(set(merge) | {s for sources in merge.values() for s in sources})
+            pop = coge.GeoInfo().add_field(input=pd.DataFrame({'where': codes}),
+                                           field='population', geofield='where')
+            self._merge_populations = dict(zip(pop['where'], pop['population']))
+        return self._merge_populations
+
   def get_parsing(self,):
       """Parse the json file loaded by the init function (self.metadata).
 
@@ -305,6 +413,10 @@ class DataParser:
       replace_field = False
       if 'replace' in list(self.metadata.keys()):
           replace_field = self.metadata['replace']
+      # 'merge' folds locations the source lists apart into the country they
+      # belong to, {"FRA": ["GLP", ...]}: read as {"GLP": "FRA", ...}
+      merge_into = {source: target for target, sources in self.metadata.get('merge', {}).items()
+                    for source in sources}
 
       self.url = []
       self.keyword_definition = {}
@@ -345,6 +457,11 @@ class DataParser:
              pdatatemp['fillmissing'] = pdatatemp['fillmissing'].fillna(value=False)
           else:
             pdatatemp['fillmissing'] = False
+
+          if 'intensive' in list(pdatatemp.columns):
+             pdatatemp['intensive'] = pdatatemp['intensive'].fillna(value=False)
+          else:
+            pdatatemp['intensive'] = False
 
           usecols = pdatatemp.alias.to_list()
           selections = None
@@ -442,6 +559,17 @@ class DataParser:
                   str.split(splitwhere.get('separator',',')).\
                   str[splitwhere.get('keep',-1)].str.strip()
 
+          # the locations merged into another are summed with it below, as
+          # rows sharing a date and a place; an 'intensive' column, a rate
+          # per inhabitant, is averaged weighted by population instead
+          intensive, part = [], None
+          if merge_into and 'where' in list(pandas_temp.columns) \
+                  and pandas_temp['where'].isin(merge_into.keys()).any():
+              intensive = [c for c in pdatatemp.loc[pdatatemp['intensive'], 'name']
+                           if c in list(pandas_temp.columns)]
+              part = pandas_temp['where'].copy()
+              pandas_temp['where'] = pandas_temp['where'].replace(merge_into)
+
           if dropcolumns:
               pandas_temp = pandas_temp.drop(columns=dropcolumns)
           value_name = None
@@ -470,7 +598,15 @@ class DataParser:
           self.available_keywords = notwhereanddate
           pandas_temp[notwhereanddate] = pandas_temp[notwhereanddate].apply(lambda col: pd.to_numeric(col.astype(str).str.replace(",", ".", regex=False), errors="coerce"))
           pandas_temp = pandas_temp[whereanddate+notwhereanddate]
-          pandas_temp = pandas_temp.groupby(whereanddate).sum(min_count=1).reset_index()
+          weight, merged = None, None
+          if part is not None:
+              running = [c for c in notwhereanddate
+                         if c.startswith(('tot_', 'total_')) and c not in intensive]
+              pandas_temp, part = carry_merged_totals(pandas_temp, part,
+                                                      set(merge_into.values()), running)
+              weight = part.map(self.merge_populations())
+              merged = part.isin(merge_into.keys())
+          pandas_temp = sum_rows(pandas_temp, whereanddate, intensive, weight, merged)
           if pandas_db.empty:
               pandas_db = pandas_temp
           else:

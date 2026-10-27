@@ -168,7 +168,58 @@ def read_raw(dataset, metadata):
         sw = dataset["splitwhere"]
         raw["where"] = (raw["where"].astype(str).str.split(sw.get("separator", ","))
                         .str[sw.get("keep", -1)].str.strip())
+    into = {s: t for t, sources in metadata.get("merge", {}).items() for s in sources}
+    if into and raw["where"].isin(into).any():
+        intensive = {c["name"] for c in cols if c.get("intensive")}
+        raw = merge_raw(raw, into, intensive, dataset)
     return raw, variables
+
+
+def merge_raw(raw, into, intensive, dataset):
+    """Fold the merged locations into their country, as the 'merge' key asks.
+
+    Each part's running totals ('tot_', 'total_') are carried forward over the
+    dates its country has, since the parts do not report on the same days; then
+    counts are summed, and an intensive column, a rate per inhabitant, is
+    averaged over the merged rows that have a value, weighted by population.
+    """
+    from pyvoa.geo import GeoInfo
+
+    codes = sorted(set(into) | set(into.values()))
+    pop = GeoInfo().add_field(input=pd.DataFrame({"where": codes}),
+                              field="population", geofield="where")
+    pop = dict(zip(pop["where"], pop["population"]))
+    touched = raw["where"].isin(codes)
+    part = raw[touched].rename(columns={"where": "part"})
+    part["where"] = part["part"].replace(into)
+    part["day"] = _parse_dates(part["date"].to_numpy(), dataset).to_numpy()
+    values = [c for c in part.columns if c not in ("where", "date", "part", "day")]
+    for v in values:
+        part[v] = pd.to_numeric(part[v].astype(str).str.replace(",", ".", regex=False),
+                                errors="coerce")
+    running = [v for v in values if v.startswith(("tot_", "total_")) and v not in intensive]
+    rows = []
+    for where, country in part.dropna(subset=["day"]).groupby("where"):
+        country = country.groupby(["day", "part"])[values].sum(min_count=1)
+        full = pd.MultiIndex.from_product(
+            [sorted(country.index.get_level_values("day").unique()),
+             country.index.get_level_values("part").unique()], names=["day", "part"])
+        country = country.reindex(full)
+        country[running] = country[running].groupby(level="part").ffill()
+        country = country.reset_index()
+        country["w"] = country["part"].map(pop).astype(float)
+        for day, group in country.groupby("day"):
+            row = {"where": where, "date": day.strftime("%Y-%m-%d")}
+            several = (group["part"] != where).any()
+            for v in values:
+                ok = group[v].notna() & group["w"].notna()
+                if v in intensive and several:
+                    row[v] = ((group[v][ok] * group["w"][ok]).sum() / group["w"][ok].sum()
+                              if ok.any() else np.nan)
+                else:
+                    row[v] = group[v].sum(min_count=1)
+            rows.append(row)
+    return pd.concat([raw[~touched], pd.DataFrame(rows)], ignore_index=True)
 
 
 def raw_totals(raw, variables, dataset):
