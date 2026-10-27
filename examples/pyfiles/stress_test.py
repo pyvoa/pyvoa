@@ -17,6 +17,10 @@ The sections are those of the notebook:
     options    which x what x option x chart on one database (mpoxgh)
     sumall     the daily sum of every variable of every database
     get        every output, what and option of get()
+    sources    every database read from the Zenodo archive and live: the first
+               and last date with data of each, and how much more recent the
+               live source is (sources.csv); a gap of more than a month is
+               flagged, a hint that the archive could be refreshed
 
 Usage
 -----
@@ -25,6 +29,7 @@ Usage
     python stress_test.py -s databases --db owid spf
     python stress_test.py --no-figures             # run, write no chart
     python stress_test.py --reload                 # parse the databases again
+    python stress_test.py -s sources               # archive against live only
 
 Then open stress_test_output/index.html: one row per case, its status, its
 error if any, and its chart — a thumbnail for matplotlib, a link for bokeh.
@@ -57,11 +62,16 @@ from pathlib import Path
 os.environ.setdefault('MPLBACKEND', 'Agg')
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import pyvoa.front as pf
 from pyvoa.tools import PyvoaError
 
-SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get']
+SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get', 'sources']
+# a live source more recent than its archive by more than this is flagged
+NEWER_DAYS = 30
+SOURCE_FIELDS = ['db', 'archive_first', 'archive_last', 'live_first', 'live_last',
+                 'live_newer_days', 'flag']
 FIELDS = ['n', 'section', 'db', 'vis', 'call', 'status', 'seconds', 'file', 'detail']
 # index.html is rewritten every so many cases; report.csv takes each case as it ends
 INDEX_EVERY = 10
@@ -83,6 +93,8 @@ class StressTest:
         # system short of memory for one, keeps what it did
         with open(self.outdir / 'report.csv', 'w', newline='', encoding='utf-8') as f:
             csv.DictWriter(f, fieldnames=FIELDS).writeheader()
+        self.sources = []
+        (self.outdir / 'sources.csv').unlink(missing_ok=True)
         self.write_index(finished=False)
 
     def record(self, row):
@@ -157,6 +169,51 @@ class StressTest:
         pf.savefig(str(self.figdir / f'{name}.png'))
         return f'figures/{name}.png'
 
+    def source_span(self, db, live):
+        """Parse a database from the archive or live; return its data's first and last dates.
+
+        A source that cannot be read (gone upstream, as phe's is) is a case
+        refused or in error, and gives (None, None).
+        """
+        mode = 'live' if live else 'archive'
+        n = len(self.rows) + 1
+        row = {'n': n, 'section': 'sources', 'db': db, 'vis': '',
+               'call': f'setlive({live}); setwhom({db!r}, reload=True)', 'status': 'ok',
+               'seconds': '', 'file': '', 'detail': ''}
+        print(f'[{n:4d}] sources   {db:13s} {mode}', end='', flush=True)
+        self.log.write(f'\n===== [{n}] {db} {mode}\n')
+        start, span = time.perf_counter(), (None, None)
+        try:
+            with contextlib.redirect_stdout(self.log):
+                pf.setlive(live)
+                pf.setwhom(db, reload=True)
+                span = data_span(pf.getdatabase())
+            row['detail'] = f'{mode}: {span[0]} to {span[1]}'
+        except PyvoaError as e:
+            row['status'], row['detail'] = 'refused', f'{mode}: {e}'
+        except Exception as e:
+            row['status'], row['detail'] = 'error', f'{mode}: {type(e).__name__}: {e}'
+            self.log.write(traceback.format_exc())
+        finally:
+            pf.setlive(False)
+            # setwhom() was called behind self.setwhom()'s back
+            self.db = None
+        row['seconds'] = f'{time.perf_counter() - start:.1f}'
+        print(f'  -> {row["status"]}')
+        self.record(row)
+        return span
+
+    def record_source(self, entry):
+        """Keep one database's dates: in memory, in sources.csv at once."""
+        path = self.outdir / 'sources.csv'
+        new = not path.exists()
+        with open(path, 'a', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=SOURCE_FIELDS)
+            if new:
+                writer.writeheader()
+            writer.writerow(entry)
+        self.sources.append(entry)
+
     def counts(self):
         """Return the number of cases per status."""
         return {s: sum(r['status'] == s for r in self.rows) for s in ('ok', 'refused', 'error')}
@@ -181,7 +238,17 @@ class StressTest:
         summary = ', '.join(f'{v} {k}' for k, v in counts.items())
         if not finished:
             summary = f'Not finished, {len(self.rows)} cases so far: {summary}'
-        page = INDEX.format(summary=summary, rows='\n'.join(lines))
+        sources = ''
+        if self.sources:
+            cells = ''.join(
+                f'<tr class="{"refused" if e["flag"] else "ok"}">'
+                + ''.join(f'<td>{html.escape(str(e[k]))}</td>' for k in SOURCE_FIELDS) + '</tr>'
+                for e in self.sources)
+            sources = ('<h2>Archive against live</h2><p>First and last date with data; '
+                       f'a live source more recent by over {NEWER_DAYS} days is flagged.</p>'
+                       '<table><tr>' + ''.join(f'<th>{k}</th>' for k in SOURCE_FIELDS)
+                       + '</tr>' + cells + '</table><h2>Cases</h2>')
+        page = INDEX.format(summary=summary, sources=sources, rows='\n'.join(lines))
         (self.outdir / 'index.html').write_text(page, encoding='utf-8')
 
     def report(self, finished=True):
@@ -209,6 +276,7 @@ traceback is in log.txt).</p>
 <label><input type="checkbox" value="ok" checked> ok</label>
 <label><input type="checkbox" value="refused" checked> refused</label>
 <label><input type="checkbox" value="error" checked> error</label></p>
+{sources}
 <table><tr><th>#</th><th>section</th><th>db</th><th>vis</th><th>call</th>
 <th>status</th><th>s</th><th>detail</th><th>chart</th></tr>
 {rows}
@@ -224,6 +292,18 @@ document.querySelectorAll('#filter input').forEach(box => box.addEventListener('
 def slug(text):
     """Turn a call into a file name."""
     return re.sub(r'[^A-Za-z0-9_.-]+', '-', text)[:150]
+
+
+def data_span(frame):
+    """Return the first and last date a database has a value on."""
+    values = [c for c in frame.columns if c not in ('date', 'where', 'code', 'geometry', 'from_db')]
+    has = frame[values].notna().any(axis=1)
+    if 'from_db' in frame.columns:
+        has &= frame['from_db'].astype(bool)
+    dates = pd.to_datetime(frame.loc[has, 'date'])
+    if dates.empty:
+        return None, None
+    return dates.min().date(), dates.max().date()
 
 
 def describe(result):
@@ -344,12 +424,34 @@ def get(t, reload, rng):
         t.case('get', 'get', when='01/01/2023', what=what, option=pf.listoption()[0:4])
 
 
+def sources(t, dbs, reload, rng):
+    """Read every database live, then from the archive, and compare their dates.
+
+    Live first: the archive read last leaves the pickles of each database as
+    the other sections, and a later run, expect them.
+    """
+    for db in dbs:
+        live = t.source_span(db, True)
+        archive = t.source_span(db, False)
+        newer = (live[1] - archive[1]).days if live[1] and archive[1] else ''
+        flag = ''
+        if newer != '' and newer > NEWER_DAYS:
+            flag = f'live newer by {newer} days'
+        elif live[1] is None and archive[1] is not None:
+            flag = 'live unreadable'
+        t.record_source({'db': db, 'archive_first': archive[0], 'archive_last': archive[1],
+                         'live_first': live[0], 'live_last': live[1],
+                         'live_newer_days': newer, 'flag': flag})
+        t.write_index(finished=False)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__.split('\n\n')[0])
     parser.add_argument('-o', '--outdir', default='stress_test_output',
                         help='where to write the charts and the report')
     parser.add_argument('-s', '--sections', nargs='+', choices=SECTIONS, default=SECTIONS)
-    parser.add_argument('--db', nargs='+', help='the databases of the databases and sumall sections')
+    parser.add_argument('--db', nargs='+',
+                        help='the databases of the databases, sumall and sources sections')
     parser.add_argument('--no-figures', action='store_true', help='draw, but write no chart')
     parser.add_argument('--reload', action='store_true', help='parse the databases again')
     parser.add_argument('--seed', type=int, default=0, help='for the locations drawn at random')
@@ -365,7 +467,7 @@ def main():
     try:
         for section in args.sections:
             print(f'\n=== {section}')
-            if section in ('databases', 'sumall'):
+            if section in ('databases', 'sumall', 'sources'):
                 globals()[section](t, dbs, args.reload, rng)
             else:
                 globals()[section](t, args.reload, rng)
@@ -374,6 +476,9 @@ def main():
         # an interrupted run (Ctrl-C, an exception of the script) still gets its page
         counts = t.report(finished)
     print(f'\n{len(t.rows)} cases: ' + ', '.join(f'{v} {k}' for k, v in counts.items()))
+    for e in t.sources:
+        print(f"{e['db']:14s} archive {e['archive_first']} to {e['archive_last']}, "
+              f"live {e['live_first']} to {e['live_last']}  {e['flag']}")
     print(f'report: {t.outdir / "index.html"}')
     raise SystemExit(1 if counts['error'] else 0)
 
