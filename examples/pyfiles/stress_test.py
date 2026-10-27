@@ -69,6 +69,8 @@ from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.tools import PyvoaError
 
 SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get', 'sources']
+# the date the options section ends on: see options()
+OPTIONS_WHEN = '12/04/2026'
 # a live source more recent than its archive by more than this is flagged
 NEWER_DAYS = 30
 SOURCE_FIELDS = ['db', 'archive_first', 'archive_last', 'live_first', 'live_last',
@@ -372,34 +374,41 @@ def charts(t, reload, rng):
 
 
 def options(t, reload, rng):
-    """Cross which, what, option and every chart on mpoxgh, under matplotlib."""
+    """Cross which, what, option and every chart on mpoxgh, under matplotlib.
+
+    Every call ends on OPTIONS_WHEN, the last date on which each series of
+    mpoxgh, cases and deaths, current, daily and weekly, is not negative and
+    not all zero: on the last date of the data, daily deaths are zero
+    everywhere, and a pie chart is then refused, rightly, for want of
+    anything to share.
+    """
     if not t.setwhom('options', 'mpoxgh', reload=reload):
         return
     pf.setvis('matplotlib')
     where = 'Brazil'
+    when = ':' + OPTIONS_WHEN
     for which in pf.listwhich():
         for what in pf.listwhat():
             for option in [o for o in pf.listoption() if o != 'nonneg'] + ['']:
+                common = {'which': which, 'what': what, 'option': option, 'when': when}
                 for p in pf.listplot():
                     if p in ('spiral', 'menulocation', 'versus'):
                         continue
                     if p == 'yearly':
                         if option == 'sumall':
-                            t.case('options', 'plot', which=which, what=what, option=option,
-                                   typeofplot=p, where=where)
+                            t.case('options', 'plot', **common, typeofplot=p, where=where)
                         continue
                     if option == 'sumall' and p == 'compare':
                         continue
-                    t.case('options', 'plot', which=which, what=what, option=option, typeofplot=p)
+                    t.case('options', 'plot', **common, typeofplot=p)
                 for h in pf.listhist():
-                    t.case('options', 'hist', which=which, what=what, option=option, typeofhist=h)
+                    t.case('options', 'hist', **common, typeofhist=h)
                 if option != 'sumall':
                     for m in pf.listmap():
                         for tile in pf.listtile():
-                            t.case('options', 'map', which=which, what=what, option=option,
-                                   typeofmap=m, tile=tile)
+                            t.case('options', 'map', **common, typeofmap=m, tile=tile)
                 for output in pf.listoutput():
-                    t.case('options', 'get', which=which, what=what, option=option, output=output)
+                    t.case('options', 'get', **common, output=output)
 
 
 def sumall(t, dbs, reload, rng):
