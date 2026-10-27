@@ -72,14 +72,14 @@ autodoc_default_options = {
 autodoc_typehints = "description"
 autodoc_preserve_defaults = True
 
-# seaborn and folium (with branca) are optional backends: pyvoa imports them at
-# module level and fails gracefully at runtime when one is absent. Neither is in
-# `dependencies`, so neither is present in the environment the workflow builds
-# from; mocking them is what lets the docs cover every backend without
-# installing them just to read their docstrings. matplotlib and bokeh are
+# folium (with branca) is an optional backend: pyvoa imports it at module
+# level and fails gracefully at runtime when it is absent. It is not in
+# `dependencies`, so it is not present in the environment the workflow builds
+# from; mocking it is what lets the docs cover every backend without
+# installing it just to read its docstrings. matplotlib and bokeh are
 # dependencies, and are read for real. autodoc still reads the real pyvoa
 # modules -- only the third-party names they import are stubbed.
-autodoc_mock_imports = ["seaborn", "folium", "branca"]
+autodoc_mock_imports = ["folium", "branca"]
 
 # -- intersphinx -------------------------------------------------------------
 
