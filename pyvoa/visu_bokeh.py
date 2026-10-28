@@ -1731,7 +1731,7 @@ class visu_bokeh:
         if tilename == 'openstreet':
             tile = r'https://tile.openstreetmap.org/{Z}/{X}/{Y}.png'
         elif tilename == 'esri':
-            tile = r'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}.png'
+            tile = "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
         # withdrawn: CartoDB displays a request for an API key over the map
         #elif tilename == 'positron':
         #    tile = 'https://tiles.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
