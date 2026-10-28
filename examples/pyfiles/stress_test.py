@@ -13,7 +13,8 @@ The sections are those of the notebook:
 
     databases  every database: plot, hist and map with bokeh, map with matplotlib
     regions    a time series of every region of the world (jhu)
-    charts     every typeofplot, typeofhist and typeofmap on owid, both backends
+    charts     every typeofplot, typeofhist and typeofmap (on every tile) on owid,
+               each drawn under matplotlib then bokeh
     options    which x what x option x chart on one database (mpoxgh)
     sumall     the daily sum of every variable of every database
     get        every output, what and option of get()
@@ -81,6 +82,8 @@ from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.tools import PyvoaError
 
 SECTIONS = ['databases', 'regions', 'charts', 'options', 'sumall', 'get', 'sources']
+# the backends the charts section draws each chart with, in this order
+VIS = ('matplotlib', 'bokeh')
 # the date the options section ends on: see options()
 OPTIONS_WHEN = '12/04/2026'
 # a live source more recent than its archive by more than this is flagged
@@ -362,27 +365,41 @@ def regions(t, reload, rng):
 
 
 def charts(t, reload, rng):
-    """Draw every chart type of both backends on owid."""
+    """Draw every chart on owid under both backends, one after the other.
+
+    Each chart, maps on every tile included, is drawn under matplotlib and
+    then under bokeh with the same arguments, so that the two come next to
+    each other in the report. A chart one backend does not offer (compare and
+    spiral under matplotlib) is drawn by the other alone.
+    """
     if not t.setwhom('charts', 'owid', reload=reload):
         return
     common = {'which': 'total_deaths', 'where': 'Western Europe', 'what': 'daily', 'option': 'smooth7'}
-    for vis in ('matplotlib', 'bokeh'):
+    dated = dict(common, when='20/02/2022')
+    pf.setvis(VIS[0])                   # the list*() functions need a backend
+    cases = [('hist', dict(dated, typeofhist=h)) for h in pf.listhist()]
+    for m in pf.listmap():
+        if m == 'dense':                # a dense map is drawn without tiles
+            cases.append(('map', dict(dated, typeofmap=m)))
+        else:
+            cases += [('map', dict(dated, typeofmap=m, tile=tile)) for tile in pf.listtile()]
+    plots = []
+    for vis in VIS:
         pf.setvis(vis)
-        for h in pf.listhist():
-            t.case('charts', 'hist', **common, when='20/02/2022', typeofhist=h)
-        for m in pf.listmap():
-            t.case('charts', 'map', **common, when='20/02/2022', typeofmap=m)
-        for p in pf.listplot():
-            if p in ('versus', 'yearly', 'spiral'):
-                continue
-            t.case('charts', 'plot', **common, typeofplot=p)
-        if vis == 'bokeh':
-            t.case('charts', 'plot', which='total_deaths', where='france', what='daily',
-                   option='smooth7', typeofplot='spiral')
-        t.case('charts', 'plot', which='total_deaths', where='france', what='daily',
-               option='smooth7', typeofplot='yearly')
-        t.case('charts', 'plot', which=['total_deaths', 'cur_hosp_patients'],
-               where='Western Europe', what='daily', option='smooth7', typeofplot='versus')
+        plots += [p for p in pf.listplot() if p not in plots]
+    for p in plots:
+        if p == 'versus':
+            kwargs = dict(common, which=['total_deaths', 'cur_hosp_patients'])
+        elif p in ('spiral', 'yearly'):
+            kwargs = dict(common, where='france')
+        else:
+            kwargs = dict(common)
+        cases.append(('plot', dict(kwargs, typeofplot=p)))
+    for function, kwargs in cases:
+        for vis in VIS:
+            pf.setvis(vis)
+            if kwargs['typeof' + function] in getattr(pf, 'list' + function)():
+                t.case('charts', function, **kwargs)
 
 
 def options(t, reload, rng):
