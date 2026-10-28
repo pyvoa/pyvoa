@@ -91,7 +91,9 @@ Maps and charts:
 - a pie chart gathers into 'SumOthers' every location under 2 % of the
   total, on both backends and with or without the date slider: the names
   (bokeh) and percentages (matplotlib) of the thin slices were written over
-  one another, as for the small countries of `where='Western Europe'`.
+  one another, as for the small countries of `where='Western Europe'`. The
+  locations at zero no longer leave an empty 'SumOthers' slice, which wrote
+  a lone 0.0 % on the chart.
 
 Behaviour changes:
 

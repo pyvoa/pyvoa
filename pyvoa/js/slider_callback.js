@@ -139,13 +139,15 @@ const keep = (r, j) => j < maxcountrydisplayed
     && (!ispie || !(minshare > 0 && all > 0) || num(r) / all >= minshare);
 let limited = sorted_rows.filter(keep);
 const others = sorted_rows.filter((r, j) => !keep(r, j));
-if (ispie && others.length > 0) {
+const othersum = others.reduce((a, r) => a + (Number.isFinite(num(r)) ? num(r) : 0), 0);
+// with a minshare, the locations at zero leave no empty slice behind them
+if (ispie && others.length > 0 && !(minshare > 0 && othersum === 0)) {
     // the other locations make one slice, as without the slider, so that the
     // shares are those of the whole
     const rest = {...(limited.length > 0 ? limited[0] : others[0])};
     rest["where"] = "SumOthers";
     rest["code"] = "SumOthers";
-    rest[which] = others.reduce((a, r) => a + (Number.isFinite(Number(r[which])) ? Number(r[which]) : 0), 0);
+    rest[which] = othersum;
     rest["colors"] = "#FFFFFF";
     // ranked with the others, as gather_others ranks it in Python
     limited = [...limited, rest].sort(rank);

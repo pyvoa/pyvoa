@@ -373,7 +373,8 @@ def gather_others(frame, which, keep, minshare=0.):
     -------
     pandas.DataFrame
         The rows kept and, when any location is left over, the 'SumOthers'
-        one, ranked.
+        one, ranked; with a ``minshare``, none when the locations left over
+        sum to zero.
     """
     ranked = rank_locations(frame, which)
     values = ranked[which].apply(lambda x: x[0] if isinstance(x, list) else x)
@@ -383,10 +384,13 @@ def gather_others(frame, which, keep, minshare=0.):
         # a missing value compares False, as it is not drawn either
         kept &= (values / total >= minshare).to_numpy()
     top, others = ranked[kept], ranked[~kept]
-    if others.empty:
+    total_others = values[~kept].sum()
+    # a pie chart draws no empty slice: the locations at zero leave no
+    # 'SumOthers' behind them, which wrote a lone 0.0 % on the chart
+    if others.empty or (minshare > 0 and total_others == 0):
         return top
     rest = {col: ['SumOthers'] for col in ranked.columns}
-    rest[which] = [values[~kept].sum()]
+    rest[which] = [total_others]
     if 'date' in ranked.columns:
         rest['date'] = [ranked['date'].iloc[0]]
     rest['colors'] = ['#FFFFFF']

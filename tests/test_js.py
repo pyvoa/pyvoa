@@ -278,6 +278,14 @@ def test_slider_gathers_the_thin_slices_of_a_pie_only():
     assert len(slider(thin_slices(), 12, False)["data"]["where"]) == 9
 
 
+def test_slider_leaves_no_empty_slice_on_a_pie():
+    frame = pd.DataFrame({"where": ["A", "B", "C", "D"], "code": ["A", "B", "C", "D"],
+                          "tot": [8.0, 3.0, 0.0, 0.0], "colors": ["#a", "#b", "#c", "#d"]})
+    assert slider(frame, 12, True)["data"]["where"] == ["A", "B"]
+    want = gather_others(frame, "tot", 12, PIE_MINSHARE)["where"].tolist()
+    assert slider(frame, 12, True)["data"]["where"] == want
+
+
 def test_slider_ranks_a_missing_value_last():
     # Python's addcolumnspie cannot take a NaN (the total would be NaN), so the
     # parity test drops it; the ranking alone is checked with it here

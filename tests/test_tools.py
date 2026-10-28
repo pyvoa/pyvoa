@@ -1073,6 +1073,14 @@ def test_gather_others_gathers_the_slices_under_minshare_whatever_their_rank():
     assert len(tools.gather_others(frame, "v", 12)) == 5
 
 
+def test_gather_others_leaves_no_empty_slice_on_a_pie():
+    frame = pd.DataFrame({"where": ["A", "B", "C", "D"], "v": [8.0, 3.0, 0.0, 0.0]})
+    # C and D, at zero, are not drawn: no 0.0 % slice on the pie
+    assert list(tools.gather_others(frame, "v", 12, tools.PIE_MINSHARE)["where"]) == ["A", "B"]
+    # a histogram by value counts them still
+    assert list(tools.gather_others(frame, "v", 2)["where"]) == ["A", "B", "SumOthers"]
+
+
 def test_gather_others_ignores_minshare_without_a_positive_total():
     frame = pd.DataFrame({"where": ["A", "B"], "v": [1.0, -3.0]})
     assert list(tools.gather_others(frame, "v", 12, 0.02)["where"]) == ["A", "B"]
