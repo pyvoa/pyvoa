@@ -52,7 +52,7 @@ from bokeh.palettes import Category10, Category20, Viridis256
 from bokeh.plotting import figure
 from bokeh.transform import cumsum
 
-from pyvoa.kwargs_options import InputOption
+from pyvoa.kwargs_options import TILE_ATTRIBUTION, InputOption
 from pyvoa.tools import (
     PyvoaError,
     PyvoaWarning,
@@ -1659,9 +1659,9 @@ class visu_bokeh:
 
         Colours each location by its value and, unless the map is drawn dense,
         lays it over the background tiles named by 'tile' ('openstreet' when
-        none is named). The locations the source says nothing about are drawn
-        in pink, and a location without a geometry of its own is counted but
-        not drawn. The pyvoa logo is laid over the figure only when
+        none is named), credited in the bottom right corner. The locations
+        the source says nothing about are drawn in pink, and a location
+        without a geometry of its own is counted but not drawn. The pyvoa logo is laid over the figure only when
         'pyvoalogo' is True, as on the other charts.
 
         The map is framed on every location, pink ones included, as the
@@ -1686,8 +1686,10 @@ class visu_bokeh:
         tile = kwargs.get('tile',self.av.d_graphicsinput_args['tile'][0])
 
         if 'dense' not in kwargs['typeofmap']:
-            tile = visu_bokeh.convert_tile(tile)
-            wmt = WMTSTileSource(url = tile)
+            # the credit both tile providers require, in the corner of the
+            # map, as the matplotlib map writes it
+            wmt = WMTSTileSource(url=visu_bokeh.convert_tile(tile),
+                                 attribution=TILE_ATTRIBUTION.get(tile, ''))
             bokeh_figure.add_tile(wmt, retina=True)
 
         # no logo glyph drawn in the map itself: its x and y are data

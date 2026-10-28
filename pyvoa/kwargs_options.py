@@ -19,7 +19,15 @@ import pandas as pd
 
 from pyvoa.tools import kwargs_keystesting
 
-__all__ = ['InputOption']
+__all__ = ['TILE_ATTRIBUTION', 'InputOption']
+
+#: The credit each background tile asks for, as both backends write it in
+#: the corner of a map. Kept short on purpose: contextily's full Esri credit
+#: runs over two lines and hid the note under it.
+TILE_ATTRIBUTION = {
+    'openstreet': '© OpenStreetMap contributors',
+    'esri': 'Tiles © Esri',
+}
 
 class InputOption:
     """The catalogue of keyword arguments, and the values each one accepts.

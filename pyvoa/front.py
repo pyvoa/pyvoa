@@ -974,7 +974,10 @@ class front:
         tile : {'openstreet', 'esri'}, optional
             The background tiles; :meth:`listtile` lists them. Defaults to
             'openstreet' (OpenStreetMap), the first of them, under bokeh and
-            matplotlib alike. A dense map is drawn without tiles. A bokeh map
+            matplotlib alike; 'esri' is Esri's World Street Map. The tiles are
+            credited in the bottom right corner of the map
+            (``TILE_ATTRIBUTION`` in :mod:`pyvoa.kwargs_options`). A dense
+            map is drawn without tiles. A bokeh map
             saved with :meth:`savefig` and opened as a local file shows
             OpenStreetMap's "Access blocked" tiles in some browsers (Firefox):
             such a page sends no Referer, which OpenStreetMap's tile usage

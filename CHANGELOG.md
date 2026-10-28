@@ -60,6 +60,10 @@ Maps and charts:
   both. Bokeh stays in Mercator.
 - maps use OpenStreetMap tiles by default, on both backends; `positron` and
   `stamen` are withdrawn, so `listtile()` gives `['openstreet', 'esri']`.
+  `esri` is Esri's World Street Map on both backends (bokeh drew its satellite
+  imagery), and both credit their tiles with one short line in the bottom
+  right corner of the map: bokeh credited none, and matplotlib's two-line Esri
+  credit ran over the pink note.
 - new keywords: `pyvoalogo` (the logo is no longer stamped unasked),
   `return_pltaxis` and `maxcountrydisplayed`; `maxlettersdisplayed` defaults
   to 20. Locations missing from the parsed database are shown in pink.

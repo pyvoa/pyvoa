@@ -21,7 +21,7 @@ from matplotlib.ticker import FuncFormatter
 from PIL import Image
 
 from pyvoa.__version__ import __version__
-from pyvoa.kwargs_options import InputOption
+from pyvoa.kwargs_options import TILE_ATTRIBUTION, InputOption
 from pyvoa.tools import (
     PyvoaError,
     equal_area_projection,
@@ -486,7 +486,8 @@ class visu_matplotlib:
         False) are drawn in pink, with a note saying so. The background tiles
         are those 'tile' names, OpenStreetMap ('openstreet') unless another one
         is asked for, fetched with a pyvoa User-Agent, which OpenStreetMap
-        requires; a dense map has none. A location
+        requires, and credited in one short line in the bottom right corner;
+        a dense map has none. A location
         without a geometry of its own is counted but not drawn.
 
         Returns
@@ -580,7 +581,7 @@ class visu_matplotlib:
                 linewidth=0.2,
             )
             ax.text(0.5, 0.05, "In pink: no data available",
-            ha='center', color='#E91E63', fontsize=10, transform=ax.transAxes,
+            ha='center', va='bottom', color='#E91E63', fontsize=10, transform=ax.transAxes,
             bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.8, 'pad': 3})
 
         plot = input.plot(
@@ -639,39 +640,29 @@ class visu_matplotlib:
         # basemap
         if tile is not None:
             if tile == 'openstreet':
-                cx.add_basemap(
-                ax,
-                crs=data_crs,
-                source=cx.providers.OpenStreetMap.Mapnik,
-                headers={
-                    # OpenStreetMap serves a blocked image to a client that
-                    # does not identify itself
-                    "User-Agent": f"pyvoa/{__version__} (+https://github.com/pyvoa/pyvoa)"
-                },
-                )
+                source = cx.providers.OpenStreetMap.Mapnik
+                # OpenStreetMap serves a blocked image to a client that does
+                # not identify itself
+                headers = {"User-Agent": f"pyvoa/{__version__} (+https://github.com/pyvoa/pyvoa)"}
             elif tile == 'esri':
-                cx.add_basemap(
-                    ax,
-                    crs=data_crs,
-                    source=cx.providers.Esri.WorldStreetMap,
-                )
+                source = cx.providers.Esri.WorldStreetMap
+                headers = None
             # withdrawn: Stamen moved to Stadia Maps and no longer loads here
             #elif tile == 'stamen':
-            #    cx.add_basemap(
-            #        ax,
-            #        crs=data_crs,
-            #        source=cx.providers.Stamen.TonerLite,
-            #    )
+            #    source = cx.providers.Stamen.TonerLite
             # withdrawn: CartoDB displays a request for an API key over the map
             #elif tile == 'positron':
-            #    cx.add_basemap(
-            #        ax,
-            #        crs=data_crs,
-            #        source=cx.providers.CartoDB.PositronNoLabels,
-            #    )
-
+            #    source = cx.providers.CartoDB.PositronNoLabels
             else:
                 raise PyvoaError("Don't know what kind of tile it is...")
+            # contextily's own credit is the provider's full one, two lines
+            # wide for Esri, laid bottom left where it ran over the pink note:
+            # a short one goes in the bottom right corner instead, as on a web
+            # map, under the note rather than across it
+            cx.add_basemap(ax, crs=data_crs, source=source, headers=headers, attribution=False)
+            ax.text(0.995, 0.005, TILE_ATTRIBUTION[tile], ha='right', va='bottom',
+                fontsize=6, color='#444444', transform=ax.transAxes,
+                bbox={'facecolor': 'white', 'edgecolor': 'none', 'alpha': 0.6, 'pad': 1})
         if return_pltaxis:
             return ax
         #return ax
