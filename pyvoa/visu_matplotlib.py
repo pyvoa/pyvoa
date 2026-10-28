@@ -282,8 +282,9 @@ class visu_matplotlib:
         """Draw a pie chart of one variable across locations.
 
         The 'maxcountrydisplayed' (12 by default) largest locations get a
-        slice each, and
-        AllVisu gathers the others into a 'SumOthers' slice.
+        slice each, and AllVisu gathers the others into a 'SumOthers' slice,
+        with every location under 2 % of the total, whose percentage would be
+        written over its neighbours'. The legend lists the slices drawn.
 
         Returns
         -------

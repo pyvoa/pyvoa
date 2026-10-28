@@ -88,6 +88,10 @@ Maps and charts:
   or without the slider, and 'SumOthers' is white.
 - fix: two bokeh charts with a date slider in one notebook shared a single
   Play timer, so that pausing one stopped the other.
+- a pie chart gathers into 'SumOthers' every location under 2 % of the
+  total, on both backends and with or without the date slider: the names
+  (bokeh) and percentages (matplotlib) of the thin slices were written over
+  one another, as for the small countries of `where='Western Europe'`.
 
 Behaviour changes:
 

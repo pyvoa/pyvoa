@@ -340,12 +340,19 @@ def rank_locations(frame, which):
         key=lambda c: c.astype(str) if c.name == 'where' else c,
     ).reset_index(drop=True)
 
-def gather_others(frame, which, keep):
+# the share of the whole under which a pie chart gathers a location into
+# 'SumOthers': below 2 %, a slice is too thin for its label, and the names and
+# percentages of the smallest locations were drawn over one another, on both
+# backends
+PIE_MINSHARE = 0.02
+
+def gather_others(frame, which, keep, minshare=0.):
     """Keep the first locations of one date, and gather the others into 'SumOthers'.
 
     What a pie chart or a histogram by value draws, with or without a date
-    slider: the ``keep`` first locations of :func:`rank_locations`, then one
-    row 'SumOthers' summing the others, ranked among them by its value. Its
+    slider: the ``keep`` first locations of :func:`rank_locations` whose
+    share of the date's total is at least ``minshare``, then one row
+    'SumOthers' summing the others, ranked among them by its value. Its
     'where' and its code are 'SumOthers', on both backends and with or
     without the slider, and its colour is white.
 
@@ -356,7 +363,11 @@ def gather_others(frame, which, keep):
     which : str
         The column holding the value.
     keep : int
-        How many locations are kept.
+        How many locations are kept, at most.
+    minshare : float, optional
+        The share of the total under which a location is gathered whatever
+        its rank: :data:`PIE_MINSHARE` for a pie chart, 0 (none) by default.
+        It applies only while the total is positive.
 
     Returns
     -------
@@ -365,11 +376,17 @@ def gather_others(frame, which, keep):
         one, ranked.
     """
     ranked = rank_locations(frame, which)
-    top, others = ranked.iloc[:keep], ranked.iloc[keep:]
+    values = ranked[which].apply(lambda x: x[0] if isinstance(x, list) else x)
+    kept = np.arange(len(ranked)) < keep
+    total = values.sum()
+    if minshare > 0 and total > 0:
+        # a missing value compares False, as it is not drawn either
+        kept &= (values / total >= minshare).to_numpy()
+    top, others = ranked[kept], ranked[~kept]
     if others.empty:
         return top
     rest = {col: ['SumOthers'] for col in ranked.columns}
-    rest[which] = [others[which].apply(lambda x: x[0] if isinstance(x, list) else x).sum()]
+    rest[which] = [values[~kept].sum()]
     if 'date' in ranked.columns:
         rest['date'] = [ranked['date'].iloc[0]]
     rest['colors'] = ['#FFFFFF']

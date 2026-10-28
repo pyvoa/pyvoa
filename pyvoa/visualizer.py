@@ -23,6 +23,7 @@ import numpy as np
 from pyvoa.jsondb_parser import MetaInfo
 from pyvoa.kwargs_options import InputOption
 from pyvoa.tools import (
+    PIE_MINSHARE,
     PyvoaError,
     PyvoaWarning,
     gather_others,
@@ -195,7 +196,8 @@ class AllVisu:
         ``tools.rank_locations``), caps a histogram by location at
         ``maxcountrydisplayed`` of them, and gathers the rest into a
         'SumOthers' slice for a histogram by value or a pie chart
-        (``tools.gather_others``). Each location of a histogram or a pie chart
+        (``tools.gather_others``), along with, on a pie chart, every location
+        under ``tools.PIE_MINSHARE`` (2 %) of the total. Each location of a histogram or a pie chart
         is given the colour front gave it over the whole frame, so that it
         keeps it from one date to another; 'SumOthers' is white.
         """
@@ -240,8 +242,11 @@ class AllVisu:
                 if func.__name__ != 'map' and kwargs['typeofhist'] == 'location':
                     input = input.head(maxcountry)
 
-                if typeofhist == 'value' or typeofhist == 'pie':
+                if typeofhist == 'value':
                     input = gather_others(input, which, maxcountry)
+                elif typeofhist == 'pie':
+                    # a slice too thin for its label joins 'SumOthers' too
+                    input = gather_others(input, which, maxcountry, PIE_MINSHARE)
 
             if kwargs['what'] in ['daily','weekly']:
                cols = [c for c in input.columns if c.endswith(kwargs['what'])]

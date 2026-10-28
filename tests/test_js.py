@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pyvoa.tools import gather_others, rank_locations
+from pyvoa.tools import PIE_MINSHARE, gather_others, rank_locations
 
 JS = Path(__file__).resolve().parents[1] / "pyvoa" / "js"
 
@@ -180,7 +180,7 @@ def test_histo_value_swaps_the_bins_and_fits_the_axes():
 
 SLIDER_NAMES = ["cb_obj", "frames", "sourcemap", "sourcehisto", "which", "dates", "div",
                 "maxcountrydisplayed", "ylabellinear", "ylabellog", "ymax",
-                "color_mapperjs", "titlefigs", "ispie", "titleprefix"]
+                "color_mapperjs", "titlefigs", "ispie", "titleprefix", "minshare"]
 
 # the columns the slider callback computes, which must be the Python ones
 DRAWN = ["where", "tot", "colors", "top", "bottom", "left", "right",
@@ -207,14 +207,15 @@ def slider(frame: pd.DataFrame, maxcountrydisplayed: int, ispie: bool) -> dict:
     """Run the slider callback on one frame of a histogram or a pie chart."""
     consts = (f"const NAMES = {json.dumps(SLIDER_NAMES)};"
               f"const FRAME = {json.dumps(columns(frame))};"
-              f"const MAX = {maxcountrydisplayed}; const ISPIE = {json.dumps(ispie)};")
+              f"const MAX = {maxcountrydisplayed}; const ISPIE = {json.dumps(ispie)};"
+              f"const MINSHARE = {PIE_MINSHARE};")
     return run(consts + """
     const axis = () => ({ticker: {}});
     const src = {data: {colors: ["#000"], extra: ["kept", "kept too"]}};
     const a = {div: {text: ""}, ylin: axis(), ylog: axis()};
     callback("slider_callback.js", NAMES)(
         {value: 0}, [FRAME], src, src, "tot", ["01/02/2021"], a.div, MAX,
-        a.ylin, a.ylog, 400, {}, [], ISPIE, "");
+        a.ylin, a.ylog, 400, {}, [], ISPIE, "", MINSHARE);
     out({data: src.data, ticks: a.ylin.ticker.ticks,
          labels: Object.fromEntries(a.ylin.major_label_overrides), div: a.div.text});
     """)
@@ -223,7 +224,7 @@ def slider(frame: pd.DataFrame, maxcountrydisplayed: int, ispie: bool) -> dict:
 def python_side(frame: pd.DataFrame, maxcountrydisplayed: int, ispie: bool) -> pd.DataFrame:
     """Return what decodateslider draws before the slider moves, on the same frame."""
     if ispie:
-        drawn = gather_others(frame, "tot", maxcountrydisplayed)
+        drawn = gather_others(frame, "tot", maxcountrydisplayed, PIE_MINSHARE)
     else:
         drawn = rank_locations(frame, "tot").head(maxcountrydisplayed)
     pytest.importorskip("bokeh")
@@ -241,17 +242,40 @@ def same(a, b) -> bool:
     return a == b
 
 
+def thin_slices() -> pd.DataFrame:
+    """Return the frame of one date whose smallest shares fall under PIE_MINSHARE."""
+    return pd.DataFrame({
+        "where": ["France", "Germany", "Belgium", "Austria", "Netherlands",
+                  "Switzerland", "Luxembourg", "Liechtenstein", "Monaco"],
+        "code": ["FRA", "DEU", "BEL", "AUT", "NLD", "CHE", "LUX", "LIE", "MCO"],
+        "tot": [424.0, 419.0, 68.0, 47.0, 22.0, 11.0, 1.0, 0.4, 0.2],
+        "colors": ["#a", "#b", "#c", "#d", "#e", "#f", "#g", "#h", "#i"],
+    })
+
+
+@pytest.mark.parametrize("make, maxcountrydisplayed", [(one_date, 4), (thin_slices, 10)],
+                         ids=["capped", "thin slices"])
 @pytest.mark.parametrize("ispie", [False, True], ids=["histogram", "pie"])
-def test_slider_draws_a_date_as_python_draws_it(ispie):
-    frame = one_date().dropna(subset=["tot"])
-    js = slider(frame, 4, ispie)["data"]
-    py = python_side(frame, 4, ispie)
+def test_slider_draws_a_date_as_python_draws_it(ispie, make, maxcountrydisplayed):
+    frame = make().dropna(subset=["tot"])
+    js = slider(frame, maxcountrydisplayed, ispie)["data"]
+    py = python_side(frame, maxcountrydisplayed, ispie)
     for col in DRAWN:
         got, want = js[col], py[col].tolist()
         assert len(got) == len(want), f"{col}: {got} != {want}"
         assert all(same(g, w) for g, w in zip(got, want)), f"{col}: {got} != {want}"
     assert js["extra"] == ["kept"] + ["kept too"] * (len(js["where"]) - 1), (
         "a column nothing recomputes must keep its values, padded to the new length")
+
+
+def test_slider_gathers_the_thin_slices_of_a_pie_only():
+    pie = slider(thin_slices(), 12, True)["data"]
+    # Switzerland (1.1 %) and the three smaller ones make one slice
+    assert pie["where"] == ["France", "Germany", "Belgium", "Austria", "Netherlands", "SumOthers"]
+    assert pie["tot"][-1] == pytest.approx(12.6)
+    assert pie["colors"][-1] == "#FFFFFF"
+    # a histogram keeps every location
+    assert len(slider(thin_slices(), 12, False)["data"]["where"]) == 9
 
 
 def test_slider_ranks_a_missing_value_last():
@@ -281,7 +305,7 @@ def test_slider_maps_each_value_to_its_own_shape():
     callback("slider_callback.js", NAMES)(
         {value: 1}, [{where: ["C"], tot: [1]}, {where: ["C", "A"], tot: [30, 10]}],
         sourcemap, {data: {}}, "tot", ["d0", "d1"], div, 10, null, null, 400,
-        mapper, [fig], false, "SPF database ");
+        mapper, [fig], false, "SPF database ", 0.02);
     out({data: sourcemap.data, low: mapper.low, high: mapper.high,
          emitted: sourcemap.change.emitted === true, title: fig.title.text, div: div.text});
     """)

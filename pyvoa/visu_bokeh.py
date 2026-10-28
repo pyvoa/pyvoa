@@ -54,6 +54,7 @@ from bokeh.transform import cumsum
 
 from pyvoa.kwargs_options import TILE_ATTRIBUTION, InputOption
 from pyvoa.tools import (
+    PIE_MINSHARE,
     PyvoaError,
     PyvoaWarning,
     gather_others,
@@ -860,8 +861,9 @@ class visu_bokeh:
         the last date, with the slider at its end, and a histogram or a pie
         chart shows the maxcountrydisplayed locations ranked by value at every
         date, ties by name as ``tools.rank_locations`` ranks them, and a pie
-        chart gathers the other locations into a 'SumOthers' slice, as it does
-        without the slider. A map holds one shape per location, which the callback colours
+        chart gathers the other locations, and those under
+        ``tools.PIE_MINSHARE`` of the total, into a 'SumOthers' slice, as it
+        does without the slider. A map holds one shape per location, which the callback colours
         with the value of its own location at the date chosen. The default
         title, which ends on the date, follows the slider, and the colour bar
         labels its ticks from the range of that date: plainly between 0.001
@@ -1004,7 +1006,7 @@ class visu_bokeh:
                     if func.__name__ == 'bokeh_pie':
                         # the other locations make one slice, as without the
                         # slider, so that the shares are those of the whole
-                        input_dates = gather_others(input_dates, which, maxcountrydisplayed)
+                        input_dates = gather_others(input_dates, which, maxcountrydisplayed, PIE_MINSHARE)
                     else:
                         input_dates = rank_locations(input_dates, which).head(maxcountrydisplayed)
                     input_dates = self.addcolumnshisto(input_dates,which,maxcountrydisplayed)
@@ -1049,6 +1051,7 @@ class visu_bokeh:
                             'color_mapperjs': color_mapper,
                             'titlefigs': titlefigs,
                             'ispie': func.__name__ == 'bokeh_pie',
+                            'minshare': PIE_MINSHARE,
                             'titleprefix': titleprefix,
                         },
                         code=slider_code)

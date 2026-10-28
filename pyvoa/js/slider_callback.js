@@ -5,7 +5,8 @@ On a map, each value of the selected frame goes to the shape of its location
 and the colour scale is fitted to them. On a histogram or a pie chart, the
 locations are ranked as ``tools.rank_locations`` ranks them, the first
 ``maxcountrydisplayed`` drawn, the others gathered into one ``SumOthers``
-slice of a pie. The title and the date label follow the date drawn.
+slice of a pie, with those under ``minshare`` of the total, as
+``tools.gather_others`` gathers them. The title and the date label follow the date drawn.
 
 Parameters
 ----------
@@ -39,6 +40,9 @@ titlefigs : list of figure
     the figures whose title follows the date.
 ispie : bool
     whether the chart is a pie chart, the only one to gather the others.
+minshare : float
+    the share of the total under which a location of a pie chart is gathered
+    into ``SumOthers`` whatever its rank, ``tools.PIE_MINSHARE``.
 titleprefix : str
     the default title less its trailing ``(date)``, or empty when the caller
     gave a title of their own, which is then left as it is.
@@ -127,12 +131,18 @@ const byname = (a, b) => {
 };
 const rank = (a, b) => (val(b) - val(a)) || byname(a, b);
 const sorted_rows = [...rows].sort(rank);
-let limited = sorted_rows.slice(0, maxcountrydisplayed);
-const others = sorted_rows.slice(maxcountrydisplayed);
+// a pie chart also gathers a slice too thin for its label, as gather_others
+// does: under minshare of the total of the date, a missing value with them
+const num = r => Number(r[which]);
+const all = sorted_rows.reduce((a, r) => a + (Number.isFinite(num(r)) ? num(r) : 0), 0);
+const keep = (r, j) => j < maxcountrydisplayed
+    && (!ispie || !(minshare > 0 && all > 0) || num(r) / all >= minshare);
+let limited = sorted_rows.filter(keep);
+const others = sorted_rows.filter((r, j) => !keep(r, j));
 if (ispie && others.length > 0) {
     // the other locations make one slice, as without the slider, so that the
     // shares are those of the whole
-    const rest = {...limited[0]};
+    const rest = {...(limited.length > 0 ? limited[0] : others[0])};
     rest["where"] = "SumOthers";
     rest["code"] = "SumOthers";
     rest[which] = others.reduce((a, r) => a + (Number.isFinite(Number(r[which])) ? Number(r[which]) : 0), 0);

@@ -1059,6 +1059,25 @@ def test_gather_others_keeps_the_first_and_sums_the_rest_in_white():
     assert list(tools.gather_others(frame, "v", 4)["where"]) == ["B", "D", "C", "A"]
 
 
+def test_gather_others_gathers_the_slices_under_minshare_whatever_their_rank():
+    frame = pd.DataFrame({"where": ["A", "B", "C", "D", "E"], "code": ["A", "B", "C", "D", "E"],
+                          "v": [60.0, 37.0, 1.5, 1.0, 0.5], "colors": ["#a", "#b", "#c", "#d", "#e"]})
+    out = tools.gather_others(frame, "v", 12, tools.PIE_MINSHARE)
+    # C, D and E are each under 2 % of 100: one white slice of 3, ranked last
+    assert list(out["where"]) == ["A", "B", "SumOthers"]
+    assert list(out["v"]) == [60.0, 37.0, 3.0]
+    assert out["colors"].iloc[-1] == "#FFFFFF"
+    # the cap still applies on top of the share
+    assert list(tools.gather_others(frame, "v", 1, tools.PIE_MINSHARE)["where"]) == ["A", "SumOthers"]
+    # no share without it: every location kept, as a histogram by value keeps them
+    assert len(tools.gather_others(frame, "v", 12)) == 5
+
+
+def test_gather_others_ignores_minshare_without_a_positive_total():
+    frame = pd.DataFrame({"where": ["A", "B"], "v": [1.0, -3.0]})
+    assert list(tools.gather_others(frame, "v", 12, 0.02)["where"]) == ["A", "B"]
+
+
 def test_shorten_locations_never_cuts_below_five_letters():
     assert list(tools.shorten_locations(pd.Series(["Luxembourg"]), 2)) == ["Luxem..."]
 

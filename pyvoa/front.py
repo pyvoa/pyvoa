@@ -1012,7 +1012,9 @@ class front:
             How many locations the chart shows at most; 12 by default. The time
             series and the histograms by location keep that many; the pie
             charts and the histograms by value gather the others into a
-            'SumOthers' slice. Must be a positive integer.
+            'SumOthers' slice, which a pie chart also gives every location
+            under 2 % of the total, too thin a slice for its label. Must be a
+            positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional
@@ -1141,7 +1143,9 @@ class front:
             How many locations the chart shows at most; 12 by default. The time
             series and the histograms by location keep that many; the pie
             charts and the histograms by value gather the others into a
-            'SumOthers' slice. Must be a positive integer.
+            'SumOthers' slice, which a pie chart also gives every location
+            under 2 % of the total, too thin a slice for its label. Must be a
+            positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional
@@ -1285,7 +1289,9 @@ class front:
             How many locations the chart shows at most; 12 by default. The time
             series and the histograms by location keep that many; the pie
             charts and the histograms by value gather the others into a
-            'SumOthers' slice. Must be a positive integer.
+            'SumOthers' slice, which a pie chart also gives every location
+            under 2 % of the total, too thin a slice for its label. Must be a
+            positive integer.
         pyvoalogo : bool, optional
             Stamp the pyvoa logo on the figure. Defaults to False.
         return_pltaxis : bool, optional
