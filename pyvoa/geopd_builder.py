@@ -641,14 +641,23 @@ class GPDBuilder:
             )
 
             all_dates = np.sort(input['date'].unique())
+            # a value is carried forward, never back: before a location's
+            # first date it has no value. Its code, geometry and the like are
+            # carried both ways, a row without them being no row at all.
+            values = set(flat_list(which))
+            if kwargs['kwargsuser']['input'].empty:
+                values |= set(self.get_available_keywords())
+
+            def carried(g):
+                g = g.droplevel(0).reindex(all_dates).ffill()
+                labels = [c for c in g.columns if c not in values]
+                g[labels] = g[labels].bfill()
+                return g
 
             input = (
                 input.set_index(['where', 'date'])
                   .groupby(level=0)
-                  .apply(lambda g: g.droplevel(0)
-                                    .reindex(all_dates)
-                                    .ffill()
-                                    .bfill())
+                  .apply(carried)
                   .reset_index()
                   .rename(columns={'index': 'date'})
             )
@@ -706,12 +715,11 @@ class GPDBuilder:
        suffix = ['code','geometry']
        for w in which:
            option = kwargs.get('option',defaultargs['option'][0])
-           input[w] = (
-           input.groupby('where')[w]
-                 .apply(lambda s: s.bfill().ffill())
-                 .reset_index(level=0, drop=True)
-                 .fillna(0)
-                 )
+           # a day without a value takes the last one before it; the days
+           # before a location's first value stay missing. Filled backwards,
+           # they took that first value: sumeau's ratio54, measured from
+           # February 2024, read as a constant over the 18 months before.
+           input[w] = input.groupby('where', observed=True)[w].ffill()
 
            #kwargs['input'] = input
            #if kwargs['kwargsuser']['input'].empty:
@@ -737,10 +745,13 @@ class GPDBuilder:
                    temppd = getnonnegfunc(temppd, w)
                elif o == 'smooth7':
                     temppd[w] = temppd[w].astype(float)
+                    observed = temppd[w].notna()
                     temppd.loc[:,w] = temppd.groupby(['where'])[w].rolling(7,min_periods=7).mean().reset_index(level=0,drop=True)
-                    inx7 = temppd.groupby('where').head(7).index
+                    # the first six days of a series have no full week behind
+                    # them and take the first full week's mean; the days
+                    # before the series starts stay missing
+                    temppd.loc[:,w] = temppd.groupby('where', observed=True)[w].bfill().where(observed)
                     temppd = temppd.reset_index(drop=True)
-                    temppd.loc[inx7, w] = temppd[w].bfill()
                elif o == 'sumall':
                     if 'geometry' in list(temppd.columns):
                         if w.startswith(('cur_idx_', 'cur_tx_')):
@@ -772,7 +783,10 @@ class GPDBuilder:
            windows = InputOption().windows
            for k,v in windows.items():
                input.loc[:,w+k]  = input.groupby('where')[w].diff(v)
-               input.loc[:,w+k]  = input[w + k].bfill()
+               # the first day(s) of a series, which have nothing to be
+               # differenced against, take the next difference of the same
+               # location; before the series starts, nothing
+               input.loc[:,w+k]  = input.groupby('where', observed=True)[w + k].bfill().where(input[w].notna())
                if bypopvalue is not None:
                   input = self.normbypop(input, w+k ,bypopvalue)
 

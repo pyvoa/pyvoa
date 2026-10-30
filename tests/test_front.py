@@ -87,6 +87,55 @@ def test_sumall_adds_up_the_selected_locations_of_an_in_house_frame(in_house_fra
     assert z.set_index('date')['cur_rea sumall'].tolist() == [3.0, 7.0]
 
 
+@pytest.fixture
+def late_frame(cache_dir):
+    """Return a frame where Aisne starts reporting four days after Ain."""
+    days = pd.date_range('2021-03-01', '2021-03-14')
+    yield pd.DataFrame({
+        'date': days.repeat(2),
+        'where': ['Ain', 'Aisne'] * len(days),
+        'cur_rea': [v for d in range(len(days))
+                    for v in (float(d + 1), float('nan') if d < 4 else 10.0 * d)],
+    })
+    plt.close('all')
+
+
+def test_get_gives_no_value_before_a_series_starts(late_frame):
+    # the days before Aisne's first value used to take that first value
+    z = pf.get(input=late_frame, which='cur_rea')
+    aisne = z[z['where'] == 'Aisne'].set_index('date')['cur_rea']
+    assert aisne[:'2021-03-04'].isna().all()
+    assert aisne['2021-03-05':].tolist() == [10.0 * d for d in range(4, 14)]
+    ain = z[z['where'] == 'Ain'].set_index('date')['cur_rea']
+    assert ain.tolist() == [float(d) for d in range(1, 15)]
+
+
+@pytest.mark.parametrize('kwargs, column', [
+    ({'what': 'daily'}, 'cur_rea daily'),
+    ({'what': 'weekly'}, 'cur_rea weekly'),
+    ({'option': 'smooth7'}, 'cur_rea smooth7'),
+])
+def test_daily_and_smooth7_give_no_value_before_a_series_starts(late_frame, kwargs, column):
+    z = pf.get(input=late_frame, which='cur_rea', **kwargs)
+    aisne = z[z['where'] == 'Aisne'].set_index('date')[column]
+    assert aisne[:'2021-03-04'].isna().all()
+    assert aisne['2021-03-05':].notna().all()
+
+
+def test_daily_takes_the_next_difference_on_a_series_first_day(late_frame):
+    z = pf.get(input=late_frame, which='cur_rea', what='daily')
+    aisne = z[z['where'] == 'Aisne'].set_index('date')['cur_rea daily']
+    # 40 on 5 March has nothing before it: it takes the difference of 6 March
+    assert aisne['2021-03-05':].tolist() == [10.0] * 10
+
+
+def test_sumall_adds_only_the_series_already_started(late_frame):
+    z = pf.get(input=late_frame, which='cur_rea', option='sumall')
+    total = z.set_index('date')['cur_rea sumall']
+    assert total[:'2021-03-04'].tolist() == [1.0, 2.0, 3.0, 4.0]
+    assert total['2021-03-05'] == 5.0 + 40.0
+
+
 def test_where_names_what_an_in_house_frame_lacks(in_house_frame):
     with pytest.raises(pf.PyvoaError, match='Not in your table: Paris'):
         pf.get(input=in_house_frame, which='cur_rea', where=['Ain', 'Paris'])

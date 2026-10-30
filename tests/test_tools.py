@@ -244,11 +244,15 @@ def test_week_to_date_single_day_returns_the_middle_of_the_week():
 
 
 def test_week_to_date_compact_week_number():
-    assert tools.week_to_date("202001") == datetime.datetime(2020, 1, 6)
+    # ISO week 1 of 2020 runs from Monday 30 December 2019
+    assert tools.week_to_date("202001") == datetime.datetime(2019, 12, 30)
 
 
 def test_week_to_date_iso_week_number():
-    assert tools.week_to_date("2020-S01") == datetime.datetime(2020, 1, 6)
+    # the Monday of the week itself, as its docstring says and as Santé
+    # publique France dates its weeks: it was the Monday after
+    assert tools.week_to_date("2020-S01") == datetime.datetime(2019, 12, 30)
+    assert tools.week_to_date("2022-S31") == datetime.datetime(2022, 8, 1)
 
 
 def test_fill_missing_dates_inserts_the_missing_days():

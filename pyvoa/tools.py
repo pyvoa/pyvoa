@@ -437,8 +437,8 @@ def fill_missing_dates(p, date_field='date', loc_field='where',
     Every location is given every day between d1 and d2. A day the source
     says nothing about is left missing, never carried over from the day
     before: a column of increments is cumulated afterwards, and forward
-    filling the running totals is ``GPDBuilder.get_stats``'s business. A
-    timezone on the dates is dropped first, the dates being calendar days.
+    filling the series is ``GPDBuilder.get_stats``'s business. A timezone on
+    the dates is dropped first, the dates being calendar days.
 
     Parameters
     ----------
@@ -602,9 +602,9 @@ def week_to_date(whenstr):
         year = whenstr[:4]
         week = '-S'+whenstr[4:]
         whenstr = year + week
-        convertion = datetime.datetime.strptime(whenstr  + '-1' , "%G-S%V-%u")+datetime.timedelta(days = 7)
+        convertion = datetime.datetime.strptime(whenstr  + '-1' , "%G-S%V-%u")
     else:
-        convertion = datetime.datetime.strptime(whenstr  + '-1' , "%G-S%V-%u")+datetime.timedelta(days = 7)
+        convertion = datetime.datetime.strptime(whenstr  + '-1' , "%G-S%V-%u")
     return convertion
 
 def exists_from_url(path):

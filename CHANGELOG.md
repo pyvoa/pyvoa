@@ -112,6 +112,13 @@ Behaviour changes:
 - `sumeau`'s `ratio` is now `ratio54`, the national indicator of the 54
   stations, which starts in February 2024; `ratio12`, the indicator of the
   12 historic stations, from August 2022, is new and the default `which`.
+- `get()` carries a value forward, never back: before a series starts there
+  is no value, where it used to take the first one (`sumeau`'s `ratio54` read
+  as a constant over the 18 months before its first measurement), and a day
+  missing inside a series takes the last value before it, not the next.
+  `daily`, `weekly` and `smooth7` follow.
+- a week number (`2022-S31`) is dated on its own Monday, not on the Monday
+  after (`sumeau`, the weekly tests of `spf`).
 - `pip install pyvoa` brings the matplotlib and bokeh backends with it;
   `pyvoa-full`, which only added them, is no longer needed.
 
