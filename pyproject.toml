@@ -136,7 +136,10 @@ convention = "numpy"
 [tool.ruff.lint.per-file-ignores]
 # The example scripts are documentation, not library code, exactly like the
 # notebooks excluded above: they are meant to read as a user's session.
-"examples/*" = ["D"]
+# EXE: the repository is synced with Overleaf, which knows no file modes and
+# pushes every file back as 100644, so the executable bit of these scripts
+# cannot be relied on. They are run as `python <script>.py` anyway.
+"examples/*" = ["D", "EXE"]
 
 # A test documents itself through its name and its assertions, so a missing
 # docstring is not a finding here. The ones that do carry a docstring are
