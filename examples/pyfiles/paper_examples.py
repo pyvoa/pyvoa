@@ -25,8 +25,9 @@ Figures are written as PDF, which is the vector artwork Elsevier asks for and
 what \includegraphics pulls in from the .tex. Examples 1-4 are the manuscript
 listings and produce Figs. 2-5; example 3 carries a second listing whose output
 is printed rather than drawn, and is reproduced here as the console session the
-manuscript prints under Fig. 4. Examples 5 and 6 are not listings and draw
-nothing — they support claims made in Sections 2.1 and 4.
+manuscript prints under Fig. 4. Examples 5 and 6 are not listings — they support
+claims made in Sections 2.1 and 4; example 5 draws nothing, example 6 writes
+fig6_wastewater_spf.pdf, which the manuscript does not include (yet).
 
 Each example is self-contained and prints the exact snippet that appears in the
 manuscript, so that the listings in the .tex file and the code actually executed
@@ -254,34 +255,91 @@ def example_5(pf, vis: str) -> None:
 # ---------------------------------------------------------------------------
 
 def example_6(pf, vis: str) -> None:
-    """Wastewater signal against reported incidence, same country, same axis.
-    This is the concrete illustration suggested for Impact, point 1: two
-    unrelated providers, one query grammar, one geographic key."""
-    banner(6, "wastewater vs reported incidence (Impact, point 1)", """
-        pf.setwhom('sumeau')
-        waste = pf.get(which='ratio12', what='current', output='pandas')
+    """Wastewater signal against confirmed cases and hospital admissions.
 
-        pf.setwhom('spfnational')
-        cases = pf.get(which='cur_cas', what='daily', option='smooth7',
-                       output='pandas')
+    Not a manuscript listing (yet): the illustration proposed for Impact,
+    point 1. Two providers, one query grammar, one geographic key; get() hands
+    back pandas frames, so the comparison itself is plain pandas and
+    matplotlib, whatever backend --vis names.
+
+    The period is all the two sources share: SUM'Eau starts in August 2022,
+    spfnational stops in June 2023. ratio12 is the indicator of the 12
+    stations followed since 2022 (ratio54 starts in February 2024). The
+    wastewater is sampled once a week, hence weekly means and lags in weeks;
+    its producer smooths it in time on both sides, which flattens the peaks
+    without delaying them.
+    """
+    banner(6, "wastewater against cases and hospital admissions (Impact, point 1)", """
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        when = '08/08/2022:30/06/2023'
+        pf.setwhom('sumeau')          # SARS-CoV-2 in wastewater, France
+        waste = pf.get(which='ratio12', when=when, output='pandas')
+        pf.setwhom('spfnational')     # Santé publique France, national
+        cases = pf.get(which='cur_cas', when=when, output='pandas')
+        hosp = pf.get(which='cur_hospitalises', when=when, output='pandas')
+
+        weekly = pd.DataFrame({
+            'confirmed cases': cases.set_index('date')['cur_cas'],
+            'hospital admissions': hosp.set_index('date')['cur_hospitalises'],
+            'wastewater': waste.set_index('date')['ratio12'],
+        }).resample('W').mean()
+
+        lags = range(-3, 5)           # in weeks; positive: after the wastewater
+        corr = pd.DataFrame({k: [weekly['wastewater'].corr(weekly[k].shift(-lag))
+                                 for lag in lags]
+                             for k in ('confirmed cases', 'hospital admissions')},
+                            index=lags)
+
+        fig, (left, right) = plt.subplots(1, 2, figsize=(10, 3.6),
+                                          width_ratios=(2.2, 1))
+        (weekly / weekly.max()).plot(ax=left, xlabel='',
+                                     ylabel='weekly mean / its maximum')
+        corr.plot(ax=right, marker='o', legend=False,
+                  xlabel='weeks after the wastewater',
+                  ylabel='correlation with wastewater')
     """)
-    pf.setwhom('sumeau')
-    waste = pf.get(which='ratio12', what='current', output='pandas')
-    print(f"    sumeau     -> shape={waste.shape}, "
-          f"{waste['date'].min()} .. {waste['date'].max()}")
+    import matplotlib.pyplot as plt
+    import pandas as pd
 
-    pf.setwhom('spfnational')
-    cases = pf.get(which='cur_cas', what='daily', option='smooth7',
-                   output='pandas')
-    print(f"    spfnational-> shape={cases.shape}, "
-          f"{cases['date'].min()} .. {cases['date'].max()}")
+    when = '08/08/2022:30/06/2023'
+    pf.setwhom('sumeau')          # SARS-CoV-2 in wastewater, France
+    waste = pf.get(which='ratio12', when=when, output='pandas')
+    pf.setwhom('spfnational')     # Santé publique France, national
+    cases = pf.get(which='cur_cas', when=when, output='pandas')
+    hosp = pf.get(which='cur_hospitalises', when=when, output='pandas')
 
-    merged = waste.merge(cases, on=['date', 'where'],
-                         suffixes=('_waste', '_cases'))
-    print(f"    overlapping rows after the merge: {len(merged)}")
-    print("    NB: both frames carry the same 'date'/'where' keys, so the "
-          "join is a one-liner —\n"
-          "        merged = waste.merge(cases, on=['date', 'where'])")
+    weekly = pd.DataFrame({
+        'confirmed cases': cases.set_index('date')['cur_cas'],
+        'hospital admissions': hosp.set_index('date')['cur_hospitalises'],
+        'wastewater': waste.set_index('date')['ratio12'],
+    }).resample('W').mean()
+
+    lags = range(-3, 5)           # in weeks; positive: after the wastewater
+    corr = pd.DataFrame({k: [weekly['wastewater'].corr(weekly[k].shift(-lag))
+                             for lag in lags]
+                         for k in ('confirmed cases', 'hospital admissions')},
+                        index=lags)
+
+    fig, (left, right) = plt.subplots(1, 2, figsize=(10, 3.6),
+                                      width_ratios=(2.2, 1))
+    (weekly / weekly.max()).plot(ax=left, xlabel='',
+                                 ylabel='weekly mean / its maximum')
+    corr.plot(ax=right, marker='o', legend=False,
+              xlabel='weeks after the wastewater',
+              ylabel='correlation with wastewater')
+
+    print(textwrap.indent(corr.round(2).to_string(), "    "))
+    for k in corr:
+        print(f"    {k}: best correlated {corr[k].idxmax():+d} week(s) "
+              f"after the wastewater (r = {corr[k].max():.2f})")
+
+    FIGDIR.mkdir(parents=True, exist_ok=True)
+    target = FIGDIR / "fig6_wastewater_spf.pdf"
+    fig.savefig(target, bbox_inches='tight')
+    plt.close(fig)
+    print(f"    -> {target}")
 
 
 # ---------------------------------------------------------------------------
@@ -318,7 +376,6 @@ def check(pf, vis: str = 'matplotlib') -> int:
         want("database", db, whom)
 
     want("what",   'daily',           set(pf.listwhat()))
-    want("what",   'current',         set(pf.listwhat()))
     want("option", 'smooth7',         set(pf.listoption()))
     want("option", 'normalize:pop1M', set(pf.listoption()))
     want("output", 'pandas',          set(pf.listoutput()))
@@ -336,7 +393,7 @@ def check(pf, vis: str = 'matplotlib') -> int:
             ('jhu',         ('tot_confirmed',), ('G20',)),
             ('spf',         ('cur_hosp',),      ()),
             ('ebolardc',    ('tot_confirmed',), ()),
-            ('spfnational', ('cur_cas',),       ()),
+            ('spfnational', ('cur_cas', 'cur_hospitalises'), ()),
             ('sumeau',      ('ratio12',),         ())):
         try:
             pf.setwhom(db, reload=False)
@@ -369,7 +426,7 @@ EXAMPLES = {
     3: example_3,
     4: example_4,
     5: example_5,   # the geolocation layer alone — not a manuscript listing
-    6: example_6,   # wastewater vs incidence — not a manuscript listing
+    6: example_6,   # wastewater vs cases and admissions — not a listing
 }
 
 
@@ -381,7 +438,7 @@ def main() -> int:
     ap.add_argument('--example', type=int, choices=sorted(EXAMPLES),
                     help="run a single example (default: all)")
     ap.add_argument('--vis', default='matplotlib',
-                    choices=('matplotlib', 'bokeh', 'seaborn'),
+                    choices=('matplotlib', 'bokeh'),
                     help="plotting backend (default: matplotlib)")
     ap.add_argument('--check', action='store_true',
                     help="validate the vocabulary of every call, plot nothing")
@@ -395,10 +452,10 @@ def main() -> int:
         FIGDIR = args.outdir.resolve()
 
     # Headless rendering: the manuscript figures are produced by a script, not
-    # by an interactive session.
-    if args.vis in ('matplotlib', 'seaborn'):
-        import matplotlib
-        matplotlib.use('Agg')
+    # by an interactive session. Whatever --vis says, since example 6 draws
+    # with matplotlib directly.
+    import matplotlib
+    matplotlib.use('Agg')
 
     try:
         import pyvoa.front as pf
