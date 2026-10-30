@@ -36,6 +36,10 @@ Data sources:
 - new keys in the database descriptions: `names` (csv with no header line),
   `splitwhere` (composite locations), `cumulative` and `fillmissing` (sources
   reporting increments), `dateformat` (day-first dates).
+- `sumeau` is read from Odissé, where Santé publique France publishes it
+  now: its data.gouv.fr file, which pyvoa's live mode read, stopped at the
+  second week of 2026. The archive is a new Zenodo record (23822170), up to
+  October 2026.
 - Kosovo is left out of every database, as the UN does not recognise it; `jhu`
   used to add it into Serbia. `owid` and `mpoxgh` no longer merge French
   Guiana and French Polynesia into France, which inflated France's rates.
