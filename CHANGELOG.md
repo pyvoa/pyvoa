@@ -109,6 +109,9 @@ Behaviour changes:
 - `plot()` refuses `dateslider`, which it ignored.
 - `saveoutput()` writes `pyvoa_out.*` by default, instead of `pycoa.ut.*`.
 - `pf.set_verbose_mode()` and `pf.get_verbose_mode()` are front methods again.
+- `sumeau`'s `ratio` is now `ratio54`, the national indicator of the 54
+  stations, which starts in February 2024; `ratio12`, the indicator of the
+  12 historic stations, from August 2022, is new and the default `which`.
 - `pip install pyvoa` brings the matplotlib and bokeh backends with it;
   `pyvoa-full`, which only added them, is no longer needed.
 

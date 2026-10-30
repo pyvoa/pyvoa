@@ -20,9 +20,14 @@
 			 "alias":"semaine"
                 },
     		{
-			"name":"ratio",
+			"name":"ratio12",
+			"alias":"National_12",
+			"description":"Ratio entre la concentration virale de SARS-CoV-2 (exprimée en cg/L et quantification réalisée à partir du gène E) et la concentration en azote ammoniacal (exprimée en mg de N/L), lissé par le producteur et agrégé à l'échelle nationale à partir des 12 stations historiques, suivies depuis 2022"
+    		},
+    		{
+			"name":"ratio54",
 			"alias":"National_54",
-			"description":"Les indicateurs de suivi du SARS-CoV-2 dans les eaux usées sont calculés à partir du ratio entre la concentration virale de SARS-CoV-2 (exprimée en cg/L et quantification réalisée à partir du gène E) et la concentration en azote ammoniacal (exprimée en mg de N/L)"
+			"description":"Le même ratio, agrégé à partir des 54 stations suivies depuis février 2024 : les 12 stations historiques et 42 nouvelles stations"
     		}
   		]
 	}

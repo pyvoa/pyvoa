@@ -259,14 +259,14 @@ def example_6(pf, vis: str) -> None:
     unrelated providers, one query grammar, one geographic key."""
     banner(6, "wastewater vs reported incidence (Impact, point 1)", """
         pf.setwhom('sumeau')
-        waste = pf.get(which='ratio', what='current', output='pandas')
+        waste = pf.get(which='ratio12', what='current', output='pandas')
 
         pf.setwhom('spfnational')
         cases = pf.get(which='cur_cas', what='daily', option='smooth7',
                        output='pandas')
     """)
     pf.setwhom('sumeau')
-    waste = pf.get(which='ratio', what='current', output='pandas')
+    waste = pf.get(which='ratio12', what='current', output='pandas')
     print(f"    sumeau     -> shape={waste.shape}, "
           f"{waste['date'].min()} .. {waste['date'].max()}")
 
@@ -337,7 +337,7 @@ def check(pf, vis: str = 'matplotlib') -> int:
             ('spf',         ('cur_hosp',),      ()),
             ('ebolardc',    ('tot_confirmed',), ()),
             ('spfnational', ('cur_cas',),       ()),
-            ('sumeau',      ('ratio',),         ())):
+            ('sumeau',      ('ratio12',),         ())):
         try:
             pf.setwhom(db, reload=False)
             available = set(pf.listwhich())
