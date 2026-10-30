@@ -20,7 +20,8 @@ MAIN     = main.tex
 # artwork (the architecture schema), which no rule here may remove: it is
 # not reproducible from the code.
 FIGURES  = figures/fig2_timeseries_weu.pdf figures/fig3_map_g20.pdf \
-           figures/fig4_hist_spf.pdf figures/fig5_ebola_drc.pdf
+           figures/fig4_hist_spf.pdf figures/fig5_ebola_drc.pdf \
+           figures/fig6_wastewater_spf.pdf
 
 # latexmk is not in every TeX installation (Debian/Ubuntu ship it in
 # texlive-extra-utils, separately from the class itself). Fall back to what

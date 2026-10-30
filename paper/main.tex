@@ -709,11 +709,27 @@ from the situation reports of the Institut National de Santé Publique, on
 
 \textbf{Questions that become tractable.} Two kinds. First, cross-source
 comparison. Because twenty-three databases share one schema and one geographic
-key, a sub-national national source and an international country-level source
-can be put side by side without writing a join: the French wastewater signal and
-the reported incidence over the same territory, or a country's own agency series
-against the aggregator's rendering of it --- a comparison that surfaces
-reporting artefacts rather than assuming them away. Second, retrospective work
+key, unrelated providers can be put side by side without writing a join.
+Fig.~\ref{fig:wastewater} sets the SARS-CoV-2 signal in French wastewater
+(\texttt{sumeau}) against the confirmed cases and hospital admissions of Santé
+publique France (\texttt{spfnational}), in five pyvoa calls and a few lines of
+pandas. The cases move with the wastewater; the admissions follow it by about a
+week, in line with the lead over emergency visits reported by the
+network~\cite{jourdain2025}; and in 2023 the cases fall away as testing
+declined --- a reporting artefact the comparison surfaces rather than assumes
+away.
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[width=0.95\textwidth]{figures/fig6_wastewater_spf.pdf}
+\caption{SARS-CoV-2 in the wastewater of the twelve SUM'Eau stations followed
+since 2022, confirmed cases and hospital admissions in France, as weekly means
+scaled to their maximum (left), and the correlation of each with the wastewater
+against the lag (right), August 2022 to June 2023.}
+\label{fig:wastewater}
+\end{figure}
+
+Second, retrospective work
 on sources that have ceased. The JHU series used in Section~\ref{sec:examples}
 is no longer published; it is nonetheless fetched, by identifier, in one line.
 The reverse case is served by the same code: an outbreak still under way, such
@@ -781,14 +797,20 @@ relecteur peut les constater. \textbf{(d)}~Le nombre de vues de la réutilisatio
 data.gouv.fr (5\,452 le 9 octobre 2026, API data.gouv.fr) est à relire avant
 soumission.}
 
-\attnpar{\textbf{Suggestion de contenu pour le premier point du canevas, les questions
-nouvelles que le logiciel rend abordables.} L'exemple le plus convaincant
-serait une figure ou une phrase montrant une question réellement traitée grâce à la
-réconciliation multi-sources --- par exemple la comparaison
-\texttt{sumeau} (eaux usées) / \texttt{spfnational} (incidence déclarée) sur la même
-période, qui n'est faisable en deux lignes qu'avec pyvoa. Si vous disposez d'un tel
-résultat, même modeste, il vaut mieux qu'un argument d'architecture. Le script
-d'exemples fourni contient la requête correspondante.}
+\attnpar{Figure~\ref{fig:wastewater} : produite par l'exemple 6 de
+\texttt{paper\_examples.py} (\texttt{ratio12} de \texttt{sumeau}, \texttt{cur\_cas}
+et \texttt{cur\_hospitalises} de \texttt{spfnational}). Corrélations maximales :
+cas à 0 semaine (r = 0,85), hospitalisations à +1 semaine (r = 0,90 ; +6 jours à
+la résolution quotidienne, 4 à 11 jours selon la vague). Limites : un prélèvement
+par semaine, un jour ouvré non fixé, donc un décalage connu à la semaine près ;
+l'indicateur est lissé par Santé publique France (LOESS, puis GAM hiérarchique
+depuis septembre 2025, historique recalculé), un lissage bilatéral qui aplatit
+les pics sans les retarder, mais qui utilise les semaines suivantes : c'est
+l'avance mesurée a posteriori, pas celle d'une alerte en temps réel. Révisions
+entre l'archive (février 2026) et Odissé (octobre 2026) : 0,1 \% en médiane sur
+la période. Le 8 février 2023, \texttt{spfnational} déclare 3\,419 admissions en
+un jour (rattrapage probable), visible sur la figure ; le décalage n'en dépend
+pas.}
 
 
 %% ============================================================================
@@ -905,9 +927,9 @@ S7 & Support email for questions & contact@pyvoa.org \\
 \label{executableMetadata}
 \end{table}
 
-\attnpar{Bibliographie. 22 entrées, toutes citées (SoftwareX refuse les
+\attnpar{Bibliographie. 23 entrées, toutes citées (SoftwareX refuse les
 références non citées), numérotées dans l'ordre de première citation par
-\texttt{elsarticle-num}. Les douze qui ont un DOI le portent, comme Elsevier le
+\texttt{elsarticle-num}. Les treize qui ont un DOI le portent, comme Elsevier le
 souhaite ; les dix autres sont des logiciels ou des pages web, ce qui est admis.
 \texttt{ponce2021}, \texttt{covid\_pypi} et \texttt{covid19py} ont été vérifiés
 le 8 octobre 2026 (Crossref, PyPI, Software Heritage). \textbf{À la soumission} :

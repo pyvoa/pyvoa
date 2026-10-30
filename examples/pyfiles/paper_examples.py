@@ -27,7 +27,7 @@ listings and produce Figs. 2-5; example 3 carries a second listing whose output
 is printed rather than drawn, and is reproduced here as the console session the
 manuscript prints under Fig. 4. Examples 5 and 6 are not listings — they support
 claims made in Sections 2.1 and 4; example 5 draws nothing, example 6 writes
-fig6_wastewater_spf.pdf, which the manuscript does not include (yet).
+Fig. 6 (Section 4), whose code the manuscript describes without printing it.
 
 Each example is self-contained and prints the exact snippet that appears in the
 manuscript, so that the listings in the .tex file and the code actually executed
@@ -257,8 +257,9 @@ def example_5(pf, vis: str) -> None:
 def example_6(pf, vis: str) -> None:
     """Wastewater signal against confirmed cases and hospital admissions.
 
-    Not a manuscript listing (yet): the illustration proposed for Impact,
-    point 1. Two providers, one query grammar, one geographic key; get() hands
+    Not a manuscript listing, but Fig. 6, in Impact, point 1 (questions that
+    become tractable): the manuscript describes the code without printing it,
+    the word budget leaving no room. Two providers, one query grammar, one geographic key; get() hands
     back pandas frames, so the comparison itself is plain pandas and
     matplotlib, whatever backend --vis names.
 
@@ -269,7 +270,7 @@ def example_6(pf, vis: str) -> None:
     its producer smooths it in time on both sides, which flattens the peaks
     without delaying them.
     """
-    banner(6, "wastewater against cases and hospital admissions (Impact, point 1)", """
+    banner(6, "wastewater against cases and hospital admissions (Fig. 6)", """
         import matplotlib.pyplot as plt
         import pandas as pd
 
@@ -426,7 +427,7 @@ EXAMPLES = {
     3: example_3,
     4: example_4,
     5: example_5,   # the geolocation layer alone — not a manuscript listing
-    6: example_6,   # wastewater vs cases and admissions — not a listing
+    6: example_6,   # wastewater vs cases and admissions (Fig. 6) — not a listing
 }
 
 
