@@ -174,7 +174,9 @@ def example_3(pf, vis: str) -> None:
     # The option context is what makes the printed frame the frame the paper
     # shows: pandas sizes its repr on the terminal, and elides every column
     # between 'date' and 'geometry' when it cannot measure one, which is the
-    # case as soon as the output is redirected to a file.
+    # case as soon as the output is redirected to a file. 60 characters, not a
+    # terminal's 80: the frame then wraps into three blocks of at most 54
+    # characters, which fit a column of Elsevier's two-column layout.
     import pandas as pd
 
     print("    >>> type(pdf)")
@@ -189,7 +191,7 @@ def example_3(pf, vis: str) -> None:
     print(f"    {pf.listoutput()}")
     print()
     print("    >>> pdf.head(4)")
-    with pd.option_context('display.width', 80, 'display.max_columns', None):
+    with pd.option_context('display.width', 60, 'display.max_columns', None):
         print(textwrap.indent(repr(pdf.head(4)), "    "))
 
 
