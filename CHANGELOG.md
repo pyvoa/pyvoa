@@ -40,6 +40,10 @@ Data sources:
   now: its data.gouv.fr file, which pyvoa's live mode read, stopped at the
   second week of 2026. The archive is a new Zenodo record (23822170), up to
   October 2026.
+- `govcy` reads the current file of the Cypriot portal, to 14 April 2022
+  instead of 13 January: the one it read had been replaced. The Ministry of
+  Health has revised the deaths upwards since January 2021 (730 instead of
+  672 on 13 January 2022); the archive is a new Zenodo version (23838249).
 - Kosovo is left out of every database, as the UN does not recognise it; `jhu`
   used to add it into Serbia. `owid` and `mpoxgh` no longer merge French
   Guiana and French Polynesia into France, which inflated France's rates.
