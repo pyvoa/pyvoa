@@ -256,7 +256,7 @@ Packaging and documentation:
 
 ## 0.5.0 — 2026-08-06
 Eight months and 236 commits since 0.4.2 (2025-12-12 to 2026-08-06), in two
-strands: the data and visualization work that occupied most of the period, and
+strands: the data and visualisation work that occupied most of the period, and
 the publication-readiness push of the last few days. A handful of names
 changed, so this is not a drop-in upgrade from 0.4.2 — see the renames below.
 
@@ -287,7 +287,7 @@ Geography:
 - fix: the `europa` database declared its geography as `EUR` while its data is
   world-wide; it is described as `WLD` now.
 
-Visualization:
+Visualisation:
 
 - `setvisu()` is now `setvis()`, and `get_echoinfo()` moved to the front module.
 - the axis-type option is now `scale` (`linear` or `log`), and it applies to
@@ -330,7 +330,7 @@ Errors, warnings and verbosity:
 - Warnings are quiet at verbosity 1, and the noise that external modules print
   when a French map archive or a datetime column is read is swallowed below
   verbosity 2. This entry used to say that `set_verbose_mode()` was exposed on
-  the front module as well. It was, on `main`, from `36e0768` (february 2026)
+  the front module as well. It was, on `main`, from `36e0768` (February 2026)
   until `5b127de` cleared the lint findings hours before the tag: the name was
   only ever imported into `front.py`, never used there, so ruff reported it as
   an unused import and removed it. No released version shipped it, and the
@@ -361,13 +361,13 @@ Packaging, tests and process:
 
 ## 0.4.0 — 2025-12-12
 Five months and 359 commits (2025-07-08 to 2025-12-12). The release settles the
-vocabulary of the front-end API and finishes the visualization layer inherited
+vocabulary of the front-end API and finishes the visualisation layer inherited
 from PyCoA, so nearly every rename a 0.3.x user has to know about is here.
 
-- Most of the work consisted in adding decorators to the classes.
+- Most of the work consisted of adding decorators to the classes.
 - Jupyter is not mandatory to use pyvoa; it can be used from a console.
-- add json description of the database
-- we use one class per visualization
+- each database is described by a JSON file.
+- each visualisation backend has a class of its own.
 - renamed on the front, with no compatibility aliases: `setvisu()` is
   `setvis()` (by way of a short-lived `setgraphics()`), `listvisu()` is
   `listvis()`, `getrawdb()` is `getdatabase()`, `listbypop()` is `listpop()`,
@@ -409,8 +409,7 @@ from PyCoA, so nearly every rename a 0.3.x user has to know about is here.
 First full release on PyPI. No git tag was ever pushed for it; the release was
 prepared in `05b3f0c`.
 
-- cosmetic and docstrings
-- version for pip, first full version
+- cosmetic changes, and docstrings.
 - the docstrings were written across the whole code base with LLM assistance.
 - Google Colab is detected and handled.
 - the front-end input handling was refactored, and the error messages with it.
@@ -419,24 +418,24 @@ prepared in `05b3f0c`.
 - the error banner adapts to the terminal size, and to there being no terminal.
 
 ## 0.3.0 — 2025-03-26
-- import of the whole former PyCoA software into pyvoa
-- using matplotlib as graphical output
+- the whole former PyCoA software is imported into pyvoa.
+- matplotlib is added as a graphical output, next to bokeh.
 - the import landed in a single commit — 24 files, about 5100 lines — bringing
-  the bokeh, matplotlib and seaborn visualizers, the geo module and the JSON
+  the bokeh, matplotlib and seaborn visualisers, the geo module and the JSON
   database descriptions.
 - bokeh is detected rather than assumed, and the data path the import brought
   with it was corrected.
 
 ## 0.2.2 — 2025-03-19
-- nothing (pip troubles with previous version)
+- nothing new: a re-release, after pip trouble with the previous one.
 
 ## 0.2.1 — 2025-03-19
-- Structure of the package to deal with pip
-- data file can be access now. See test1.py
+- the package is structured for pip.
+- the data files can be accessed now; see `test1.py`.
 - no git tag was pushed for this one either.
 
 ## 0.2.0 — 2024-12-19
-Adding geo and a python example. This changelog starts here.
+Adds the `geo` module and a Python example. This changelog starts here.
 
 ## 0.1.0 — 2024-12-19
 First import, skeleton only: the project structure and a first upload to PyPI.
@@ -454,27 +453,27 @@ the import of the code base it had already accumulated. The lineage:
 | 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2023 | <https://github.com/coa-project/pycoa> (private), until 2025-03-24 |
 | 3 | **pyvoa** — Python Virus Open Analysis | since 2023 | a branch of the PyCoA repository, then <https://github.com/pyvoa/pyvoa>, opened in 2024-12 and holding the code from 2025-03 |
 
-### CoCoA, april to november 2020
+### CoCoA, April to November 2020
 
 Started during the Covid Hackathon of April 2020 by Tristan Beau, Julien
-Browaeys and Olivier Dadoun. 266 commits, tags `v0.1` (may 2020), `v0.2` and
-`v0.3` (june 2020), and a `1.0` announced in the README while the code still
+Browaeys and Olivier Dadoun. 266 commits, tags `v0.1` (May 2020), `v0.2` and
+`v0.3` (June 2020), and a `1.0` announced in the README while the code still
 called itself `pre1.0`.
 
 - the aim was already the one pyvoa states today: simplified, unified access to
   Covid databases for people who are not data specialists — pupils, students,
   science journalists, and scientists outside the field — with raw data, time
   series and maps a few lines of code away.
-- bokeh output from `v0.2`, in may 2020; worldometers support in july.
+- bokeh output from `v0.2`, in May 2020; worldometers support in July.
 - three modules of that first design are still in pyvoa under the same names:
-  `geo.py`, which arrived in july 2020 already carrying `GeoManager` and the
+  `geo.py`, which arrived in July 2020 already carrying `GeoManager` and the
   standardisation of location names, and `tools.py`, renamed from `verb.py` in
-  november 2020. A third, `error.py`, survived until 0.5.0 folded it into
+  November 2020. A third, `error.py`, survived until 0.5.0 folded it into
   `tools.py`.
-- in november 2020 the project was renamed and moved; the CoCoA README has
+- in November 2020 the project was renamed and moved; the CoCoA README has
   pointed at the new home ever since.
 
-### PyCoA, november 2020 to 2023, and pyvoa in its repository until march 2025
+### PyCoA, November 2020 to 2023, and pyvoa in its repository until March 2025
 
 The repository is private, so the history below is summarised from PyCoA's own
 `Release_notes.md` and from its log — the authoritative record, and not public.
@@ -483,41 +482,41 @@ The repository is private, so the history below is summarised from PyCoA's own
 (about 470), Noam Boulze (77), Alexander Martínez Méndez and Julien Browaeys.
 2021 was the busiest year, at 822 commits.
 
-- **v1.0, november 2020** — first official release: the worldwide JHU database.
-- **v2.0, february 2021** — major release. More than one database at last:
+- **v1.0, November 2020** — first official release: the worldwide JHU database.
+- **v2.0, February 2021** — major release. More than one database at last:
   OWID worldwide, JHU-USA, and SPF and OpenCovid19 for France. A `GeoCountry`
   class for local geography, an automatic cache, and a wide rework of the
   graphical output, the data processing and the front end.
-- **v2.01 and v2.02, march 2021** — local databases for the USA
+- **v2.01 and v2.02, March 2021** — local databases for the USA
   (Covidtracking), Italy (dpc) and India (covid19india). A pandas dataframe
   became the standard output; pie charts and the date slider arrived; Windows
   and SPF fixes.
-- **v2.10, october 2021** — national databases for ESP, DEU, BEL, GBR and PRT,
+- **v2.10, October 2021** — national databases for ESP, DEU, BEL, GBR and PRT,
   the Obépine and opencovid19national French sets, map labels for the bokeh
   maps, a `rapport` class, `export` and `merger`, and `sumall` over lists of
   lists.
 - **v2.11** — decorators and kwargs uniformised across the front, date plots
   over several variables and locations, `vline` and `hline` modes, the GRC and
   CYP databases, geopandas output.
-- **v2.20, march 2022** — population figures for the USA and France and
+- **v2.20, March 2022** — population figures for the USA and France and
   normalisation by population, yearly and spiral plots, a choice between dense
   and standard geometry for ESP, FRA and USA, the Insee, Risklayer, Europa,
   Greece and Cyprus databases, and the bokeh figure handed back to the caller.
-- **v2.21, september 2022** — the `condensed` map label for USA and FRA, and
+- **v2.21, September 2022** — the `condensed` map label for USA and FRA, and
   repairs to databases that had changed shape upstream. Tagged for FdS 2022.
-- **v2.22, november 2023** — the database parsing split into a `dbparser`
+- **v2.22, November 2023** — the database parsing split into a `dbparser`
   class, so that one file describes a database; `setwhom(reload=True)` reading
   a pickled cache; OWID replacing JHU as the default database.
 
 After v2.22 the work went on untagged for 311 more commits. In 2023 the project
 was renamed pyvoa, and developed in a branch of the PyCoA repository:
 
-- matplotlib and seaborn backends joined bokeh in may 2024, and the front end
-  was pulled apart from the visualization classes — batch output separated from
+- matplotlib and seaborn backends joined bokeh in May 2024, and the front end
+  was pulled apart from the visualisation classes — batch output separated from
   graphical output, `bypop` moved out of `allvisu`, `front.py` rewritten.
 - an Olympics medal dataset was carried for a while as an experiment. pyvoa
   dropped it in 0.4.0, on the grounds that it is not a virus database.
-- in february and march 2025 pyvoa left the PyCoA repository for a repository
+- in February and March 2025 pyvoa left the PyCoA repository for a repository
   of its own, and the code took the name: `src` became `pyvoa`, the JSON
   descriptions became `pyvoa-data`, `Coa` became `Pyvoa` throughout, and the
   covid-specific vocabulary was taken out of the code. The last PyCoA commit is

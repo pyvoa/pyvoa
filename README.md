@@ -9,7 +9,6 @@
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/pyvoa/pyvoa/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/pyvoa/pyvoa)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-
 [pyvoa](https://pyvoa.org) (Python Virus Open Analysis) is a Python™ package that provides:
 
 - easy access to COVID-19 and other viral disease datasets;
@@ -51,7 +50,7 @@ pf.setvis('matplotlib')     # or 'bokeh'
 pf.plot(where=['France', 'Italy', 'Spain'], which='total_deaths', what='daily')
 
 # map total deaths across all places covered by the database
-pf.map(which='total_deaths')  
+pf.map(which='total_deaths')
 ```
 
 - `where` accepts a place name or a list of place names. Names are matched
@@ -74,9 +73,7 @@ Downloads are cached in `~/.cache/pyvoa.data_<username>/`, making subsequent
 runs faster. Calling `pf.setwhom('owid', reload=False)` reuses the local copy
 saved by a previous call without downloading the data again.
 
-
 ### Archived data, live data
-
 
 By default, pyvoa uses archive mode, retrieving data from the project’s Zenodo mirrors wherever available. These archived snapshots preserve reproducibility even when the original providers change or their files become unavailable. Databases available only from live online sources are an exception: archive mode automatically falls back to the provider.
 
@@ -109,7 +106,6 @@ pf.listvis()       # ['bokeh', 'matplotlib']
 pf.listoutput()    # ['geopandas', 'pandas', 'list', 'dict', 'array']
 ```
 
-
 ## Supported databases
 
 pyvoa includes 23 databases. `pf.listwhom()` returns the keys listed below, and `pf.setwhom(key)` selects a database. Each is described by a JSON file in [`pyvoa/data/`](pyvoa/data/). Adding a source usually requires only a new JSON descriptor, with no Python code to write (see [CONTRIBUTING.md §6](CONTRIBUTING.md#6-adding-a-new-database)).
@@ -124,7 +120,6 @@ By default, data are retrieved from Zenodo mirrors where available, preserving r
 Only the archived data provide reproducible results across retrieval dates; see [Archived data, live data](#archived-data-live-data).
 
 The *Licence* column refers to the data licence specified by the provider and retained with the Zenodo mirror, where one exists. These terms govern reuse of the data and are separate from pyvoa’s MIT licence. For example, the licence for `imed` prohibits commercial use.
-
 
 | Key | Coverage | Granularity | Source | Licence | Availability |
 |---|---|---|---|---|---|
@@ -153,7 +148,6 @@ The *Licence* column refers to the data licence specified by the provider and re
 | `sumeau` | France | country | Santé publique France (SUM'Eau) | Licence Ouverte / Etalab 2.0 | both |
 
 Most of these databases contain COVID-19 series. The exceptions are `mpoxgh`, which covers mpox; `ebolardc`, which covers the 2026 Bundibugyo ebolavirus outbreak in the Democratic Republic of the Congo; and `measles-usa`, which tracks measles cases in the United States. Several providers have stopped updating their COVID-19 datasets, so the latest available date varies by database. `pf.setwhom()` displays this date when a database is selected.
-
 
 ## Documentation and examples
 
@@ -194,7 +188,6 @@ make -C docs html
 
 Then open `docs/_build/html/index.html` in your browser.
 
-
 ## Community and support
 
 - **Questions about using pyvoa** — ask in [GitHub Discussions](https://github.com/pyvoa/pyvoa/discussions). Beginner questions are welcome: pyvoa is designed to be accessible to people new to data analysis.
@@ -202,9 +195,6 @@ Then open `docs/_build/html/index.html` in your browser.
 - **Contributing** — see [CONTRIBUTING.md](CONTRIBUTING.md), including the checklist for [adding a new database](CONTRIBUTING.md#6-adding-a-new-database).
 - **Community guidelines** — all participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 - **Security or privacy concerns** — contact [contact@pyvoa.org](mailto:contact@pyvoa.org) privately rather than opening a public issue.
-
-
-
 
 ## Citation
 
@@ -215,7 +205,6 @@ generate a formatted citation.
 See [AUTHORS](AUTHORS) for authorship details and
 [CONTRIBUTORS.md](CONTRIBUTORS.md) for acknowledgements of other contributions.
 
-
 ## Funding
 
 This work was supported by the IdEx « Université Paris Cité 2022 », funded by
@@ -225,7 +214,6 @@ ANR-18-IDEX-0001]; and by the
 of Université Paris Cité.
 
 The pyvoa team is required to acknowledge both funding sources in its publications, presentations and other project materials; see the *Funding* section of [AUTHORS](AUTHORS). Users of pyvoa are not required to acknowledge these funding sources in their own work.
-
 
 ## Licence
 

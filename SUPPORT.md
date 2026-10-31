@@ -60,8 +60,8 @@ The issue form asks for these, and they are what makes a report actionable
    verbosity up to debug first usually makes the cause visible:
 
    ```python
-   from pyvoa.tools import set_verbose_mode
-   set_verbose_mode(2)   # 0 = silent, 1 = info, 2 = debug
+   import pyvoa.front as pf
+   pf.set_verbose_mode(2)   # 0 = silent, 1 = info, 2 = debug
    ```
 4. **The date you ran it**, since the upstream data changes from day to day.
 
