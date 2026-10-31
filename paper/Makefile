@@ -60,7 +60,7 @@ else
 endif
 	@mv -f main.pdf pyvoa-softwarex.pdf
 	@echo "-> paper/pyvoa-softwarex.pdf (submit this one)"
-	@echo "   check it: no red, and sections 1-5 within 6 pages."
+	@echo "   check it: no red, and sections 1-5 within 4000 words (make check)."
 
 check:
 	cd .. && $(PYTHON) -m pytest tests/test_paper.py -v
