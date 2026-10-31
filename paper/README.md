@@ -58,11 +58,11 @@ them in order of first citation as the guide for authors requires. Submit
 The annotations are switched by a single toggle at the top of `main.tex`; the
 Makefile sets it, nothing else differs between the two builds.
 
-The class is `preprint,12pt,a4paper`, which is a reading layout, not the
-published one: `make final` currently gives 13 pages. Recompiled with
-`final,5p,times,twocolumn` — Elsevier's own two-column layout — the same source
-is 6 pages including the metadata tables and the references, which is how the
-6-page limit on sections 1-5 should be judged.
+The class is `preprint,12pt,a4paper`, the single-column layout of the
+SoftwareX template, and the one to submit: Elsevier typesets the published,
+two-column version itself. The guide's limits apply to sections 1-5 — at most
+4000 words, which it puts before the page count, and at most six figures —
+and `tests/test_paper.py` checks both.
 
 ## Two things to be aware of
 
