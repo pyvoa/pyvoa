@@ -139,8 +139,9 @@ using the examples in `examples/`.
    the file, in the style of the entries already there: one bullet per
    user-visible change, written for someone upgrading rather than for someone
    reading the diff, and prefixed with `fix:` when it is a bug fix. The file
-   predates this project and does not follow *Keep a Changelog*; please match
-   the surrounding entries rather than introducing a new structure.
+   predates these guidelines and does not follow *Keep a Changelog*: entries go
+   under `## Unreleased`, grouped by theme as in the entries already there, and
+   each release becomes a dated `## X.Y.Z — YYYY-MM-DD` section (see §9).
 
 A maintainer will review the pull request. Review comments are about the code,
 never about the person; see the [Code of Conduct](CODE_OF_CONDUCT.md).
@@ -227,13 +228,17 @@ committing, unless the output is the point of the example.
 
 ## 9. Releases (maintainers)
 
-1. Update `CHANGELOG.md` and the version number in `pyvoa/__version__.py` — the
-   single source of truth, from which `pyproject.toml` reads it dynamically.
-2. Tag the release: `git tag -a v0.4.3 -m "v0.4.3" && git push --tags`.
+1. In `CHANGELOG.md`, turn the `## Unreleased` heading into
+   `## X.Y.Z — YYYY-MM-DD` and open a new, empty `## Unreleased` above it;
+   update the version number in `pyvoa/__version__.py` — the single source
+   of truth, from which `pyproject.toml` reads it dynamically.
+2. Tag the release: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
 3. Publish on PyPI; check that the GitHub-Zenodo hook has minted a version DOI
    and that the Zenodo metadata (title, author list, ORCID) matches
    `CITATION.cff`.
-4. Update `version`, `date-released` and the DOI in `CITATION.cff`, then check it
-   with `pipx run cffconvert --validate`. Run it through `pipx` (or `uvx`):
+4. Update `version`, `date-released` and the DOI in `CITATION.cff`, and
+   `version` and `datePublished` in `codemeta.json` and `schemaorg.jsonld`,
+   then check `CITATION.cff` with `pipx run cffconvert --validate`. Run it
+   through `pipx` (or `uvx`):
    cffconvert requires `jsonschema<4` and will downgrade it in a shared
    environment.

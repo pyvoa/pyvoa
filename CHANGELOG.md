@@ -1,4 +1,6 @@
-# Unreleased
+# Changelog
+
+## Unreleased
 Since 0.5.0 (2026-08-06), in short:
 
 - data sources: `measles-usa` and `ebolardc` come in, `sentinellesIRA` and
@@ -252,7 +254,7 @@ Packaging and documentation:
   through `input=`: `PyvoaFront-withINSEE.ipynb` and
   `examples/pyfiles/insee_deaths.py`.
 
-# version 0.5.0
+## 0.5.0 — 2026-08-06
 Eight months and 236 commits since 0.4.2 (2025-12-12 to 2026-08-06), in two
 strands: the data and visualization work that occupied most of the period, and
 the publication-readiness push of the last few days. A handful of names
@@ -350,14 +352,14 @@ Packaging, tests and process:
   `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SUPPORT.md` and the issue forms.
 - `__pycache__` is no longer tracked.
 
-# version 0.4.2
+## 0.4.2 — 2025-12-12
 - a re-release for pip: the version string and the help text, nothing else.
 
-# version 0.4.1
+## 0.4.1 — 2025-12-12
 - cosmetic: the project logo is the PNG one, and the JPEG `pyvoa_logo2.jpg` is
   dropped from the package data.
 
-# version 0.4.0
+## 0.4.0 — 2025-12-12
 Five months and 359 commits (2025-07-08 to 2025-12-12). The release settles the
 vocabulary of the front-end API and finishes the visualization layer inherited
 from PyCoA, so nearly every rename a 0.3.x user has to know about is here.
@@ -403,7 +405,7 @@ from PyCoA, so nearly every rename a 0.3.x user has to know about is here.
 - the surviving `pycoa` references became `pyvoa`, and `pyvoa.fr` became
   `pyvoa.org`.
 
-# version 0.3.1
+## 0.3.1 — 2025-07-08
 First full release on PyPI. No git tag was ever pushed for it; the release was
 prepared in `05b3f0c`.
 
@@ -416,7 +418,7 @@ prepared in `05b3f0c`.
   on.
 - the error banner adapts to the terminal size, and to there being no terminal.
 
-# version 0.3.0
+## 0.3.0 — 2025-03-26
 - import of the whole former PyCoA software into pyvoa
 - using matplotlib as graphical output
 - the import landed in a single commit — 24 files, about 5100 lines — bringing
@@ -425,23 +427,23 @@ prepared in `05b3f0c`.
 - bokeh is detected rather than assumed, and the data path the import brought
   with it was corrected.
 
-# version 0.2.2
+## 0.2.2 — 2025-03-19
 - nothing (pip troubles with previous version)
 
-# version 0.2.1
+## 0.2.1 — 2025-03-19
 - Structure of the package to deal with pip
 - data file can be access now. See test1.py
 - no git tag was pushed for this one either.
 
-# version 0.2.0
+## 0.2.0 — 2024-12-19
 Adding geo and a python example. This changelog starts here.
 
-# version 0.1.0
+## 0.1.0 — 2024-12-19
 First import, skeleton only: the project structure and a first upload to PyPI.
 
 ---
 
-# Before pyvoa — CoCoA and PyCoA, 2020 to 2023
+## Before pyvoa — CoCoA and PyCoA, 2020 to 2023
 
 pyvoa is the third name of one continuous project, and version 0.3.0 above is
 the import of the code base it had already accumulated. The lineage:
@@ -452,7 +454,7 @@ the import of the code base it had already accumulated. The lineage:
 | 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2023 | <https://github.com/coa-project/pycoa> (private), until 2025-03-24 |
 | 3 | **pyvoa** — Python Virus Open Analysis | since 2023 | a branch of the PyCoA repository, then <https://github.com/pyvoa/pyvoa>, opened in 2024-12 and holding the code from 2025-03 |
 
-## CoCoA, april to november 2020
+### CoCoA, april to november 2020
 
 Started during the Covid Hackathon of April 2020 by Tristan Beau, Julien
 Browaeys and Olivier Dadoun. 266 commits, tags `v0.1` (may 2020), `v0.2` and
@@ -472,7 +474,7 @@ called itself `pre1.0`.
 - in november 2020 the project was renamed and moved; the CoCoA README has
   pointed at the new home ever since.
 
-## PyCoA, november 2020 to 2023, and pyvoa in its repository until march 2025
+### PyCoA, november 2020 to 2023, and pyvoa in its repository until march 2025
 
 The repository is private, so the history below is summarised from PyCoA's own
 `Release_notes.md` and from its log — the authoritative record, and not public.
