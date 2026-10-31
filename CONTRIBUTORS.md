@@ -31,14 +31,14 @@ Also listed in [`AUTHORS`](AUTHORS), with affiliations and CRediT roles.
 pyvoa is the third name of one continuous project: it began as
 [CoCoA](https://github.com/tjbtjbtjb/CoCoA) (Covid Collaborative Analysis) at
 the Covid Hackathon of April 2020, became
-[pycoa](https://github.com/coa-project/pycoa) (Python COVID Analysis) that
-November, and pyvoa in 2025. Contributions made to CoCoA and pycoa are recorded
-in the git histories of those repositories; the pycoa one is no longer public,
+[PyCoA](https://github.com/coa-project/pycoa) (Python Covid Analysis) that
+November, and pyvoa in 2023. Contributions made to CoCoA and PyCoA are recorded
+in the git histories of those repositories; the PyCoA one is no longer public,
 and [`CHANGELOG.md`](CHANGELOG.md) carries a summary of both.
 
 ### Interns and student contributors
 
-With thanks to the students who worked on pyvoa and on pycoa before it, during
+With thanks to the students who worked on pyvoa and on PyCoA before it, during
 an internship or a research project.
 
 - Boulze, Noam — 2024, L3, Université Paris I Panthéon-Sorbonne. The main
@@ -47,7 +47,7 @@ an internship or a research project.
 - Brassart, Aurélie — 2022, L3, Sorbonne Université.
 - Herry, Saméo — 2023, L3, Sorbonne Université.
 - Kande, Seydina — 2023, L3, Sorbonne Université.
-- Martínez Méndez, Alexander — 2023, PhD, LA-CoNGA physics. Dependency versions
+- Martínez Méndez, Alexander — 2023–2024, PhD, LA-CoNGA physics. Dependency versions
   and the development environment, and the move to Zenodo for data storage,
   which is how pyvoa serves its databases today.
 - Triantafyllidou, Lemonia — 2022, L3, Sorbonne Université.
@@ -55,8 +55,11 @@ an internship or a research project.
 ## Data providers
 
 pyvoa would not exist without the institutions and projects that publish
-epidemiological data openly. Each database is credited, with its licence, in its
-description file under [`pyvoa/data/`](pyvoa/data/) and in the documentation.
+epidemiological data openly. Each database is credited, with its provider and
+its licence, in the [table of supported databases](README.md#supported-databases)
+of the README, and in its Zenodo archive where one exists, which names the
+provider as its creator and carries the provider's licence; its description file
+under [`pyvoa/data/`](pyvoa/data/) records where its data are read from.
 
 ## Institutional support
 

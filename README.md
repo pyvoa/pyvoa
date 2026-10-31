@@ -130,13 +130,13 @@ The *Licence* column refers to the data licence specified by the provider and re
 |---|---|---|---|---|---|
 | `covid19india` | India | region | covid19india.org | CC BY 4.0 | both |
 | `covidtracking` | United States | subregion (states) | The COVID Tracking Project | CC BY 4.0 | both |
-| `dgs` | Portugal | region | Direção-Geral da Saúde | GPL-3.0 (DSSG compilation; DGS data without a published licence) | both |
+| `dgs` | Portugal | region | Direção-Geral da Saúde, via DSSG Portugal | GPL-3.0 (DSSG compilation; DGS data without a published licence) | both |
 | `dpc` | Italy | region | Dipartimento della Protezione Civile | CC BY 4.0 | both |
 | `ebolardc` | Democratic Republic of the Congo | subregion (health zones) | Institut National de Santé Publique, via INRB/UMIE | INSP terms: attribution and permission required before republication | live only |
 | `escovid19data` | Spain | subregion (provinces) | escovid19data | CC BY 4.0 | both |
 | `europa` | worldwide | country | European Commission, Joint Research Centre | CC BY 4.0 | both |
 | `govcy` | Cyprus | country | Government of Cyprus | CC BY 4.0 | both |
-| `imed` | Greece | subregion | iMEDD | CC BY-NC 4.0 | both |
+| `imed` | Greece | subregion | iMEdD Lab | CC BY-NC 4.0 | both |
 | `jhu` | worldwide | country | Johns Hopkins University CSSE | CC BY 4.0 | both |
 | `jhu-usa` | United States | subregion (states) | Johns Hopkins University CSSE | CC BY 4.0 | both |
 | `jpnmhlw` | Japan | subregion (prefectures) | Ministry of Health, Labour and Welfare | CC BY 4.0 (via Public Data License 1.0) | both |
@@ -146,11 +146,11 @@ The *Licence* column refers to the data licence specified by the provider and re
 | `mpoxgh` | worldwide | country | Global.health, via Our World in Data | CC BY 4.0 | both |
 | `owid` | worldwide | country | Our World in Data | CC BY 4.0 | both |
 | `phe` | United Kingdom | subregion | Public Health England / UKHSA | OGL v3.0 | archive only |
-| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institut | dl-de/by-2-0 | both |
+| `rki` | Germany | subregion (*Kreise*) | Robert Koch Institute, via covid-19-germany-gae (J.-P. Gehrcke) | dl-de/by-2-0 | both |
 | `sciensano` | Belgium | region | Sciensano | CC0 1.0 | both |
 | `spf` | France | subregion (*départements*) | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
 | `spfnational` | France | country | Santé publique France | Licence Ouverte / Etalab 2.0 | both |
-| `sumeau` | France | country | SUM'EAU — SARS-CoV-2 in wastewater | Licence Ouverte / Etalab 2.0 | both |
+| `sumeau` | France | country | Santé publique France (SUM'Eau) | Licence Ouverte / Etalab 2.0 | both |
 
 Most of these databases contain COVID-19 series. The exceptions are `mpoxgh`, which covers mpox; `ebolardc`, which covers the 2026 Bundibugyo ebolavirus outbreak in the Democratic Republic of the Congo; and `measles-usa`, which tracks measles cases in the United States. Several providers have stopped updating their COVID-19 datasets, so the latest available date varies by database. `pf.setwhom()` displays this date when a database is selected.
 
@@ -160,17 +160,17 @@ Most of these databases contain COVID-19 series. The exceptions are `mpoxgh`, wh
 - [`examples/notebooks/`](examples/notebooks/) — Jupyter notebooks:
   `PyvoaForBeginners.ipynb` introduces the main features;
   `GeoByExamples.ipynb` explores the geolocation layer independently;
-  and `PyvoaFront-withINSEE.ipynb` shows how to use pyvoa’s visualisation
-  tools with an external dataset.
+  `PyvoaFront-withINSEE.ipynb` shows how to use pyvoa’s visualisation
+  tools with an external dataset;
+  and `PaperExamples.ipynb` runs the examples of the software paper.
 - [`examples/pyfiles/`](examples/pyfiles/) — Python scripts:
   `pyvoa_for_beginners.py` and `geo_by_examples.py`, the script
   equivalents of the first two notebooks, write their charts to files;
   `insee_deaths.py`, the script equivalent of `PyvoaFront-withINSEE.ipynb`,
   passes pyvoa a DataFrame built from INSEE death records;
-  `stress_test.py` runs many combinations of options on every database,
-  as `PyvoaFrontStressTest.ipynb` does, and gathers the charts in a page;
-  `paper_example` reproduces the examples presented in a forthcoming
-  software paper.
+  `paper_examples.py`, the script equivalent of `PaperExamples.ipynb`,
+  reproduces the examples of a forthcoming software paper and writes its
+  figures.
 - [pyvoa.org](https://pyvoa.org) — the project website.
 - `pf.whattodo()` — a quick reference within a Python session. It returns
   a DataFrame listing all keywords accepted by `get`, `plot`, `hist`
@@ -198,7 +198,7 @@ Then open `docs/_build/html/index.html` in your browser.
 ## Community and support
 
 - **Questions about using pyvoa** — ask in [GitHub Discussions](https://github.com/pyvoa/pyvoa/discussions). Beginner questions are welcome: pyvoa is designed to be accessible to people new to data analysis.
-- **Bug reports and requests for new data sources** — [open an issue](https://github.com/pyvoa/pyvoa/issues/new/choose). Before reporting a problem, see [SUPPORT.md](SUPPORT.md) for support channels and two preliminary checks. Many problems arise from changes to the original data sources.
+- **Bug reports and requests for new data sources** — [open an issue](https://github.com/pyvoa/pyvoa/issues/new/choose). Before reporting a problem, see [SUPPORT.md](SUPPORT.md) for support channels and the [checks worth running first](SUPPORT.md#before-you-report-a-bug). Many problems arise from changes to the original data sources.
 - **Contributing** — see [CONTRIBUTING.md](CONTRIBUTING.md), including the checklist for [adding a new database](CONTRIBUTING.md#6-adding-a-new-database).
 - **Community guidelines** — all participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 - **Security or privacy concerns** — contact [contact@pyvoa.org](mailto:contact@pyvoa.org) privately rather than opening a public issue.

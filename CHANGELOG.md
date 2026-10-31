@@ -4,8 +4,9 @@ Since 0.5.0 (2026-08-06), in short:
 - data sources: `measles-usa` and `ebolardc` come in, `sentinellesIRA` and
   `risklayer` go out for licence reasons (23 databases, each one's licence in
   the README); `pf.setlive(True)` reads the providers' files instead of the
-  frozen Zenodo copies; five new keys in the database descriptions; Kosovo is
-  left out, and France no longer includes French Guiana and French Polynesia.
+  frozen Zenodo copies; new keys in the database descriptions; Kosovo is
+  left out, and France counts its overseas territories in `owid`, `europa` and
+  `mpoxgh`, without inflating its rates.
 - parsing: day-first dates are read right in `govcy` and `dgs`, locations
   that were lost are matched again (`rki`, `minciencia` and four more), and
   `tests/test_sources.py` checks every database against its files.
@@ -35,7 +36,10 @@ Data sources:
   Zenodo copies (now record 23601685), `pf.getlive()` tells which is in use.
 - new keys in the database descriptions: `names` (csv with no header line),
   `splitwhere` (composite locations), `cumulative` and `fillmissing` (sources
-  reporting increments), `dateformat` (day-first dates).
+  reporting increments), `dateformat` (day-first dates), `merge` with the
+  column key `intensive` (locations folded into their country), and
+  `archiveonly` (datasets read from the archive in live mode too); the last
+  two are described below.
 - `sumeau` is read from Odissé, where Santé publique France publishes it
   now: its data.gouv.fr file, which pyvoa's live mode read, stopped at the
   second week of 2026. The archive is a new Zenodo record (23822170), up to
@@ -45,8 +49,7 @@ Data sources:
   Health has revised the deaths upwards since January 2021 (730 instead of
   672 on 13 January 2022); the archive is a new Zenodo version (23838249).
 - Kosovo is left out of every database, as the UN does not recognise it; `jhu`
-  used to add it into Serbia. `owid` and `mpoxgh` no longer merge French
-  Guiana and French Polynesia into France, which inflated France's rates.
+  used to add it into Serbia.
 
 Parsing:
 
@@ -204,6 +207,8 @@ Packaging and documentation:
   territories (Guadeloupe, Martinique, French Guiana, Réunion, Mayotte,
   French Polynesia), and the United Kingdom Jersey and Guernsey, as `jhu`
   already did: a new `merge` key of the database description folds them in.
+  `owid` and `mpoxgh` used to add French Guiana and French Polynesia alone,
+  summing every column, so that France's rates per inhabitant were inflated.
   Each part's running totals are carried over the days it does not report
   before they are summed, rates per inhabitant (`intensive` columns) are
   averaged weighted by population, and `normalize` divides by the population
@@ -355,7 +360,7 @@ Packaging, tests and process:
 # version 0.4.0
 Five months and 359 commits (2025-07-08 to 2025-12-12). The release settles the
 vocabulary of the front-end API and finishes the visualization layer inherited
-from pycoa, so nearly every rename a 0.3.x user has to know about is here.
+from PyCoA, so nearly every rename a 0.3.x user has to know about is here.
 
 - Most of the work consisted in adding decorators to the classes.
 - Jupyter is not mandatory to use pyvoa; it can be used from a console.
@@ -412,7 +417,7 @@ prepared in `05b3f0c`.
 - the error banner adapts to the terminal size, and to there being no terminal.
 
 # version 0.3.0
-- import of the whole former pycoa software into pyvoa
+- import of the whole former PyCoA software into pyvoa
 - using matplotlib as graphical output
 - the import landed in a single commit — 24 files, about 5100 lines — bringing
   the bokeh, matplotlib and seaborn visualizers, the geo module and the JSON
@@ -436,7 +441,7 @@ First import, skeleton only: the project structure and a first upload to PyPI.
 
 ---
 
-# Before pyvoa — CoCoA and pycoa, 2020 to 2023
+# Before pyvoa — CoCoA and PyCoA, 2020 to 2023
 
 pyvoa is the third name of one continuous project, and version 0.3.0 above is
 the import of the code base it had already accumulated. The lineage:
@@ -445,7 +450,7 @@ the import of the code base it had already accumulated. The lineage:
 |---|---|---|---|
 | 1 | **CoCoA** — Covid Collaborative Analysis | 2020-04-29 to 2020-11-26 | <https://github.com/tjbtjbtjb/CoCoA> (public, archived) |
 | 2 | **PyCoA** — Python Covid Analysis | 2020-11-18 to 2023 | <https://github.com/coa-project/pycoa> (private), until 2025-03-24 |
-| 3 | **pyvoa** — Python Virus Open Analysis | since 2023 | a branch of the pycoa repository, then <https://github.com/pyvoa/pyvoa> from 2025-03 |
+| 3 | **pyvoa** — Python Virus Open Analysis | since 2023 | a branch of the PyCoA repository, then <https://github.com/pyvoa/pyvoa>, opened in 2024-12 and holding the code from 2025-03 |
 
 ## CoCoA, april to november 2020
 
@@ -469,7 +474,7 @@ called itself `pre1.0`.
 
 ## PyCoA, november 2020 to 2023, and pyvoa in its repository until march 2025
 
-The repository is private, so the history below is summarised from pycoa's own
+The repository is private, so the history below is summarised from PyCoA's own
 `Release_notes.md` and from its log — the authoritative record, and not public.
 
 1924 commits on the main line — Olivier Dadoun (about 1350), Tristan Beau
@@ -503,15 +508,15 @@ The repository is private, so the history below is summarised from pycoa's own
   a pickled cache; OWID replacing JHU as the default database.
 
 After v2.22 the work went on untagged for 311 more commits. In 2023 the project
-was renamed pyvoa, and developed in a branch of the pycoa repository:
+was renamed pyvoa, and developed in a branch of the PyCoA repository:
 
 - matplotlib and seaborn backends joined bokeh in may 2024, and the front end
   was pulled apart from the visualization classes — batch output separated from
   graphical output, `bypop` moved out of `allvisu`, `front.py` rewritten.
 - an Olympics medal dataset was carried for a while as an experiment. pyvoa
   dropped it in 0.4.0, on the grounds that it is not a virus database.
-- in february and march 2025 pyvoa left the pycoa repository for a repository
+- in february and march 2025 pyvoa left the PyCoA repository for a repository
   of its own, and the code took the name: `src` became `pyvoa`, the JSON
   descriptions became `pyvoa-data`, `Coa` became `Pyvoa` throughout, and the
-  covid-specific vocabulary was taken out of the code. The last pycoa commit is
+  covid-specific vocabulary was taken out of the code. The last PyCoA commit is
   dated 2025-03-24, and pyvoa 0.3.0 was tagged two days later.

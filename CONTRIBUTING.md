@@ -19,8 +19,9 @@ submit changes. By participating in this project you agree to abide by our
 | A new feature or a new database | Open an issue **before** writing code, so that the design can be discussed |
 | A security or confidentiality concern | <contact@pyvoa.org> (please do not open a public issue) |
 
-[SUPPORT.md](SUPPORT.md) describes these channels in more detail, and lists two
-checks worth running before reporting a bug. Please search the
+[SUPPORT.md](SUPPORT.md) describes these channels in more detail, and lists the
+[checks worth running before reporting a bug](SUPPORT.md#before-you-report-a-bug).
+Please search the
 [existing issues](https://github.com/pyvoa/pyvoa/issues) before opening a new
 one.
 
@@ -125,9 +126,13 @@ using the examples in `examples/`.
    change touches downloading or parsing, keeping in mind that they fail when a
    provider is down rather than when your code is wrong.
 
-5. **Write a clear commit message.** We follow
-   [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), e.g.
-   `fix(dbparser): handle empty ISO-3166 field in OWID dataset`.
+5. **Write a clear commit message.** The subject line names the part of the
+   project the commit touches — a module, a database, `docs`, `tests`,
+   `examples`, `paper` — then says what the commit does, in the present tense:
+   `sumeau: read from Odissé, the archive refreshed to October 2026`, or
+   `get: carry values forward only`. A bug fix may say `fix:` instead
+   (`fix: sumall with normalize hands out the normalised sum`). The body
+   explains why, in full sentences.
 6. **Open a pull request** against `main`, describing *what* changes and *why*,
    and linking the related issue (`Closes #42`).
 7. Add an entry to `CHANGELOG.md` under the *Unreleased* heading at the top of
@@ -191,8 +196,11 @@ standardised interface. A new data provider should:
    codes wherever possible);
 4. come with tests that do not depend on network availability (use a small
    fixture file rather than a live download);
-5. be added to the table of supported databases in `README.md`, so that it is
-   listed alongside the others and appears in `pf.listwhom()`.
+5. be added to the table of supported databases in `README.md`, with its
+   source, licence and availability, and the count announced above the table
+   updated: `tests/test_readme.py` checks both against `pyvoa/data/`. The
+   database itself appears in `pf.listwhom()` as soon as its JSON description
+   is in `pyvoa/data/`.
 
 ## 7. Documentation and teaching material
 

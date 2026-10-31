@@ -96,7 +96,7 @@ identifiers:
 
 references:
   - type: software
-    title: "pycoa: Python COVID Analysis"
+    title: "PyCoA: Python Covid Analysis"
     abstract: "Predecessor of pyvoa (2020-2023), in whose repository pyvoa was developed until 2025."
     repository-code: "https://github.com/coa-project/pycoa"
     authors:
@@ -111,7 +111,7 @@ references:
         orcid: "https://orcid.org/0000-0002-2169-9725"
   - type: software
     title: "CoCoA: Covid Collaborative Analysis"
-    abstract: "Origin of pycoa and pyvoa, started at the Covid Hackathon (2020)."
+    abstract: "Origin of PyCoA and pyvoa, started at the Covid Hackathon (2020)."
     repository-code: "https://github.com/tjbtjbtjb/CoCoA"
     year: 2020
     authors:
