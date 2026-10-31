@@ -218,11 +218,11 @@ See [AUTHORS](AUTHORS) for authorship details and
 
 ## Funding
 
-This work was supported by the IdEx “Université Paris Cité 2022”, funded by
-the French State through the “Investissements d’avenir” programme
-(grant ANR-18-IDEX-0001), and by the
-[Institut Covid-19 Ad Memoriam](https://institut-ad-memoriam.u-pariscite.fr/)
-at Université Paris Cité.
+This work was supported by the IdEx « Université Paris Cité 2022 », funded by
+the French State under the « Investissements d'avenir » programme [grant number
+ANR-18-IDEX-0001]; and by the
+« [Institut Covid-19 Ad Memoriam](https://institut-ad-memoriam.u-pariscite.fr/) »
+of Université Paris Cité.
 
 The pyvoa team is required to acknowledge both funding sources in its publications, presentations and other project materials; see the *Funding* section of [AUTHORS](AUTHORS). Users of pyvoa are not required to acknowledge these funding sources in their own work.
 

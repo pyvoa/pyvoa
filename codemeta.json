@@ -3,6 +3,8 @@
     "@type": "SoftwareSourceCode",
     "identifier": "https://doi.org/10.5281/zenodo.21829901",
     "name": "pyvoa: Python Virus Open Analysis",
+    "version": "0.5.0",
+    "datePublished": "2026-08-06",
     "description": "pyvoa is an open-source Python library providing unified access to epidemiological databases (COVID-19 and other viral datasets), a standardised data format, transparent joins with geolocation databases, and built-in tools for time-series and cartographic visualisation. It is designed to be usable by non-specialists — high-school and university students, science journalists, researchers unfamiliar with data extraction — while remaining scriptable for advanced Python users.",
     "dateCreated": "2024-12-19",
     "license": "https://spdx.org/licenses/MIT",
@@ -99,13 +101,30 @@
         "lxml",
         "IPython",
         "contextily",
-        "html5lib"
-    ],
-    "softwareSuggestions": [
+        "html5lib",
         "matplotlib",
-        "bokeh",
-        "folium",
-        "seaborn"
+        "bokeh"
+    ],
+    "funding": [
+        {
+            "@type": "Grant",
+            "name": "IdEx « Université Paris Cité 2022 », Investissements d'avenir",
+            "identifier": "ANR-18-IDEX-0001",
+            "funder": {
+                "@type": "Organization",
+                "name": "Agence Nationale de la Recherche",
+                "@id": "https://ror.org/00rbzpz17"
+            }
+        },
+        {
+            "@type": "Grant",
+            "name": "Institut Covid-19 Ad Memoriam",
+            "url": "https://institut-ad-memoriam.u-pariscite.fr/",
+            "funder": {
+                "@type": "Organization",
+                "name": "Université Paris Cité"
+            }
+        }
     ],
     "relatedLink": [
         "https://pypi.org/project/pyvoa/",

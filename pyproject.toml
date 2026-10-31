@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyvoa"
 dynamic = ["version"]
-description = "Python virus open analysis. See more on pyvoa.org"
+description = "Python Virus Open Analysis: unified access to open epidemiological data, with a standardised format and built-in visualisation"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.10"
@@ -56,7 +56,7 @@ dependencies = [
     "contextily>=1.7",
     "html5lib>=1.1",
     # the two plotting backends: a plain `pip install pyvoa` draws, there is no
-    # separate distribution for them any more. seaborn and folium stay optional.
+    # separate distribution for them any more.
     "matplotlib>=3.8.4",
     "bokeh>=3.1",
 ]
