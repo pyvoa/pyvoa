@@ -20,9 +20,30 @@
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\usepackage{array}        % ragged-right paragraph columns of the metadata tables
+\usepackage{xurl}         % a URL may break anywhere, so it never sticks out of a line
 \usepackage{etoolbox}
 \usepackage[colorlinks=true,allcolors=blue]{hyperref}
+
+% LaTeX 2026-06-01, the release Overleaf compiles with, checks the math fonts of
+% \textsuperscript and \textsubscript outside their group (latex3/latex2e#2199,
+% fixed in 2026-11-01), so that elsarticle's author marks warn "Font shape ...
+% in size <> not available". The output is unaffected. On that release only,
+% the two commands get their 2026-11-01 definitions.
+\makeatletter
+\IfFormatAtLeastTF{2026-11-01}{}{\IfFormatAtLeastTF{2026-06-01}{%
+  \protected\def\@textsuperscript#1{\leavevmode\begingroup\check@mathfonts
+    \sbox\z@{\fontsize\sf@size\sf@size#1}%
+    \raise\dimexpr\textsuperscript@offset\relax\box\z@\textsuperscript@space
+    \endgroup}%
+  \protected\def\@textsubscript#1{\leavevmode\begingroup\check@mathfonts
+    \sbox\z@{\fontsize\sf@size\sf@size#1}%
+    \lower\dimexpr\textsubscript@offset\relax\box\z@\textsubscript@space
+    \endgroup}%
+}{}}
+\makeatother
 \setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{1.5em}  % a looser line rather than one sticking into the margin
 
 %% ---------------------------------------------------------------------------
 %%  DRAFT ANNOTATIONS
@@ -45,7 +66,7 @@
 }
 \newcommand{\attnpar}[1]{%
   \iftoggle{draftmode}{\par\smallskip\noindent\fcolorbox{red}{red!5}{%
-    \parbox{0.97\linewidth}{\textcolor{red}{\textbf{$\triangleright$ À TRAITER.} \textit{#1}}}}\par\smallskip}{}%
+    \parbox{0.97\linewidth}{\raggedright\textcolor{red}{\textbf{$\triangleright$ À TRAITER.} \textit{#1}}}}\par\smallskip}{}%
 }
 
 % Python code style
@@ -105,6 +126,12 @@
 
 \begin{document}
 \renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}}
+% The PDF metadata, given plainly: elsarticle would hand hyperref the author
+% list with its footnote marks, which a PDF string cannot hold.
+\hypersetup{
+  pdftitle={pyvoa: a Python framework for unified access, standardisation and
+    visualisation of open epidemiological data},
+  pdfauthor={Tristan Beau, Julien Browaeys, Olivier Dadoun}}
 
 \begin{frontmatter}
 
@@ -157,7 +184,7 @@ epidemiological data  \sep geospatial data \sep open data \sep reproducible rese
 
 \begin{table}[!ht]
 \small
-\begin{tabular}{|l|p{5.6cm}|p{7.0cm}|}
+\begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
 \hline
 \textbf{Nr.} & \textbf{Code metadata description} & \textbf{Metadata} \\
 \hline
@@ -425,8 +452,8 @@ its own and is also useful outside epidemiology.
 \subsubsection{Front end}
 
 The user interacts with a single module, \texttt{pyvoa.front}, conventionally
-imported as \texttt{pf}. It is used through plain function calls, such as
-\texttt{pf.setwhom('owid')} to select a data resource: there is no class to
+imported as \texttt{pf}. It is used through plain function calls ---
+\texttt{pf.setwhom('owid')} selects a data resource --- with no class to
 instantiate, and the module keeps the state of the session (selected resource,
 archive or live mode, chart backend) between calls. Its functions are presented
 in Section~\ref{sec:functionalities}.
@@ -865,7 +892,7 @@ in this paper.
 \label{sec:acknowledgements}
 
 The project originated at the Data Against COVID-19 hackathon (April 2020).
-The authors thank the CNRS MODCOV19 platform, and CNRS/IN2P3, Université Paris
+The authors thank the CNRS MODCOV19 platform, and CNRS/\allowbreak IN2P3, Université Paris
 Cité and Sorbonne Université for institutional support.
 
 Funding: This work was supported by the IdEx « Université Paris Cité 2022 »,
@@ -898,13 +925,14 @@ déclaration. Revérifier la page au moment de la soumission.}
 %% ============================================================================
 
 \bibliographystyle{elsarticle-num}
+\renewcommand{\bibfont}{\raggedright}
 \bibliography{references}
 
 \section*{Current executable software version}
 
 \begin{table}[!ht]
 \small
-\begin{tabular}{|l|p{5.6cm}|p{7.0cm}|}
+\begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
 \hline
 \textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
 \hline
