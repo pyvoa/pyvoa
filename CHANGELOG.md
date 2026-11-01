@@ -134,6 +134,13 @@ Behaviour changes:
   after (`sumeau`, the weekly tests of `spf`).
 - `pip install pyvoa` brings the matplotlib and bokeh backends with it;
   `pyvoa-full`, which only added them, is no longer needed.
+- `pf.getversion()`, and the welcome banner, name the exact pyvoa that runs,
+  in the format of `git describe --tags --always --dirty`: `v0.5.0` for a
+  release, `v0.5.0-g512aefe` for a copy installed from GitHub with
+  `pip install git+https://…` (the commit pip recorded), `v0.5.0-484-g512aefe`
+  for a clone of the repository, with `-dirty` when it holds local changes.
+  It returned `0.5.0`, without the `v`, whatever was installed. SUPPORT.md and
+  every issue form now ask for it.
 
 Packaging and documentation:
 

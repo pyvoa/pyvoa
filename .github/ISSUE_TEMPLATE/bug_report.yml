@@ -35,17 +35,17 @@ body:
     attributes:
       label: Versions
       description: >-
-        pyvoa, Python and operating system. Run
-        `python -c "import pyvoa, sys, platform; print(pyvoa.__version__,
-        sys.version, platform.platform())"` and paste the output. If you run
-        pyvoa from a clone of the repository rather than from a release, add
-        the output of `git describe --tags --always --dirty`, run in the
-        clone: the version number alone does not change between two releases.
+        pyvoa, Python and operating system. In a notebook or a script, run
+        `import platform, sys; import pyvoa.front as pf;
+        print(pf.getversion(), sys.version, platform.platform())`, or from a
+        terminal
+        `python -c "import platform, sys, pyvoa.front as pf; print(pf.getversion(), sys.version, platform.platform())"`,
+        and paste the line it prints after the welcome banner.
+        `pf.getversion()` names the commit when you run pyvoa from GitHub or
+        from a clone, where `pyvoa.__version__` stays the same between two
+        releases.
       placeholder: |
-        pyvoa X.Y.Z
-        Python X.Y.Z
-        Linux-X.Y.Z-generic-x86_64
-        vX.Y.Z-N-gHASH (clone only, optional)
+        v0.5.0-484-g512aefe 3.12.3 (main, …) [GCC 13.2.0] Linux-6.8.0-generic-x86_64-with-glibc2.39
       render: text
     validations:
       required: true

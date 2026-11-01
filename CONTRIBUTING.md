@@ -30,9 +30,10 @@ one.
 The [bug report form](https://github.com/pyvoa/pyvoa/issues/new/choose) asks for
 each of the items below. A useful report contains:
 
-1. the pyvoa version, the Python version and the operating system, plus the
-   commit (`git describe --tags --always --dirty`) if you run a clone of the
-   repository rather than a release;
+1. the pyvoa version as `pf.getversion()` gives it — the release, or the
+   commit for a copy installed from GitHub or a clone — the Python version and
+   the operating system ([SUPPORT.md](SUPPORT.md#what-to-include) gives the
+   code);
 2. a **minimal reproducible example** — the shortest snippet that triggers the
    problem, including the database (`setwhom`) and the visualisation backend
    (`setvis`) used;

@@ -31,6 +31,19 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: versions
+    attributes:
+      label: pyvoa version
+      description: >-
+        The output of `pf.getversion()` (`import pyvoa.front as pf`), so that
+        we know which pyvoa you run — the release, or the commit for a copy
+        installed from GitHub or a clone: the feature may already be in a
+        newer one. Optional if pyvoa is not installed.
+      placeholder: "v0.5.0-484-g512aefe"
+    validations:
+      required: false
+
   - type: textarea
     id: alternatives
     attributes:

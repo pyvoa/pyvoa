@@ -1,7 +1,12 @@
+import shutil
+import subprocess
+from pathlib import Path
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import pytest
 
+import pyvoa
 import pyvoa.front as pf
 
 
@@ -139,3 +144,70 @@ def test_sumall_adds_only_the_series_already_started(late_frame):
 def test_where_names_what_an_in_house_frame_lacks(in_house_frame):
     with pytest.raises(pf.PyvoaError, match='Not in your table: Paris'):
         pf.get(input=in_house_frame, which='cur_rea', where=['Ain', 'Paris'])
+
+
+def test_getversion_is_git_describe_in_a_checkout():
+    root = Path(pf.__file__).resolve().parent.parent
+    if not (root / '.git').exists() or shutil.which('git') is None:
+        pytest.skip('not a git checkout of pyvoa')
+    expected = subprocess.run(
+        ['git', '-C', str(root), 'describe', '--tags', '--always', '--dirty'],
+        capture_output=True, encoding='utf-8', check=True,
+    ).stdout.strip()
+    assert pf.getversion() == expected
+
+
+def test_getversion_falls_back_to_the_release_number_without_git(monkeypatch):
+    def no_git(*args, **kwargs):
+        raise FileNotFoundError('git')
+    monkeypatch.setattr(pf.subprocess, 'run', no_git)
+    assert pf.getversion() == 'v' + pyvoa.__version__
+
+
+@pytest.mark.parametrize('requested, expected', [
+    ('', '-g512aefe'),
+    ('main', '-g512aefe'),
+    ('v' + pyvoa.__version__, ''),
+])
+def test_getversion_names_the_commit_pip_installed_from_git(monkeypatch, requested, expected):
+    monkeypatch.setattr(pf, '_git_describe', lambda root: '')
+    monkeypatch.setattr(pf, '_pip_git_commit',
+                        lambda here: ('512aefe842db700c34334cde9da0fa6159a3aaf8', requested))
+    assert pf.getversion() == 'v' + pyvoa.__version__ + expected
+
+
+class FakeDistribution:
+    """Stand in for the importlib.metadata view of an installed pyvoa."""
+
+    def __init__(self, front, direct_url):
+        self.front, self.direct_url = front, direct_url
+
+    def locate_file(self, path):
+        """Return where the installation keeps ``path``."""
+        return self.front
+
+    def read_text(self, name):
+        """Return the ``direct_url.json`` pip wrote, or None."""
+        return self.direct_url
+
+
+GIT_URL = '{"url": "https://github.com/pyvoa/pyvoa.git", "vcs_info": {"vcs": "git", %s}}'
+
+
+@pytest.mark.parametrize('direct_url, expected', [
+    (GIT_URL % '"commit_id": "512aefe842db", "requested_revision": "main"', ('512aefe842db', 'main')),
+    (GIT_URL % '"commit_id": "512aefe842db"', ('512aefe842db', '')),
+    ('{"url": "file:///home/someone/pyvoa", "dir_info": {}}', ('', '')),
+    (None, ('', '')),
+])
+def test_pip_git_commit_reads_direct_url(monkeypatch, tmp_path, direct_url, expected):
+    front = tmp_path / 'pyvoa' / 'front.py'
+    monkeypatch.setattr(pf.metadata, 'distribution', lambda name: FakeDistribution(front, direct_url))
+    assert pf._pip_git_commit(front.resolve()) == expected
+
+
+def test_pip_git_commit_ignores_another_copy(monkeypatch, tmp_path):
+    direct_url = '{"vcs_info": {"vcs": "git", "commit_id": "512aefe842db"}}'
+    monkeypatch.setattr(pf.metadata, 'distribution',
+                        lambda name: FakeDistribution(tmp_path / 'other' / 'front.py', direct_url))
+    assert pf._pip_git_commit((tmp_path / 'pyvoa' / 'front.py').resolve()) == ('', '')

@@ -46,13 +46,29 @@ If the problem survives all three, it is worth an issue.
 The issue form asks for these, and they are what makes a report actionable
 (see also [CONTRIBUTING.md §2](CONTRIBUTING.md#2-reporting-a-bug)):
 
-1. **Versions** — pyvoa (`python -c "import pyvoa; print(pyvoa.__version__)"`),
-   Python, and the operating system. If you run pyvoa from a clone of the
-   repository rather than from a release, add the commit as well: run
-   `git describe --tags --always --dirty` in the clone (`v0.5.0-399-g89fbbc9`
-   reads 399 commits after 0.5.0, at commit `89fbbc9`; a trailing `-dirty` means
-   local changes), since the version number alone stays the same between two
-   releases.
+1. **Versions** — pyvoa, Python and the operating system. `pf.getversion()`
+   gives the exact pyvoa you run, however it was installed, so please use it
+   rather than `pyvoa.__version__`, which stays the same between two releases.
+   In a notebook or a script:
+
+   ```python
+   import platform, sys
+   import pyvoa.front as pf
+   print(pf.getversion(), sys.version, platform.platform())
+   ```
+
+   or from a terminal, pasting the last line of the output (the lines before
+   it are pyvoa's welcome banner):
+
+   ```bash
+   python -c "import platform, sys, pyvoa.front as pf; print(pf.getversion(), sys.version, platform.platform())"
+   ```
+
+   The version reads `v0.5.0` for a release, `v0.5.0-g512aefe` for a copy
+   installed from GitHub (`pip install git+https://…`, at commit `512aefe`),
+   and `v0.5.0-484-g512aefe` for a clone of the repository: 484 commits after
+   0.5.0, at commit `512aefe`, followed by `-dirty` if the clone holds local
+   changes.
 2. **A minimal reproducible example** — the shortest snippet that triggers the
    problem, including the database (`setwhom`) and the visualisation backend
    (`setvis`).

@@ -28,9 +28,12 @@ warnings.simplefilter(action='ignore', category=FutureWarning)
 #warnings.simplefilter(action="ignore", category=DeprecationWarning, module='jupyter_client')
 
 import ast
+import json
 import random
+import subprocess
 from functools import wraps
-from importlib import import_module
+from importlib import import_module, metadata
+from pathlib import Path
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -67,23 +70,97 @@ from pyvoa.tools import set_verbose_mode as _set_verbose_mode
 from pyvoa.visualizer import AllVisu
 
 
-def getversion():
-    """Return the installed pyvoa version, for the welcome message.
+def _git_describe(root):
+    """Return ``git describe --tags --always --dirty`` run in ``root``, or ''.
 
-    Imports pyvoa.__version__ lazily and falls back to 'unknown' rather than
-    raising, so that a broken or partial installation still prints a banner
-    instead of failing at import time.
+    The command only runs when ``root`` holds a ``.git``, and any failure (git
+    missing, a repository git refuses to read, more than five seconds) gives
+    ''.
+    """
+    if not (root / ".git").exists():
+        return ""
+    try:
+        return subprocess.run(
+            ["git", "-C", str(root), "describe", "--tags", "--always", "--dirty"],
+            capture_output=True, encoding="utf-8", timeout=5, check=True,
+            # no console window flashing up on Windows; 0 elsewhere
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+        ).stdout.strip()
+    except Exception:
+        return ""
+
+
+def _pip_git_commit(here):
+    """Return the git commit and revision pip installed this copy from.
+
+    Read from the ``direct_url.json`` that pip writes into the
+    ``.dist-info`` of an installation from a VCS url (PEP 610), and only if
+    that ``.dist-info`` describes the very copy whose ``front.py`` is
+    ``here`` -- not another pyvoa met earlier on the path.
+
+    Returns
+    -------
+    tuple of str
+        the full commit hash and the revision asked for after ``@`` in the
+        url (``''`` when none was), or ``('', '')`` for any other installation.
+    """
+    try:
+        dist = metadata.distribution("pyvoa")
+        if Path(dist.locate_file("pyvoa/front.py")).resolve() != here:
+            return "", ""
+        vcs = json.loads(dist.read_text("direct_url.json") or "{}").get("vcs_info", {})
+        if vcs.get("vcs") != "git":
+            return "", ""
+        return vcs.get("commit_id", ""), vcs.get("requested_revision", "")
+    except Exception:
+        return "", ""
+
+
+def getversion():
+    """Return the pyvoa version, as ``git describe --tags --always --dirty`` gives it.
+
+    In a git checkout of pyvoa (an editable install, a clone), the answer is
+    that of ``git describe --tags --always --dirty`` run at the root of the
+    checkout: the last tag, the number of commits since and the abbreviated
+    hash, e.g. ``v0.5.0-484-g512aefe``, followed by ``-dirty`` when tracked
+    files carry uncommitted changes, or the bare hash when no tag is reachable.
+    The command only runs when the directory above the package holds a
+    ``.git``, so that a copy installed into some other repository (a virtual
+    environment inside a project) does not report that repository's state.
+
+    A copy installed by ``pip install git+https://...`` has no ``.git`` left,
+    but pip records the commit it built, which gives ``v0.5.0-g512aefe``:
+    ``git describe`` without the number of commits since the tag, which only
+    the history could tell. A copy installed from the release tag itself
+    (``...pyvoa.git@v0.5.0``) reads ``v0.5.0``.
+
+    Anywhere else (a release from PyPI, a local ``pip install .``, git missing,
+    the command failing or taking more than five seconds), it is
+    ``pyvoa.__version__``, imported lazily and prefixed with ``v`` like the
+    release tags, so that a release reads ``v0.5.0`` whichever way it was
+    installed; and ``'unknown'`` if even that fails, rather than raising: a
+    broken or partial installation still prints a banner instead of failing
+    at import time.
 
     Returns
     -------
     str
-        the version, or 'unknown'.
+        the ``git describe`` string, else ``v`` and the release number,
+        followed by ``-g`` and the commit when pip installed it from git, else
+        'unknown'.
     """
+    here = Path(__file__).resolve()
+    described = _git_describe(here.parent.parent)
+    if described:
+        return described
     try:
-        version_module = import_module("pyvoa.__version__")
-        return getattr(version_module, "__version__", "unknown")
+        release = "v" + import_module("pyvoa.__version__").__version__
     except Exception:
         return "unknown"
+    commit, requested = _pip_git_commit(here)
+    if commit and requested != release:
+        return f"{release}-g{commit[:7]}"
+    return release
 
 print_banner(getversion())
 

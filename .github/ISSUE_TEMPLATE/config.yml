@@ -9,7 +9,8 @@ contact_links:
     url: https://github.com/pyvoa/pyvoa/discussions
     about: >-
       How do I plot this, which database has that field, why is my series
-      empty? Ask in Discussions - beginner questions are welcome.
+      empty? Ask in Discussions - beginner questions are welcome. Please
+      give the output of pf.getversion() (import pyvoa.front as pf).
 
   - name: Where to get help
     url: https://github.com/pyvoa/pyvoa/blob/main/SUPPORT.md
