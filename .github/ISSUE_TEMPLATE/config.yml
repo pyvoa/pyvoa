@@ -6,11 +6,10 @@ blank_issues_enabled: false
 
 contact_links:
   - name: Question about using pyvoa
-    url: https://github.com/pyvoa/pyvoa/discussions
+    url: https://github.com/pyvoa/pyvoa/discussions/new?category=q-a
     about: >-
       How do I plot this, which database has that field, why is my series
-      empty? Ask in Discussions - beginner questions are welcome. Please
-      give the output of pf.getversion() (import pyvoa.front as pf).
+      empty? Ask in the Q&A of Discussions - beginner questions are welcome.
 
   - name: Where to get help
     url: https://github.com/pyvoa/pyvoa/blob/main/SUPPORT.md

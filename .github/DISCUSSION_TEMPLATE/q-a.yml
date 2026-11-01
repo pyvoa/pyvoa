@@ -1,0 +1,59 @@
+# Form of the Q&A category of GitHub Discussions, the place config.yml sends
+# questions about using pyvoa to. A category form is named after the slug of
+# its category; Announcements (maintainers only) and Polls (no forms there)
+# have none.
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Questions are welcome, beginner ones included. If pyvoa does something
+        wrong rather than something unclear, the
+        [bug report form](https://github.com/pyvoa/pyvoa/issues/new/choose) is
+        the better place.
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: >-
+        What you are trying to do, with which database (`setwhom`) and, if a
+        chart is involved, which backend (`setvis`).
+    validations:
+      required: true
+
+  - type: textarea
+    id: tried
+    attributes:
+      label: What you tried
+      description: The code you ran, and what it gave. Optional.
+      placeholder: |
+        import pyvoa.front as pf
+        pf.setwhom('owid', reload=False)
+        pf.plot(where='France', which='total_cases')
+      render: python
+    validations:
+      required: false
+
+  - type: input
+    id: versions
+    attributes:
+      label: pyvoa version
+      description: >-
+        The output of `pf.getversion()`, after `import pyvoa.front as pf`: it
+        names the release, or the commit for a copy installed from GitHub or
+        a clone, and the answer may depend on it.
+      placeholder: "v0.5.0-484-g512aefe"
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Where you run pyvoa
+      description: >-
+        Notebook or console, local, Google Colab or Binder, and the operating
+        system. Optional.
+      placeholder: "Jupyter notebook, Windows 11"
+    validations:
+      required: false

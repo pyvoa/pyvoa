@@ -1,0 +1,31 @@
+# Form of the Ideas category of GitHub Discussions: ideas still open to
+# discussion. A worked-out proposal goes to the feature request issue form.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        An idea to talk over is welcome here. Once it is clear what pyvoa
+        should do, a [feature request](https://github.com/pyvoa/pyvoa/issues/new/choose)
+        or, for a data source, a *New database* issue is the next step.
+
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: >-
+        The analysis or the teaching situation it would help with, rather
+        than the solution only.
+    validations:
+      required: true
+
+  - type: input
+    id: versions
+    attributes:
+      label: pyvoa version
+      description: >-
+        The output of `pf.getversion()`, after `import pyvoa.front as pf`: the
+        idea may already be in a newer pyvoa. Optional if pyvoa is not
+        installed.
+      placeholder: "v0.5.0-484-g512aefe"
+    validations:
+      required: false

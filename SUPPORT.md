@@ -9,7 +9,7 @@ Explaining is part of the purpose of this project.
 
 | You want to… | Go to |
 |---|---|
-| Ask how to do something with pyvoa | [GitHub Discussions](https://github.com/pyvoa/pyvoa/discussions) |
+| Ask how to do something with pyvoa | [GitHub Discussions](https://github.com/pyvoa/pyvoa/discussions/new?category=q-a), category Q&A |
 | Report a bug or unexpected output | [Open an issue](https://github.com/pyvoa/pyvoa/issues/new/choose) |
 | Propose a new database | [Open an issue](https://github.com/pyvoa/pyvoa/issues/new/choose) — before writing code |
 | Report a security or privacy concern | <contact@pyvoa.org> — please do not open a public issue |

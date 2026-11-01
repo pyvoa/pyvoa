@@ -1,0 +1,23 @@
+# Form of the Show and tell category of GitHub Discussions: what people made
+# with pyvoa (a course, an article, a chart).
+body:
+  - type: textarea
+    id: work
+    attributes:
+      label: What you made with pyvoa
+      description: >-
+        A course, an article, an analysis, a chart: a link, a picture, the
+        code if you wish to share it.
+    validations:
+      required: true
+
+  - type: input
+    id: versions
+    attributes:
+      label: pyvoa version
+      description: >-
+        The output of `pf.getversion()`, after `import pyvoa.front as pf`, so
+        that others can run the same pyvoa. Optional.
+      placeholder: "v0.5.0-484-g512aefe"
+    validations:
+      required: false

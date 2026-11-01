@@ -140,7 +140,8 @@ Behaviour changes:
   `pip install git+https://…` (the commit pip recorded), `v0.5.0-484-g512aefe`
   for a clone of the repository, with `-dirty` when it holds local changes.
   It returned `0.5.0`, without the `v`, whatever was installed. SUPPORT.md and
-  every issue form now ask for it.
+  every issue form now ask for it, and so do the new forms of the Discussions
+  categories (Q&A, Ideas, General, Show and tell).
 
 Packaging and documentation:
 
