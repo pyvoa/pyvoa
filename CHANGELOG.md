@@ -129,7 +129,9 @@ Behaviour changes:
   is no value, where it used to take the first one (`sumeau`'s `ratio54` read
   as a constant over the 18 months before its first measurement), and a day
   missing inside a series takes the last value before it, not the next.
-  `daily`, `weekly` and `smooth7` follow.
+  `daily`, `weekly` and `smooth7` follow. A location without any value of
+  a variable has none on any day, where it used to read 0 (`spf`'s overseas
+  collectivities, reported in the tests alone, had 0 hospital stays).
 - a week number (`2022-S31`) is dated on its own Monday, not on the Monday
   after (`sumeau`, the weekly tests of `spf`).
 - `pip install pyvoa` brings the matplotlib and bokeh backends with it;

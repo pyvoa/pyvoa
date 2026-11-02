@@ -330,7 +330,9 @@ def test_get_daily_on_a_single_date_matches_the_same_day_of_a_range():
     """A single 'when' is cut once 'daily' is computed, not before.
 
     Cut first, the day had no day before it, and every daily value came
-    out NaN (October 2026).
+    out NaN (October 2026). The overseas collectivities (980) are the one
+    exception: SPF reports their tests, never their hospital stays, so they
+    have no cur_hosp at all, and no value is not 0 (7884d57).
     """
     import pyvoa.front as pf
 
@@ -340,8 +342,9 @@ def test_get_daily_on_a_single_date_matches_the_same_day_of_a_range():
     span = pf.get(which="cur_hosp", what="daily",
                   when="25/12/2021:31/12/2021", output="pandas")
     last = span[span["date"] == pd.Timestamp("2021-12-31")]
-    assert single["cur_hosp daily"].notna().all()
-    assert _by_where(single, "cur_hosp daily") == _by_where(last, "cur_hosp daily")
+    assert set(single.loc[single["cur_hosp daily"].isna(), "code"]) == {"980"}
+    assert (_by_where(single.dropna(subset=["cur_hosp daily"]), "cur_hosp daily")
+            == _by_where(last.dropna(subset=["cur_hosp daily"]), "cur_hosp daily"))
 
 
 def test_get_normalize_hands_out_the_normalised_values():
