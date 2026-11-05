@@ -232,14 +232,29 @@ committing, unless the output is the point of the example.
 1. In `CHANGELOG.md`, turn the `## Unreleased` heading into
    `## X.Y.Z — YYYY-MM-DD` and open a new, empty `## Unreleased` above it;
    update the version number in `pyvoa/__version__.py` — the single source
-   of truth, from which `pyproject.toml` reads it dynamically.
-2. Tag the release: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
-3. Publish on PyPI; check that the GitHub-Zenodo hook has minted a version DOI
-   and that the Zenodo metadata (title, author list, ORCID) matches
-   `CITATION.cff`.
-4. Update `version`, `date-released` and the DOI in `CITATION.cff`, and
+   of truth, from which `pyproject.toml` reads it dynamically — and rows C1,
+   S1 and S2 of `paper/main.tex`, which `tests/test_paper.py` checks against it.
+2. Reserve the version DOI: open a new version of the latest pyvoa record on
+   Zenodo (concept DOI `10.5281/zenodo.21829901`) and reserve its DOI, without
+   publishing. No GitHub-Zenodo hook is installed: the deposit is made by hand.
+3. Update `version`, `date-released` and the version DOI in `CITATION.cff`,
    `version` and `datePublished` in `codemeta.json` and `schemaorg.jsonld`,
-   then check `CITATION.cff` with `pipx run cffconvert --validate`. Run it
-   through `pipx` (or `uvx`):
+   and the archived release in row C2 of `paper/main.tex`; check `CITATION.cff`
+   with `pipx run cffconvert --validate`. Run it through `pipx` (or `uvx`):
    cffconvert requires `jsonschema<4` and will downgrade it in a shared
-   environment.
+   environment. Commit, push, and wait for CI to pass.
+4. Build the sdist and the wheel from that commit (`python -m build`), check
+   them with `twine check`, and make sure the wheel holds `pyvoa/js/` and
+   `pyvoa/data/`.
+5. Tag the release, annotated so that Software Heritage gives it a
+   `swh:1:rel:` identifier: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin
+   vX.Y.Z`; then publish a GitHub release for the tag, its notes taken from the
+   changelog.
+6. Publish the sdist and the wheel on PyPI.
+7. Upload the same two files to the Zenodo draft, its metadata taken from
+   `.zenodo.json` (creators, keywords, funding, related identifiers, the
+   `isSupplementTo` link pointing at the tag), and publish it.
+8. Ask Software Heritage to "Save code now" `https://github.com/pyvoa/pyvoa`,
+   read the `swh:1:rel:` of the new tag from the latest visit's snapshot, and
+   put it in `CITATION.cff`, in row C2 of `paper/main.tex` and in the
+   `pyvoa_github` entry of `paper/references.bib`.
