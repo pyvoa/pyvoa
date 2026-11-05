@@ -36,8 +36,8 @@ offline job and adds no dependency and no CI configuration. It skips itself when
 failing checkout.
 
 The second reason is ordinary: the manuscript then has the same history, the
-same review path and the same tags as the software it describes. `v0.5.0` and
-the text that describes `v0.5.0` are one commit away from each other.
+same review path and the same tags as the software it describes. `v1.0.0` and
+the text that describes `v1.0.0` are one commit away from each other.
 
 ## Building
 
