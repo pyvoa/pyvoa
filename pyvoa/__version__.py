@@ -24,7 +24,7 @@ License : see the joint LICENSE file
 https://pyvoa.org/
 """
 
-__version__ = '0.5.0'
+__version__ = '1.0.0'
 
 # Neither of these is standardised: distribution metadata belongs in
 # pyproject.toml, and AUTHORS and CITATION.cff are the canonical record of

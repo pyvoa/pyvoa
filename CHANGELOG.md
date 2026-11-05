@@ -1,7 +1,9 @@
 # Changelog
 
 ## Unreleased
-Since 0.5.0 (2026-08-06), in short:
+
+## 1.0.0 — 2026-11-05
+Three months and 489 commits since 0.5.0 (2026-08-06 to 2026-11-05), in short:
 
 - data sources: `measles-usa` and `ebolardc` come in, `sentinellesIRA` and
   `risklayer` go out for licence reasons (23 databases, each one's licence in
@@ -345,7 +347,7 @@ Errors, warnings and verbosity:
   only ever imported into `front.py`, never used there, so ruff reported it as
   an unused import and removed it. No released version shipped it, and the
   claim was written four days after the removal. It is true again from the next
-  release; see the Unreleased entry.
+  release; see the 1.0.0 entry.
 
 Packaging, tests and process:
 
