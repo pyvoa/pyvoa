@@ -45,30 +45,6 @@
 \setlength{\parindent}{0pt}
 \setlength{\emergencystretch}{1.5em}  % a looser line rather than one sticking into the margin
 
-%% ---------------------------------------------------------------------------
-%%  DRAFT ANNOTATIONS
-%%  All editorial notes are wrapped in \attn{...} / \attnpar{...}.
-%%
-%%  Two ways to turn them off, which must stay equivalent:
-%%    - edit the line below to \togglefalse{draftmode}, or
-%%    - leave it alone and build with
-%%        latexmk -pdf -pretex='\def\paperfinal{1}' -usepretex main.tex
-%%      which is what `make final` does. \providecommand cannot override a
-%%      definition made by -pretex, so the command line wins and the source
-%%      is provably the same for both PDFs.
-%% ---------------------------------------------------------------------------
-\providecommand{\paperfinal}{0}
-\newtoggle{draftmode}
-\ifdefstring{\paperfinal}{1}{\togglefalse{draftmode}}{\toggletrue{draftmode}}
-
-\newcommand{\attn}[1]{%
-  \iftoggle{draftmode}{\textcolor{red}{\textbf{[$\triangleright$ À TRAITER]} \textit{#1}}}{}%
-}
-\newcommand{\attnpar}[1]{%
-  \iftoggle{draftmode}{\par\smallskip\noindent\fcolorbox{red}{red!5}{%
-    \parbox{0.97\linewidth}{\raggedright\textcolor{red}{\textbf{$\triangleright$ À TRAITER.} \textit{#1}}}}\par\smallskip}{}%
-}
-
 % Python code style
 \lstdefinestyle{python}{
   language=Python,
@@ -157,8 +133,9 @@ national agencies, and cover COVID-19, mpox, measles, and Ebola. Each resource
 is described by a JSON file rather than by code, so the catalogue can be
 extended without modifying the library. Resources are normalised into a common
 pandas DataFrame, and a geolocation layer reconciles location identifiers and
-provides geometries. Data are read from the project's Zenodo archive by
-default, or directly from live sources for ongoing outbreaks, so series remain accessible after providers stop publishing. Charts and maps can be produced in a few lines of Python. pyvoa is MIT-licensed and available from PyPI.
+provides geometries.  Data are read by default from the project's Zenodo archive, so that series
+remain accessible after providers stop publishing, or directly from live
+sources for ongoing outbreaks. Charts and maps can be produced in a few lines of Python. pyvoa is MIT-licensed and available from PyPI.
 
 \end{abstract}
 
@@ -182,47 +159,49 @@ epidemiological data  \sep geospatial data \sep open data \sep reproducible rese
 
 \section*{Current code version}
 
-\begin{table}[!ht]
-\small
-\begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
-\hline
-\textbf{Nr.} & \textbf{Code metadata description} & \textbf{Metadata} \\
-\hline
-C1 & Current code version & v1.0.0 (released 2026-11-05) \\
-\hline
-C2 & Permanent GitHub link to code/repository used for this code version &
-\url{https://github.com/pyvoa/pyvoa} \newline
-archived release: \url{https://doi.org/10.5281/zenodo.23976534} \newline
-concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \newline
-Software Heritage: \href{https://archive.softwareheritage.org/swh:1:rel:42f9b1f51e9c5da2eef3f5d048a3e3995cfe854f;origin=https://github.com/pyvoa/pyvoa}{\texttt{swh:1:rel:42f9b1f5\allowbreak 1e9c5da2\allowbreak eef3f5d0\allowbreak 48a3e399\allowbreak 5cfe854f}} \\
-\hline
-C3 & Legal Code License & MIT License \\
-\hline
-C4 & Code versioning system used & git \\
-\hline
-C5 & Software code languages, tools and services used &
-Python~3; JSON database descriptors; pytest; ruff; GitHub Actions (lint, test
-matrix on Python 3.10--3.14, weekly network tests); PyPI; Zenodo; Software Heritage \\
-\hline
-C6 & Compilation requirements, operating environments \& dependencies &
-Python~$\geq$~3.10. Required, with the lower bound each is tested against:
-pandas~$\geq$~2.1.1, geopandas~$\geq$~1.0, shapely~$\geq$~2.0.2,
-beautifulsoup4~$\geq$~4.11, numpy~$\geq$~1.26, pycountry~$\geq$~23.12.7,
-pycountry\_convert~$\geq$~0.7.2, requests~$\geq$~2.28, unidecode~$\geq$~1.3,
-lxml~$\geq$~4.9.3, IPython~$\geq$~8.10, contextily~$\geq$~1.7,
-html5lib~$\geq$~1.1, and the two plotting backends, matplotlib~$\geq$~3.8.4
-and bokeh~$\geq$~3.1. Runs on
-Linux, macOS and Windows, in a script, a console or a Jupyter notebook. \\
-\hline
-C7 & If available, link to developer documentation/manual &
-\url{https://pyvoa.github.io/pyvoa/} \\
-\hline
-C8 & Support email for questions & contact@pyvoa.org \\
-\hline
-\end{tabular}
-\caption{Code metadata (mandatory)}
-\label{codeMetadata}
-\end{table}
+  \begin{table}[!ht]
+  \small
+  \begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
+  \hline
+  \textbf{Nr.} & \textbf{Code metadata description} & \textbf{Metadata} \\
+  \hline
+  C1 & Current code version & v1.0.0 (released 2026-11-05) \\
+  \hline
+  C2 & Permanent GitHub link to code/repository used for this code version &
+  \url{https://github.com/pyvoa/pyvoa} \newline
+  archived release: \url{https://doi.org/10.5281/zenodo.23976534} \newline
+  concept DOI (all versions): \url{https://doi.org/10.5281/zenodo.21829901} \newline
+  Software Heritage: \href{https://archive.softwareheritage.org/swh:1:rel:42f9b1f51e9c5da2eef3f5d048a3e3995cfe854f;origin=https://github.com/pyvoa/pyvoa}{\texttt{swh:1:rel:42f9b1f5\allowbreak 1e9c5da2\allowbreak
+  eef3f5d0\allowbreak 48a3e399\allowbreak 5cfe854f}} \\
+  \hline
+  C3 & Legal Code License & MIT License \\
+  \hline
+  C4 & Code versioning system used & git \\
+  \hline
+  C5 & Software code languages, tools, and services used &
+  Python~3; JSON data resource descriptors; pytest; ruff; GitHub Actions (lint, test
+  matrix on Python 3.10--3.14, weekly network tests); PyPI; Zenodo; Software Heritage \\
+  \hline
+  C6 & Compilation requirements, operating environments \& dependencies &
+  Python~$\geq$~3.10. Required, with the lower bound each is tested against:
+  pandas~$\geq$~2.1.1, geopandas~$\geq$~1.0, shapely~$\geq$~2.0.2,
+  beautifulsoup4~$\geq$~4.11, numpy~$\geq$~1.26, pycountry~$\geq$~23.12.7,
+  pycountry\_convert~$\geq$~0.7.2, requests~$\geq$~2.28, unidecode~$\geq$~1.3,
+  lxml~$\geq$~4.9.3, IPython~$\geq$~8.10, contextily~$\geq$~1.7,
+  html5lib~$\geq$~1.1, and the two plotting backends, matplotlib~$\geq$~3.8.4
+  and bokeh~$\geq$~3.1. Runs on
+  Linux, macOS and Windows, in a script, a console or a Jupyter notebook. \\
+  \hline
+  C7 & If available Link to developer documentation/manual &
+  \url{https://pyvoa.github.io/pyvoa/} \\
+  \hline
+  C8 & Support email for questions & contact@pyvoa.org \\
+  \hline
+  \end{tabular}
+  \caption{Code metadata (mandatory)}
+  \label{codeMetadata}
+  \end{table}
+
 
 %% ============================================================================
 %%  1. MOTIVATION AND SIGNIFICANCE
@@ -296,7 +275,7 @@ from other sources.
 Several software tools have also been developed to facilitate access to pandemic data. \texttt{covid}~\cite{covid_pypi} and
 \texttt{COVID19Py}~\cite{covid19py} provide lightweight interfaces to a small
 number of original data sources, but offer limited support for analysis and
-visualisation.  The COVIDcast Epidata API~\cite{reinhart2021} offers a
+visualisation. The COVIDcast Epidata API~\cite{reinhart2021} offers a
 well-documented collection of more than 170 signals from 12 data sources,
 combining traditional public health indicators with auxiliary signals derived
 from medical claims, surveys, mobility data, and internet search trends. These
@@ -348,15 +327,8 @@ direct retrieval from the original source.}
 \label{tab:comparison}
 \end{table}
 
-The two challenges identified above are addressed in \texttt{pyvoa} through a
-common architecture. Twenty-three data resources are described declaratively,
-normalised into a common schema, and linked to a geographic layer that
-reconciles location identifiers and provides the corresponding geometries.
-Data can be retrieved either from their original sources, when current values
-are required, or from the project's Zenodo deposits, which preserve previously
-retrieved datasets. Once a data resource has been integrated, the same interface can
-be used for data retrieval, geographic processing, and visualisation, allowing
-a complete figure to be produced in only a few lines of Python.
+pyvoa addresses both challenges within a single architecture, described in
+Section~\ref{sec:description}.
 
 
 \bigskip
@@ -369,13 +341,6 @@ Democratic Republic of the Congo~\cite{bdbv2026}. These resources are described 
 COVID-19 counterparts. New resources can therefore be added without modifying
 the core library.
 
-
-\bigskip
-
-The archival component complements this source-agnostic architecture by
-preserving retrieved datasets as persistent and independently citable records.
-Archived copies can therefore remain accessible even if the original source
-changes or disappears, improving both recoverability and reproducibility.
 
 %% ============================================================================
 %%  2. SOFTWARE DESCRIPTION
@@ -413,154 +378,168 @@ time series, histograms, maps and exported tables.}
 which involves writing Python. First, the content served at the provider's URL
 can be deposited in the pyvoa community on Zenodo~\cite{zenodo_pyvoa}. Second, the resource is described in a JSON file stored
 in \texttt{pyvoa/data/}, in the GitHub repository. This descriptor gives the
-two locations of the data: the Zenodo mirror (\texttt{urldata}) (if it exists) and the
+two locations of the data: the Zenodo mirror, if there is one (\texttt{urldata}), and the
 provider's live URL (\texttt{urlparent}). It also gives the separator and
 decimal conventions, the columns to drop and the rows to select. It maps each
 of the provider's column names onto pyvoa's own vocabulary. Lastly, it gives the geographic granularity
 (\texttt{country}, \texttt{region} or \texttt{subregion}) and the ISO~3166-1
-alpha-3 code of the territory covered.  Of the 23
+alpha-3 code of the territory covered. Of the 23
 data resources, 19 can currently be read from both locations, 3 from the
 archive only, their provider having withdrawn the files, and 1 from its
 provider only, its publisher asking to be consulted before any republication;
-the repository README lists the status and the licence of each. Licences are
-the providers': most are open, one rules out commercial reuse, and two
-compilations rest on official data published with no licence or reserved
-before republication.
+the repository README lists the status and the licence of each. 
 
-\textbf{Preprocessing (automatic).} On loading, \texttt{MetaInfo} and
-\texttt{DataParser} read the descriptor, fetch the data and reshape them into a
-normalised table. By default the data are read from the Zenodo mirror, so that
-a given release of pyvoa always returns the same numbers; a resource without a
-mirror is read from its provider. Locations are then mapped onto an internal
-geographic abstraction layer, so that changing data resource leaves geographic
-identifiers unchanged. For international data this layer follows the United
-Nations M49 standard~\cite{geoscheme}; for sub-national data it follows the
-administrative nomenclature in use in the country concerned.
-\texttt{GeoManager} converts between the \texttt{iso2}, \texttt{iso3},
-\texttt{name} and \texttt{num} standards and absorbs the spellings specific to
-each provider: names are stripped of accents and case-folded, so that
-\texttt{"cote d'ivoire"} and \texttt{"Côte d'Ivoire"} resolve alike.
-\texttt{GeoRegion} resolves supranational groupings (M49 regions, European
-Union, G20, OECD and others), so that a grouping is a single \texttt{where}
-argument. \texttt{GeoCountry} provides sub-national units and their geometries,
-with variants that draw overseas territories in place, next to the mainland, or
-not at all. Finally, \texttt{GPDBuilder} joins the table to the geometries. The
-result is held internally as a single geopandas
-\texttt{GeoDataFrame}~\cite{geopandas}. The geographic layer can be imported on
-its own and is also useful outside epidemiology.
+
+\textbf{Preprocessing (automatic).} When a data resource is loaded,
+\texttt{MetaInfo} and \texttt{DataParser} read its descriptor, fetch the data
+and reshape them into a normalised table. The data are read from the Zenodo
+mirror when one exists, and from the provider otherwise; the reference tables
+of the geographic layer (geometries, populations, composition of the
+groupings) are always read from Zenodo. Data read from the archive are
+therefore reproducible: a given release of pyvoa always returns the same
+numbers. Locations are then mapped onto an internal geographic abstraction
+layer, so that geographic identifiers do not depend on the data resource. For
+international data this layer follows the United Nations M49
+standard~\cite{geoscheme}; for sub-national data it follows the administrative
+nomenclature of the country concerned. \texttt{GeoManager} converts between
+the \texttt{iso2}, \texttt{iso3}, \texttt{num} and \texttt{name} codings.
+Country names are resolved with pycountry~\cite{pycountry}, preceded by an
+alias table for spellings specific to some providers, so that
+\texttt{"Korea, South"} (JHU) and \texttt{"South Korea"} (OWID) designate the
+same country; accents and case are ignored, so that \texttt{"cote d'ivoire"}
+and \texttt{"Côte d'Ivoire"} resolve alike. \texttt{GeoRegion} resolves
+supranational groupings (M49 regions, European Union, G20, OECD and others),
+so that a grouping can be passed as a single \texttt{where} argument.
+\texttt{GeoCountry} provides sub-national units with their geometries and
+populations; for France and the United States, variants place the overseas
+territories next to the mainland or omit them. Finally, \texttt{GPDBuilder}
+joins the table to the geometries, yielding a single geopandas
+\texttt{GeoDataFrame}~\cite{geopandas} held internally.
+
 
 \subsubsection{Front end}
 
 The user interacts with a single module, \texttt{pyvoa.front}, conventionally
-imported as \texttt{pf}. It is used through plain function calls ---
-\texttt{pf.setwhom('owid')} selects a data resource --- with no class to
-instantiate, and the module keeps the state of the session (selected resource,
-archive or live mode, chart backend) between calls. Its functions are presented
-in Section~\ref{sec:functionalities}.
+imported as \texttt{pf}. On import, the module creates one instance of its
+interface class and exposes its methods as plain functions, so that
+\texttt{pf.setwhom('owid')} selects a data resource without any object being
+created by the user. That instance keeps the state of the session (selected
+resource, archive or live mode, chart backend) from one call to the next.
+
 
 \subsection{Software functionalities}
 \label{sec:functionalities}
 
-\textbf{Selecting data.} A session starts by choosing a data resource with
-\texttt{pf.setwhom()}; \texttt{pf.listwhom()} lists the twenty-three available.
-By default the data are read from the Zenodo archive, so that an analysis
-returns the same numbers whenever it is run again. \texttt{pf.setlive(True)}
-reads the providers' current files instead, which an epidemic still under way
-requires, at the cost of that reproducibility (Section~\ref{sec:ex-beyond}).
-Downloaded files are cached locally, the archived and the live copies apart.
+\textbf{Selecting data.} A session starts with \texttt{pf.setwhom()}, which
+selects one of the twenty-three data resources listed by
+\texttt{pf.listwhom()}. By default, the data are read from the Zenodo archive
+(Section~\ref{sec:architecture}). For an epidemic still under way,
+\texttt{pf.setlive(True)} reads them directly from the providers, which gives
+the most recent figures at the expense of reproducibility. Some files are
+nevertheless always read from the archive: the geographic reference tables,
+and the data of resources no longer available from their providers.
+Conversely, a resource without a mirror is always read from its provider
+(Section~\ref{sec:ex-beyond}). Downloaded files are cached locally, with
+archived and live copies stored separately.
 
-\textbf{One query grammar.} Four functions share the same keywords:
-\texttt{get()} returns the data, and \texttt{plot()}, \texttt{hist()} and
-\texttt{map()} draw them. The keywords state what is asked for:
+\textbf{One query grammar.} Four functions take the same five keywords:
+\texttt{get()} returns the data, while \texttt{plot()}, \texttt{hist()} and
+\texttt{map()} draw them. Together, the keywords specify the query:
 \begin{itemize}
 \item \texttt{where}: a location, a list of locations, or a grouping such as
   \texttt{'G20'} or \texttt{'Western Europe'}
   (Sections~\ref{sec:ex-timeseries} and~\ref{sec:ex-map});
-\item \texttt{which}: the indicator, among those of the selected resource;
-\item \texttt{what}: the value as published (\texttt{current}), or its daily
-  or weekly change;
-\item \texttt{when}: a date or a period;
-\item \texttt{option}: transformations such as a seven-day smoothing, the sum
-  over the selected locations, or a normalisation by population
-  (Section~\ref{sec:ex-hist}).
+\item \texttt{which}: one of the indicators of the selected resource;
+\item \texttt{what}: the value as published (\texttt{'current'}), or its
+  day-to-day or week-to-week difference (\texttt{'daily'}, \texttt{'weekly'});
+\item \texttt{when}: a date (\texttt{'dd/mm/yyyy'}) or a period in slice-like
+  notation (\texttt{'dd/mm/yyyy:dd/mm/yyyy'}), either bound being optional;
+\item \texttt{option}: transformations such as a seven-day rolling mean
+  (\texttt{'smooth7'}), the sum over the selected locations
+  (\texttt{'sumall'}), or a normalisation by population, per inhabitant up to
+  per million (\texttt{'normalize:pop'} to \texttt{'normalize:pop1M'};
+  Section~\ref{sec:ex-hist}).
 \end{itemize}
+
 
 \textbf{Outputs.} \texttt{get()} returns a table with one row per date and
 location: by default a geopandas \texttt{GeoDataFrame}, which carries the
-geometry of each location, or on request a pandas \texttt{DataFrame}, a list, a
-dictionary or an array (Section~\ref{sec:ex-hist}). These are standard Python
-objects, so further analysis and export use the usual pandas methods.
-Conversely, a user's own table can be passed through the \texttt{input}
-keyword, and pyvoa then processes and draws data it did not fetch.
+geometry of each location, or on request a plain pandas \texttt{DataFrame}
+(Section~\ref{sec:ex-hist}). Both are ordinary pandas objects, so further
+analysis and export rely on the usual pandas methods. The same rows can also
+be returned, without geometry, as a list, a dictionary or a NumPy array.
 
 \textbf{Charts.} Charts are drawn with matplotlib~\cite{hunter2007} or
-bokeh~\cite{bokeh}, chosen with \texttt{pf.setvis()}. \texttt{plot()} draws
-time series (Section~\ref{sec:ex-timeseries}); \texttt{hist()} draws bar charts
-comparing locations (Section~\ref{sec:ex-hist}), histograms of the values, or
-pie charts (Section~\ref{sec:ex-beyond}); \texttt{map()} draws choropleth maps
-(Section~\ref{sec:ex-map}), on an equal-area projection with matplotlib and
-with a date slider with bokeh. Titles, legends and the export to image files
-(\texttt{pf.savefig()}) behave alike with both, and both are installed with
-the package.
+bokeh~\cite{bokeh}, both installed with the package and chosen with
+\texttt{pf.setvis()}. \texttt{plot()} draws an indicator against time
+(Section~\ref{sec:ex-timeseries}), two indicators against each other, or one
+curve per year over the calendar, so that seasons can be compared; \texttt{hist()} draws bar charts comparing locations (Section~\ref{sec:ex-hist}), histograms of the values, or pie
+charts (Section~\ref{sec:ex-beyond}); \texttt{map()} draws choropleth maps
+(Section~\ref{sec:ex-map}), on an equal-area projection with matplotlib.
+Titles and legends are the same with both backends. With matplotlib,
+\texttt{pf.savefig()} writes an image file; with bokeh, it writes an
+interactive HTML page, in which maps, bar charts and pie charts can carry a
+date slider.
 
-\textbf{Discovering the vocabulary.} Every accepted value can be listed at
-run time: \texttt{listwhom()}, \texttt{listwhich()}, \texttt{listwhere()},
-\texttt{listwhat()}, \texttt{listoption()} and their counterparts for the
-charts return plain Python lists. A user can thus explore a resource without
+
+\textbf{Discovering the vocabulary.} Each keyword has a function, named after
+it, that lists the values it accepts: \texttt{listwhom()},
+\texttt{listwhich()}, \texttt{listwhere()}, \texttt{listwhat()},
+\texttt{listoption()}, and \texttt{listvis()}, \texttt{listplot()},
+\texttt{listhist()} or \texttt{listmap()} for the charts. Each returns a plain
+Python list; \texttt{listwhich()} and \texttt{listwhere()} answer for the
+selected resource. \texttt{getwhichinfo()} prints the definition of an indicator and the file it is read from, and \texttt{whattodo()} gathers every keyword and its
+values in a single table. A user can thus explore a resource without
 consulting the documentation, which matters for teaching
 (Section~\ref{sec:impact}).
+
 
 \subsection{Development history and quality assurance}
 \label{sec:history}
 
-\textbf{History.} pyvoa is the third name of one continuous project, developed
-throughout by the same authors. It began as \emph{CoCoA} (Covid Collaborative
-Analysis) at the Data Against COVID-19 hackathon of April 2020, with the aim it
-still has: unified access to pandemic data for people who are not data
-specialists. Renamed \emph{PyCoA} (Python Covid Analysis) in November 2020, it
-gained, over some 1900 commits, its support for several databases and its
-sub-national geography in 2021, the normalisation by population in 2022 and the
-JSON descriptors in 2023. The same year it became \emph{pyvoa}, Python Virus
-Open Analysis, as its scope widened beyond COVID-19. pyvoa was developed in a
-branch of the PyCoA repository until March 2025, then in a repository of its
-own. Version 1.0.0 (November 2026), described here, is its first stable
-release.
+\textbf{History.} pyvoa is the third name of one continuous project, led
+throughout by the same three authors. It began as \emph{CoCoA} (Covid
+Collaborative Analysis) during the first COVID-19 lockdown in France, at the
+Data Against COVID-19 hackathon of April 2020, with the aim it still has:
+unified access to pandemic data for people who are not data specialists.
+Renamed \emph{PyCoA} (Python Covid Analysis) in November 2020, it acquired
+support for several databases and sub-national geography in 2021,
+normalisation by population in 2022, and JSON descriptors in 2023, over some
+1900 commits recorded in the project's changelog. The same year it was
+renamed \emph{pyvoa}, Python Virus Open Analysis, as its scope widened beyond
+COVID-19. pyvoa was developed in a branch of the PyCoA repository until March
+2025, then in a repository of its own. Version 1.0.0 (November 2026),
+described here, is its first stable release.
 
 \textbf{Quality assurance.} An offline test suite covers the parsing of the
-descriptors, the geographic layer and the visualisation layer; a test that
-needs a network connection must be marked as such, so that the default suite
-cannot silently depend on an upstream server. Continuous integration on GitHub
-Actions runs the suite on Python 3.10 to 3.14, against both the newest and the
-oldest supported version of each dependency; it also checks the code style,
-the documentation build, and this manuscript against the code it describes
-(database counts, functions used in the listings, dependencies). A weekly job
-runs the network tests, which compare every database, as parsed by pyvoa,
-with an independent reading of its source files.
+descriptors, the geographic layer and the visualisation layer; tests that
+need a network connection are marked and excluded from it. Continuous
+integration on GitHub Actions runs this suite on Linux with Python 3.10 to
+3.14, on macOS and Windows with the oldest and the newest of these versions,
+and with every dependency at the minimum version declared in
+Table~\ref{codeMetadata}. It also checks the code style, the documentation
+build, and the consistency of this manuscript with the code. A weekly job
+runs the network tests, which compare every data resource, as parsed by
+pyvoa, with an independent reading of its source files.
 
 \textbf{Release and citation.} Releases are published on PyPI and archived on
-Zenodo under a concept DOI; the git history is also preserved by Software
-Heritage, which identifies each release by an intrinsic, content-based
-identifier (SWHID). The repository carries citation and software
-metadata (\texttt{CITATION.cff}, \texttt{codemeta.json}), contribution and
-conduct guidelines, and a changelog covering every release since 0.1.0 as well
-as the CoCoA and PyCoA years --- the only public record of a history whose
-PyCoA repository is private.
+Zenodo, each with its own DOI, all of them grouped under a concept DOI. The
+git history is also preserved by Software Heritage, which identifies each
+release by an intrinsic identifier (SWHID), computed from its content and
+therefore independent of where the code is hosted. The repository carries
+citation and software metadata (\texttt{CITATION.cff},
+\texttt{codemeta.json}), contribution and conduct guidelines, and a changelog
+covering every release since 0.1.0 as well as the CoCoA and PyCoA years. For
+the PyCoA period, whose repository is private, this changelog is the only
+public record.
 
-\textbf{Use of generative AI.} Generative AI was used at two stages of the development. For release 0.3.1, the
-docstrings of the code base were drafted with the help of large language model
-assistants (GitHub Copilot, Claude) and reviewed by the authors. In 2026, before
-the release described here, an AI coding assistant, Claude (Anthropic) used
-through Claude Code, assisted in finalising and debugging the code --- locating
-and fixing defects, writing regression tests, and checking every database
-against a direct read of its source files --- and in preparing the publication:
-maintaining the metadata (\texttt{CITATION.cff}, \texttt{.zenodo.json},
-\texttt{codemeta.json}), packaging and releasing on PyPI, and checking the
-consistency between the code, its documentation and this article. Every change
-was reviewed by the authors before being committed, and is recorded in the
-project's changelog.
-
-
-
+\textbf{Use of generative AI.} Generative AI was used at two stages of the
+development. For release 0.3.1 (July 2025), the docstrings were drafted with
+large language model assistants (GitHub Copilot, Claude). In preparing
+release 1.0.0, the authors used Claude Code (Anthropic) to locate and fix
+defects, write regression tests, check every data resource against its
+source files, maintain the metadata and package the software. Every change
+was reviewed by the authors before being committed.
 
 %% ============================================================================
 %%  3. ILLUSTRATIVE EXAMPLES
@@ -569,8 +548,9 @@ project's changelog.
 \section{Illustrative examples}
 \label{sec:examples}
 
-The four examples below are taken from the notebooks and scripts shipped with
-the package; each runs as printed after \texttt{pip install pyvoa}.
+The four examples below are taken from the notebooks and scripts of the
+repository (\texttt{examples/}); run in sequence after
+\texttt{pip install pyvoa}, each produces the output shown.
 
 \subsection{Comparing countries through time series}
 \label{sec:ex-timeseries}
@@ -593,8 +573,8 @@ artefacts common in national series (Fig.~\ref{fig:timeseries}).
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.9\linewidth]{figures/fig2_timeseries_weu.pdf}
-\caption{Daily COVID-19 deaths in the nine
-Western European states, seven-day smoothed, from Our World in Data.}
+\caption{Daily COVID-19 deaths in the nine states of Western Europe (M49),
+seven-day smoothed, from Our World in Data.}
 \label{fig:timeseries}
 \end{figure}
 
@@ -606,20 +586,21 @@ pf.setwhom('jhu')             # Johns Hopkins CSSE, worldwide
 pf.map(which='tot_confirmed', where='G20', when='31/12/2021')
 \end{lstlisting}
 
-As in the previous example, \texttt{where} may designate a region rather than a
-list of countries, be it geographical, political or economic, provided the
-geolocation layer resolves it; here the G20 member states~\cite{g20}, whose
-geometries it supplies. Countries outside the grouping are left unfilled, so
-the map background shows through. The JHU series is read from its Zenodo
-mirror, upstream collection having ended in March~2023
-(Fig.~\ref{fig:map}). In the absence of a \texttt{what} keyword, a
-\texttt{tot\_} variable is taken at its cumulative value.
+As in the previous example, \texttt{where} names a grouping of countries
+rather than listing them, here the nineteen member countries of the
+G20~\cite{g20}. The geolocation layer then supplies their geometries, so
+that the map is drawn without any further input; countries outside the
+grouping are simply left uncoloured. Since no \texttt{what} keyword is
+given, each country is shown with the value its source publishes, here the
+cumulative number of confirmed cases. This series is no longer updated, the
+upstream collection having ended in March~2023, but it remains available
+from its Zenodo mirror, which is where pyvoa reads it (Fig.~\ref{fig:map}).
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.9\linewidth]{figures/fig3_map_g20.pdf}
-\caption{Total confirmed COVID-19 cases across the
-G20 member states on 31~December 2021, from the Johns Hopkins CSSE mirror.}
+\caption{Total confirmed COVID-19 cases in the nineteen member countries of
+the G20 on 31~December 2021, from the Johns Hopkins CSSE mirror. Map lines delineate study areas and do not necessarily depict accepted national boundaries.}
 \label{fig:map}
 \end{figure}
 
@@ -633,40 +614,39 @@ pf.hist(which='cur_hosp', when='31/12/2021',
 \end{lstlisting}
 
 The same grammar addresses a French source at \emph{département} granularity.
-It also introduces the \texttt{option} keyword:
-\texttt{option='normalize:pop1M'} divides the count by the population the
+It also introduces the \texttt{option} keyword. Here,
+\texttt{option='normalize:pop1M'} divides the count by the population that the
 geolocation layer carries, turning patient numbers into a rate per million
-inhabitants, which is what makes \emph{départements} of very different sizes
-comparable; the bars are then ranked by value rather than by name
-(Fig.~\ref{fig:hist}).
+inhabitants, so that \emph{départements} of very different sizes can be
+compared. By default, \texttt{hist()} ranks the bars by value and draws the
+twelve highest (Fig.~\ref{fig:hist}).
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.85\linewidth]{figures/fig4_hist_spf.pdf}
-\caption{Patients hospitalised for COVID-19 per
-million inhabitants by French \emph{département} on 31~December 2021, ranked,
-from Santé publique France.}
+\caption{Patients hospitalised for COVID-19 per million inhabitants on
+31~December 2021, in the twelve French \emph{départements} with the highest
+rate, from Santé publique France.}
 \label{fig:hist}
 \end{figure}
 
-The same selection is available as data rather than as a picture. Calling
-\texttt{pf.get()} with identical keywords returns a
+Called with the same keywords, \texttt{pf.get()} returns the data themselves
+rather than a picture: every \emph{département}, as a
 \texttt{GeoDataFrame}~\cite{geopandas}, that is, a pandas
-frame~\cite{mckinney2010} carrying a geometry column: pyvoa is meant to be the
-starting point of an analysis, not its boundary.
+frame~\cite{mckinney2010} with a geometry column. pyvoa is thus meant to be
+the starting point of an analysis, not its boundary.
 
 \begin{lstlisting}[style=python]
 pf.setwhom('spf')    # Sante Publique France db
 pdf = pf.get(which='cur_hosp', when='31/12/2021',
-             option='normalize:pop1M', what='daily')
+             option='normalize:pop1M')
 \end{lstlisting}
 
-\noindent The frame holds one row per date and place. It carries the indicator
-that was asked for and nothing else, under a name that records the
-transformations applied to it: \texttt{what} and \texttt{option} each leave
-their mark, so the column reads \texttt{cur\_hosp daily normalize:pop1M}. Next
-to it sit the code of the \emph{département} and its geometry, which is what a
-map or a spatial join needs:
+\noindent The frame has one row per date and location, sorted by decreasing
+value, and five columns: the date, the location, its code, the requested
+indicator, and the geometry. The name of the indicator column records the
+transformation applied, \texttt{cur\_hosp normalize:pop1M}; the code and the
+geometry make the frame ready for mapping or for a spatial join:
 
 \begin{lstlisting}[style=pyout]
 >>> type(pdf)
@@ -676,23 +656,23 @@ map or a spatial join needs:
 (102, 5)
 
 >>> pdf.head(4)
-        date           where code  \
-0 2021-12-31    Corse-Du-Sud   2A
-1 2021-12-31           Isère   38
-2 2021-12-31    Eure-Et-Loir   28
-3 2021-12-31  Hauts-De-Seine   92
+        date                  where code  \
+0 2021-12-31       Bouches-Du-Rhône   13
+1 2021-12-31           Corse-Du-Sud   2A
+2 2021-12-31  Territoire De Belfort   90
+3 2021-12-31               Vaucluse   84
 
-   cur_hosp daily normalize:pop1M  \
-0                       88.690110
-1                       29.282276
-2                       27.777971
-3                       25.940017
+   cur_hosp normalize:pop1M  \
+0                604.613645
+1                595.490741
+2                585.116882
+3                519.835010
 
                                             geometry
-0  POLYGON ((954375.99062 5218303.80578, 954292.9...
-1  POLYGON ((696923.44222 5641512.66328, 697482.7...
-2  POLYGON ((213957.78999 6183341.89871, 213839.0...
-3  POLYGON ((255029.557 6266545.41899, 252593.947...
+0  POLYGON ((470905.18323 5382327.2226, 477130.57...
+1  POLYGON ((954375.99062 5218303.80578, 954292.9...
+2  POLYGON ((759600.52216 6075847.9608, 758232.12...
+3  MULTIPOLYGON (((544949.0389 5517924.90438, 543...
 \end{lstlisting}
 
 \subsection{Beyond COVID-19}
@@ -703,17 +683,19 @@ pf.setwhom('ebolardc')
 pf.hist(which='tot_confirmed', typeofhist='pie', when='01/10/2026')
 \end{lstlisting}
 
-The grammar does not change with the disease. The situation reports on
-Bundibugyo ebolavirus issued by the Institut National de Santé Publique of the
-Democratic Republic of the Congo are indexed by \emph{zone de santé}, a
-geography the geolocation layer resolves just as it resolves French
-\emph{départements} or United States states; \texttt{typeofhist='pie'} asks for
-a composition rather than a ranking, the smaller zones being gathered into a
-single slice rather than discarded (Fig.~\ref{fig:beyond}). Measles in the
-United States and mpox are read on the same terms. Unlike the other examples,
-these data are not archived: the Institut asks to be consulted before any
-republication, so pyvoa reads them from the provider at every call, and only
-the \texttt{when} keyword keeps the figure from following the latest report.
+
+Moving to another disease requires no new syntax: only the resource changes.
+The Institut National de Santé Publique of the Democratic Republic of the
+Congo indexes its situation reports on the Bundibugyo ebolavirus outbreak by
+\emph{zone de santé} (health zone), a geography that the geolocation layer
+resolves just as it resolves French \emph{départements} or US states. With
+\texttt{typeofhist='pie'}, \texttt{hist()} shows a composition rather than a
+ranking, and gathers the smaller zones into a single slice instead of
+discarding them (Fig.~\ref{fig:beyond}). Unlike the other examples, these
+data are not archived: the Institut asks to be consulted before any
+republication, so pyvoa always reads them from the provider. The
+\texttt{when} keyword sets the date shown, but a revision of past reports by
+the Institut could still change the values.
 
 \begin{figure}[!ht]
 \centering
@@ -732,111 +714,78 @@ from the situation reports of the Institut National de Santé Publique, on
 \section{Impact}
 \label{sec:impact}
 
-\textbf{Questions that become tractable.} Two kinds. First, cross-source
-comparison. Because twenty-three databases share one schema and one geographic
-key, unrelated providers can be put side by side without writing a join.
-Fig.~\ref{fig:wastewater} sets the SARS-CoV-2 signal in French wastewater
-(\texttt{sumeau}) against the confirmed cases and hospital admissions of Santé
-publique France (\texttt{spfnational}), in five pyvoa calls and a few lines of
-pandas. The cases move with the wastewater; the admissions follow it by about a
-week, in line with the lead over emergency visits reported by the
-network~\cite{jourdain2025}; and in 2023 the cases fall away as testing
-declined --- a reporting artefact the comparison surfaces rather than assumes
-away.
+\textbf{Cross-source comparison.} Because the twenty-three data resources
+share one schema, series from unrelated providers can be put side by side
+without any source-specific parsing. Fig.~\ref{fig:wastewater} compares the
+SARS-CoV-2 signal in French wastewater (\texttt{sumeau}) with the confirmed
+cases and hospital admissions reported by Santé publique France
+(\texttt{spfnational}), using five pyvoa calls and a few lines of pandas. The
+cases move with the wastewater signal, and the admissions follow it by about
+a week, consistent with the lead over emergency visits reported by the
+SUM'Eau network~\cite{jourdain2025}. In 2023 the cases fall away as testing
+declines: the comparison brings out this reporting artefact instead of
+leaving it hidden.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.95\linewidth]{figures/fig6_wastewater_spf.pdf}
-\caption{SARS-CoV-2 in the wastewater of the twelve SUM'Eau stations followed
-since 2022, confirmed cases and hospital admissions in France, as weekly means
-scaled to their maximum (left), and the correlation of each with the wastewater
-against the lag (right), August 2022 to June 2023.}
+\caption{Left: SARS-CoV-2 in wastewater (SUM'Eau), and confirmed cases and
+hospital admissions in France, as weekly means scaled to their maximum, from
+August 2022 to June 2023. Right: correlation of cases and of admissions with
+the wastewater signal as a function of the lag; a positive lag means that the
+series follows the wastewater signal.}
 \label{fig:wastewater}
 \end{figure}
 
-Second, retrospective work
-on sources that have ceased. The JHU series used in Section~\ref{sec:examples}
-is no longer published; it is nonetheless fetched, by identifier, in one line.
-The reverse case is served by the same code: an outbreak still under way, such
-as the Ebola epidemic of Section~\ref{sec:ex-beyond}, is read from the provider itself, the
-archive holding no copy of it.
+\textbf{Data archive and reproducibility.} pyvoa makes retrospective work
+possible on series whose providers have stopped publishing. The JHU series of
+Section~\ref{sec:ex-map} is no longer updated, and the Chilean data cited in
+Section~\ref{sec:motivation} are no longer available from their provider at
+all; both are still retrieved in one line, with \texttt{pf.setwhom('jhu')}
+and \texttt{pf.setwhom('minciencia')}. The archive also makes analyses reproducible: a pyvoa script records every
+choice made in a few short calls, and, for archived resources, returns the
+same numbers when it is run again years later
+(Section~\ref{sec:architecture}).
 
-\textbf{Existing questions pursued better.} The gain is on reproducibility
-rather than on speed. An analysis written against pyvoa records which database,
-which indicator, which pre-treatment and which options were used, in five
-keywords that a reader can re-execute; and because the payload is read from an
-archived copy carrying a persistent identifier~\cite{zenodo_pyvoa} rather than
-from a live URL, re-execution years later returns the same numbers. This is what
-a live endpoint cannot offer, and it is increasingly the limiting factor in
-pandemic retrospectives.
+\textbf{Teaching and outreach.} pyvoa has been used since 2020 in a physics
+and data analysis course at Université Paris Cité, and was designed with this
+use in mind: a complete figure takes a few lines, and every accepted value
+can be listed at run time. Students thus work with real data, heterogeneous
+and incomplete, from the first session rather than with a cleaned teaching
+set. Since \texttt{get()} returns a pandas frame, they can then move from a
+first figure to an analysis of their own without changing tool. The same
+features make pyvoa accessible to the general public, to science journalists
+and to researchers from other disciplines. It was presented in Paris, under its earlier name PyCoA, at the Salon Culture et Jeux Mathématiques and at the Fête de la Science from 2021 to 2023.
 
-\textbf{Daily practice, and who changes it.} The design constraint --- a
-complete figure in two lines, every vocabulary enumerable at run time --- was
-set for teaching, and the software has been used that way at Université Paris
-Cité since 2020, in physics and data analysis courses. Students meet real,
-heterogeneous, incomplete data on the first day rather than a cleaned teaching
-set; \texttt{get()} then hands them a pandas frame, so the progression from
-first figure to independent analysis happens without changing tool. The same
-property serves science journalists and researchers from outside epidemiology,
-the other audiences the project has targeted from the start.
 
-\textbf{Uptake so far.} The project began at the Data Against COVID-19 hackathon
-(April 2020) and was presented at Hackathon COVID --- Lutter Ensemble (April
-2021) and at the 22nd Salon Culture et Jeux Mathématiques (May 2021). It was
-covered by the CNRS MODCOV19 modelling platform~\cite{modcov19} and in
-institutional communications of Sorbonne Université, Université Paris Cité and
-LPNHE. Its authors have also registered it, since 2021, as a reuse on
-data.gouv.fr, the French national open-data portal~\cite{datagouv_pyvoa}. The
-page names the Santé publique France datasets pyvoa reads and the Insee death
-records one of its examples uses, so that the software is listed on the page of
-each of them, where users of those data look for tools; it shows a short
-session in the grammar of Section~\ref{sec:ex-hist}, ending in a map of
-hospital deaths per thousand inhabitants by \emph{département}. The page has been viewed over 5\,000 times.
-\attn{compléter ici par les usages tiers documentés --- voir note}
+% https://2021.salon-math.fr/listes-des-exposants/
 
-\textbf{Reuse, and commercial status.} The geolocation layer is importable on
-its own (\texttt{pyvoa.geo}) and contains nothing epidemiological: any dataset
-keyed by country, region or French \emph{département} can be reconciled and
-mapped with it. Extending the catalogue takes a JSON descriptor and no Python,
-which is what makes a new disease a matter of hours rather than of a release
-cycle. The software is distributed under the MIT licence, has no commercial
-version and is not exploited commercially.
+% https://2022.salon-math.fr/listes-des-exposants/
 
-\attnpar{\textbf{Impact --- c'est ici que se joue l'acceptation.} Un article SoftwareX est
-évalué sur la démonstration d'usage, pas sur l'élégance du code, et le paragraphe sur
-l'adoption (le quatrième des cinq points que le canevas demande ici) est aujourd'hui le
-maillon faible : la liste hackathons/presse établit une visibilité,
-pas une adoption. \textbf{Trois éléments à réunir, par ordre d'efficacité décroissante.}
-\textbf{(a)}~\emph{Un usage tiers documenté} --- un travail publié, un mémoire, un cours
-hors laboratoire, un article de presse ayant produit ses figures avec pyvoa ou PyCoA.
-Une seule occurrence vérifiable pèse plus que toute la revue de presse. Chercher les
-citations de PyCoA sur Google Scholar et HAL. \textbf{(b)}~\emph{Des chiffres
-d'enseignement} : intitulés d'UE, niveaux (L2/L3/M1), effectifs annuels, années
-concernées. « Utilisé en cours depuis 2020 » sans quantification sera lu comme une
-autopromotion ; « environ N étudiants par an dans l'UE X » ne le sera pas.
-\textbf{(c)}~\emph{Des chiffres
-d'adoption} : au 9 octobre 2026, 0~étoile et 0~fork sur GitHub, et 49 téléchargements
-PyPI le mois écoulé pour \texttt{pyvoa}
-(\url{https://pypistats.org/packages/pyvoa}). Trop faibles pour être cités ; un
-relecteur peut les constater. \textbf{(d)}~Le nombre de vues de la réutilisation
-data.gouv.fr (5\,452 le 9 octobre 2026, API data.gouv.fr) est à relire avant
-soumission.}
+% https://2023.salon-math.fr/listes-des-exposants/
 
-\attnpar{Figure~\ref{fig:wastewater} : produite par l'exemple 6 de
-\texttt{paper\_examples.py} (\texttt{ratio12} de \texttt{sumeau}, \texttt{cur\_cas}
-et \texttt{cur\_hospitalises} de \texttt{spfnational}). Corrélations maximales :
-cas à 0 semaine (r = 0,85), hospitalisations à +1 semaine (r = 0,91 ; +6 jours à
-la résolution quotidienne, 4 à 11 jours selon la vague). Limites : un prélèvement
-par semaine, un jour ouvré non fixé, donc un décalage connu à la semaine près ;
-l'indicateur est lissé par Santé publique France (LOESS, puis GAM hiérarchique
-depuis septembre 2025, historique recalculé), un lissage bilatéral qui aplatit
-les pics sans les retarder, mais qui utilise les semaines suivantes : c'est
-l'avance mesurée a posteriori, pas celle d'une alerte en temps réel. Données de
-la livraison Odissé du 30 octobre 2026, archivée sur Zenodo (23822170) ; elles
-diffèrent de la précédente (data.gouv.fr, février 2026) de 0,1 \% en médiane sur
-la période, sans changer les décalages. Le 8 février 2023, \texttt{spfnational} déclare 3\,419 admissions en
-un jour (rattrapage probable), visible sur la figure ; le décalage n'en dépend
-pas.}
+% https://www.sorbonne-universite.fr/fete-de-la-science-2021
+
+% https://fetedelascience-scolaires.sorbonne-universite.fr/home/actions/VoirFicheAction/2681
+
+% https://fetedelascience-scolaires.sorbonne-universite.fr/home/actions/VoirFicheAction/2749
+
+\textbf{Adoption.} Under its earlier name, PyCoA, the software was featured
+by the CNRS MODCOV19 modelling platform~\cite{modcov19}. Its data.gouv.fr
+page, which lists pyvoa as a reuse of French public data, has been viewed
+more than 6\,000 times since July 2022~\cite{datagouv_pyvoa}.
+Since its first release on PyPI in December 2024,
+it has been installed about 420 times with pip or uv outside
+continuous-integration environments, according to the public PyPI download
+logs (\texttt{bigquery-public-data.pypi.file\_downloads}); mirrors and other
+automated clients, which account for most of the 10\,122 recorded downloads,
+are excluded. This is a lower bound, since installations from the GitHub
+sources are not recorded. Over the same period, COVID19Py~\cite{covid19py},
+released in 2020, recorded about 1\,600 such installations.
+
+\textbf{Licence and commercial status.} pyvoa is distributed under the MIT
+licence, so that anyone can use, modify and redistribute it freely; it has no
+commercial version and is not exploited commercially.
 
 
 %% ============================================================================
@@ -846,24 +795,20 @@ pas.}
 \section{Conclusions}
 \label{sec:conclusions}
 
-pyvoa gives one Python interface to twenty-three publicly available
-epidemiological databases, most of them openly licensed.
-Sources are described declaratively rather than coded, normalised into a common
-frame, reconciled geographically by a layer that is useful in its own right, and
-served from archived copies with persistent identifiers rather than from
-upstream URLs that no longer resolve. A figure costs two lines; the underlying
-frame is one call away, so the framework is a point of entry rather than a
-boundary.
+pyvoa brings twenty-three epidemiological data resources, from global
+aggregators to national agencies, under one Python interface. Each resource
+is described by a JSON file, normalised into a common table and placed on a
+shared geography, so that series from different providers can be compared
+directly. Resources with a Zenodo mirror remain available after their
+provider stops publishing, and analyses based on them can be run again
+unchanged. 
 
 The pandemic's open data are now a historical record, and an increasingly
-fragile one, while the diseases that followed produce their own. Work ahead
-follows from that: widening the catalogue beyond the mpox, measles and Ebola
-series it already carries, deepening the
-sub-national geolocation layer, and continuing to mirror sources before they
-disappear. Contributions ---
-in particular new database descriptors --- are welcome through the
-repository~\cite{pyvoa_github}, which documents the procedure.
-
+fragile one, while the diseases that followed produce their own. Future work
+follows from this: extending the catalogue to further diseases, refining the
+sub-national geography, and archiving new resources before they disappear.
+Contributions, in particular new resource descriptors, are welcome through
+the repository~\cite{pyvoa_github}, which documents the procedure.
 %% ============================================================================
 %%  DECLARATIONS
 %% ============================================================================
@@ -872,7 +817,7 @@ repository~\cite{pyvoa_github}, which documents the procedure.
 
 \textbf{Tristan Beau:} Conceptualization, Funding acquisition, Project administration, Software, Validation, Writing -- original draft.
 \textbf{Julien Browaeys:} Conceptualization, Funding acquisition, Supervision, Writing -- original draft, Writing -- review \& editing.
-\textbf{Olivier Dadoun:} Conceptualization, Data curation, Software, Validation, Visualization.
+\textbf{Olivier Dadoun:} Conceptualization, Data curation, Software, Validation, Visualization, Writing -- review \& editing.
 
 \section*{Declaration of competing interest}
 
@@ -896,21 +841,13 @@ publication.
 
 \section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
 
-During the preparation of this work the authors used Claude (Anthropic),
-through Claude Code, in order to check the consistency of the manuscript with
+During the preparation of this work the authors used Claude Code (Anthropic) in order to check the consistency of the manuscript with
 the software it describes (database counts, code listings and the output they
 produce, metadata) and to edit parts of the text, and ChatGPT (OpenAI) in order
 to improve the English phrasing. After using these tools, the authors reviewed
 and edited the content as needed and take full responsibility for the content
 of the published article. The use of generative AI in developing the software
 is described in Section~\ref{sec:history}.
-
-\attnpar{Formulation et emplacement conformes à la page Elsevier « Generative AI
-policies for journals » consultée le 8 octobre 2026 : titre « \dots{} in the
-manuscript preparation process » (l'ancien titre disait « writing process »),
-section séparée en fin de manuscrit, juste avant les références ; l'usage de l'IA
-dans le code relève du corps de l'article (§\ref{sec:history}), pas de cette
-déclaration. Revérifier la page au moment de la soumission.}
 
 %% ============================================================================
 %%  REFERENCES
@@ -920,46 +857,41 @@ déclaration. Revérifier la page au moment de la soumission.}
 \renewcommand{\bibfont}{\raggedright}
 \bibliography{references}
 
-\section*{Current executable software version}
+  \section*{Current executable software version}
 
-\begin{table}[!ht]
-\small
-\begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
-\hline
-\textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
-\hline
-S1 & Current software version & v1.0.0 \\
-\hline
-S2 & Permanent link to executables of this version &
-\url{https://pypi.org/project/pyvoa/1.0.0/} \\
-\hline
-S3 & Legal Software License & MIT License \\
-\hline
-S4 & Computing platforms/Operating Systems & Linux, macOS, Microsoft Windows;
-any platform running Python~$\geq$~3.10, including hosted notebook services
-(Google Colaboratory, Binder) \\
-\hline
-S5 & Installation requirements \& dependencies &
-\texttt{pip install pyvoa} (library and plotting backends) \\
-\hline
-S6 & If available, link to user manual &
-\url{https://pyvoa.org} \newline
-	\url{https://pyvoa.github.io/pyvoa/} \newline
-example notebooks: \url{https://github.com/pyvoa/pyvoa/tree/main/examples} \\
-\hline
-S7 & Support email for questions & contact@pyvoa.org \\
-\hline
-\end{tabular}
-\caption{Software metadata.}
-\label{executableMetadata}
-\end{table}
-
-\attnpar{Bibliographie. 23 entrées, toutes citées (SoftwareX refuse les
-références non citées), numérotées dans l'ordre de première citation par
-\texttt{elsarticle-num}. Les treize qui ont un DOI le portent, comme Elsevier le
-souhaite ; les dix autres sont des logiciels ou des pages web, ce qui est admis.
-\texttt{ponce2021}, \texttt{covid\_pypi} et \texttt{covid19py} ont été vérifiés
-le 8 octobre 2026 (Crossref, PyPI, Software Heritage). \textbf{À la soumission} :
-joindre \texttt{references.bib}.}
+  \begin{table}[!ht]
+  \small
+  \begin{tabular}{|l|>{\raggedright\arraybackslash}p{5.0cm}|>{\raggedright\arraybackslash}p{6.7cm}|}
+  \hline
+  \textbf{Nr.} & \textbf{(Executable) software metadata description} & \textbf{Metadata} \\
+  \hline
+  S1 & Current software version & v1.0.0 \\
+  \hline
+  S2 & Permanent link to executables of this version &
+  \url{https://pypi.org/project/pyvoa/1.0.0/} \\
+  \hline
+  S3 & Permanent link to Reproducible Capsule & Not applicable \\
+  \hline
+  S4 & Legal Software License & MIT License \\
+  \hline
+  S5 & Computing platforms/Operating Systems & Linux, macOS, Microsoft Windows;
+  any platform running Python~$\geq$~3.10, including hosted notebook services
+  (Google Colaboratory, Binder) \\
+  \hline
+  S6 & Installation requirements \& dependencies &
+  \texttt{pip install pyvoa} (library and plotting backends) \\
+  \hline
+  S7 & If available, link to user manual - if formally published include a
+  reference to the publication in the reference list &
+  \url{https://pyvoa.org} \newline
+  \url{https://pyvoa.github.io/pyvoa/} \newline
+  example notebooks: \url{https://github.com/pyvoa/pyvoa/tree/main/examples} \\
+  \hline
+  S8 & Support email for questions & contact@pyvoa.org \\
+  \hline
+  \end{tabular}
+  \caption{Software metadata.}
+  \label{executableMetadata}
+  \end{table}
 
 \end{document}
