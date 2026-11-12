@@ -4,6 +4,7 @@
 [![Docs](https://github.com/pyvoa/pyvoa/actions/workflows/docs.yml/badge.svg)](https://pyvoa.github.io/pyvoa/)
 [![PyPI](https://img.shields.io/pypi/v/pyvoa)](https://pypi.org/project/pyvoa/)
 [![Python](https://img.shields.io/pypi/pyversions/pyvoa)](https://pypi.org/project/pyvoa/)
+[![Downloads](https://static.pepy.tech/badge/pyvoa)](https://pepy.tech/projects/pyvoa)
 [![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](https://github.com/pyvoa/pyvoa/actions/workflows/ci.yml)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21829901.svg)](https://doi.org/10.5281/zenodo.21829901)
 [![SWH](https://archive.softwareheritage.org/badge/origin/https://github.com/pyvoa/pyvoa/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/pyvoa/pyvoa)
