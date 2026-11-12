@@ -11,6 +11,12 @@
 %%    - Code must be in a public *GitHub* repository (not GitLab).
 %%  ============================================================================
 
+% The architecture schema is a PDF 1.6 file, and pdfTeX writes PDF 1.5 by
+% default, warning on every build that it embeds a newer version. Writing 1.7
+% matches what any reader opens; the test keeps other engines, where the
+% primitive does not exist, out of it.
+\ifdefined\pdfminorversion\pdfminorversion=7\fi
+
 \documentclass[preprint,12pt,a4paper]{elsarticle}
 
 \usepackage[utf8]{inputenc}
@@ -762,7 +768,7 @@ and to researchers from other disciplines. It was presented in Paris, under its 
 
 % https://2022.salon-math.fr/listes-des-exposants/
 
-% https://2023.salon-math.fr/listes-des-exposants/
+% https://2023.salon-math.fr/nos-exposants/
 
 % https://www.sorbonne-universite.fr/fete-de-la-science-2021
 
@@ -872,7 +878,7 @@ is described in Section~\ref{sec:history}.
   \hline
   S3 & Legal Software License & MIT License \\
   \hline
-  S4 & Computing platforms/Operating Systems & Linux, macOS, Microsoft Windows;
+  S4 & Computing platforms/Operating Systems & Linux, macOS, Windows;
   any platform running Python~$\geq$~3.10, including hosted notebook services
   (Google Colaboratory, Binder) \\
   \hline

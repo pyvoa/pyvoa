@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+The library is unchanged since 1.0.0.
+
+- examples: the frame printed after Fig. 4, in `paper_examples.py` and
+  `PaperExamples.ipynb`, is read with the keywords of the histogram, without
+  `what='daily'`: its column is `cur_hosp normalize:pop1M`, as in the paper.
+- metadata: `CITATION.cff` gives the Software Heritage identifier of 1.0.0, not
+  0.5.0's; `AUTHORS` adds Validation and Writing – review & editing to Olivier
+  Dadoun's roles.
+- README: a badge for the PyPI downloads.
+
 ## 1.0.0 — 2026-11-05
 Three months and 489 commits since 0.5.0 (2026-08-06 to 2026-11-05), in short:
 
