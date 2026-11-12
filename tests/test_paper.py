@@ -256,6 +256,30 @@ def test_authors_match_the_citation_file(body: str) -> None:
     assert not missing, f"CITATION.cff lists authors absent from the paper: {missing}"
 
 
+def _credit_roles(text: str) -> set[str]:
+    """Return the CRediT roles of a comma-separated list, spelt one way."""
+    text = text.replace("--", "–").replace(r"\&", "&")
+    return {r.strip() for r in re.sub(r"\s+", " ", text).rstrip(". ").split(",")}
+
+
+def test_credit_roles_match_the_authors_file(body: str) -> None:
+    """Check that each author has the same CRediT roles in AUTHORS and the paper."""
+    authors = (ROOT / "AUTHORS").read_text(encoding="utf-8")
+    in_file = {
+        m.group(1).split()[-1]: _credit_roles(m.group(2))
+        for m in re.finditer(
+            r"^(\S.*?) <[^>]+>\n(?:    .*\n)*?    CRediT: (.*(?:\n {12}.*)*)",
+            authors, re.MULTILINE)
+    }
+    statement = body.split(r"\section*{CRediT authorship contribution statement}")[1]
+    statement = statement.split(r"\section*")[0]
+    in_paper = {
+        m.group(1).split()[-1]: _credit_roles(m.group(2))
+        for m in re.finditer(r"\\textbf\{([^:}]+):\}\s*([^\n]+)", statement)
+    }
+    assert in_file and in_file == in_paper
+
+
 def test_title_agrees_with_the_preferred_citation(body: str) -> None:
     """Check the manuscript title against the preferred citation.
 

@@ -13,6 +13,7 @@
 #
 # Order: alphabetical by family name. It implies no hierarchy.
 # Roles: CRediT taxonomy (ANSI/NISO Z39.104-2022), https://credit.niso.org/
+#        the same as in the CRediT statement of the paper (paper/main.tex)
 # Additions or changes: by pull request, see CONTRIBUTING.md
 # Contact: contact@pyvoa.org
 
@@ -21,17 +22,20 @@
 Tristan Beau <tristan.beau@u-pariscite.fr>
     Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France
     ORCID: 0000-0002-2022-2140
-    CRediT: Conceptualization, Software, Methodology, Project administration
+    CRediT: Conceptualization, Funding acquisition, Methodology,
+            Project administration, Software, Validation,
+            Writing – original draft
 
 Julien Browaeys <julien.browaeys@u-pariscite.fr>
     Université Paris Cité, CNRS, Matière et systèmes complexes, F-75013 Paris, France
     ORCID: 0000-0003-4405-9875
-    CRediT: Conceptualization, Software, Validation, Supervision
+    CRediT: Conceptualization, Funding acquisition, Software, Supervision,
+            Validation, Writing – original draft, Writing – review & editing
 
 Olivier Dadoun <dadoun@in2p3.fr>
     Université Paris Cité and Sorbonne Université, CNRS, LPNHE, F-75005 Paris, France
     ORCID: 0000-0002-2169-9725
-    CRediT: Conceptualization, Software, Data curation, Validation,
+    CRediT: Conceptualization, Data curation, Software, Validation,
             Visualization, Writing – review & editing
 
 ## History

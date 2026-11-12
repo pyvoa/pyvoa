@@ -8,8 +8,8 @@ The library is unchanged since 1.0.0.
   `PaperExamples.ipynb`, is read with the keywords of the histogram, without
   `what='daily'`: its column is `cur_hosp normalize:pop1M`, as in the paper.
 - metadata: `CITATION.cff` gives the Software Heritage identifier of 1.0.0, not
-  0.5.0's; `AUTHORS` adds Validation and Writing – review & editing to Olivier
-  Dadoun's roles.
+  0.5.0's; each author has the same CRediT roles in `AUTHORS` and in the
+  paper, which `tests/test_paper.py` now checks.
 - README: a badge for the PyPI downloads.
 
 ## 1.0.0 — 2026-11-05
