@@ -156,11 +156,11 @@ def example_3(pf, vis: str) -> None:
     banner(3, "the frame behind Fig. 4 (same listing, printed)", """
         pf.setwhom('spf')    # Sante Publique France db
         pdf = pf.get(which='cur_hosp', when='31/12/2021',
-                     option='normalize:pop1M', what='daily')
+                     option='normalize:pop1M')
     """)
     pf.setwhom('spf')
     pdf = pf.get(which='cur_hosp', when='31/12/2021',
-                 option='normalize:pop1M', what='daily')
+                 option='normalize:pop1M')
 
     # get() advertises output='pandas' by default, but a database whose
     # geography pyvoa knows comes back with its geometry attached, hence a
@@ -168,7 +168,7 @@ def example_3(pf, vis: str) -> None:
     #
     # One indicator column, not three: get() keeps only what was asked for, and
     # 'what' and 'option' compose its name, so the frame carries
-    # 'cur_hosp daily normalize:pop1M' and neither the count it was derived
+    # 'cur_hosp normalize:pop1M' and neither the count it was derived
     # from nor the other twenty indicators of the database.
     #
     # The option context is what makes the printed frame the frame the paper
