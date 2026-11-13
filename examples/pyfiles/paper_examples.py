@@ -44,6 +44,8 @@ import textwrap
 import traceback
 from pathlib import Path
 
+import matplotlib
+
 
 def _default_figdir() -> Path:
     """Where the manuscript looks for its artwork.
@@ -60,6 +62,12 @@ def _default_figdir() -> Path:
 
 
 FIGDIR = _default_figdir()
+
+# The figures are vector PDFs, but what matplotlib cannot draw as vectors —
+# the basemap tiles of Fig. 3, a colour bar — is embedded as an image at the
+# savefig resolution, 100 dpi by default. Elsevier asks for at least 300 dpi
+# for such halftone artwork, so every figure is saved at 300.
+matplotlib.rcParams['savefig.dpi'] = 300
 
 # Nothing is factored out into a constant. Each listing spells its arguments
 # out literally, so that the .tex and this file can be diffed line by line; a
