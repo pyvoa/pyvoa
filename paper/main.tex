@@ -93,6 +93,7 @@
 \lstdefinestyle{pyout}{
   basicstyle=\ttfamily\scriptsize,
   columns=fixed,          % keeps the pandas columns aligned
+  basewidth=0.525em,      % cmtt's own advance: the default 0.6em spaces every letter out
   keepspaces=true,
   showstringspaces=false,
   breaklines=false,       % a table is NEVER broken across lines
@@ -652,7 +653,8 @@ pdf = pf.get(which='cur_hosp', when='31/12/2021',
 value, and five columns: the date, the location, its code, the requested
 indicator, and the geometry. The name of the indicator column records the
 transformation applied, \texttt{cur\_hosp normalize:pop1M}; the code and the
-geometry make the frame ready for mapping or for a spatial join:
+geometry make the frame ready for mapping or for a spatial join. Without the
+date, the same on every row here, and the geometry, the frame begins:
 
 \begin{lstlisting}[style=pyout]
 >>> type(pdf)
@@ -661,24 +663,12 @@ geometry make the frame ready for mapping or for a spatial join:
 >>> pdf.shape
 (102, 5)
 
->>> pdf.head(4)
-        date                  where code  \
-0 2021-12-31       Bouches-Du-Rhône   13
-1 2021-12-31           Corse-Du-Sud   2A
-2 2021-12-31  Territoire De Belfort   90
-3 2021-12-31               Vaucluse   84
-
-   cur_hosp normalize:pop1M  \
-0                604.613645
-1                595.490741
-2                585.116882
-3                519.835010
-
-                                            geometry
-0  POLYGON ((470905.18323 5382327.2226, 477130.57...
-1  POLYGON ((954375.99062 5218303.80578, 954292.9...
-2  POLYGON ((759600.52216 6075847.9608, 758232.12...
-3  MULTIPOLYGON (((544949.0389 5517924.90438, 543...
+>>> pdf.drop(columns=['date', 'geometry']).round(1).head(4)
+                   where code  cur_hosp normalize:pop1M
+0       Bouches-Du-Rhône   13                     604.6
+1           Corse-Du-Sud   2A                     595.5
+2  Territoire De Belfort   90                     585.1
+3               Vaucluse   84                     519.8
 \end{lstlisting}
 
 \subsection{Beyond COVID-19}

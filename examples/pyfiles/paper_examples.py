@@ -171,12 +171,18 @@ def example_3(pf, vis: str) -> None:
     # 'cur_hosp normalize:pop1M' and neither the count it was derived
     # from nor the other twenty indicators of the database.
     #
+    # The manuscript prints the head of the frame without its date, the same
+    # on every row of a single-date get(), and without its geometry, whose
+    # truncated projected coordinates tell a reader nothing; the values are
+    # rounded to one decimal. What is left is 56 characters wide, one block
+    # that fits a column of Elsevier's two-column layout, where the whole
+    # frame wrapped into three blocks joined by backslashes.
+    #
     # The option context is what makes the printed frame the frame the paper
-    # shows: pandas sizes its repr on the terminal, and elides every column
-    # between 'date' and 'geometry' when it cannot measure one, which is the
-    # case as soon as the output is redirected to a file. 60 characters, not a
-    # terminal's 80: the frame then wraps into three blocks of at most 54
-    # characters, which fit a column of Elsevier's two-column layout.
+    # shows: pandas sizes its repr on the terminal, and elides columns when it
+    # cannot measure one, which is the case as soon as the output is
+    # redirected to a file. At 60 characters, not a terminal's 80, a frame
+    # that grew too wide for a column would wrap rather than overflow.
     import pandas as pd
 
     print("    >>> type(pdf)")
@@ -190,9 +196,10 @@ def example_3(pf, vis: str) -> None:
     print("    >>> pf.listoutput()")
     print(f"    {pf.listoutput()}")
     print()
-    print("    >>> pdf.head(4)")
+    print("    >>> pdf.drop(columns=['date', 'geometry']).round(1).head(4)")
+    head = pdf.drop(columns=['date', 'geometry']).round(1).head(4)
     with pd.option_context('display.width', 60, 'display.max_columns', None):
-        print(textwrap.indent(repr(pdf.head(4)), "    "))
+        print(textwrap.indent(repr(head), "    "))
 
 
 # ---------------------------------------------------------------------------
