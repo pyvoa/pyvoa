@@ -239,10 +239,12 @@ committing, unless the output is the point of the example.
    publishing. No GitHub-Zenodo hook is installed: the deposit is made by hand.
 3. Update `version`, `date-released` and the version DOI in `CITATION.cff`,
    `version` and `datePublished` in `codemeta.json` and `schemaorg.jsonld`,
-   and the archived release in row C2 of `paper/main.tex`; check `CITATION.cff`
-   with `pipx run cffconvert --validate`. Run it through `pipx` (or `uvx`):
-   cffconvert requires `jsonschema<4` and will downgrade it in a shared
-   environment. Commit, push, and wait for CI to pass.
+   the archived release in row C2 of `paper/main.tex`, and the version in the
+   title and the version DOI — not the concept DOI, which follows the latest
+   release — of the `pyvoa_github` entry of `paper/references.bib`; check
+   `CITATION.cff` with `pipx run cffconvert --validate`. Run it through
+   `pipx` (or `uvx`): cffconvert requires `jsonschema<4` and will downgrade it
+   in a shared environment. Commit, push, and wait for CI to pass.
 4. Build the sdist and the wheel from that commit (`python -m build`), check
    them with `twine check`, and make sure the wheel holds `pyvoa/js/` and
    `pyvoa/data/`.
@@ -258,3 +260,17 @@ committing, unless the output is the point of the example.
    read the `swh:1:rel:` of the new tag from the latest visit's snapshot, and
    put it in `CITATION.cff`, in row C2 of `paper/main.tex` and in the
    `pyvoa_github` entry of `paper/references.bib`.
+9. Whenever a new version of the code or of the paper is submitted, check
+   the archives themselves, not only the files that cite them:
+   - the version DOI resolves to a *published* Zenodo record of this version,
+     and the concept DOI `10.5281/zenodo.21829901` now resolves to it;
+   - the two files of that record are byte for byte those of PyPI (same size,
+     same md5: `https://zenodo.org/api/records/<id>` and
+     `https://pypi.org/pypi/pyvoa/X.Y.Z/json`);
+   - the `swh:1:rel:` identifier exists
+     (`https://archive.softwareheritage.org/api/1/release/<hash>/`), is named
+     `vX.Y.Z`, and is the annotated tag itself — `git rev-parse vX.Y.Z` prints
+     the same hash, its target being `git rev-parse vX.Y.Z^{}`;
+   - every file carries the same identifiers: rows C1, C2, S1 and S2 of
+     `paper/main.tex`, the `pyvoa_github` entry of `paper/references.bib`,
+     `CITATION.cff`, `codemeta.json`, `schemaorg.jsonld`, `README.md`.

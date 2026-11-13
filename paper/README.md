@@ -39,6 +39,12 @@ The second reason is ordinary: the manuscript then has the same history, the
 same review path and the same tags as the software it describes. `v1.0.0` and
 the text that describes `v1.0.0` are one commit away from each other.
 
+What `tests/test_paper.py` cannot check is the archives: that the Zenodo
+record of the version and its Software Heritage identifier exist and hold
+that version. Check them by hand before every submission of a new version of
+the code or of the paper, as listed in step 9 of the release checklist,
+`CONTRIBUTING.md` §9.
+
 ## Building
 
     make draft     # with the editorial annotations, in red
